@@ -1,189 +1,324 @@
 // This file contains the complete question data structure (allQuizData)
-// for a Multiple-Select Quiz on Basic Combinatorics.
-// Note: Mathematical expressions use MathJax syntax delimited by \( and \).
-// Formatting uses only standard HTML tags (like <br> and <b>) within the string content.
-
-const quizTitle = "4001CMD Quiz Week 5: Basic Combinatorics";
-
+//  Quiz Data for the Information Security Life Cycle (25 Questions)
+// Quiz Data for the Information Security Life Cycle (25 Questions)
+const quizTitle = "Advanced Security Life Cycle (SLC) Quiz: Variable Multiple-Select (25 Questions)";
 const allQuizData = [
+    // ------------------------------------------------------------------
+    // 1. Life Cycle Structure
+    // ------------------------------------------------------------------
     {
         id: 1,
-        question: 'Which scenarios are best modeled using the <b>Product Rule (Multiplication Principle)</b> for counting?<sup>1</sup>',
+        question: 'The Information Security Life Cycle (SLC) described in the lecture is a six-step process. Which phases directly follow a step involving either "Analysis" or "Design"?',
         options: [
-            'Determining the number of ways to select a shirt OR a pair of pants from 10 shirts and 5 pairs of pants.',
-            'Determining the number of 4-digit PINs where each digit can be any number from 0 to 9.',
-            'Counting the number of different outcomes when flipping a coin followed by rolling a six-sided die.',
-            'Calculating the total number of students in a class that are either enrolled in Mathematics (M) or Computer Science (C), where \\(|M \\cap C| \\neq 0|\\).'
+            'Security Planning',
+            'Security Implementation',
+            'Security Review',
+            'Continual Security'
         ],
-        correct: [1, 2],
-        explanation: 'Rationale: The Product Rule applies when counting the number of ways to perform a sequence of independent tasks.<br><b>A:</b> Incorrect. This is the Sum Rule (mutually exclusive choices).<br><b>B:</b> Correct. This is 10 choices (Task 1) AND 10 choices (Task 2) AND 10 choices (Task 3) AND 10 choices (Task 4): \\(10^4\\).<br><b>C:</b> Correct. This is 2 choices (Task 1) AND 6 choices (Task 2): \\(2 \\times 6\\).<br><b>D:</b> Incorrect. This requires the Inclusion-Exclusion Principle.'
+        correct: [1, 2], // 2 correct
+        explanation: 'Rationale: Security Implementation (B) follows Design, and Security Review (C) follows Implementation (which follows Design). Planning (A) is first, and Continual Security (D) is last.'
     },
     {
         id: 2,
-        question: 'A traveler can choose to fly via one of 3 airlines (A, B, C) or take a bus from one of 5 coach companies (P, Q, R, S, T). Which statements apply the <b>Sum Rule (Addition Principle)</b> correctly?<sup>2</sup>',
+        question: 'What is the most fundamental goal of the entire Information Security Life Cycle (SLC)?',
         options: [
-            'The total number of travel options is \\(3 \\times 5 = 15\\).',
-            'The total number of travel options is \\(3 + 5 = 8\\).',
-            'The Sum Rule is applicable because choosing an airline and choosing a bus are mutually exclusive events.',
-            'The Principle of Inclusion-Exclusion must be used because both sets of options are available to the traveler.'
+            'To ensure the highest level of encryption for all data.',
+            'To achieve Confidentiality, Integrity, and Availability (CIA) for an information asset.',
+            'To reduce the total cost of security ownership over time.',
+            'To implement Non-Repudiation for all user transactions.'
         ],
-        correct: [1, 2],
-        explanation: 'Rationale: The Sum Rule applies when the tasks are mutually exclusive. The traveler chooses one OR the other.<br><b>A:</b> Incorrect. This would be the Product Rule, used if the traveler had to fly AND take a bus.<br><b>B:</b> Correct. Total options are \\(3 + 5 = 8\\).<br><b>C:</b> Correct. Since a traveler cannot simultaneously fly and take a bus for the same trip, the sets of options are disjoint.<br><b>D:</b> Incorrect. Since the sets are mutually exclusive, the size of the union is simply the sum of the sizes of the sets.'
+        correct: [1], // 1 correct
+        explanation: 'Rationale: The lecture states the security life cycle describes all the steps necessary to achieve **Confidentiality, Integrity, and Availability (CIA)** for a given information asset. This is the overarching goal.'
     },
     {
         id: 3,
-        question: 'Let \\(A\\) be the set of positive integers less than or equal to 100 that are divisible by 2, and \\(B\\) be the set of positive integers less than or equal to 100 that are divisible by 5. Which statements correctly apply the <b>Principle of Inclusion-Exclusion (PIE) (Sieve Principle)</b>?<sup>3</sup>',
+        question: 'Which of the following phases of the SLC are categorized as governance and management activities that occur at the *beginning* of the process?',
         options: [
-            '\\(|A| = 50\\) and \\(|B| = 20\\).',
-            'The numbers divisible by both 2 and 5 are divisible by 10, so \\(|A \\cap B| = 5\\).',
-            'The total number of integers in the union \\(A \\cup B\\) is \\(50 + 20 - 10 = 60\\).',
-            'PIE is only necessary for problems with three or more sets.'
+            'Security Planning',
+            'Security Analysis',
+            'Security Design',
+            'Security Review'
         ],
-        correct: [0, 2],
-        explanation: 'Rationale: PIE for two sets is \\(|A \\cup B| = |A| + |B| - |A \\cap B|\\).<br><b>A:</b> Correct. \\(|A| = \\lfloor 100/2 \\rfloor = 50\\); \\(|B| = \\lfloor 100/5 \\rfloor = 20\\).<br><b>B:</b> Incorrect. Numbers divisible by 10 are \\(\\lfloor 100/10 \\rfloor = 10\\). So \\(|A \\cap B| = 10\\).<br><b>C:</b> Correct. \\(50 + 20 - 10 = 10 = 60\\).<br><b>D:</b> Incorrect. PIE is required whenever the sets are not mutually exclusive, even for two sets.'
+        correct: [0, 1], // 2 correct
+        explanation: 'Rationale: **Security Planning** (A) and **Security Analysis** (B) define the scope, policy, and requirements before any physical design or implementation takes place.'
     },
     {
         id: 4,
-        question: 'Which of the following scenarios are classified as <b>Permutations</b>?<sup>4</sup>',
+        question: 'The **Continual Security** process requires that the system be monitored to identify which specific changes that necessitate corrective actions?',
         options: [
-            'Selecting a starting lineup of 5 players from a team of 12, where position (e.g., Forward, Guard) matters.',
-            'Counting the number of unique 5-letter codes that can be formed from the letters A, B, C, D, E without repetition.',
-            'Choosing 3 flavors of ice cream from a list of 10 available flavors for a triple-scoop cone where the order of the scoops does not matter.',
-            'Determining the number of ways to arrange the letters in the word "BOOKKEEPER".'
+            'Changes in the physical location of the asset.',
+            'Changes in the asset\'s security risks.',
+            'Changes in the cost of IT hardware.',
+            'Changes in the threat environment.'
         ],
-        correct: [0, 1],
-        explanation: 'Rationale: Permutations are about arrangements (order matters).<br><b>A:</b> Correct. Selecting and assigning positions means order matters (P1 at Guard is different from P1 at Forward). This is \\(P(12, 5)\\).<br><b>B:</b> Correct. Since the resulting code (arrangement) is different if the order changes (ABCDE is different from EABCD), order matters. This is \\(P(5, 5) = 5!\\).<br><b>C:</b> Incorrect. Choosing a subset where order does not matter is a Combination.<br><b>D:</b> Incorrect. This is a Permutation with Repetition, a specialized formula for arrangements of non-distinct items.'
+        correct: [1, 3], // 2 correct
+        explanation: 'Rationale: Continual Security monitors for changes in the **threat environment** (D) and changes in the asset\'s **security risks** (B). Corrective actions are taken to restore the asset\'s accepted security state.'
     },
+    // ------------------------------------------------------------------
+    // 2. Planning and Analysis (Identify)
+    // ------------------------------------------------------------------
     {
         id: 5,
-        question: 'A lock combination uses 4 distinct digits (0-9). How is the number of possible combinations calculated, and what does it represent?<sup>5</sup>',
+        question: 'Which steps are necessary for **Security Planning** (the first phase) and serve to define the project\'s direction and constraints?',
         options: [
-            'The problem is a Combination problem, since the term "combination" is used by the lock manufacturer.',
-            'The calculation is a Permutation, given by \\(P(10, 4) = 10! / (10-4)!\\).',
-            'The number represents the count of ordered arrangements of 4 distinct items chosen from 10.',
-            'The calculation is a Combination, given by \\(\\binom{10}{4} = 10! / (4! (10-4)!)\\).'
+            'Asset definition',
+            'Security policy',
+            'Security scope',
+            'Security countermeasures'
         ],
-        correct: [1, 2],
-        explanation: 'Rationale: Despite the misleading common term "lock combination," locks requires an ordered sequence (e.g., 1-2-3-4 is different from 4-3-2-1), making it a Permutation.<br><b>A:</b> Incorrect. The mathematical term "combination" means order does not matter.<br><b>B:</b> Correct. It is a permutation of 4 items chosen from 10: \\(P(10, 4)\\).<br><b>C:</b> Correct. A permutation is an ordered arrangement.<br><b>D:</b> Incorrect. This formula is for an unordered selection (combination).'
+        correct: [0, 1, 2], // 3 correct
+        explanation: 'Rationale: Planning involves **Asset definition**, defining the **Security policy**, defining Security objectives, and defining the **Security scope**. Security countermeasures (D) are defined in the Design phase.'
     },
     {
         id: 6,
-        question: 'Which of the following expressions correctly represent the number of ways to form a 3-letter sequence using the English alphabet (26 letters) <b>with repetition allowed</b>?<sup>6</sup>',
+        question: 'The two approaches used in the initial **identification of information assets** for a security project are:',
         options: [
-            '\\(P(26, 3)\\)',
-            '\\(26 \\times 25 \\times 24\\)',
-            '\\(26^3\\)',
-            'The product of the number of choices for each of the three positions.'
+            'Top-down approach',
+            'Problem-based approach',
+            'Objective-based approach',
+            'Reactive-based approach'
         ],
-        correct: [2, 3],
-        explanation: 'Rationale: When repetition is allowed, the number of choices for each position is independent and constant, making this a simple application of the Product Rule.<br><b>A:</b> Incorrect. \\(P(26, 3)\\) is for *without* repetition.<br><b>B:</b> Incorrect. This is the expanded form of \\(P(26, 3)\\), which is for *without* repetition.<br><b>C:</b> Correct. 26 choices for the 1st letter, 26 for the 2nd, and 26 for the 3rd.<br><b>D:</b> Correct. The Product Rule states that if there are \\(n_1\\) ways to do the first task and \\(n_2\\) ways to do the second, there are \\(n_1 n_2\\) ways to do both (which equals \\(26 \\times 26 \\times 26\\)).'
+        correct: [1, 2], // 2 correct
+        explanation: 'Rationale: The two approaches for asset identification are the **Problem-based approach** (B) and the **Objective-based approach** (C). Top-down (A) is a generic management style, and Reactive-based (D) is not a defined approach in the lecture.'
     },
     {
         id: 7,
-        question: 'You need to select a committee of 5 people from a group of 15 eligible candidates. Which formulas represent the number of ways to do this?<sup>7</sup>',
+        question: 'The purpose of a **limited Preliminary Impact Analysis** within the Planning phase is to:',
         options: [
-            '\\(\\binom{15}{5}\\)',
-            '\\(P(15, 5)\\)',
-            '\\(\\frac{15!}{5! \\times 10!}\\)',
-            '\\(15 \\times 14 \\times 13 \\times 12 \\times 11\\)'
+            'Determine the exact monetary loss of a security breach.',
+            'Indicate the level of impact the asset has on the organization\'s business mission.',
+            'Guide the final definition of the security scope.',
+            'Identify all technical vulnerabilities.'
         ],
-        correct: [0, 2],
-        explanation: 'Rationale: Selecting a committee means the order of selection does not matter; hence, it is a Combination problem.\\(C(n, k) = \\binom{n}{k} = \\frac{n!}{k! (n-k)!}\\).<br><b>A:</b> Correct. Standard Binomial Coefficient notation for combinations.<br><b>B:</b> Incorrect. This is the formula for Permutations (order matters).<br><b>C:</b> Correct. This is the expanded definition of \\(\\binom{15}{5}\\), where \\(n=15\\) and \\(k=5\\).<br><b>D:</b> Incorrect. This is the expanded form of \\(P(15, 5)\\).'
+        correct: [1, 2], // 2 correct
+        explanation: 'Rationale: The Preliminary Impact Analysis **indicates the level of impact** (B) the asset has on the mission, which is then used to **guide the definition of the security scope** (C) and constraints.'
     },
     {
         id: 8,
-        question: 'The number of distinct arrangements (permutations) of the letters in the word <b>"MISSISSIPPI"</b> is calculated using which method and notation?<sup>8</sup>',
+        question: 'The **Security Analysis** phase is where the asset\'s security is studied to define its security requirements. This study acquires information on which of the following areas?',
         options: [
-            'Simple Permutation, \\(P(11, 11) = 11!\\), because there are 11 letters in total.',
-            'Permutation with Repetition, due to repeated letters (M, I, S, P).',
-            'The formula \\(\\frac{11!}{1! 4! 4! 2!}\\), where 11 is the total length.',
-            'Combination, because the letters are grouped together in the final word.'
+            'Current threats',
+            'Current security controls',
+            'Asset vulnerabilities and their exposure',
+            'Detailed design of new security mechanisms'
         ],
-        correct: [1, 2],
-        explanation: 'Rationale: This is an arrangement of a set of objects where some are indistinguishable, requiring the specific Permutation with Repetition formula: \\(\\frac{n!}{n_1! n_2! ... n_k!}\\).<br>Word breakdown: M (1), I (4), S (4), P (2). Total \\(n=11\\).<br><b>A:</b> Incorrect. This assumes all letters are distinct.<br><b>B:</b> Correct. The letters I, S, and P are repeated.<br><b>C:</b> Correct. \\(\\frac{11!}{1! \\times 4! \\times 4! \\times 2!}\\) is the correct application of the formula.'
+        correct: [0, 1, 2], // 3 correct
+        explanation: 'Rationale: Analysis acquires information on **current threats**, **current security controls**, and **asset vulnerabilities and their exposure**. The detailed design of new mechanisms (D) is the output of the next phase (Design).'
     },
+    // ------------------------------------------------------------------
+    // 3. Design and Implementation (Protect)
+    // ------------------------------------------------------------------
     {
         id: 9,
-        question: 'Which scenarios are examples of <b>Combinations with Repetition</b> (using the Stars and Bars technique)?<br><i>(Stars and Bars counts the number of ways to distribute \\(n\\) identical items into \\(k\\) distinct bins, or non-negative integer solutions to the equation: \\(x_1 + \\cdots + x_k = n\\).)</i><sup>9</sup>',
+        question: 'The **Security Design** phase requires a detailed risk assessment to establish which of the following?',
         options: [
-            'Selecting 4 items from 7 available items where the order of selection is irrelevant.',
-            'Determining the number of ways to distribute 10 identical cookies among 3 distinct children.',
-            'Choosing a selection of 5 doughnuts from a shop that offers 12 different types, where the order you pick them up does not matter.',
-            'Counting the number of non-negative integer solutions to the equation \\(x_1 + x_2 + x_3 = 8\\).'
+            'The security mechanisms (e.g., encryption, access control).',
+            'The asset\'s security policy.',
+            'A feasible risk-driven security program.',
+            'The security architecture blueprint.'
         ],
-        correct: [1, 3],
-        explanation: 'Rationale: Combinations with Repetition (Stars and Bars) involves choosing items from a set where repetition is allowed AND order does not matter. This is equivalent to distributing identical objects (stars) into distinct bins (variables/children/flavors). The formula is \\(\\binom{n+k-1}{k}\\) or \\(\\binom{n+k-1}{n-1}\\).<br><b>A:</b> Incorrect. This is a simple Combination without repetition, \\(\\binom{7}{4}\\).<br><b>B:</b> Correct. Identical cookies (stars) into distinct children (bins/variables). \\(n=10, k=3\\).<br><b>C:</b> Incorrect. While repetition is allowed and order doesn\'t matter, this is a direct application of \\(\\binom{n+k-1}{k}\\) with \\(n=12\\) flavors and \\(k=5\\) selections. However, the cookie distribution is the standard textbook example of this principle.<br><b>D:</b> Correct. This is the direct definition of Stars and Bars: finding non-negative integer solutions, where 8 is the number of stars (cookies) and 3 is the number of variables (children/bins).'
+        correct: [0, 2, 3], // 3 correct
+        explanation: 'Rationale: The Design phase defines the **security mechanisms**, establishes the **risk-driven security program**, and creates the **security architecture blueprint**. The Security Policy (B) is defined in the Planning phase.'
     },
     {
         id: 10,
-        question: 'Given an integer \\(n \\geq 1\\), which statements about the factorial notation \\(n!\\) are true?<sup>10</sup>',
+        question: 'The **Security Implementation** phase involves translating the design into a working program. Key activities in this phase include:',
         options: [
-            '\\(n!\\) represents the number of ways to arrange \\(n\\) distinct objects in a line.',
-            '\\(0! = 0\\), by definition.',
-            '\\(n! = n \\cdot (n-1)!\\) for \\(n \\geq 1\\).',
-            '\\(n!\\) grows faster than any exponential function \\(a^n\\).'
+            'Developing final operational and backup procedures.',
+            'Acquiring and installing new hardware and software.',
+            'Defining the security objectives.',
+            'Testing the implementation of the security mechanisms.'
         ],
-        correct: [0, 2],
-        explanation: 'Rationale: Factorial is the product of all positive integers less than or equal to \\(n\\).<br><b>A:</b> Correct. This is the combinatorial definition of the factorial.<br><b>B:</b> Incorrect. By definition, \\(0! = 1\\).<br><b>C:</b> Correct. This is the recursive definition of the factorial.<br><b>D:</b> Incorrect. The growth rate of \\(n!\\) is not a standard part of basic combinatorics but it is true that \\(n!\\) grows faster than any polynomial function, but *not* necessarily faster than all exponential functions (Stirling\'s approximation shows its growth is close to \\(\\left(\\frac{n}{e}\\right)^n \\sqrt{2\\pi n}\\)). The standard facts relate to definitions and arrangements.'
+        correct: [0, 1, 3], // 3 correct
+        explanation: 'Rationale: Implementation activities are practical and involve **developing procedures**, **acquiring/installing components**, and **testing the implemented mechanisms**. Defining objectives (C) is a Planning activity.'
     },
     {
         id: 11,
-        question: 'Which of the following must be true concerning the <b>Pigeonhole Principle (PHP)</b>?<sup>11</sup>',
+        question: 'Which of the following principles from Saltzer and Schroeder are specifically aimed at **simplifying** the security system to minimize flaws and ease review?',
         options: [
-            'If \\(N\\) objects (pigeons) are placed into \\(M\\) containers (pigeonholes) and \\(N > M\\), then at least two objects must share a container.',
-            'The PHP only works if the objects are indistinguishable (e.g., identical balls).',
-            'If 13 people are in a room, the PHP guarantees that at least two people share the same birth month.',
-            'If \\(N\\) objects are placed into \\(M\\) containers, and \\(N < M\\), then no container can be empty.'
+            'Fail-safe Defaults',
+            'Open Design',
+            'Economy of Mechanism',
+            'Psychological Acceptability'
         ],
-        correct: [0, 2],
-        explanation: 'Rationale: The PHP is a guarantee on the distribution of objects when the number of objects exceeds the number of places to put them.<br><b>A:</b> Correct. This is the formal statement of the basic PHP.<br><b>B:</b> Incorrect. The principle works regardless of whether the objects are distinguishable or not; it only concerns the count of objects.<br><b>C:</b> Correct. The objects (pigeons) are the 13 people, and the containers (pigeonholes) are the 12 months. Since \\(13 > 12\\), at least one month must contain two or more people.<br><b>D:</b> Incorrect. If \\(N < M\\), it is possible for many containers to be empty.'
+        correct: [2], // 1 correct
+        explanation: 'Rationale: **Economy of Mechanism** (C) is the principle that explicitly advocates for keeping the design as simple and small as possible to minimize flaws and simplify analysis.'
     },
     {
         id: 12,
-        question: 'Use the <b>Generalized Pigeonhole Principle (GPHP)</b>.<br><small>The GPHP states that if \\(N\\) objects are distributed into \\(M\\) containers, at least one container must contain \\(\\lceil N/M \\rceil\\) or more objects.</small><br>If 25 letters are distributed into 6 mailboxes, which statements are guaranteed to be true?<sup>12</sup>',
+        question: 'The principle of **Complete Mediation** mandates that **all** accesses to objects be checked for authority. This requires checking at which points?',
         options: [
-            'At least one mailbox must contain \\(\\lfloor 25/6 \\rfloor = 4\\) letters.',
-            'The number of mailboxes with exactly 3 letters is 5, and the 6th mailbox has 10 letters.',
-            'At least one mailbox must contain \\(\\lceil 25/6 \\rceil = 5\\) or more letters.',
-            'The distribution of letters could be 4, 4, 4, 4, 4, 5.'
+            'Only on initial resource request.',
+            'During every access attempt.',
+            'During initialization and shutdown.',
+            'Whenever a password is changed.'
         ],
-        correct: [2, 3],
-        explanation: 'Rationale: The GPHP guarantees that at least one hole contains \\(\\lceil N/M \\rceil\\) objects. Here, \\(N=25\\) (pigeons) and \\(M=6\\) (pigeonholes).<br><b>A:</b> Incorrect. \\(4\\) is the floor, which is a possible minimum, but not the guarantee.<br><b>B:</b> Incorrect. This specific distribution is possible, but the GPHP is a minimum guarantee, not a statement on all possible distributions.<br><b>C:</b> Correct. \\(\\lceil 25/6 \\rceil = \\lceil 4.16... \\rceil = 5\\). This is the minimum guaranteed count.<br><b>D:</b> Correct. This is a possible distribution that meets the GPHP guarantee (since the last box has 5 letters).'
+        correct: [1, 2], // 2 correct
+        explanation: 'Rationale: Complete Mediation requires checking for authority **during every access attempt** (B) and throughout the system lifecycle, including **initialization and shutdown** (A). Checking only on initial request (C) creates a bypass vulnerability.'
     },
     {
         id: 13,
-        question: 'In a problem that requires selecting a subset of items, how can one determine whether to use Permutations (order matters) or Combinations (order does not matter)?<sup>13</sup>',
+        question: 'The design principle of **Fail-Safe Defaults** is permission-based. This implies the default security posture is:',
         options: [
-            'If the items are being placed into distinct positions (e.g., President, Vice President), use Permutations.',
-            'If the question asks for a "selection," "group," or "subset," use Combinations.',
-            'If the question involves a "lineup," "arrangement," or "sequence," use Combinations.',
-            'If the items being selected are identical, the process is always a Permutation with Repetition.'
+            'Allow access to all authenticated users.',
+            'Denial of access.',
+            'Explicitly based on exclusion.',
+            'Lack of access.'
         ],
-        correct: [0, 1],
-        explanation: 'Rationale: The key is whether the identity of the final arrangement changes when two selected items swap places.<br><b>A:</b> Correct. Assigning roles means order/position is important (Person A as President is different from Person B as President).<br><b>B:</b> Correct. These terms imply that the resulting group is the focus, not the sequence of choosing them.<br><b>C:</b> Incorrect. "Lineup," "arrangement," and "sequence" are keywords for Permutations.<br><b>D:</b> Incorrect. If the items are identical, there is only one arrangement, but the problem could be a Combination with Repetition (Stars and Bars) if items are distributed to distinct bins.'
+        correct: [1, 3], // 2 correct
+        explanation: 'Rationale: Fail-Safe Defaults means the protection scheme identifies conditions under which access is permitted. Therefore, the default situation is a **lack of access** (D) or **denial of access** (B).'
     },
+    // ------------------------------------------------------------------
+    // 4. Review and Continual Security (Detect, Respond, Recover)
+    // ------------------------------------------------------------------
     {
         id: 14,
-        question: 'What is the correct value of the binomial coefficient \\(\\binom{5}{2}\\) and what does it represent?<sup>14</sup>',
+        question: 'The **Security Review** phase formally consists of which of the following processes?',
         options: [
-            'The value is 10.',
-            'The value is 20, which is \\(5 \\times 4\\).',
-            'It represents the number of different ways to choose 2 unordered items from a set of 5 distinct items.',
-            'It represents the number of ordered arrangements of 2 items chosen from 5.'
+            'Certification',
+            'Accreditation',
+            'Authorization',
+            'Design'
         ],
-        correct: [0, 2],
-        explanation: 'Rationale: The binomial coefficient \\(\\binom{n}{k}\\) is the formula for combinations, \\(\\frac{n!}{k! (n-k)!}\\).<br><b>A:</b> Correct. \\(\\binom{5}{2} = \\frac{5!}{2! 3!} = \\frac{5 \\times 4}{2 \\times 1} = 10\\).<br><b>B:</b> Incorrect. 20 is the value of the permutation \\(P(5, 2)\\).<br><b>C:</b> Correct. This is the definition of a combination.<br><b>D:</b> Incorrect. This is the definition of a permutation.'
+        correct: [0, 1, 2], // 3 correct
+        explanation: 'Rationale: The Security Review process is defined as the **certification**, **accreditation**, and **authorization** of the security program. Design (D) is an earlier phase.'
     },
     {
         id: 15,
-        question: 'A coin is flipped 8 times, resulting in a sequence of Heads (H) and Tails (T). Which methods correctly calculate the number of sequences that contain exactly 3 Heads?<sup>15</sup>',
+        question: '**Certification** of a security program primarily focuses on which aspect?',
         options: [
-            'Using the Product Rule as \\(2^8\\).',
-            'Calculating the number of ways to choose 3 positions for the Heads from the 8 total positions.',
-            'The combination formula \\(\\binom{8}{3}\\).',
-            'The permutation formula \\(P(8, 3)\\).'
+            'Formal management acceptance of the risk.',
+            'Technical evaluation of the security mechanisms.',
+            'Verifying the program is compliant with established policy.',
+            'Auditing the system for operational security flaws.'
         ],
-        correct: [1, 2],
-        explanation: 'Rationale: Once the positions for the 3 Heads are chosen, the remaining 5 positions must be Tails. The problem simplifies to choosing 3 slots out of 8, where the order of selection does not matter.<br><b>A:</b> Incorrect. \\(2^8\\) is the total number of all possible sequences, regardless of the number of Heads.<br><b>B:</b> Correct. This is the combinatorial logic: select a subset of 3 spots for the H\'s.<br><b>C:</b> Correct. The calculation is exactly \\(\\binom{8}{3}\\).<br><b>D:</b> Incorrect. Permutation would imply that the order in which the Heads are placed matters, but it does not (Position 1, 2, 3 for H is the same as Position 3, 2, 1 for H).'
+        correct: [1, 3], // 2 correct
+        explanation: 'Rationale: **Certification** is the technical review, which involves **technical evaluation of mechanisms** (B) and **auditing for security flaws** (D). Management acceptance (A) is part of Accreditation.'
+    },
+    {
+        id: 16,
+        question: '**Accreditation** is the process where upper management formally accepts the risk and allows the security program to operate. This process ensures:',
+        options: [
+            'The system meets its established Recovery Time Objective (RTO).',
+            'Compliance with legal and organizational security policies.',
+            'Formal acceptance of the system\'s security posture.',
+            'All technical flaws have been patched.'
+        ],
+        correct: [1, 2], // 2 correct
+        explanation: 'Rationale: Accreditation is the formal sign-off where management **formally accepts the security posture** (C) and confirms **compliance with policies** (B). RTO (A) is a goal related to recovery, and patching (D) is a technical function of Implementation/Continual Security.'
+    },
+    {
+        id: 17,
+        question: 'What is the "accepted state" of the information asset that **Continual Security** seeks to maintain and restore when risks change?',
+        options: [
+            'The state prescribed in its security policy.',
+            'The state that provides the highest speed and performance.',
+            'The state before the initial security project began.',
+            'The state certified by the Security Review phase.'
+        ],
+        correct: [0], // 1 correct
+        explanation: 'Rationale: When risks change, corrective actions are taken to restore the security of the asset to its accepted state, **as prescribed in its security policy** (A).'
+    },
+    // ------------------------------------------------------------------
+    // 5. Security Objectives (CIAAN)
+    // ------------------------------------------------------------------
+    {
+        id: 18,
+        question: 'Which of the following Security Star objectives are concerned with preventing unauthorized changes to information?',
+        options: [
+            'Confidentiality',
+            'Integrity',
+            'Availability',
+            'Non-Repudiation'
+        ],
+        correct: [1], // 1 correct
+        explanation: 'Rationale: **Integrity** (B) is the objective concerned with safeguarding the accuracy and completeness of information and methods of processing, thereby preventing unauthorized or accidental modification.'
+    },
+    {
+        id: 19,
+        question: 'Ensuring data is only disclosed to authorized entities is the core concern of which security objective(s)?',
+        options: [
+            'Confidentiality',
+            'Integrity',
+            'Authentication',
+            'Authorization'
+        ],
+        correct: [0, 3], // 2 correct
+        explanation: 'Rationale: **Confidentiality** (A) prevents unauthorized disclosure. **Authorization** (D) is the mechanism that defines *which* entities are authorized to access the data.'
+    },
+    {
+        id: 20,
+        question: 'Which Security Star objectives are part of the AAA (Authentication, Authorization, Accounting) framework and are used to verify the identity and permissions of a subject?',
+        options: [
+            'Confidentiality',
+            'Authentication',
+            'Authorization',
+            'Non-Repudiation'
+        ],
+        correct: [1, 2], // 2 correct
+        explanation: 'Rationale: The AAA framework includes **Authentication** (verifying identity) and **Authorization** (verifying permissions). Non-Repudiation (D) is related but focuses on proof of action.'
+    },
+    // ------------------------------------------------------------------
+    // 6. Security Principles
+    // ------------------------------------------------------------------
+    {
+        id: 21,
+        question: 'The principle of **Least Privilege** limits damage by granting users only the necessary permissions. Which security design principles are most effective in complementing this limitation?',
+        options: [
+            'Open Design',
+            'Least Common Mechanism',
+            'Separation of Privilege',
+            'Psychological Acceptability'
+        ],
+        correct: [1, 2], // 2 correct
+        explanation: 'Rationale: **Least Common Mechanism** (B) limits shared resources, restricting the spread of damage. **Separation of Privilege** (C) limits power by requiring multiple conditions for sensitive actions. Open Design (A) and Psychological Acceptability (D) are about transparency and usability, respectively.'
+    },
+    {
+        id: 22,
+        question: 'According to the **Open Design** principle, the security of a mechanism should rely on which of the following?',
+        options: [
+            'The secrecy of the proprietary software.',
+            'The difficulty of reverse-engineering the code.',
+            'The secrecy of the cryptographic keys or passwords.',
+            'The ease with which it can be reviewed and tested by experts.'
+        ],
+        correct: [2, 3], // 2 correct
+        explanation: 'Rationale: Open Design, rooted in Kerckhoffs\'s principle, states that security must depend on the **secrecy of the keys/passwords** (C). Making the design public also allows for **easier review and testing** (D).'
+    },
+    {
+        id: 23,
+        question: 'The principle of **Least Common Mechanism** is a design goal that seeks to minimize which risk factors?',
+        options: [
+            'The cost of hardware components.',
+            'The potential for a flaw in one mechanism to compromise multiple users.',
+            'The number of shared resources.',
+            'The difficulty of understanding the code.'
+        ],
+        correct: [1, 2], // 2 correct
+        explanation: 'Rationale: This principle minimizes the number of **shared mechanisms/resources** (C), thereby limiting the risk that a vulnerability in one common mechanism will be exploited to **compromise multiple users** (B).'
+    },
+    {
+        id: 24,
+        question: 'The principle of **Psychological Acceptability** ensures that users will routinely and automatically apply protection mechanisms correctly. This is achieved by designing interfaces that are:',
+        options: [
+            'Intuitive and easy to use.',
+            'Not burdensome to the user\'s workflow.',
+            'Highly visible to remind users of security risks.',
+            'Required by mandatory corporate policy.'
+        ],
+        correct: [0, 1], // 2 correct
+        explanation: 'Rationale: Psychological Acceptability requires the human interface to be designed for **ease of use** (A) and to **not make the resource more difficult to access** (B). If mechanisms are burdensome, users will bypass them.'
+    },
+    {
+        id: 25,
+        question: 'In addition to the eight main principles from Saltzer and Schroeder, the lecture mentions two other concepts for evaluating or improving protection designs. These include:',
+        options: [
+            'Work Factor',
+            'Economy of Scale',
+            'Compromise Recording',
+            'Complete Mediation'
+        ],
+        correct: [0, 2], // 2 correct
+        explanation: 'Rationale: The final page mentions comparing attacker resources with the **Work Factor** (A) required to defeat the system and the strategy of **Compromise Recording** (C). Complete Mediation (D) is one of the eight main principles.'
     }
 ];
