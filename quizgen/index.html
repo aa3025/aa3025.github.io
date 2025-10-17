@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title is now dynamic (will be set by JavaScript on load) -->
+    <title id="page-title">Loading Quiz...</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load the external quiz data (allQuizData and quizTitle) before the logic script -->
+    <script src="https://aa3025.github.io/quizgen/quiz.js"></script>
+
+    <!-- Load MathJax for correct LaTeX rendering -->
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        // Configure MathJax to process LaTeX content
+        MathJax = {
+            tex: {
+                // Using \(\) for inline math is more robust in HTML generated from JS strings
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    
+    <style>
+        /* Custom styles for better readability and a clean look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .quiz-option:hover {
+            background-color: #f1f5f9;
+        }
+        .correct-answer {
+            background-color: #d1fae5; /* Green 100 */
+        }
+        .incorrect-answer {
+            background-color: #fee2e2; /* Red 100 */
+        }
+        .explanation-box {
+            white-space: pre-wrap; /* Preserve formatting in explanations */
+        }
+        /* Ensure MathJax content is easy to read */
+        .MathJax {
+            font-size: 1.1rem; 
+        }
+        /* Custom loader spinner for visual appeal (for generator) */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- HEADER AND GENERATOR TOGGLE -->
+        <header class="mb-6 flex justify-between items-center bg-white p-4 rounded-xl shadow-lg">
+            <h1 class="text-2xl font-extrabold text-gray-800" id="quiz-header">Loading...</h1>
+            <div class="space-x-4 flex items-center">
+                <button id="toggleGeneratorButton" class="px-4 py-2 text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition">
+                    Generate Quiz
+                </button>
+                
+                <!-- DEBUG TOGGLE (Now a checkbox) -->
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="debug-toggle" class="h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                    <label for="debug-toggle" class="text-sm text-gray-600 font-medium select-none">Show Debug</label>
+                </div>
+            </div>
+        </header>
+
+        <!-- DEBUG STATUS -->
+        <div id="debug-status" class="mb-6 p-3 bg-yellow-100 border border-yellow-300 text-sm text-yellow-800 rounded-lg shadow-inner hidden">
+            Debug Status: Awaiting action...
+        </div>
+        
+        <!-- WARNING FOR DEFAULT KEY USAGE -->
+        <div id="keyWarning" class="p-3 mb-6 bg-red-100 border-l-4 border-red-500 text-red-800 rounded-lg hidden text-sm font-medium">
+            <p class="font-bold">⚠️ Warning: Using Fallback API Key</p>
+            <p>The fallback API key is often rate-limited or disabled. If generation fails, please enter your own Gemini API key above to override it.</p>
+        </div>
+
+        <!-- QUIZ GENERATOR SECTION (Hidden by default) -->
+        <div id="generator-section" class="bg-white shadow-xl rounded-xl p-6 md:p-8 mb-8 hidden">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4 border-b pb-2">
+                Dynamic Quiz Generator
+            </h2>
+            <div class="space-y-4">
+                
+                <!-- API Key Input -->
+                <div>
+                    <label for="apiKeyInput" class="block text-sm font-medium text-gray-700 mb-1">Gemini API Key (Optional)</label>
+                    <!-- NOTE: We start with type="password" but JS will momentarily change it to "text" to clear it, then back to "password" -->
+                    <input type="password" id="apiKeyInput"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                           placeholder="Enter your Gemini API Key to override default"
+                           autocomplete="new-password">
+                </div>
+
+                <!-- Model Selection -->
+                <div>
+                    <label for="modelSelect" class="block text-sm font-medium text-gray-700 mb-1">Model Selection</label>
+                    <select id="modelSelect" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                        <!-- UPDATED MODEL NAMES -->
+                        <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                        <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                    </select>
+                </div>
+
+                <!-- Existing Inputs -->
+                <div>
+                    <label for="topicInput" class="block text-sm font-medium text-gray-700 mb-1">Quiz Topic</label>
+                    <input type="text" id="topicInput" value="Operating System Security"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                           placeholder="Enter the topic for your new quiz">
+                </div>
+
+                <div>
+                    <label for="countInput" class="block text-sm font-medium text-gray-700 mb-1">Questions (1-20)</label>
+                    <input type="number" id="countInput" value="5" min="1" max="20"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                </div>
+
+                <button id="generateButton"
+                        class="w-full flex justify-center items-center px-4 py-2 border border-transparent text-base font-medium rounded-lg shadow-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
+                    <span id="buttonText">Generate & Load New Quiz</span>
+                    <span id="loadingSpinner" class="spinner ml-3 hidden"></span>
+                </button>
+
+                <!-- Status Message Area for Generator -->
+                <div id="genStatusMessage" class="text-sm p-3 rounded-lg hidden" role="alert"></div>
+
+                <!-- Generated Code Output (optional display) -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Raw Generated Data (for review)</h3>
+                    <pre id="outputCode"
+                         class="bg-gray-100 text-gray-700 p-3 rounded-lg overflow-x-auto text-xs whitespace-pre-wrap h-40"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ CONTENT -->
+        <div class="bg-white shadow-xl rounded-xl p-6 md:p-10 relative">
+            <!-- Dropdown for selecting number of questions -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between text-lg text-gray-600 mb-8 border-b pb-4">
+                <p class="mb-2 sm:mb-0">Select all correct options for each question.</p>
+                <div class="flex items-center space-x-2">
+                    <label for="question-count" class="text-base font-medium text-gray-700">Questions to show:</label>
+                    <select id="question-count" onchange="loadNewQuizSet(this.value)" class="p-1 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base">
+                        <option value="5" selected>5 Questions</option>
+                        <option value="10">10 Questions</option>
+                        <option value="15">15 Questions (All)</option>
+                    </select>
+                </div>
+            </div>
+            <!-- End Dropdown -->
+
+            <div id="quiz-container">
+                <!-- Questions will be rendered here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =======================================================================
+        // 1. GEMINI API GENERATOR LOGIC (with secure key handling)
+        // =======================================================================
+
+        const DEFAULT_MODEL = "gemini-2.5-flash"; // Changed to non-preview version
+        
+        // Base64 encoded version of the default Canvas key (AIzaSyDjk8CKOg1H2RI8pOc30XPyLl4A3dfeIDs)
+        const OBFUSCATED_SECRET_CONTAINER = 'QUl6YVN5RGprOENLT2cxSDJSSThwT2MzMFhQeUxsNEEzZGZlSURz'; 
+
+        /**
+         * Decodes the Base64-encoded fallback key.
+         * @param {string} encoded - The Base64 string.
+         * @returns {string} The decoded key.
+         */
+        function decodeFallback(encoded) {
+            try {
+                // The atob function is standard for decoding Base64 strings
+                return atob(encoded); 
+            } catch (e) {
+                console.error("Failed to decode fallback key:", e);
+                return "";
+            }
+        }
+
+        // Store the current number of questions to load (default is 5)
+        let questionCount = 5; 
+        
+        // NOTE: allQuizData and optionally quizTitle are expected to be loaded from quiz.js
+        
+        // Generator UI Elements
+        const topicInput = document.getElementById('topicInput');
+        const countInput = document.getElementById('countInput');
+        const generateButton = document.getElementById('generateButton');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const genStatusMessage = document.getElementById('genStatusMessage');
+        const outputCode = document.getElementById('outputCode');
+        const generatorSection = document.getElementById('generator-section');
+        const toggleGeneratorButton = document.getElementById('toggleGeneratorButton');
+        const keyWarning = document.getElementById('keyWarning'); 
+
+        // Elements for API configuration
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        
+        // --- RELIABLE API KEY CLEARING WORKAROUND ---
+        // This is a robust method to force clear the password field, overriding
+        // browser autofill/session restore which is common with password types.
+        function clearApiKeyField() {
+            // 1. Momentarily change the input type to 'text'
+            apiKeyInput.type = 'text';
+            // 2. Clear the value
+            apiKeyInput.value = '';
+            // 3. Immediately change the input type back to 'password'
+            apiKeyInput.type = 'password';
+             apiKeyInput.value = '';
+            // Log for debugging
+            if (debugMode) {
+                 console.log("[DEBUG] API Key field forcefully cleared.");
+            }
+        }
+        
+        // Call the new clear function on window load
+        window.addEventListener('load', clearApiKeyField);
+        // --- END WORKAROUND ---
+
+        const modelSelect = document.getElementById('modelSelect');
+        modelSelect.value = DEFAULT_MODEL;
+
+        // --- Generator Utilities ---
+        function showGenLoading(isLoading) {
+            generateButton.disabled = isLoading;
+            if (isLoading) {
+                buttonText.textContent = 'Generating... it may take a minute';
+                loadingSpinner.classList.remove('hidden');
+                genStatusMessage.classList.add('hidden');
+                outputCode.textContent = '';
+            } else {
+                buttonText.textContent = 'Generate & Load New Quiz';
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        function showGenStatus(message, type = 'success') {
+            genStatusMessage.textContent = message;
+            genStatusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800', 'bg-blue-100', 'text-blue-800');
+            if (type === 'error') {
+                genStatusMessage.classList.add('bg-red-100', 'text-red-800');
+            } else if (type === 'success') {
+                genStatusMessage.classList.add('bg-green-100', 'text-green-800');
+            } else {
+                 genStatusMessage.classList.add('bg-blue-100', 'text-blue-800');
+            }
+        }
+
+        function toggleGenerator() {
+            if (generatorSection.classList.contains('hidden')) {
+                generatorSection.classList.remove('hidden');
+                toggleGeneratorButton.textContent = 'Hide Generator';
+                
+                // Show warning if the input is empty (meaning we will fall back to the generic key)
+                if (apiKeyInput.value.trim().length === 0) {
+                     keyWarning.classList.remove('hidden');
+                }
+            } else {
+                generatorSection.classList.add('hidden');
+                toggleGeneratorButton.textContent = 'Generate Quiz';
+                keyWarning.classList.add('hidden');
+            }
+        }
+        
+        // --- Core Generation Function ---
+        async function generateQuiz() {
+            const userKey = apiKeyInput.value.trim();
+            let keySource = ''; // For debugging
+            
+            // Logic to determine which key to use: Input Key (pre-filled or user-entered) > Fallback key
+            let apiKey = userKey;
+            let usingFallbackKey = false; 
+
+            if (apiKey.length > 0) {
+                // Use key found in input field (user-entered)
+                keySource = 'User Input';
+                keyWarning.classList.add('hidden');
+            } else {
+                // Use the decoded default key as fallback
+                apiKey = decodeFallback(OBFUSCATED_SECRET_CONTAINER);
+                keySource = apiKey.length > 0 ? 'Decoded Fallback (Base64)' : 'MISSING';
+                usingFallbackKey = apiKey.length > 0;
+                
+                if (usingFallbackKey && generatorSection.classList.contains('hidden') === false) {
+                    // Only show warning if using fallback and the generator is visible
+                    keyWarning.classList.remove('hidden'); 
+                }
+            }
+
+            if (debugMode) {
+                // Log the key source and the first few characters of the key (for safety, only log first 8)
+                debugStatus.textContent = `Debug Mode Active. API Key Source: ${keySource}. Key Snippet: ${apiKey.substring(0, 8)}...`;
+                console.log(`[DEBUG] API Key Source: ${keySource}. Key Snippet: ${apiKey.substring(0, 8)}...`);
+            }
+            
+            const model = modelSelect.value;
+            const API_URL_BASE = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+            const fullApiUrl = `${API_URL_BASE}?key=${apiKey}`;
+
+            if (apiKey.length === 0) { 
+                showGenStatus("ERROR: API Key is missing or invalid. Please provide a valid Gemini API Key.", 'error');
+                console.error("API Key is missing or invalid.");
+                return;
+            }
+            
+            showGenLoading(true);
+
+            const topic = topicInput.value.trim();
+            const count = parseInt(countInput.value, 10);
+            
+            if (!topic || isNaN(count) || count < 1 || count > 20) {
+                showGenLoading(false);
+                showGenStatus('Please enter a valid topic and question count (1-20).', 'error');
+                return;
+            }
+
+            // Define System Instruction and Query
+            const systemPrompt = `You are an expert quiz question generator. Your task is to generate a set of multiple-select quiz questions (one or more correct answers) on a given topic.
+
+            The output MUST be a strict JSON array of objects, conforming exactly to the provided JSON schema.
+            - Ensure all strings, including question and explanation content, use proper HTML tags for bolding (<b>) and line breaks (<br>) instead of markdown/asterisks.
+            - The 'explanation' field MUST start with 'Rationale: <br>' and clearly justify why each option (A, B, C, etc.) is correct or incorrect.
+            - The correct options in the 'correct' array must be the 0-based index of the 'options' array.
+            - The 'options' array must contain at 4-6 distinct options.
+            - The 'id' must be unique sequential numbers starting from 1.
+            - All the LaTeX formatting for mathematics must be correctly formatted for MathJaX rendering: do not use $ ... $ for mathematics (at all), instead use \\( ... \\) for MathJax maths.`;
+            
+            const userQuery = `Generate ${count} multiple-select quiz questions on the topic: "${topic}". The quiz title should be: "AI Quiz on ${topic}".`;
+
+            // Define the Strict JSON Schema for the response structure
+            const responseSchema = {
+                type: "ARRAY",
+                items: {
+                    type: "OBJECT",
+                    properties: {
+                        "id": { "type": "INTEGER", "description": "Sequential ID starting from 1." },
+                        "question": { "type": "STRING", "description": "The quiz question content, formatted with <b> and <br>." },
+                        "options": {
+                            "type": "ARRAY", 
+                            "description": "Exactly four answer options.",
+                            "items": { "type": "STRING" }
+                        },
+                        "correct": {
+                            "type": "ARRAY",
+                            "description": "Array of 0-based indices of the correct options.",
+                            "items": { "type": "INTEGER" }
+                        },
+                        "explanation": { "type": "STRING", "description": "Detailed rationale, starting with 'Rationale: <br>', justifying each option. Use <b>." }
+                    },
+                    required: ["id", "question", "options", "correct", "explanation"]
+                }
+            };
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema
+                }
+            };
+            
+            
+            console.log("Attempting API call to:", API_URL_BASE);
+            console.log("Payload (excluding key):", JSON.stringify(payload, null, 2));
+
+
+            let response;
+            try {
+                // Exponential Backoff implementation (Max 3 retries)
+                for (let i = 0; i < 3; i++) {
+                    response = await fetch(fullApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        break; // Success
+                    }
+
+                    if (i < 2) {
+                        const delay = Math.pow(2, i) * 1000;
+                        console.warn(`Attempt ${i + 1} failed (HTTP ${response.status}). Retrying in ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    } else {
+                        // Attempt to extract the error message from the body on the final failure
+                        let errorBody = "Unknown error body.";
+                        try {
+                            const errorJson = await response.json();
+                            errorBody = JSON.stringify(errorJson, null, 2);
+                        } catch (e) {
+                             // Ignore JSON parsing failure, use default message
+                        }
+                        console.error(`Final API Request Failed (HTTP ${response.status}). Raw Error Body:`, errorBody);
+                        
+                        // Check for specific 503 error message
+                        let errorMessage = `Failed to fetch from API after 3 attempts. HTTP Status: ${response.status}.`;
+                        if (errorBody.includes("The model is overloaded")) {
+                            errorMessage += " (Model Overloaded - Try again later or use your own key)";
+                        } else if (response.status === 404) {
+                            errorMessage += " (404 Not Found - Check Model Name or API Version)";
+                        } else if (response.status === 400 && errorBody.includes("API key not valid")) {
+                             errorMessage += " (Invalid API Key - Please ensure the key in the input box is correct)";
+                        }
+
+                        throw new Error(errorMessage);
+                    }
+                }
+                
+                if (!response || !response.ok) {
+                    throw new Error("Final network or HTTP failure after retries.");
+                }
+
+                const result = await response.json();
+                
+                const jsonString = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!jsonString) {
+                    console.error("API Result:", JSON.stringify(result, null, 2));
+                    throw new Error("API response was missing expected JSON content. Check console for raw result.");
+                }
+
+                // Clean the JSON string (removes markdown code fences like ```json)
+                const cleanJsonString = jsonString.replace(/```json\s*|```\s*/g, '').trim();
+
+                const newQuizData = JSON.parse(cleanJsonString);
+
+                if (!Array.isArray(newQuizData) || newQuizData.length === 0) {
+                     throw new Error("Generated data is not a valid or non-empty array.");
+                }
+
+                // SUCCESS: Update global quiz variables and re-render the quiz
+                // Use window object to ensure we're modifying the global variable
+                window.quizTitle = `AI Quiz on ${topic}`;
+                window.allQuizData = newQuizData;
+
+                // Update output area with formatted code for review
+                const finalOutput = `const quizTitle = "${window.quizTitle}";\n\nconst allQuizData = ${JSON.stringify(newQuizData, null, 4)};`;
+                outputCode.textContent = finalOutput;
+
+                // RENDER THE NEW QUIZ
+                renderQuiz();
+                
+                showGenStatus(`Successfully generated ${newQuizData.length} questions on "${topic}" and loaded them into the quiz!`, 'success');
+                toggleGenerator(); // Hide generator after success
+                keyWarning.classList.add('hidden'); // Hide warning on success
+
+            } catch (error) {
+                console.error("Quiz generation failed (Catch block):", error);
+                showGenStatus(`Generation Error: ${error.message}. Please check the browser console (F12) for detailed status codes and error messages.`, 'error');
+            } finally {
+                showGenLoading(false);
+            }
+        }
+
+        // =======================================================================
+        // 2. QUIZ RENDERING AND INTERACTION LOGIC (ORIGINAL LOGIC)
+        // =======================================================================
+
+        const quizContainer = document.getElementById('quiz-container');
+        const debugStatus = document.getElementById('debug-status');
+        const debugToggle = document.getElementById('debug-toggle');
+        
+        // Event Listeners for the Generator
+        generateButton.addEventListener('click', generateQuiz);
+        toggleGeneratorButton.addEventListener('click', toggleGenerator);
+
+        // Debug Toggle Logic
+        let debugMode = false;
+        debugToggle.addEventListener('change', () => {
+            debugMode = debugToggle.checked; // Read the state directly from the checkbox
+            if (debugMode) {
+                // Initial check for key status when debug is turned on
+                const userKey = apiKeyInput.value.trim();
+                let keySource = userKey.length > 0 ? 'User Input' : 'Fallback Key';
+                
+                debugStatus.classList.remove('hidden');
+                debugStatus.textContent = `Debug Mode Active. Key Status: ${keySource}. Quiz ready.`;
+                console.log(`[DEBUG] Debug Mode Activated. Key Status: ${keySource}.`);
+            } else {
+                debugStatus.classList.add('hidden');
+            }
+        });
+        
+        // Update key warning visibility when the user types a key
+        apiKeyInput.addEventListener('input', () => {
+             if (apiKeyInput.value.trim().length > 0) {
+                keyWarning.classList.add('hidden');
+            } else if (!generatorSection.classList.contains('hidden')) {
+                // If input becomes empty while the generator is open, show the fallback warning
+                keyWarning.classList.remove('hidden');
+            }
+        });
+
+        // --- UTILITY FUNCTION FOR RANDOMIZATION ---
+        /**
+         * Shuffles an array in place using the Fisher-Yates algorithm.
+         * @param {Array} array - The array to shuffle.
+         * @returns {Array} The shuffled array.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        /**
+         * Loads a new set of questions based on the selected count and re-renders the quiz.
+         * @param {string} count - The number of questions to load (5, 10, or 15).
+         */
+        function loadNewQuizSet(count) {
+            questionCount = parseInt(count, 10);
+            renderQuiz();
+            
+            // Optional: Update debug status
+            const debugStatus = document.getElementById('debug-status');
+            if (debugStatus && !debugStatus.classList.contains('hidden')) {
+                debugStatus.textContent = `Quiz reloaded. Now showing ${questionCount} random questions.`;
+            }
+        }
+        
+        // --- CORE QUIZ RENDERING LOGIC ---
+        function renderQuiz() {
+            // Check if data is available (loaded from quiz.js or generated)
+            // Use window object to access variables that might have been reassigned
+            const currentAllQuizData = window.allQuizData || allQuizData;
+            const currentQuizTitle = window.quizTitle || quizTitle;
+            
+            if (typeof currentAllQuizData === 'undefined' || !Array.isArray(currentAllQuizData) || currentAllQuizData.length === 0) {
+                const container = document.getElementById('quiz-container');
+                container.innerHTML = '<div class="text-center p-12 bg-red-50 border border-red-300 rounded-lg"><h2 class="text-xl font-bold text-red-800">Error: Quiz data not loaded.</h2><p class="text-red-700 mt-2">Please ensure <code>quiz.js</code> is present and defines the <code>allQuizData</code> array.</p></div>';
+                
+                // If data is missing, still try to update the title if it was provided alone
+                const defaultTitle = "Error Loading Quiz";
+                const finalQuizTitle = (typeof currentQuizTitle !== 'undefined' && currentQuizTitle) ? currentQuizTitle : defaultTitle;
+                document.getElementById('page-title').textContent = finalQuizTitle;
+                document.getElementById('quiz-header').textContent = finalQuizTitle;
+                
+                return;
+            }
+            
+            // --- Dynamic Title Loading ---
+            const defaultTitle = "Generic MSQ Quiz";
+            // Check for quiz title from either source
+            const finalQuizTitle = (typeof currentQuizTitle !== 'undefined' && currentQuizTitle) ? currentQuizTitle : defaultTitle;
+
+            // Update the page title (browser tab) and the main header (on the page)
+            document.getElementById('page-title').textContent = finalQuizTitle;
+            document.getElementById('quiz-header').textContent = finalQuizTitle;
+            // --- END: Dynamic Title Loading ---
+
+            const container = document.getElementById('quiz-container');
+            
+            // 1. Shuffle all questions and select the number defined by questionCount
+            const selectedQuestions = shuffleArray([...currentAllQuizData]).slice(0, questionCount); // Use spread to shuffle a copy
+
+            container.innerHTML = selectedQuestions.map((q, index) => `
+                <div id="question-${q.id}" class="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 shadow-sm relative">
+                    <!-- Reset Button with Unicode Symbol ♲ -->
+                    <button onclick="resetQuestion(${q.id})" 
+                            title="Reset Question"
+                            class="absolute top-4 right-4 p-1 rounded-full text-gray-400 hover:text-indigo-600 hover:bg-gray-100 transition duration-150 text-xl font-bold leading-none">
+                        <span class="block">♲</span>
+                    </button>
+                    <!-- End Reset Button -->
+
+                    <!-- Question number uses the current index (1 to questionCount) -->
+                    <p class="text-xl font-semibold mb-4 text-gray-700">Q${index + 1}: ${q.question}</p>
+                    <div class="space-y-3">
+                        ${q.options.map((option, optIndex) => `
+                            <label class="flex items-center p-3 rounded-lg bg-white shadow-sm border border-gray-100 quiz-option cursor-pointer transition duration-150 ease-in-out" for="q${q.id}o${optIndex}">
+                                <input type="checkbox" id="q${q.id}o${optIndex}" name="q${q.id}" value="${optIndex}" class="form-checkbox h-5 w-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                <span class="ml-3 text-base text-gray-800">${String.fromCharCode(65 + optIndex)}. ${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+
+                    <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                        <button onclick="checkAnswer(${q.id})" class="check-btn-${q.id} w-full sm:w-1/3 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-200">
+                            Check Answer
+                        </button>
+                        <!-- Show Answer button, initially disabled -->
+                        <button onclick="revealAnswers(${q.id})" disabled class="show-answer-btn-${q.id} w-full sm:w-1/3 px-4 py-2 font-semibold rounded-lg shadow-md transition duration-200 
+                            bg-gray-300 text-gray-700 opacity-50 cursor-not-allowed">
+                            Show Answer
+                        </button>
+                        <!-- Explain button is now initially disabled (gray) -->
+                        <button onclick="showExplanation(${q.id})" disabled class="explain-btn-${q.id} w-full sm:w-1/3 px-4 py-2 font-semibold rounded-lg shadow-md transition duration-200 
+                            bg-gray-300 text-gray-700 opacity-50 cursor-not-allowed">
+                            Explain
+                        </button>
+                    </div>
+
+                    <div id="explanation-${q.id}" class="explanation-box mt-6 p-4 rounded-lg bg-blue-50 border border-blue-200 text-sm text-gray-700 hidden">
+                        <p class="font-bold text-blue-800 mb-2">Explanation:</p>
+                        ${q.explanation}
+                    </div>
+                </div>
+            `).join('');
+
+            // After rendering the HTML, ask MathJax to process the math content
+            // Need to wait for MathJax to be loaded before calling typesetPromise
+            if (window.MathJax) {
+                MathJax.typesetPromise([container]).catch(err => console.error("MathJax typesetting failed: ", err));
+            }
+        }
+
+        /**
+         * Toggles the visibility of the debug status box based on the checkbox state.
+         */
+        function toggleDebug() {
+            const debugBox = document.getElementById('debug-status');
+            const toggle = document.getElementById('debug-toggle');
+
+            if (toggle.checked) {
+                debugBox.classList.remove('hidden');
+            } else {
+                debugBox.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Resets the specified question to its default, unanswered state.
+         * @param {number} questionId - The ID of the question to reset.
+         */
+        function resetQuestion(questionId) {
+            // Ensure allQuizData is accessible (check both sources)
+            const currentAllQuizData = window.allQuizData || allQuizData;
+            if (typeof currentAllQuizData === 'undefined') return;
+
+            // Find the data for the specific question ID
+            const questionData = currentAllQuizData.find(q => q.id === questionId);
+            if (!questionData) return;
+            
+            // DEBUGGING
+            const debugStatus = document.getElementById('debug-status');
+            if (!debugStatus.classList.contains('hidden')) {
+                debugStatus.textContent = `Resetting Question ID ${questionId} via Recycle icon.`;
+            }
+
+            const questionElement = document.getElementById(`question-${questionId}`);
+            if (!questionElement) return; // Guard for safety
+
+            const labels = questionElement.querySelectorAll('label.quiz-option');
+            const checkboxes = questionElement.querySelectorAll(`input[name="q${questionId}"]`);
+            const checkButton = questionElement.querySelector(`.check-btn-${questionId}`);
+            const showAnswerButton = questionElement.querySelector(`.show-answer-btn-${questionId}`); 
+            const explainButton = questionElement.querySelector(`.explain-btn-${questionId}`);
+            const explanationBox = document.getElementById(`explanation-${questionId}`);
+
+            // 1. Reset options (uncheck and remove highlights/borders)
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+            });
+            labels.forEach(label => {
+                label.classList.remove('correct-answer', 'incorrect-answer');
+                label.style.border = '1px solid #e5e7eb'; // Default border
+            });
+            
+            // 2. Reset Check Button to original state
+            checkButton.textContent = "Check Answer";
+            checkButton.classList.remove('bg-red-600', 'hover:bg-red-700', 'bg-green-600', 'hover:bg-green-700');
+            checkButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            checkButton.disabled = false;
+            checkButton.setAttribute('onclick', `checkAnswer(${questionId})`);
+
+            // 3. Reset Show Answer, Explain Button, and Explanation
+            showAnswerButton.textContent = 'Show Answer';
+            showAnswerButton.disabled = true;
+            showAnswerButton.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'cursor-pointer');
+            showAnswerButton.classList.add('bg-gray-300', 'text-gray-700', 'opacity-50', 'cursor-not-allowed');
+            showAnswerButton.style.opacity = '0.5';
+            showAnswerButton.style.backgroundColor = ''; 
+
+            explainButton.textContent = 'Explain';
+            explainButton.disabled = true;
+            explainButton.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'cursor-pointer');
+            explainButton.classList.add('bg-gray-300', 'text-gray-700', 'opacity-50', 'cursor-not-allowed');
+            explainButton.style.opacity = '0.5';
+            explainButton.style.backgroundColor = ''; 
+            
+            explanationBox.classList.add('hidden');
+
+            // Re-render math if necessary (though MathJax usually handles hidden/shown content)
+            if (window.MathJax) {
+                MathJax.typesetPromise([questionElement]).catch(err => console.error("MathJax re-typesetting failed: ", err));
+            }
+        }
+
+        /**
+         * Highlights correct answers and enables the explanation button.
+         * This is called when the user selects 'Show Answer'.
+         * @param {number} questionId - The ID of the question to reveal.
+         */
+        function revealAnswers(questionId) {
+            // Ensure allQuizData is accessible (check both sources)
+            const currentAllQuizData = window.allQuizData || allQuizData;
+            if (typeof currentAllQuizData === 'undefined') return;
+
+            const questionData = currentAllQuizData.find(q => q.id === questionId);
+            if (!questionData) return;
+
+            const questionElement = document.getElementById(`question-${questionId}`);
+            const labels = questionElement.querySelectorAll('label.quiz-option');
+            const showAnswerButton = questionElement.querySelector(`.show-answer-btn-${questionId}`);
+            const explainButton = questionElement.querySelector(`.explain-btn-${questionId}`);
+
+            // 1. Highlight Correct Answers
+            labels.forEach((label, index) => {
+                const isOptionCorrect = questionData.correct.includes(index);
+                
+                // Ensure incorrect-answer highlight (red) is removed if present if it was selected
+                label.classList.remove('incorrect-answer'); 
+                
+                if (isOptionCorrect) {
+                    // Highlight all correct answers
+                    label.classList.add('correct-answer');
+                    label.style.border = '2px solid #34d399'; // Green border
+                }
+            });
+            
+            // 2. Disable "Show Answer" button
+            showAnswerButton.disabled = true;
+            showAnswerButton.textContent = 'Answers Shown';
+            showAnswerButton.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'cursor-pointer');
+            showAnswerButton.classList.add('bg-gray-300', 'text-gray-700', 'opacity-50', 'cursor-not-allowed');
+            showAnswerButton.style.opacity = '0.5';
+            showAnswerButton.style.backgroundColor = '';
+
+            // 3. Enable Explain Button and apply active styling
+            explainButton.disabled = false;
+            explainButton.textContent = 'Explain'; 
+            
+            explainButton.classList.remove('bg-gray-300', 'text-gray-700', 'opacity-50', 'cursor-not-allowed');
+            explainButton.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'cursor-pointer');
+            explainButton.style.opacity = '1';
+            explainButton.style.backgroundColor = '#2563eb';
+            
+            const debugStatus = document.getElementById('debug-status');
+            // Only update debug status if debug mode is active
+            if (!debugStatus.classList.contains('hidden')) {
+                debugStatus.textContent = `Answers revealed for Question ID ${questionId}. Explanation button enabled.`;
+            }
+        }
+
+
+        function checkAnswer(questionId) {
+            // Ensure allQuizData is accessible (check both sources)
+            const currentAllQuizData = window.allQuizData || allQuizData;
+            if (typeof currentAllQuizData === 'undefined') return;
+
+            const questionData = currentAllQuizData.find(q => q.id === questionId);
+            if (!questionData) return;
+
+            // DEBUGGING: Update the status message box to confirm execution
+            const debugStatus = document.getElementById('debug-status');
+
+            const questionElement = document.getElementById(`question-${questionId}`);
+            if (!questionElement) return; // Guard for safety
+
+            const checkboxes = questionElement.querySelectorAll(`input[name="q${questionId}"]:checked`);
+            const labels = questionElement.querySelectorAll('label.quiz-option');
+
+            const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            let isCorrect = true;
+
+            // 1. Check if the set of selected answers matches the set of correct answers
+            if (selectedIndices.length !== questionData.correct.length ||
+                !questionData.correct.every(index => selectedIndices.includes(index))) {
+                isCorrect = false;
+            }
+
+            // 2. Visual Feedback (Highlighting)
+            labels.forEach((label, index) => {
+                const isOptionSelected = selectedIndices.includes(index);
+                const isOptionCorrect = questionData.correct.includes(index);
+
+                // Reset classes and default border
+                label.classList.remove('correct-answer', 'incorrect-answer');
+                label.style.border = '1px solid #e5e7eb'; 
+
+                if (isCorrect) {
+                    // If the answer is correct, highlight ALL correct options green immediately
+                    if (isOptionCorrect) {
+                        label.classList.add('correct-answer');
+                        label.style.border = '2px solid #34d399'; // Green border
+                    }
+                } else {
+                    // If the answer is incorrect, ONLY highlight selected INCORRECT options red
+                    if (isOptionSelected && !isOptionCorrect) {
+                        label.classList.add('incorrect-answer');
+                        label.style.border = '2px solid #f87171'; // Red border
+                    }
+                    // Correct answers are intentionally NOT highlighted yet.
+                }
+            });
+
+            // 3. Update Button States
+            const checkButton = questionElement.querySelector(`.check-btn-${questionId}`);
+            const showAnswerButton = questionElement.querySelector(`.show-answer-btn-${questionId}`);
+            const explainButton = questionElement.querySelector(`.explain-btn-${questionId}`);
+            
+            // Remove previous check button styling classes
+            checkButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'bg-red-600', 'hover:bg-red-700', 'bg-green-600', 'hover:bg-green-700');
+            
+            // Always reset the explain and show answer buttons to disabled state initially for logic below
+            [showAnswerButton, explainButton].forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'cursor-pointer');
+                btn.classList.add('bg-gray-300', 'text-gray-700', 'opacity-50', 'cursor-not-allowed');
+                btn.style.opacity = '0.5';
+                btn.style.backgroundColor = '';
+                btn.textContent = (btn === showAnswerButton) ? 'Show Answer' : 'Explain';
+            });
+            
+            if (isCorrect) {
+                // Correct: Show success, disable check button, and enable explain button immediately.
+                checkButton.textContent = "✅ Correct!";
+                checkButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                checkButton.disabled = true; 
+                checkButton.setAttribute('onclick', ''); 
+                
+                // Enable Explain button immediately upon correct answer
+                explainButton.disabled = false;
+                explainButton.classList.remove('bg-gray-300', 'text-gray-700', 'opacity-50', 'cursor-not-allowed');
+                explainButton.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'cursor-pointer');
+                explainButton.style.opacity = '1';
+                explainButton.style.backgroundColor = '#2563eb';
+
+                // Only update debug status if debug mode is active
+                if (!debugStatus.classList.contains('hidden')) {
+                    debugStatus.textContent = `Check Answer executed for Question ID ${questionId}. Status: Correct! Explanation enabled.`;
+                }
+            } else {
+                // Incorrect: Show 'Try Again', keep check button enabled, change action to resetQuestion, and ENABLE Show Answer button.
+                checkButton.textContent = "❌ Try Again";
+                checkButton.classList.add('bg-red-600', 'hover:bg-red-700');
+                checkButton.disabled = false;
+                checkButton.setAttribute('onclick', `resetQuestion(${questionId})`);
+                
+                // Enable Show Answer button
+                showAnswerButton.disabled = false;
+                showAnswerButton.classList.remove('bg-gray-300', 'text-gray-700', 'opacity-50', 'cursor-not-allowed');
+                showAnswerButton.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'cursor-pointer');
+                showAnswerButton.style.opacity = '1';
+                showAnswerButton.style.backgroundColor = '#2563eb';
+                
+                // Only update debug status if debug mode is active
+                if (!debugStatus.classList.contains('hidden')) {
+                    debugStatus.textContent = `Check Answer executed for Question ID ${questionId}. Status: Incorrect. Try Again or Show Answer enabled.`;
+                }
+            }
+        }
+
+        function showExplanation(questionId) {
+            const explanationBox = document.getElementById(`explanation-${questionId}`);
+            const explainButton = document.querySelector(`.explain-btn-${questionId}`);
+            if (!explanationBox || !explainButton) return;
+
+            if (explanationBox.classList.contains('hidden')) {
+                explanationBox.classList.remove('hidden');
+                explainButton.textContent = 'Hide Explanation';
+            } else {
+                explanationBox.classList.add('hidden');
+                explainButton.textContent = 'Explain';
+            }
+        }
+
+        // Initialize the quiz when the window loads
+        window.onload = renderQuiz;
+    </script>
+</body>
+</html>
