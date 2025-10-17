@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Load the external quiz data (allQuizData and quizTitle) before the logic script -->
-    <script src="https://aa3025.github.io/quizgen/quiz.js"></script>
+   <script src="https://aa3025.github.io/quizgen/quiz.js"></script>
 
     <!-- Load MathJax for correct LaTeX rendering -->
     <script type="text/javascript" id="MathJax-script" async
@@ -188,7 +188,7 @@
         const DEFAULT_MODEL = "gemini-2.5-flash"; // Changed to non-preview version
         
         // Base64 encoded version of the default Canvas key (AIzaSyDjk8CKOg1H2RI8pOc30XPyLl4A3dfeIDs)
-        const OBFUSCATED_SECRET_CONTAINER = 'QUl6YVN5RGprOENLT2cxSDJSSThwT2MzMFhQeUxsNEEzZGZlSURz'; 
+        const foo = 'QUl6YVN5RGprOENLT2cxSDJSSThwT2MzMFhQeUxsNEEzZGZlSURz'; 
 
         /**
          * Decodes the Base64-encoded fallback key.
@@ -306,7 +306,7 @@
                 keyWarning.classList.add('hidden');
             } else {
                 // Use the decoded default key as fallback
-                apiKey = decodeFallback(OBFUSCATED_SECRET_CONTAINER);
+                apiKey = decodeFallback(foo);
                 keySource = apiKey.length > 0 ? 'Decoded Fallback (Base64)' : 'MISSING';
                 usingFallbackKey = apiKey.length > 0;
                 
