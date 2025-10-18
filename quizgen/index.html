@@ -187,14 +187,9 @@
 
         const DEFAULT_MODEL = "gemini-2.5-flash"; // Changed to non-preview version
         
-        // Base64 encoded version of the default Canvas key (AIzaSyDjk8CKOg1H2RI8pOc30XPyLl4A3dfeIDs)
         const foo = 'QUl6YVN5RGprOENLT2cxSDJSSThwT2MzMFhQeUxsNEEzZGZlSURz'; 
 
-        /**
-         * Decodes the Base64-encoded fallback key.
-         * @param {string} encoded - The Base64 string.
-         * @returns {string} The decoded key.
-         */
+        
         function decodeFallback(encoded) {
             try {
                 // The atob function is standard for decoding Base64 strings
