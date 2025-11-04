@@ -19,7 +19,7 @@
             position: relative;
             width: 100%;
             min-height: 100vh;
-            padding-top: 80px; /* Space for fixed header */
+            padding-top: 130px; /* Increased space for the taller header */
             padding-bottom: 200px; /* Space for fixed output */
         }
         .number-circle {
@@ -53,14 +53,33 @@
 <div class="drag-container" id="dragContainer">
     <!-- Fixed header remains at the top -->
     <div class="fixed top-0 left-0 right-0 p-4 bg-white shadow-lg text-center z-40">
-        <h1 class="text-xl font-bold text-gray-800">Interactive Selection Sort (N=25)</h1>
+        <h1 class="text-xl font-bold text-gray-800"><span id="headerN"></span> Interactive Selection Sort</h1>
         <p class="text-sm text-gray-500">Drag numbers onto the Xmin Tracker to find the smallest element.</p>
+
+        <!-- N Control Panel -->
+        <div class="mt-2 flex justify-center items-center space-x-3">
+            <label for="nInput" class="text-sm font-semibold text-gray-700">List Size (N):</label>
+            <input 
+                type="number" 
+                id="nInput" 
+                min="1" 
+                max="50" 
+                value="25"
+                class="w-20 p-1 border border-gray-300 rounded-md text-center text-sm"
+            >
+            <button 
+                onclick="regenerateCircles(parseInt(document.getElementById('nInput').value));"
+                class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium py-1 px-3 rounded-md transition duration-150 shadow-sm"
+            >
+                Regenerate
+            </button>
+        </div>
     </div>
 
     <!-- Xmin Control Panel -->
     <div 
         id="xminPanel" 
-        class="fixed top-[100px] right-4 w-64 p-4 bg-white rounded-xl shadow-2xl border-4 border-blue-500/20 z-40"
+        class="fixed top-[140px] right-4 w-64 p-4 bg-white rounded-xl shadow-2xl border-4 border-blue-500/20 z-40"
         ondragover="event.preventDefault(); this.classList.add('drag-over');"
         ondragleave="this.classList.remove('drag-over');"
         ondrop="handleDrop(event); this.classList.remove('drag-over');"
@@ -99,33 +118,71 @@
 </div>
 
 <script>
-    // The list of 25 numbers (first 25 from the original set)
-    const NUMBERS = [
+    // The full original list of 50 numbers
+    const FULL_NUMBERS_LIST = [
         69, 55, 66, 89, 52, 81, 58, 23, 71, 10, 38, 12, 82, 41, 83, 100,
-        99, 22, 86, 5, 93, 37, 40, 21, 29
+        99, 22, 86, 5, 93, 37, 40, 21, 29, 76, 4, 48, 16, 74, 88, 47, 92,
+        24, 35, 25, 80, 56, 49, 2, 30, 13, 17, 65, 34, 45, 91, 53, 63, 36
     ];
 
     const container = document.getElementById('dragContainer');
     const xminDisplay = document.getElementById('xminDisplay');
     const sortedOutput = document.getElementById('sortedOutput');
     const outputPlaceholder = document.getElementById('outputPlaceholder');
+    const nInput = document.getElementById('nInput');
+    const headerN = document.getElementById('headerN');
 
     const elementSize = 50; // Width and height of the circle
+    let currentN = 25; // Default list size
     let currentXminValue = 1000;
     let minElementId = null;
 
-    // --- Initialization ---
+    // --- Initialization & Regeneration ---
 
     /**
-     * Initializes the circles and places them in a 5x5 grid at the top.
+     * Clears all circles and sorted output, resets Xmin, and re-initializes the grid.
+     * @param {number} n - The new number of elements to display.
+     */
+    function regenerateCircles(n) {
+        // Validation: Clamp N between 1 and 50
+        n = Math.max(1, Math.min(FULL_NUMBERS_LIST.length, n));
+        nInput.value = n; // Update input field if clamping occurred
+        currentN = n;
+
+        // Reset display elements
+        currentXminValue = 1000;
+        minElementId = null;
+        xminDisplay.textContent = currentXminValue;
+        sortedOutput.innerHTML = '<p class="text-gray-400 italic text-sm" id="outputPlaceholder">Drag numbers here by finalizing Xmin...</p>';
+        document.getElementById('outputPlaceholder').style.display = 'block';
+        headerN.textContent = `Interactive Selection Sort (N=${currentN})`;
+        
+        // Clear existing circles
+        container.querySelectorAll('.number-circle').forEach(c => c.remove());
+        
+        // Re-initialize
+        initializeCircles();
+    }
+    
+    /**
+     * Gets the current subset of numbers based on currentN.
+     */
+    function getNumbersList() {
+        return FULL_NUMBERS_LIST.slice(0, currentN);
+    }
+
+    /**
+     * Initializes the circles and places them in a dynamic grid at the top.
      */
     function initializeCircles() {
-        // Constants for grid layout: 5 columns * 5 rows = 25 numbers
-        const N_COLS = 5; 
+        const numbers = getNumbersList();
+        
+        // Calculate number of columns for a square-ish layout
+        const N_COLS = Math.ceil(Math.sqrt(currentN)); 
         const SPACING = 20;
-        const GRID_START_Y = 100; // Start below the fixed header
+        const GRID_START_Y = 130; // Start below the fixed header
 
-        NUMBERS.forEach((number, i) => {
+        numbers.forEach((number, i) => {
             const circle = document.createElement('div');
             
             // Generate a unique ID for tracking
@@ -151,7 +208,10 @@
             const col = i % N_COLS;
             const row = Math.floor(i / N_COLS);
 
-            const initialX = col * (elementSize + SPACING) + SPACING;
+            // Left Margin applied to center the grid roughly (simple approach)
+            const leftMargin = (container.clientWidth / 2) - (N_COLS * (elementSize + SPACING) / 2);
+            
+            const initialX = col * (elementSize + SPACING) + SPACING + (leftMargin > 0 ? leftMargin : 0);
             const initialY = row * (elementSize + SPACING) + GRID_START_Y;
             
             circle.style.left = `${initialX}px`;
@@ -189,6 +249,12 @@
             const data = JSON.parse(e.dataTransfer.getData('text/plain'));
             const droppedValue = data.value;
             const droppedId = data.id;
+
+            // Only consider circles that haven't been sorted yet
+            if (!document.getElementById(droppedId)) {
+                // Ignore drop if the element is already removed/sorted
+                return;
+            }
 
             if (droppedValue < currentXminValue) {
                 // New minimum found! Update Xmin and highlight the circle
@@ -230,12 +296,22 @@
             // 2. Create the final sorted element clone
             const sortedItem = document.createElement('div');
             sortedItem.className = 'flex items-center justify-center rounded-md text-white text-sm font-semibold p-2 shadow-md';
-            sortedItem.classList.add(minEl.classList[minEl.classList.length - 1]); // Re-use color class
+            
+            // Re-use color class (simple check for the class that starts with 'bg-')
+            const bgColorClass = Array.from(minEl.classList).find(cls => cls.startsWith('bg-'));
+            if (bgColorClass) {
+                sortedItem.classList.add(bgColorClass); 
+            }
+
             sortedItem.textContent = currentXminValue;
 
             // 3. Add to the sorted output area
+            // Check for and remove placeholder before adding the first item
+            const currentPlaceholder = document.getElementById('outputPlaceholder');
+            if (currentPlaceholder) {
+                currentPlaceholder.remove();
+            }
             sortedOutput.appendChild(sortedItem);
-            outputPlaceholder.style.display = 'none';
         }
         
         // 4. Reset for the next pass
@@ -253,14 +329,15 @@
 
 
     // --- General Setup ---
-    window.addEventListener('load', initializeCircles);
+    window.addEventListener('load', () => {
+        // Initialize with default N=25 on load
+        regenerateCircles(currentN);
+    });
     
     // Simple resize logic: just re-initialize the circles
     window.addEventListener('resize', () => {
-        // Clear circles but keep fixed panels
-        const circles = container.querySelectorAll('.number-circle');
-        circles.forEach(c => c.remove());
-        initializeCircles();
+        // Re-initialize with the current N value to adjust layout
+        regenerateCircles(currentN);
     });
 
 </script>
