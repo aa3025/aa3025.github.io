@@ -27,7 +27,7 @@
             width: 50px;
             height: 50px;
             cursor: grab;
-            transition: box-shadow 0.1s ease, transform 0.2s ease;
+            transition: box-shadow 0.1s ease, transform 0.2s ease, left 0.3s ease-in-out, top 0.3s ease-in-out; /* Added transition for smooth swapping */
             user-select: none;
             z-index: 10;
         }
@@ -37,7 +37,7 @@
             z-index: 50;
             transform: scale(1.1); /* Slight lift on active */
         }
-        /* Style for the drop target */
+        /* Style for the Xmin drop target */
         #xminPanel {
             transition: background-color 0.2s;
         }
@@ -54,7 +54,7 @@
     <!-- Fixed header remains at the top -->
     <div class="fixed top-0 left-0 right-0 p-4 bg-white shadow-lg text-center z-40">
         <h1 class="text-xl font-bold text-gray-800"><span id="headerN"></span> Interactive Selection Sort</h1>
-        <p class="text-sm text-gray-500">Drag numbers onto the Xmin Tracker to find the smallest element.</p>
+        <p class="text-sm text-gray-500">Drag numbers onto the Xmin Tracker to find the smallest element, or drag circles onto each other to **swap** their positions.</p>
 
         <!-- N Control Panel -->
         <div class="mt-2 flex justify-center items-center space-x-3">
@@ -82,7 +82,7 @@
         class="fixed top-[140px] right-4 w-64 p-4 bg-white rounded-xl shadow-2xl border-4 border-blue-500/20 z-40"
         ondragover="event.preventDefault(); this.classList.add('drag-over');"
         ondragleave="this.classList.remove('drag-over');"
-        ondrop="handleDrop(event); this.classList.remove('drag-over');"
+        ondrop="handleDropXmin(event); this.classList.remove('drag-over');"
     >
         <h3 class="text-xl font-extrabold text-blue-700 mb-2 border-b-2 pb-2 border-blue-100">Xmin Tracker</h3>
         <p class="text-sm text-gray-600 mb-4 font-semibold">
@@ -154,7 +154,11 @@
         minElementId = null;
         xminDisplay.textContent = currentXminValue;
         sortedOutput.innerHTML = '<p class="text-gray-400 italic text-sm" id="outputPlaceholder">Drag numbers here by finalizing Xmin...</p>';
-        document.getElementById('outputPlaceholder').style.display = 'block';
+        
+        // Ensure the placeholder is visible if the list is empty
+        const ph = document.getElementById('outputPlaceholder');
+        if (ph) ph.style.display = 'block';
+
         headerN.textContent = `Interactive Selection Sort (N=${currentN})`;
         
         // Clear existing circles
@@ -220,6 +224,18 @@
             // Drag event listeners for data transfer
             circle.addEventListener('dragstart', dragStart);
             
+            // NEW: Add dragover/drop listeners to enable circle-to-circle swapping
+            circle.addEventListener('dragover', (e) => { 
+                e.preventDefault();
+                // Add a visual highlight for the target circle
+                e.currentTarget.classList.add('ring-4', 'ring-purple-500', 'ring-offset-2');
+            });
+            circle.addEventListener('dragleave', (e) => {
+                // Remove visual highlight
+                e.currentTarget.classList.remove('ring-4', 'ring-purple-500', 'ring-offset-2');
+            });
+            circle.addEventListener('drop', handleCircleDrop);
+            
             container.appendChild(circle);
         });
     }
@@ -231,7 +247,7 @@
      * @param {DragEvent} e 
      */
     function dragStart(e) {
-        // Transfer the element's ID and value
+        // Transfer the element's ID and value (value is needed for Xmin panel)
         e.dataTransfer.setData('text/plain', JSON.stringify({
             id: e.target.id,
             value: parseInt(e.target.getAttribute('data-value'))
@@ -239,10 +255,10 @@
     }
 
     /**
-     * Handles the drop operation onto the Xmin tracker.
+     * Handles the drop operation onto the Xmin tracker panel.
      * @param {DragEvent} e 
      */
-    function handleDrop(e) {
+    function handleDropXmin(e) {
         e.preventDefault();
         
         try {
@@ -262,7 +278,7 @@
                 minElementId = droppedId;
                 xminDisplay.textContent = droppedValue;
 
-                // Highlight the new minimum circle
+                // Highlight the new minimum circle (remove all other pink rings first)
                 document.querySelectorAll('.number-circle').forEach(el => {
                     el.classList.remove('ring-4', 'ring-pink-500', 'ring-offset-2');
                 });
@@ -273,6 +289,47 @@
             }
         } catch (error) {
             console.error("Error processing dropped data:", error);
+        }
+    }
+
+    /**
+     * Swaps the position of the dragged element with the drop target element.
+     * @param {DragEvent} e 
+     */
+    function handleCircleDrop(e) {
+        e.preventDefault();
+        // Remove the visual highlight from the target circle
+        e.currentTarget.classList.remove('ring-4', 'ring-purple-500', 'ring-offset-2'); 
+
+        const targetEl = e.currentTarget; // The circle being dropped ONTO
+
+        try {
+            const draggedData = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const draggedEl = document.getElementById(draggedData.id); // The circle being dragged
+
+            // Prevent dropping on self or if the dragged element is already sorted
+            if (!draggedEl || draggedEl.id === targetEl.id) {
+                return;
+            }
+
+            // Get target positions
+            const targetX = targetEl.style.left;
+            const targetY = targetEl.style.top;
+            
+            // Get dragged element's current positions
+            const draggedX = draggedEl.style.left;
+            const draggedY = draggedEl.style.top;
+
+            // 1. Target moves to dragged's original spot
+            targetEl.style.left = draggedX;
+            targetEl.style.top = draggedY;
+
+            // 2. Dragged moves to target's original spot (creates a smooth visual swap)
+            draggedEl.style.left = targetX;
+            draggedEl.style.top = targetY;
+
+        } catch (error) {
+            console.error("Error processing circle drop:", error);
         }
     }
 
