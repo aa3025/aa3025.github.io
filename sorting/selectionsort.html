@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draggable Numbers</title>
+    <!-- Load Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            height: 100vh;
+            margin: 0;
+            overflow-x: hidden; /* Only allow vertical scroll if content is long */
+        }
+        .drag-container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            padding-top: 80px; /* Space for fixed header */
+            padding-bottom: 200px; /* Space for fixed output */
+        }
+        .number-circle {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            cursor: grab;
+            transition: box-shadow 0.1s ease, transform 0.2s ease;
+            user-select: none;
+            z-index: 10;
+        }
+        .number-circle:active {
+            cursor: grabbing;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            transform: scale(1.1); /* Slight lift on active */
+        }
+        /* Style for the drop target */
+        #xminPanel {
+            transition: background-color 0.2s;
+        }
+        /* Highlight Xmin panel when a draggable element is over it */
+        #xminPanel.drag-over {
+            background-color: #e0f2fe; /* Light blue */
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="drag-container" id="dragContainer">
+    <!-- Fixed header remains at the top -->
+    <div class="fixed top-0 left-0 right-0 p-4 bg-white shadow-lg text-center z-40">
+        <h1 class="text-xl font-bold text-gray-800">Interactive Selection Sort (N=25)</h1>
+        <p class="text-sm text-gray-500">Drag numbers onto the Xmin Tracker to find the smallest element.</p>
+    </div>
+
+    <!-- Xmin Control Panel -->
+    <div 
+        id="xminPanel" 
+        class="fixed top-[100px] right-4 w-64 p-4 bg-white rounded-xl shadow-2xl border-4 border-blue-500/20 z-40"
+        ondragover="event.preventDefault(); this.classList.add('drag-over');"
+        ondragleave="this.classList.remove('drag-over');"
+        ondrop="handleDrop(event); this.classList.remove('drag-over');"
+    >
+        <h3 class="text-xl font-extrabold text-blue-700 mb-2 border-b-2 pb-2 border-blue-100">Xmin Tracker</h3>
+        <p class="text-sm text-gray-600 mb-4 font-semibold">
+            Current Smallest Value Found (Xmin):
+        </p>
+        
+        <div class="text-center mb-4">
+            <span id="xminDisplay" class="p-3 border-2 border-blue-300 rounded-lg inline-block w-full text-5xl font-mono font-bold text-blue-800 shadow-inner bg-blue-50">1000</span>
+        </div>
+
+        <p class="text-xs text-gray-500 mt-2">
+            Drag a number here to compare. Xmin updates only if the dragged value is smaller.
+        </p>
+
+        <button 
+            id="selectMinButton"
+            onclick="selectMinimum();" 
+            class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-150 shadow-md transform hover:scale-[1.01]"
+        >
+            Select & Move Minimum
+        </button>
+    </div>
+    
+    <!-- Circles will be placed in a grid below the header -->
+</div>
+
+<!-- Fixed Sorted Output Panel at the bottom -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-gray-800 shadow-2xl z-40">
+    <h3 class="text-lg font-bold text-white mb-2">Sorted Output List:</h3>
+    <div id="sortedOutput" class="flex flex-wrap gap-2 min-h-[50px] p-2 bg-gray-900 rounded-lg border border-gray-700">
+        <p class="text-gray-400 italic text-sm" id="outputPlaceholder">Drag numbers here by finalizing Xmin...</p>
+    </div>
+</div>
+
+<script>
+    // The list of 25 numbers (first 25 from the original set)
+    const NUMBERS = [
+        69, 55, 66, 89, 52, 81, 58, 23, 71, 10, 38, 12, 82, 41, 83, 100,
+        99, 22, 86, 5, 93, 37, 40, 21, 29
+    ];
+
+    const container = document.getElementById('dragContainer');
+    const xminDisplay = document.getElementById('xminDisplay');
+    const sortedOutput = document.getElementById('sortedOutput');
+    const outputPlaceholder = document.getElementById('outputPlaceholder');
+
+    const elementSize = 50; // Width and height of the circle
+    let currentXminValue = 1000;
+    let minElementId = null;
+
+    // --- Initialization ---
+
+    /**
+     * Initializes the circles and places them in a 5x5 grid at the top.
+     */
+    function initializeCircles() {
+        // Constants for grid layout: 5 columns * 5 rows = 25 numbers
+        const N_COLS = 5; 
+        const SPACING = 20;
+        const GRID_START_Y = 100; // Start below the fixed header
+
+        NUMBERS.forEach((number, i) => {
+            const circle = document.createElement('div');
+            
+            // Generate a unique ID for tracking
+            const elementId = `num-${number}-${i}`;
+            
+            // Apply Tailwind classes for styling
+            circle.className = 'number-circle flex items-center justify-center rounded-full text-white text-sm font-semibold shadow-lg transition duration-150 ease-in-out hover:shadow-xl';
+
+            // Color logic
+            let bgColor;
+            if (number <= 25) bgColor = 'bg-red-500';
+            else if (number <= 50) bgColor = 'bg-yellow-500';
+            else if (number <= 75) bgColor = 'bg-blue-500';
+            else bgColor = 'bg-green-500';
+
+            circle.classList.add(bgColor);
+            circle.textContent = number;
+            circle.id = elementId;
+            circle.setAttribute('data-value', number);
+            circle.setAttribute('draggable', true); // Make the circles draggable
+
+            // --- Grid Positioning Logic ---
+            const col = i % N_COLS;
+            const row = Math.floor(i / N_COLS);
+
+            const initialX = col * (elementSize + SPACING) + SPACING;
+            const initialY = row * (elementSize + SPACING) + GRID_START_Y;
+            
+            circle.style.left = `${initialX}px`;
+            circle.style.top = `${initialY}px`;
+
+            // Drag event listeners for data transfer
+            circle.addEventListener('dragstart', dragStart);
+            
+            container.appendChild(circle);
+        });
+    }
+    
+    // --- Drag and Drop Handlers ---
+
+    /**
+     * Handles the start of a drag operation, setting the data to be transferred.
+     * @param {DragEvent} e 
+     */
+    function dragStart(e) {
+        // Transfer the element's ID and value
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+            id: e.target.id,
+            value: parseInt(e.target.getAttribute('data-value'))
+        }));
+    }
+
+    /**
+     * Handles the drop operation onto the Xmin tracker.
+     * @param {DragEvent} e 
+     */
+    function handleDrop(e) {
+        e.preventDefault();
+        
+        try {
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const droppedValue = data.value;
+            const droppedId = data.id;
+
+            if (droppedValue < currentXminValue) {
+                // New minimum found! Update Xmin and highlight the circle
+                currentXminValue = droppedValue;
+                minElementId = droppedId;
+                xminDisplay.textContent = droppedValue;
+
+                // Highlight the new minimum circle
+                document.querySelectorAll('.number-circle').forEach(el => {
+                    el.classList.remove('ring-4', 'ring-pink-500', 'ring-offset-2');
+                });
+                const minEl = document.getElementById(minElementId);
+                if (minEl) {
+                    minEl.classList.add('ring-4', 'ring-pink-500', 'ring-offset-2');
+                }
+            }
+        } catch (error) {
+            console.error("Error processing dropped data:", error);
+        }
+    }
+
+    // --- Algorithm Step Execution ---
+
+    /**
+     * Finalizes the current pass by moving the minimum element to the sorted output.
+     */
+    function selectMinimum() {
+        if (currentXminValue === 1000) {
+            console.warn("No minimum selected yet. Please drag circles onto the Xmin Tracker.");
+            return;
+        }
+
+        const minEl = document.getElementById(minElementId);
+
+        if (minEl) {
+            // 1. Remove from the drag container
+            minEl.remove();
+
+            // 2. Create the final sorted element clone
+            const sortedItem = document.createElement('div');
+            sortedItem.className = 'flex items-center justify-center rounded-md text-white text-sm font-semibold p-2 shadow-md';
+            sortedItem.classList.add(minEl.classList[minEl.classList.length - 1]); // Re-use color class
+            sortedItem.textContent = currentXminValue;
+
+            // 3. Add to the sorted output area
+            sortedOutput.appendChild(sortedItem);
+            outputPlaceholder.style.display = 'none';
+        }
+        
+        // 4. Reset for the next pass
+        currentXminValue = 1000;
+        minElementId = null;
+        xminDisplay.textContent = currentXminValue;
+        
+        // Remove highlights from any remaining circles
+        document.querySelectorAll('.number-circle').forEach(el => {
+            el.classList.remove('ring-4', 'ring-pink-500', 'ring-offset-2');
+        });
+        
+        console.log(`Pass complete. Minimum value ${currentXminValue} moved to sorted list.`);
+    }
+
+
+    // --- General Setup ---
+    window.addEventListener('load', initializeCircles);
+    
+    // Simple resize logic: just re-initialize the circles
+    window.addEventListener('resize', () => {
+        // Clear circles but keep fixed panels
+        const circles = container.querySelectorAll('.number-circle');
+        circles.forEach(c => c.remove());
+        initializeCircles();
+    });
+
+</script>
+
+</body>
+</html>
