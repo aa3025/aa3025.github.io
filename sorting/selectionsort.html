@@ -75,38 +75,8 @@
             </button>
         </div>
     </div>
-
-    <!-- Xmin Control Panel -->
-    <div 
-        id="xminPanel" 
-        class="fixed top-[140px] right-4 w-64 p-4 bg-white rounded-xl shadow-2xl border-4 border-blue-500/20 z-40"
-        ondragover="event.preventDefault(); this.classList.add('drag-over');"
-        ondragleave="this.classList.remove('drag-over');"
-        ondrop="handleDropXmin(event); this.classList.remove('drag-over');"
-    >
-        <h3 class="text-xl font-extrabold text-blue-700 mb-2 border-b-2 pb-2 border-blue-100">Xmin Tracker</h3>
-        <p class="text-sm text-gray-600 mb-4 font-semibold">
-            Current Smallest Value Found (Xmin):
-        </p>
-        
-        <div class="text-center mb-4">
-            <span id="xminDisplay" class="p-3 border-2 border-blue-300 rounded-lg inline-block w-full text-5xl font-mono font-bold text-blue-800 shadow-inner bg-blue-50">1000</span>
-        </div>
-
-        <p class="text-xs text-gray-500 mt-2">
-            Drag a number here to compare. Xmin updates only if the dragged value is smaller.
-        </p>
-
-        <button 
-            id="selectMinButton"
-            onclick="selectMinimum();" 
-            class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-150 shadow-md transform hover:scale-[1.01]"
-        >
-            Select & Move Minimum
-        </button>
-    </div>
     
-    <!-- Circles will be placed in a grid below the header -->
+    <!-- Circles will be placed in a single row below the header -->
 </div>
 
 <!-- Fixed Sorted Output Panel at the bottom -->
@@ -115,6 +85,42 @@
     <div id="sortedOutput" class="flex flex-wrap gap-2 min-h-[50px] p-2 bg-gray-900 rounded-lg border border-gray-700">
         <p class="text-gray-400 italic text-sm" id="outputPlaceholder">Drag numbers here by finalizing Xmin...</p>
     </div>
+</div>
+
+<!-- Xmin Control Panel - Moved to bottom right corner -->
+<div 
+    id="xminPanel" 
+    class="fixed bottom-4 right-4 w-64 p-4 bg-white rounded-xl shadow-2xl border-4 border-blue-500/20 z-40"
+    ondragover="event.preventDefault(); this.classList.add('drag-over');"
+    ondragleave="this.classList.remove('drag-over');"
+    ondrop="handleDropXmin(event); this.classList.remove('drag-over');"
+>
+    <h3 class="text-xl font-extrabold text-blue-700 mb-2 border-b-2 pb-2 border-blue-100">Xmin Tracker</h3>
+    <p class="text-sm text-gray-600 mb-4 font-semibold">
+        Current Smallest Value Found (Xmin):
+    </p>
+    
+    <div class="text-center mb-4">
+        <span id="xminDisplay" class="p-3 border-2 border-blue-300 rounded-lg inline-block w-full text-5xl font-mono font-bold text-blue-800 shadow-inner bg-blue-50">1000</span>
+    </div>
+
+    <!-- Move Counter -->
+    <div class="text-center mb-4">
+        <span class="text-sm text-gray-600 font-semibold">Moves (Swaps):</span>
+        <span id="moveCounter" class="p-2 border-2 border-purple-300 rounded-lg inline-block w-full text-2xl font-mono font-bold text-purple-800 shadow-inner bg-purple-50">0</span>
+    </div>
+
+    <p class="text-xs text-gray-500 mt-2">
+        Drag a number here to compare. Xmin updates only if the dragged value is smaller.
+    </p>
+
+    <button 
+        id="selectMinButton"
+        onclick="selectMinimum();" 
+        class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-150 shadow-md transform hover:scale-[1.01]"
+    >
+        Select & Move Minimum
+    </button>
 </div>
 
 <script>
@@ -131,11 +137,14 @@
     const outputPlaceholder = document.getElementById('outputPlaceholder');
     const nInput = document.getElementById('nInput');
     const headerN = document.getElementById('headerN');
+    const moveCounter = document.getElementById('moveCounter');
 
     const elementSize = 50; // Width and height of the circle
+    const SPACING = 20; // Space between circles
     let currentN = 25; // Default list size
     let currentXminValue = 1000;
     let minElementId = null;
+    let moves = 0; // Counter for moves/swaps
 
     // --- Initialization & Regeneration ---
 
@@ -152,7 +161,9 @@
         // Reset display elements
         currentXminValue = 1000;
         minElementId = null;
+        moves = 0;
         xminDisplay.textContent = currentXminValue;
+        moveCounter.textContent = moves;
         sortedOutput.innerHTML = '<p class="text-gray-400 italic text-sm" id="outputPlaceholder">Drag numbers here by finalizing Xmin...</p>';
         
         // Ensure the placeholder is visible if the list is empty
@@ -176,15 +187,17 @@
     }
 
     /**
-     * Initializes the circles and places them in a dynamic grid at the top.
+     * Initializes the circles and places them in a single row at the top.
      */
     function initializeCircles() {
         const numbers = getNumbersList();
         
-        // Calculate number of columns for a square-ish layout
-        const N_COLS = Math.ceil(Math.sqrt(currentN)); 
-        const SPACING = 20;
-        const GRID_START_Y = 130; // Start below the fixed header
+        // Calculate total width needed for all circles
+        const totalWidth = numbers.length * (elementSize + SPACING) - SPACING;
+        
+        // Calculate starting position to center the row
+        const startX = (container.clientWidth - totalWidth) / 2;
+        const startY = 130; // Start below the fixed header
 
         numbers.forEach((number, i) => {
             const circle = document.createElement('div');
@@ -208,15 +221,9 @@
             circle.setAttribute('data-value', number);
             circle.setAttribute('draggable', true); // Make the circles draggable
 
-            // --- Grid Positioning Logic ---
-            const col = i % N_COLS;
-            const row = Math.floor(i / N_COLS);
-
-            // Left Margin applied to center the grid roughly (simple approach)
-            const leftMargin = (container.clientWidth / 2) - (N_COLS * (elementSize + SPACING) / 2);
-            
-            const initialX = col * (elementSize + SPACING) + SPACING + (leftMargin > 0 ? leftMargin : 0);
-            const initialY = row * (elementSize + SPACING) + GRID_START_Y;
+            // Position in a single row
+            const initialX = startX + i * (elementSize + SPACING);
+            const initialY = startY;
             
             circle.style.left = `${initialX}px`;
             circle.style.top = `${initialY}px`;
@@ -328,6 +335,10 @@
             draggedEl.style.left = targetX;
             draggedEl.style.top = targetY;
 
+            // Increment move counter
+            moves++;
+            moveCounter.textContent = moves;
+
         } catch (error) {
             console.error("Error processing circle drop:", error);
         }
@@ -383,7 +394,6 @@
         
         console.log(`Pass complete. Minimum value ${currentXminValue} moved to sorted list.`);
     }
-
 
     // --- General Setup ---
     window.addEventListener('load', () => {
