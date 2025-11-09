@@ -1,471 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Graph Generator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            color: #333;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-        
-        header {
-            background: linear-gradient(90deg, #2c3e50, #4a235a);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 20px;
-            gap: 20px;
-        }
-        
-.graph-section {
-    flex: 1; /* Takes remaining space */
-    min-width: 600px;
-}
-
-.controls-section {
-    width: 350px; /* Fixed width */
-    min-width: 350px;
-    flex: none; /* Don't grow or shrink */
-}
-        
-.canvas-container {
-    border: 2px solid #34495e;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #f8f9fa;
-    margin-bottom: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    /* Aspect ratio container */
-    position: relative;
-    aspect-ratio: 940 / 768; /* Width / Height of your canvas */
-}
-
-#graphCanvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    background-color: white;
-    cursor: pointer;
-    /* Maintain aspect ratio */
-    object-fit: contain;
-    /* Improve touch experience */
-    touch-action: none; /* Prevent browser touch gestures like scrolling */
-    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
-}
-        
-        .controls {
-            background-color: #ecf0f1;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .control-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #bdc3c7;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .checkbox-group label {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0;
-            font-weight: normal;
-            cursor: pointer;
-        }
-        
-        .checkbox-group input {
-            margin-right: 8px;
-            transform: scale(1.2);
-        }
-        
-        .buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        #generateBtn {
-            background: linear-gradient(90deg, #27ae60, #2ecc71);
-            color: white;
-        }
-        
-        #generateBtn:hover {
-            background: linear-gradient(90deg, #219653, #27ae60);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(39, 174, 96, 0.4);
-        }
-        
-        #randomizeBtn {
-            background: linear-gradient(90deg, #e67e22, #f39c12);
-            color: white;
-        }
-        
-        #randomizeBtn:hover {
-            background: linear-gradient(90deg, #d35400, #e67e22);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(230, 126, 34, 0.4);
-        }
-        
-        .matrix-section {
-            background-color: #ecf0f1;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .matrix-section h2 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-            border-bottom: 2px solid #bdc3c7;
-            padding-bottom: 8px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        th, td {
-            border: 1px solid #bdc3c7;
-            padding: 8px;
-            text-align: center;
-        }
-        
-        th {
-            background-color: #34495e;
-            color: white;
-            font-weight: 600;
-        }
-        
-        .matrix-cell {
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            border: 1px solid #bdc3c7;
-            border-radius: 3px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .matrix-cell:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 8px rgba(52, 152, 219, 0.7);
-        }
-        
-        .matrix-cell.diagonal {
-            background-color: #f5f5f5;
-        }
-        
-        .matrix-cell.connected {
-            background-color: #d5f5e3;
-            color: #27ae60;
-        }
-        
-        .matrix-cell.directed {
-            background-color: #d6eaf8;
-            color: #2980b9;
-        }
-        
-        .matrix-cell.self-loop {
-            background-color: #fadbd8;
-            color: #e74c3c;
-        }
-        
-        .properties-section {
-            background-color: #ecf0f1;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .properties-section h2 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-            border-bottom: 2px solid #bdc3c7;
-            padding-bottom: 8px;
-        }
-        
-        .properties-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .property-section {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-        }
-        
-        .property-section h3 {
-            margin-bottom: 12px;
-            color: #2c3e50;
-            border-bottom: 1px solid #ecf0f1;
-            padding-bottom: 5px;
-        }
-        
-        .property-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 1px dashed #ecf0f1;
-        }
-        
-        .property-name {
-            font-weight: 600;
-            color: #34495e;
-        }
-        
-        .property-value {
-            font-weight: 600;
-        }
-        
-        .true-value {
-            color: #27ae60;
-        }
-        
-        .false-value {
-            color: #e74c3c;
-        }
-        
-        .degree-list, .clustering-list {
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 10px;
-            border: 1px solid #ecf0f1;
-            border-radius: 5px;
-            padding: 10px;
-        }
-        
-        .degree-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            padding-bottom: 5px;
-            border-bottom: 1px dotted #ecf0f1;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 15px;
-            background-color: #2c3e50;
-            color: white;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-            
-            .graph-section, .controls-section {
-                min-width: 100%;
-            }
-        }
-
-
-/* Mobile-specific adjustments */
-/* Mobile-specific adjustments */
-@media (max-width: 768px) {
-    body {
-        padding: 10px !important;
-    }
-    
-    .container {
-        border-radius: 10px;
-    }
-    
-    .main-content {
-        padding: 15px;
-        gap: 15px;
-    }
-    
-    .canvas-container {
-        margin-bottom: 15px;
-    }
-    
-    /* Graph section - full width, no horizontal scroll */
-    .graph-section {
-        min-width: 100%;
-        width: 100%;
-        overflow: visible;
-    }
-    
-    /* Controls section - full width */
-    .controls-section {
-        width: 100%;
-        min-width: 100%;
-    }
-    
-    /* Matrix section - allow horizontal scrolling */
-    .matrix-section {
-        overflow-x: auto; /* Enable horizontal scrolling */
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    }
-    
-    /* Make the matrix table scroll horizontally */
-    .matrix-section table {
-        min-width: auto; /* Allow table to be wider than container */
-        width: auto; /* Let table size based on content */
-    }
-    
-    /* Ensure matrix cells remain visible */
-    .matrix-cell {
-        min-width: 35px; /* Ensure cells don't get too small */
-        height: 35px;
-    }
-}
-
-/* Extra small mobile devices */
-@media (max-width: 480px) {
-    body {
-        padding: 5px !important;
-    }
-    
-    .main-content {
-        padding: 10px;
-        gap: 10px;
-    }
-    
-    header {
-        padding: 15px;
-    }
-    
-    h1 {
-        font-size: 2rem;
-    }
-    
-    .controls, .matrix-section, .properties-section {
-        padding: 15px;
-    }
-    
-    /* Even smaller matrix cells on very small screens */
-    .matrix-cell {
-        min-width: 30px;
-        height: 30px;
-        font-size: 0.8rem;
-    }
-    
-    th, td {
-        padding: 3px;
-        font-size: 0.9rem;
-    }
-}
-
-/* Prevent horizontal scrolling for everything EXCEPT the matrix */
-@media (max-width: 768px) {
-    html, body {
-        overflow-x: hidden;
-        max-width: 100%;
-    }
-    
-    .container {
-        max-width: 100%;
-        overflow-x: hidden;
-    }
-    
-    /* Only allow horizontal scroll in matrix section */
-    .matrix-section {
-        overflow-x: auto;
-        overflow-y: visible;
-    }
-    
-    /* Add visual cue for scrollable matrix */
-    .matrix-section::after {
-        content: "← scroll →";
-        display: block;
-        text-align: center;
-        font-size: 0.8rem;
-        color: #7f8c8d;
-        padding: 5px;
-        font-style: italic;
-    }
-}
-
-
-
-
-
-        
-    </style>
+     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
@@ -476,15 +16,12 @@
         
         <div class="main-content">
             <div class="graph-section">
-                <h2>Resulting Graph</h2>
-                    <p>You can drag nodes and change connections by editing the Adjacency Matrix below.</p>
                 <div class="canvas-container">
-
                     <canvas id="graphCanvas" width="940" height="768"></canvas>
                 </div>
                 
                 <div class="matrix-section">
-                    <h2>Adjacency Matrix (click entries to change values)</h2>
+                    <h2>Adjacency Matrix</h2>
                     <div id="matrixDisplay"></div>
                 </div>
             </div>
@@ -521,7 +58,7 @@
         </div>
         
         <footer>
-            <p>Graph Theory Visualizer &copy; 2025 | Interactive Graph Analysis Tool | Created by Alex P. using DeepSeek AI</p>
+            <p>Graph Theory Visualizer &copy; 2023 | Interactive Graph Analysis Tool</p>
         </footer>
     </div>
 
@@ -740,8 +277,6 @@
                 // Eulerian properties
                 properties.special.eulerian = isEulerian(degrees, isDirected, inDegrees, outDegrees, properties.connectivity.connected);
                 properties.special.semiEulerian = isSemiEulerian(degrees, isDirected, inDegrees, outDegrees, properties.connectivity.connected);
-
-                properties.special.hamiltonian = isHamiltonian();
                 
                 // Clustering coefficients
                 const clusteringResults = calculateClusteringCoefficients();
@@ -839,169 +374,57 @@ function isCompleteGraph(n, numEdges, isDirected) {
                     return oddDegreeCount === 0 || oddDegreeCount === 2;
                 }
             }
-
-            // Check if graph is Hamiltonian
-function isHamiltonian() {
-    if (nodes.length === 0) return false;
-    if (nodes.length === 1) return true;
-    
-    const n = nodes.length;
-    
-    // Use Dirac's theorem: if n ≥ 3 and every vertex has degree ≥ n/2, then Hamiltonian
-    if (n >= 3) {
-        const minDegreeRequired = Math.floor(n / 2);
-        for (let i = 0; i < n; i++) {
-            let degree = 0;
-            for (let j = 0; j < n; j++) {
-                if (adjacencyMatrix[i][j] === 1 || adjacencyMatrix[j][i] === 1) {
-                    degree++;
-                }
-            }
-            if (degree < minDegreeRequired) {
-                return "Unknown"; // Can't guarantee by Dirac's theorem
-            }
-        }
-        return true; // Hamiltonian by Dirac's theorem
-    }
-    
-    // For small graphs or when Dirac's theorem doesn't apply, use backtracking
-    return hasHamiltonianCycle() ? true : "Unknown";
-}
-
-// Check for Hamiltonian cycle using backtracking (for small graphs)
-function hasHamiltonianCycle() {
-    const n = nodes.length;
-    if (n === 0) return false;
-    
-    const path = new Array(n).fill(-1);
-    path[0] = 0; // Start from vertex 0
-    
-    if (!hamiltonianUtil(path, 1)) {
-        return false;
-    }
-    return true;
-}
-
-// Utility function for Hamiltonian cycle backtracking
-function hamiltonianUtil(path, pos) {
-    const n = nodes.length;
-    
-    // If all vertices are included in the path
-    if (pos === n) {
-        // Check if there's an edge from last vertex to first vertex
-        return adjacencyMatrix[path[pos - 1]][path[0]] === 1;
-    }
-    
-    // Try different vertices as next candidate
-    for (let v = 1; v < n; v++) {
-        if (isSafe(v, path, pos)) {
-            path[pos] = v;
-            
-            if (hamiltonianUtil(path, pos + 1)) {
-                return true;
-            }
-            
-            path[pos] = -1; // Backtrack
-        }
-    }
-    return false;
-}
-
-// Check if vertex can be added to Hamiltonian path
-function isSafe(v, path, pos) {
-    // Check if this vertex is adjacent to the previous vertex
-    if (adjacencyMatrix[path[pos - 1]][v] === 0) {
-        return false;
-    }
-    
-    // Check if the vertex has already been included
-    for (let i = 0; i < pos; i++) {
-        if (path[i] === v) {
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-
-
-
-
-
-
-
-
-
-
             
             // Calculate clustering coefficients
- 
-
-// Calculate clustering coefficients - FIXED VERSION
-function calculateClusteringCoefficients() {
-    const n = nodes.length;
-    const localCoefficients = [];
-    let globalSum = 0;
-    let totalTriangles = 0;
-    let totalConnectedTriples = 0;
-
-    // Calculate local coefficients and collect data for global
-    for (let i = 0; i < n; i++) {
-        const neighbors = [];
-        
-        // Find all neighbors of node i
-        for (let j = 0; j < n; j++) {
-            if (i !== j && adjacencyMatrix[i][j] === 1) {
-                neighbors.push(j);
-            }
-        }
-        
-        const k = neighbors.length;
-        
-        // If node has fewer than 2 neighbors, clustering coefficient is 0
-        if (k < 2) {
-            localCoefficients.push({ node: nodes[i].label, coefficient: 0 });
-            continue;
-        }
-        
-        // Count triangles (connections between neighbors)
-        let triangles = 0;
-        for (let a = 0; a < k; a++) {
-            for (let b = a + 1; b < k; b++) {
-                if (adjacencyMatrix[neighbors[a]][neighbors[b]] === 1) {
-                    triangles++;
+            function calculateClusteringCoefficients() {
+                const n = nodes.length;
+                const localCoefficients = [];
+                let globalSum = 0;
+                
+                for (let i = 0; i < n; i++) {
+                    const neighbors = [];
+                    
+                    // Find all neighbors of node i
+                    for (let j = 0; j < n; j++) {
+                        if (i !== j && adjacencyMatrix[i][j] === 1) {
+                            neighbors.push(j);
+                        }
+                    }
+                    
+                    const k = neighbors.length;
+                    
+                    // If node has fewer than 2 neighbors, clustering coefficient is 0
+                    if (k < 2) {
+                        localCoefficients.push({ node: nodes[i].label, coefficient: 0 });
+                        continue;
+                    }
+                    
+                    // Count triangles (connections between neighbors)
+                    let triangles = 0;
+                    for (let a = 0; a < k; a++) {
+                        for (let b = a + 1; b < k; b++) {
+                            if (adjacencyMatrix[neighbors[a]][neighbors[b]] === 1) {
+                                triangles++;
+                            }
+                        }
+                    }
+                    
+                    // Calculate local clustering coefficient
+                    const maxPossibleTriangles = k * (k - 1) / 2;
+                    const localCoefficient = maxPossibleTriangles > 0 ? triangles / maxPossibleTriangles : 0;
+                    
+                    localCoefficients.push({ node: nodes[i].label, coefficient: localCoefficient });
+                    globalSum += localCoefficient;
                 }
+                
+                const globalCoefficient = n > 0 ? globalSum / n : 0;
+                
+                return {
+                    global: globalCoefficient,
+                    averageLocal: globalCoefficient,
+                    local: localCoefficients
+                };
             }
-        }
-        
-        // Calculate local clustering coefficient
-        const maxPossibleTriangles = k * (k - 1) / 2;
-        const localCoefficient = maxPossibleTriangles > 0 ? triangles / maxPossibleTriangles : 0;
-        
-        localCoefficients.push({ node: nodes[i].label, coefficient: localCoefficient });
-        globalSum += localCoefficient;
-        
-        // For global coefficient calculation
-        totalTriangles += triangles;
-        totalConnectedTriples += k * (k - 1) / 2;
-    }
-    
-    // Calculate GLOBAL clustering coefficient (transitivity)
-    const globalCoefficient = totalConnectedTriples > 0 ? totalTriangles / totalConnectedTriples : 0;
-    
-    // Calculate AVERAGE LOCAL clustering coefficient
-    const averageLocalCoefficient = n > 0 ? globalSum / n : 0;
-    
-    return {
-        global: globalCoefficient,
-        averageLocal: averageLocalCoefficient,  // Now they can differ!
-        local: localCoefficients
-    };
-}
-
-
-
             
             // Display graph properties
             function displayGraphProperties() {
@@ -1064,72 +487,43 @@ function calculateClusteringCoefficients() {
                             </div>
                         </div>
                         
- 
-<div class="property-section">
-    <h3>Connectivity</h3>
-    <div class="property-item">
-        <span class="property-name">Connected:
-            <span title="A graph is connected if there is a path between every pair of vertices. For directed graphs, this means strongly connected.">ⓘ</span>
-        </span>
-        <span class="property-value ${properties.connectivity.connected ? 'true-value' : 'false-value'}">
-            ${properties.connectivity.connected ? 'Yes' : 'No'}
-        </span>
-    </div>
-    <div class="property-item">
-        <span class="property-name">Complete Graph:
-            <span title="A complete graph has an edge between every pair of distinct vertices. No self-loops allowed. For n vertices: undirected has n(n-1)/2 edges, directed has n(n-1) edges.">ⓘ</span>
-        </span>
-        <span class="property-value ${properties.connectivity.complete ? 'true-value' : 'false-value'}">
-            ${properties.connectivity.complete ? 'Yes' : 'No'}
-        </span>
-    </div>
-    <div class="property-item">
-        <span class="property-name">Regular Graph:
-            <span title="A regular graph has all vertices with the same degree. A k-regular graph has every vertex with degree k.">ⓘ</span>
-        </span>
-        <span class="property-value ${properties.connectivity.regular ? 'true-value' : 'false-value'}">
-            ${properties.connectivity.regular ? 'Yes' : 'No'}
-        </span>
-    </div>
-</div>
-
-
-
-
-<div class="property-section">
-    <h3>Special Properties</h3>
-    <div class="property-item">
-        <span class="property-name">Eulerian:
-            <span title="Eulerian Graph: Has an Eulerian circuit - visits every edge exactly once and returns to starting vertex. Undirected: all vertices have even degree. Directed: all vertices have equal in/out degree.">ⓘ</span>
-        </span>
-        <span class="property-value ${properties.special.eulerian ? 'true-value' : 'false-value'}">
-            ${properties.special.eulerian ? 'Yes' : 'No'}
-        </span>
-    </div>
-    <div class="property-item">
-        <span class="property-name">Semi-Eulerian:
-            <span title="Semi-Eulerian Graph: Has an Eulerian path but not a circuit - visits every edge exactly once, starts and ends at different vertices. Undirected: exactly 0 or 2 vertices have odd degree. Directed: one vertex has out=in+1, one has in=out+1.">ⓘ</span>
-        </span>
-        <span class="property-value ${properties.special.semiEulerian ? 'true-value' : 'false-value'}">
-            ${properties.special.semiEulerian ? 'Yes' : 'No'}
-        </span>
-    </div>
-    <div class="property-item">
-        <span class="property-name">Hamiltonian:
-            <span title="Hamiltonian Graph: Has a Hamiltonian cycle - visits every vertex exactly once and returns to starting vertex. Note: Determining if a graph is Hamiltonian is computationally difficult (NP-complete). This uses Dirac's theorem for certain cases.">ⓘ</span>
-        </span>
-        <span class="property-value ${
-            properties.special.hamiltonian === true ? 'true-value' : 
-            properties.special.hamiltonian === false ? 'false-value' : 'unknown-value'
-        }">
-            ${
-                properties.special.hamiltonian === true ? 'Yes' : 
-                properties.special.hamiltonian === false ? 'No' : 'Unknown'
-            }
-        </span>
-    </div>
-</div>
-
+                        <div class="property-section">
+                            <h3>Connectivity</h3>
+                            <div class="property-item">
+                                <span class="property-name">Connected:</span>
+                                <span class="property-value ${properties.connectivity.connected ? 'true-value' : 'false-value'}">
+                                    ${properties.connectivity.connected ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                            <div class="property-item">
+                                <span class="property-name">Complete Graph:</span>
+                                <span class="property-value ${properties.connectivity.complete ? 'true-value' : 'false-value'}">
+                                    ${properties.connectivity.complete ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                            <div class="property-item">
+                                <span class="property-name">Regular Graph:</span>
+                                <span class="property-value ${properties.connectivity.regular ? 'true-value' : 'false-value'}">
+                                    ${properties.connectivity.regular ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <h3>Special Properties</h3>
+                            <div class="property-item">
+                                <span class="property-name">Eulerian:</span>
+                                <span class="property-value ${properties.special.eulerian ? 'true-value' : 'false-value'}">
+                                    ${properties.special.eulerian ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                            <div class="property-item">
+                                <span class="property-name">Semi-Eulerian:</span>
+                                <span class="property-value ${properties.special.semiEulerian ? 'true-value' : 'false-value'}">
+                                    ${properties.special.semiEulerian ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                        </div>
                         
                         <div class="property-section">
                             <h3>Clustering Coefficients</h3>
@@ -1301,84 +695,103 @@ function calculateClusteringCoefficients() {
             }
             
             // Display adjacency matrix as HTML table with editable cells
-            function displayMatrix(matrix) {
-                const allowSelfLoops = allowSelfLoopsCheckbox.checked;
-                const isDirected = directedGraphCheckbox.checked;
-                
-                let html = '<table>';
-                
-                // Header row
-                html += '<tr><th></th>';
-                for (let i = 0; i < matrix.length; i++) {
-                    html += `<th>${String.fromCharCode(65 + i)}</th>`;
-                }
-                html += '</tr>';
-                
-                // Data rows
-                for (let i = 0; i < matrix.length; i++) {
-                    html += `<tr><th>${String.fromCharCode(65 + i)}</th>`;
-                    for (let j = 0; j < matrix[i].length; j++) {
-                        const cellValue = matrix[i][j];
-                        let cellClass = 'matrix-cell';
-                        
-                        // Add diagonal class for main diagonal cells
-                        if (i === j) {
-                            cellClass += ' diagonal';
-                        }
-                        
-                        if (cellValue === 2) {
-                            cellClass += ' self-loop';
-                        } else if (cellValue === 1) {
-                            cellClass += isDirected ? ' directed' : ' connected';
-                        }
-                        
-                        // Handle self-loops (diagonal cells)
-                        if (i === j) {
-                            if (allowSelfLoops) {
-                                html += `<td><input type="text" class="${cellClass}" value="${cellValue}" data-row="${i}" data-col="${j}"></td>`;
-                            } else {
-                                html += `<td><input type="text" class="matrix-cell diagonal" value="0" readonly></td>`;
-                            }
-                        } else {
-                            html += `<td><input type="text" class="${cellClass}" value="${cellValue}" data-row="${i}" data-col="${j}"></td>`;
-                        }
-                    }
-                    html += '</tr>';
-                }
-                
-                html += '</table>';
-                matrixDisplay.innerHTML = html;
-                
-                // Add event listeners to matrix cells
-                const matrixCells = document.querySelectorAll('.matrix-cell:not([readonly])');
-                matrixCells.forEach(cell => {
-                    cell.addEventListener('click', function() {
-                        const row = parseInt(this.getAttribute('data-row'));
-                        const col = parseInt(this.getAttribute('data-col'));
-                        const isDirected = directedGraphCheckbox.checked;
-                        
-                        // Toggle the connection
-                        if (row === col) {
-                            // Self-loop: toggle between 0 and 2
-                            adjacencyMatrix[row][col] = adjacencyMatrix[row][col] === 2 ? 0 : 2;
-                        } else {
-                            // Regular connection: toggle between 0 and 1
-                            adjacencyMatrix[row][col] = adjacencyMatrix[row][col] === 1 ? 0 : 1;
-                            
-                            // For undirected graphs, update symmetric cell
-                            if (!isDirected) {
-                                adjacencyMatrix[col][row] = adjacencyMatrix[row][col];
-                            }
-                        }
-                        
-                        // Update the matrix display
-                        displayMatrix(adjacencyMatrix);
-                        
-                        // Redraw the graph and update properties
-                        drawGraph();
-                    });
-                });
+            
+  function displayMatrix(matrix) {
+    const allowSelfLoops = allowSelfLoopsCheckbox.checked;
+    const isDirected = directedGraphCheckbox.checked;
+    
+    let html = '<div class="matrix-container">';
+    html += '<table class="matrix-table">';
+    
+    // Top header row
+    html += '<tr><th></th>';
+    for (let i = 0; i < matrix.length; i++) {
+        html += `<th>${String.fromCharCode(65 + i)}</th>`;
+    }
+    // Right labels column header
+    html += '<th></th>';
+    html += '</tr>';
+    
+    // Data rows with left and right labels
+    for (let i = 0; i < matrix.length; i++) {
+        html += `<tr>`;
+        // Left label
+        html += `<th>${String.fromCharCode(65 + i)}</th>`;
+        
+        // Matrix cells
+        for (let j = 0; j < matrix[i].length; j++) {
+            const cellValue = matrix[i][j];
+            let cellClass = 'matrix-cell';
+            
+            if (i === j) {
+                cellClass += ' diagonal';
             }
+            
+            if (cellValue === 2) {
+                cellClass += ' self-loop';
+            } else if (cellValue === 1) {
+                cellClass += isDirected ? ' directed' : ' connected';
+            }
+            
+            html += `<td><div class="matrix-cell-container">`;
+            if (i === j) {
+                if (allowSelfLoops) {
+                    html += `<div class="${cellClass}" data-row="${i}" data-col="${j}">${cellValue}</div>`;
+                } else {
+                    html += `<div class="matrix-cell diagonal" style="cursor: not-allowed; opacity: 0.6;">0</div>`;
+                }
+            } else {
+                html += `<div class="${cellClass}" data-row="${i}" data-col="${j}">${cellValue}</div>`;
+            }
+            html += `</div></td>`;
+        }
+        
+        // Right label
+        html += `<th>${String.fromCharCode(65 + i)}</th>`;
+        html += '</tr>';
+    }
+    
+    // Bottom labels row
+    html += '<tr><th></th>';
+    for (let i = 0; i < matrix.length; i++) {
+        html += `<th>${String.fromCharCode(65 + i)}</th>`;
+    }
+    html += '<th></th></tr>';
+    
+    html += '</table></div>';
+    matrixDisplay.innerHTML = html;
+    
+    // Add event listeners to matrix cells
+    const matrixCells = document.querySelectorAll('.matrix-cell:not([style*="cursor: not-allowed"])');
+    matrixCells.forEach(cell => {
+        cell.addEventListener('click', function() {
+            const row = parseInt(this.getAttribute('data-row'));
+            const col = parseInt(this.getAttribute('data-col'));
+            const isDirected = directedGraphCheckbox.checked;
+            
+            // Toggle the connection
+            if (row === col) {
+                adjacencyMatrix[row][col] = adjacencyMatrix[row][col] === 2 ? 0 : 2;
+            } else {
+                adjacencyMatrix[row][col] = adjacencyMatrix[row][col] === 1 ? 0 : 1;
+                
+                // For undirected graphs, update symmetric cell
+                if (!isDirected) {
+                    adjacencyMatrix[col][row] = adjacencyMatrix[row][col];
+                }
+            }
+            
+            // Update the matrix display
+            displayMatrix(adjacencyMatrix);
+            
+            // Redraw the graph and update properties
+            drawGraph();
+        });
+    });
+}
+
+
+
             
             // Find node at coordinates
             function getNodeAt(x, y) {
@@ -1447,80 +860,6 @@ function calculateClusteringCoefficients() {
                 selectedNode = null;
                 canvas.style.cursor = 'default';
             });
-
-
-
-// Touch event handlers for mobile devices
-canvas.addEventListener('touchstart', function(e) {
-    e.preventDefault(); // Prevent scrolling
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    
-    const touch = e.touches[0];
-    const x = (touch.clientX - rect.left) * scaleX;
-    const y = (touch.clientY - rect.top) * scaleY;
-    
-    selectedNode = getNodeAt(x, y);
-    if (selectedNode) {
-        isDragging = true;
-        offsetX = x - selectedNode.x;
-        offsetY = y - selectedNode.y;
-        canvas.style.cursor = 'grabbing';
-    }
-});
-
-canvas.addEventListener('touchmove', function(e) {
-    e.preventDefault(); // Prevent scrolling
-    if (!isDragging || !selectedNode) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    
-    const touch = e.touches[0];
-    const x = (touch.clientX - rect.left) * scaleX;
-    const y = (touch.clientY - rect.top) * scaleY;
-    
-    // Update node position
-    selectedNode.x = x - offsetX;
-    selectedNode.y = y - offsetY;
-    
-    // Keep node within canvas bounds
-    selectedNode.x = Math.max(selectedNode.radius, Math.min(canvas.width - selectedNode.radius, selectedNode.x));
-    selectedNode.y = Math.max(selectedNode.radius, Math.min(canvas.height - selectedNode.radius, selectedNode.y));
-    
-    drawGraph();
-});
-
-canvas.addEventListener('touchend', function(e) {
-    e.preventDefault();
-    isDragging = false;
-    selectedNode = null;
-    canvas.style.cursor = 'default';
-});
-
-canvas.addEventListener('touchcancel', function(e) {
-    e.preventDefault();
-    isDragging = false;
-    selectedNode = null;
-    canvas.style.cursor = 'default';
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             
             // Generate graph button handler
             generateBtn.addEventListener('click', function() {
@@ -1593,72 +932,7 @@ canvas.addEventListener('touchcancel', function(e) {
             // Generate initial graph
             generateBtn.click();
             
-        
-
-// Add resize handler inside the DOMContentLoaded event
-window.addEventListener('resize', function() {
-    const canvas = document.getElementById('graphCanvas');
-    const container = canvas.parentElement;
-    
-    // Get the container's computed dimensions
-    const rect = container.getBoundingClientRect();
-    
-    // Only resize if the container dimensions have actually changed
-    if (canvas.width !== rect.width || canvas.height !== rect.height) {
-        // Store the current dimensions for relative positioning
-        const oldWidth = canvas.width;
-        const oldHeight = canvas.height;
-        
-        // Set canvas dimensions to match the container
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        
-        // Redraw the graph with the new dimensions
-        if (nodes && nodes.length > 0) {
-            // Convert node positions from old canvas space to new canvas space
-            for (let i = 0; i < nodes.length; i++) {
-                // Convert to relative coordinates (0-1 range)
-                const relX = nodes[i].x / oldWidth;
-                const relY = nodes[i].y / oldHeight;
-                
-                // Convert back to absolute coordinates in new canvas space
-                nodes[i].x = relX * canvas.width;
-                nodes[i].y = relY * canvas.height;
-                
-                // Ensure nodes stay within bounds
-                nodes[i].x = Math.max(nodes[i].radius, Math.min(canvas.width - nodes[i].radius, nodes[i].x));
-                nodes[i].y = Math.max(nodes[i].radius, Math.min(canvas.height - nodes[i].radius, nodes[i].y));
-            }
-            
-            drawGraph();
-        }
-    }
-});
-
-
-// Call once to set initial size
-setTimeout(() => {
-    const canvas = document.getElementById('graphCanvas');
-    const container = canvas.parentElement;
-    const rect = container.getBoundingClientRect();
-    
-    // Only set initial size if different from current
-    if (canvas.width !== rect.width || canvas.height !== rect.height) {
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        
-        // Redraw if we have an existing graph
-        if (nodes && nodes.length > 0) {
-            drawGraph();
-        }
-    }
-}, 100);
-
-});
-
-
-
-
+        });
     </script>
 </body>
 </html>
