@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.95">
+    <meta name="viewport" content="width=device-width, initial-scale=0.9">
     <title>Advanced Graph Generator</title>
     <style>
         * {
@@ -607,6 +607,8 @@
                 // Eulerian properties
                 properties.special.eulerian = isEulerian(degrees, isDirected, inDegrees, outDegrees, properties.connectivity.connected);
                 properties.special.semiEulerian = isSemiEulerian(degrees, isDirected, inDegrees, outDegrees, properties.connectivity.connected);
+
+                properties.special.hamiltonian = isHamiltonian();
                 
                 // Clustering coefficients
                 const clusteringResults = calculateClusteringCoefficients();
@@ -704,6 +706,101 @@ function isCompleteGraph(n, numEdges, isDirected) {
                     return oddDegreeCount === 0 || oddDegreeCount === 2;
                 }
             }
+
+            // Check if graph is Hamiltonian
+function isHamiltonian() {
+    if (nodes.length === 0) return false;
+    if (nodes.length === 1) return true;
+    
+    const n = nodes.length;
+    
+    // Use Dirac's theorem: if n ≥ 3 and every vertex has degree ≥ n/2, then Hamiltonian
+    if (n >= 3) {
+        const minDegreeRequired = Math.floor(n / 2);
+        for (let i = 0; i < n; i++) {
+            let degree = 0;
+            for (let j = 0; j < n; j++) {
+                if (adjacencyMatrix[i][j] === 1 || adjacencyMatrix[j][i] === 1) {
+                    degree++;
+                }
+            }
+            if (degree < minDegreeRequired) {
+                return "Unknown"; // Can't guarantee by Dirac's theorem
+            }
+        }
+        return true; // Hamiltonian by Dirac's theorem
+    }
+    
+    // For small graphs or when Dirac's theorem doesn't apply, use backtracking
+    return hasHamiltonianCycle() ? true : "Unknown";
+}
+
+// Check for Hamiltonian cycle using backtracking (for small graphs)
+function hasHamiltonianCycle() {
+    const n = nodes.length;
+    if (n === 0) return false;
+    
+    const path = new Array(n).fill(-1);
+    path[0] = 0; // Start from vertex 0
+    
+    if (!hamiltonianUtil(path, 1)) {
+        return false;
+    }
+    return true;
+}
+
+// Utility function for Hamiltonian cycle backtracking
+function hamiltonianUtil(path, pos) {
+    const n = nodes.length;
+    
+    // If all vertices are included in the path
+    if (pos === n) {
+        // Check if there's an edge from last vertex to first vertex
+        return adjacencyMatrix[path[pos - 1]][path[0]] === 1;
+    }
+    
+    // Try different vertices as next candidate
+    for (let v = 1; v < n; v++) {
+        if (isSafe(v, path, pos)) {
+            path[pos] = v;
+            
+            if (hamiltonianUtil(path, pos + 1)) {
+                return true;
+            }
+            
+            path[pos] = -1; // Backtrack
+        }
+    }
+    return false;
+}
+
+// Check if vertex can be added to Hamiltonian path
+function isSafe(v, path, pos) {
+    // Check if this vertex is adjacent to the previous vertex
+    if (adjacencyMatrix[path[pos - 1]][v] === 0) {
+        return false;
+    }
+    
+    // Check if the vertex has already been included
+    for (let i = 0; i < pos; i++) {
+        if (path[i] === v) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
+
             
             // Calculate clustering coefficients
  
@@ -834,47 +931,42 @@ function calculateClusteringCoefficients() {
                             </div>
                         </div>
                         
-                        <div class="property-section">
-                            <h3>Connectivity</h3>
-                            <div class="property-item">
-                                <span class="property-name">Connected:</span>
-                                <span class="property-value ${properties.connectivity.connected ? 'true-value' : 'false-value'}">
-                                    ${properties.connectivity.connected ? 'Yes' : 'No'}
-                                </span>
-                            </div>
-                            <div class="property-item">
-                                <span class="property-name">Complete Graph:</span>
-                                <span class="property-value ${properties.connectivity.complete ? 'true-value' : 'false-value'}">
-                                    ${properties.connectivity.complete ? 'Yes' : 'No'}
-                                </span>
-                            </div>
-                            <div class="property-item">
-                                <span class="property-name">Regular Graph:</span>
-                                <span class="property-value ${properties.connectivity.regular ? 'true-value' : 'false-value'}">
-                                    ${properties.connectivity.regular ? 'Yes' : 'No'}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="property-section">
-                            <h3>Special Properties</h3>
-                            <div class="property-item">
-                                <span class="property-name">Eulerian:
-        <span class="tooltip-icon" title="A graph is Eulerian if it has an Eulerian circuit - a path that visits every edge exactly once and returns to the starting vertex. For undirected graphs: all vertices have even degree. For directed graphs: all vertices have equal in-degree and out-degree.">ⓘ</span>
-    </span>
-                                <span class="property-value ${properties.special.eulerian ? 'true-value' : 'false-value'}">
-                                    ${properties.special.eulerian ? 'Yes' : 'No'}
-                                </span>
-                            </div>
-                            <div class="property-item">
-                                <span class="property-name">Semi-Eulerian:
-        <span class="tooltip-icon" title="A graph is Semi-Eulerian if it has an Eulerian path but not an Eulerian circuit - a path that visits every edge exactly once but starts and ends at different vertices. For undirected graphs: exactly 0 or 2 vertices have odd degree. For directed graphs: exactly one vertex has out-degree = in-degree + 1 and one has in-degree = out-degree + 1.">ⓘ</span>
-    </span>
-                                <span class="property-value ${properties.special.semiEulerian ? 'true-value' : 'false-value'}">
-                                    ${properties.special.semiEulerian ? 'Yes' : 'No'}
-                                </span>
-                            </div>
-                        </div>
+ 
+
+<div class="property-section">
+    <h3>Special Properties</h3>
+    <div class="property-item">
+        <span class="property-name">Eulerian:
+            <span title="Eulerian Graph: Has an Eulerian circuit - visits every edge exactly once and returns to starting vertex. Undirected: all vertices have even degree. Directed: all vertices have equal in/out degree.">ⓘ</span>
+        </span>
+        <span class="property-value ${properties.special.eulerian ? 'true-value' : 'false-value'}">
+            ${properties.special.eulerian ? 'Yes' : 'No'}
+        </span>
+    </div>
+    <div class="property-item">
+        <span class="property-name">Semi-Eulerian:
+            <span title="Semi-Eulerian Graph: Has an Eulerian path but not a circuit - visits every edge exactly once, starts and ends at different vertices. Undirected: exactly 0 or 2 vertices have odd degree. Directed: one vertex has out=in+1, one has in=out+1.">ⓘ</span>
+        </span>
+        <span class="property-value ${properties.special.semiEulerian ? 'true-value' : 'false-value'}">
+            ${properties.special.semiEulerian ? 'Yes' : 'No'}
+        </span>
+    </div>
+    <div class="property-item">
+        <span class="property-name">Hamiltonian:
+            <span title="Hamiltonian Graph: Has a Hamiltonian cycle - visits every vertex exactly once and returns to starting vertex. Note: Determining if a graph is Hamiltonian is computationally difficult (NP-complete). This uses Dirac's theorem for certain cases.">ⓘ</span>
+        </span>
+        <span class="property-value ${
+            properties.special.hamiltonian === true ? 'true-value' : 
+            properties.special.hamiltonian === false ? 'false-value' : 'unknown-value'
+        }">
+            ${
+                properties.special.hamiltonian === true ? 'Yes' : 
+                properties.special.hamiltonian === false ? 'No' : 'Unknown'
+            }
+        </span>
+    </div>
+</div>
+ 
                         
                         <div class="property-section">
                             <h3>Clustering Coefficients</h3>
