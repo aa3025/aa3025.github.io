@@ -932,6 +932,36 @@ function calculateClusteringCoefficients() {
                         </div>
                         
  
+<div class="property-section">
+    <h3>Connectivity</h3>
+    <div class="property-item">
+        <span class="property-name">Connected:
+            <span title="A graph is connected if there is a path between every pair of vertices. For directed graphs, this means strongly connected.">ⓘ</span>
+        </span>
+        <span class="property-value ${properties.connectivity.connected ? 'true-value' : 'false-value'}">
+            ${properties.connectivity.connected ? 'Yes' : 'No'}
+        </span>
+    </div>
+    <div class="property-item">
+        <span class="property-name">Complete Graph:
+            <span title="A complete graph has an edge between every pair of distinct vertices. No self-loops allowed. For n vertices: undirected has n(n-1)/2 edges, directed has n(n-1) edges.">ⓘ</span>
+        </span>
+        <span class="property-value ${properties.connectivity.complete ? 'true-value' : 'false-value'}">
+            ${properties.connectivity.complete ? 'Yes' : 'No'}
+        </span>
+    </div>
+    <div class="property-item">
+        <span class="property-name">Regular Graph:
+            <span title="A regular graph has all vertices with the same degree. A k-regular graph has every vertex with degree k.">ⓘ</span>
+        </span>
+        <span class="property-value ${properties.connectivity.regular ? 'true-value' : 'false-value'}">
+            ${properties.connectivity.regular ? 'Yes' : 'No'}
+        </span>
+    </div>
+</div>
+
+
+
 
 <div class="property-section">
     <h3>Special Properties</h3>
@@ -966,7 +996,7 @@ function calculateClusteringCoefficients() {
         </span>
     </div>
 </div>
- 
+
                         
                         <div class="property-section">
                             <h3>Clustering Coefficients</h3>
