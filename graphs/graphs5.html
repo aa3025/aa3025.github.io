@@ -343,12 +343,15 @@
         
         <div class="main-content">
             <div class="graph-section">
+                <h2>Resulting Graph</h2>
+                    <p>You can drag nodes and change connections by editing the Adjacency Matrix below.</p>
                 <div class="canvas-container">
+
                     <canvas id="graphCanvas" width="940" height="768"></canvas>
                 </div>
                 
                 <div class="matrix-section">
-                    <h2>Adjacency Matrix</h2>
+                    <h2>Adjacency Matrix (click entries to change values)</h2>
                     <div id="matrixDisplay"></div>
                 </div>
             </div>
@@ -768,7 +771,7 @@ function calculateClusteringCoefficients() {
 }
 
 
- 
+
             
             // Display graph properties
             function displayGraphProperties() {
