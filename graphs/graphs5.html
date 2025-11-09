@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.9">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Advanced Graph Generator</title>
     <style>
         * {
@@ -340,6 +340,81 @@
                 min-width: 100%;
             }
         }
+
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    body {
+        padding: 10px !important; /* Reduce padding on mobile */
+    }
+    
+    .container {
+        border-radius: 10px; /* Slightly smaller radius on mobile */
+    }
+    
+    .main-content {
+        padding: 15px; /* Reduce internal padding */
+        gap: 15px;
+    }
+    
+    .canvas-container {
+        margin-bottom: 15px; /* Reduce margin */
+    }
+    
+    /* Ensure graph section uses full width */
+    .graph-section {
+        min-width: 100%;
+        width: 100%;
+    }
+    
+    /* Make controls section full width on mobile */
+    .controls-section {
+        width: 100%;
+        min-width: 100%;
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    body {
+        padding: 5px !important; /* Even less padding on very small screens */
+    }
+    
+    .main-content {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    header {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 2rem; /* Smaller heading on very small screens */
+    }
+    
+    .controls, .matrix-section, .properties-section {
+        padding: 15px;
+    }
+}
+
+/* Prevent horizontal scrolling on mobile */
+@media (max-width: 768px) {
+    html, body {
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+    
+    .container {
+        max-width: 100%;
+    }
+}
+
+
+
+
+
+        
     </style>
 </head>
 <body>
@@ -1395,7 +1470,7 @@ canvas.addEventListener('touchcancel', function(e) {
 
 
 
-            
+
             
             // Generate graph button handler
             generateBtn.addEventListener('click', function() {
