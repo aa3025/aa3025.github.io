@@ -703,55 +703,72 @@ function isCompleteGraph(n, numEdges, isDirected) {
             }
             
             // Calculate clustering coefficients
-            function calculateClusteringCoefficients() {
-                const n = nodes.length;
-                const localCoefficients = [];
-                let globalSum = 0;
-                
-                for (let i = 0; i < n; i++) {
-                    const neighbors = [];
-                    
-                    // Find all neighbors of node i
-                    for (let j = 0; j < n; j++) {
-                        if (i !== j && adjacencyMatrix[i][j] === 1) {
-                            neighbors.push(j);
-                        }
-                    }
-                    
-                    const k = neighbors.length;
-                    
-                    // If node has fewer than 2 neighbors, clustering coefficient is 0
-                    if (k < 2) {
-                        localCoefficients.push({ node: nodes[i].label, coefficient: 0 });
-                        continue;
-                    }
-                    
-                    // Count triangles (connections between neighbors)
-                    let triangles = 0;
-                    for (let a = 0; a < k; a++) {
-                        for (let b = a + 1; b < k; b++) {
-                            if (adjacencyMatrix[neighbors[a]][neighbors[b]] === 1) {
-                                triangles++;
-                            }
-                        }
-                    }
-                    
-                    // Calculate local clustering coefficient
-                    const maxPossibleTriangles = k * (k - 1) / 2;
-                    const localCoefficient = maxPossibleTriangles > 0 ? triangles / maxPossibleTriangles : 0;
-                    
-                    localCoefficients.push({ node: nodes[i].label, coefficient: localCoefficient });
-                    globalSum += localCoefficient;
-                }
-                
-                const globalCoefficient = n > 0 ? globalSum / n : 0;
-                
-                return {
-                    global: globalCoefficient,
-                    averageLocal: globalCoefficient,
-                    local: localCoefficients
-                };
+ 
+
+// Calculate clustering coefficients - FIXED VERSION
+function calculateClusteringCoefficients() {
+    const n = nodes.length;
+    const localCoefficients = [];
+    let globalSum = 0;
+    let totalTriangles = 0;
+    let totalConnectedTriples = 0;
+
+    // Calculate local coefficients and collect data for global
+    for (let i = 0; i < n; i++) {
+        const neighbors = [];
+        
+        // Find all neighbors of node i
+        for (let j = 0; j < n; j++) {
+            if (i !== j && adjacencyMatrix[i][j] === 1) {
+                neighbors.push(j);
             }
+        }
+        
+        const k = neighbors.length;
+        
+        // If node has fewer than 2 neighbors, clustering coefficient is 0
+        if (k < 2) {
+            localCoefficients.push({ node: nodes[i].label, coefficient: 0 });
+            continue;
+        }
+        
+        // Count triangles (connections between neighbors)
+        let triangles = 0;
+        for (let a = 0; a < k; a++) {
+            for (let b = a + 1; b < k; b++) {
+                if (adjacencyMatrix[neighbors[a]][neighbors[b]] === 1) {
+                    triangles++;
+                }
+            }
+        }
+        
+        // Calculate local clustering coefficient
+        const maxPossibleTriangles = k * (k - 1) / 2;
+        const localCoefficient = maxPossibleTriangles > 0 ? triangles / maxPossibleTriangles : 0;
+        
+        localCoefficients.push({ node: nodes[i].label, coefficient: localCoefficient });
+        globalSum += localCoefficient;
+        
+        // For global coefficient calculation
+        totalTriangles += triangles;
+        totalConnectedTriples += k * (k - 1) / 2;
+    }
+    
+    // Calculate GLOBAL clustering coefficient (transitivity)
+    const globalCoefficient = totalConnectedTriples > 0 ? totalTriangles / totalConnectedTriples : 0;
+    
+    // Calculate AVERAGE LOCAL clustering coefficient
+    const averageLocalCoefficient = n > 0 ? globalSum / n : 0;
+    
+    return {
+        global: globalCoefficient,
+        averageLocal: averageLocalCoefficient,  // Now they can differ!
+        local: localCoefficients
+    };
+}
+
+
+ 
             
             // Display graph properties
             function displayGraphProperties() {
