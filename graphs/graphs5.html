@@ -343,41 +343,61 @@
 
 
 /* Mobile-specific adjustments */
+/* Mobile-specific adjustments */
 @media (max-width: 768px) {
     body {
-        padding: 10px !important; /* Reduce padding on mobile */
+        padding: 10px !important;
     }
     
     .container {
-        border-radius: 10px; /* Slightly smaller radius on mobile */
+        border-radius: 10px;
     }
     
     .main-content {
-        padding: 15px; /* Reduce internal padding */
+        padding: 15px;
         gap: 15px;
     }
     
     .canvas-container {
-        margin-bottom: 15px; /* Reduce margin */
+        margin-bottom: 15px;
     }
     
-    /* Ensure graph section uses full width */
+    /* Graph section - full width, no horizontal scroll */
     .graph-section {
         min-width: 100%;
         width: 100%;
+        overflow: visible;
     }
     
-    /* Make controls section full width on mobile */
+    /* Controls section - full width */
     .controls-section {
         width: 100%;
         min-width: 100%;
+    }
+    
+    /* Matrix section - allow horizontal scrolling */
+    .matrix-section {
+        overflow-x: auto; /* Enable horizontal scrolling */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+    
+    /* Make the matrix table scroll horizontally */
+    .matrix-section table {
+        min-width: auto; /* Allow table to be wider than container */
+        width: auto; /* Let table size based on content */
+    }
+    
+    /* Ensure matrix cells remain visible */
+    .matrix-cell {
+        min-width: 35px; /* Ensure cells don't get too small */
+        height: 35px;
     }
 }
 
 /* Extra small mobile devices */
 @media (max-width: 480px) {
     body {
-        padding: 5px !important; /* Even less padding on very small screens */
+        padding: 5px !important;
     }
     
     .main-content {
@@ -390,15 +410,27 @@
     }
     
     h1 {
-        font-size: 2rem; /* Smaller heading on very small screens */
+        font-size: 2rem;
     }
     
     .controls, .matrix-section, .properties-section {
         padding: 15px;
     }
+    
+    /* Even smaller matrix cells on very small screens */
+    .matrix-cell {
+        min-width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+    
+    th, td {
+        padding: 3px;
+        font-size: 0.9rem;
+    }
 }
 
-/* Prevent horizontal scrolling on mobile */
+/* Prevent horizontal scrolling for everything EXCEPT the matrix */
 @media (max-width: 768px) {
     html, body {
         overflow-x: hidden;
@@ -407,6 +439,24 @@
     
     .container {
         max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    /* Only allow horizontal scroll in matrix section */
+    .matrix-section {
+        overflow-x: auto;
+        overflow-y: visible;
+    }
+    
+    /* Add visual cue for scrollable matrix */
+    .matrix-section::after {
+        content: "← scroll →";
+        display: block;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #7f8c8d;
+        padding: 5px;
+        font-style: italic;
     }
 }
 
