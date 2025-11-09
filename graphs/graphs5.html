@@ -80,11 +80,14 @@
 #graphCanvas {
     display: block;
     width: 100%;
-    height: 100%; /* Changed from fixed height */
+    height: 100%;
     background-color: white;
     cursor: pointer;
     /* Maintain aspect ratio */
     object-fit: contain;
+    /* Improve touch experience */
+    touch-action: none; /* Prevent browser touch gestures like scrolling */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
 }
         
         .controls {
@@ -1319,6 +1322,80 @@ function calculateClusteringCoefficients() {
                 selectedNode = null;
                 canvas.style.cursor = 'default';
             });
+
+
+
+// Touch event handlers for mobile devices
+canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault(); // Prevent scrolling
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const touch = e.touches[0];
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
+    
+    selectedNode = getNodeAt(x, y);
+    if (selectedNode) {
+        isDragging = true;
+        offsetX = x - selectedNode.x;
+        offsetY = y - selectedNode.y;
+        canvas.style.cursor = 'grabbing';
+    }
+});
+
+canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault(); // Prevent scrolling
+    if (!isDragging || !selectedNode) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const touch = e.touches[0];
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
+    
+    // Update node position
+    selectedNode.x = x - offsetX;
+    selectedNode.y = y - offsetY;
+    
+    // Keep node within canvas bounds
+    selectedNode.x = Math.max(selectedNode.radius, Math.min(canvas.width - selectedNode.radius, selectedNode.x));
+    selectedNode.y = Math.max(selectedNode.radius, Math.min(canvas.height - selectedNode.radius, selectedNode.y));
+    
+    drawGraph();
+});
+
+canvas.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    isDragging = false;
+    selectedNode = null;
+    canvas.style.cursor = 'default';
+});
+
+canvas.addEventListener('touchcancel', function(e) {
+    e.preventDefault();
+    isDragging = false;
+    selectedNode = null;
+    canvas.style.cursor = 'default';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
             
             // Generate graph button handler
             generateBtn.addEventListener('click', function() {
