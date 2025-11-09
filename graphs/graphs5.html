@@ -53,15 +53,16 @@
             gap: 20px;
         }
         
-        .graph-section {
-            flex: 2; /* Increased flex ratio for more width */
-            min-width: 600px;
-        }
-        
-        .controls-section {
-            flex: 1;
-            min-width: 350px;
-        }
+.graph-section {
+    flex: 1; /* Takes remaining space */
+    min-width: 600px;
+}
+
+.controls-section {
+    width: 350px; /* Fixed width */
+    min-width: 350px;
+    flex: none; /* Don't grow or shrink */
+}
         
         .canvas-container {
             border: 2px solid #34495e;
@@ -76,7 +77,7 @@
         #graphCanvas {
             display: block;
             width: 100%;
-            height: 500px;
+            height: 768px;
             background-color: white;
             cursor: pointer;
         }
@@ -343,7 +344,7 @@
         <div class="main-content">
             <div class="graph-section">
                 <div class="canvas-container">
-                    <canvas id="graphCanvas" width="800" height="500"></canvas>
+                    <canvas id="graphCanvas" width="940" height="768"></canvas>
                 </div>
                 
                 <div class="matrix-section">
