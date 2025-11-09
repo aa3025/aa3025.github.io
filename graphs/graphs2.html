@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Graph Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .controls {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 80px;
+        }
+        button {
+            background-color: #4a6ee0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #3a5ec9;
+        }
+        .graph-container {
+            position: relative;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: 600px;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .matrix-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        .matrix-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .matrix-cell {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            border: none;
+            background-color: transparent;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .matrix-cell:hover {
+            transform: scale(1.1);
+        }
+        .matrix-cell.connected {
+            background-color: #4a6ee0;
+            color: white;
+        }
+        .matrix-cell.self-loop {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .matrix-cell.directed {
+            background-color: #27ae60;
+            color: white;
+        }
+        .matrix-cell.diagonal {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .matrix-cell.diagonal.self-loop {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .instructions {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #2c5aa0;
+        }
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid #333;
+        }
+        .legend-self-loop {
+            width: 20px;
+            height: 10px;
+            border-radius: 10px 10px 0 0;
+            background-color: #e74c3c;
+        }
+        .legend-diagonal {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+        }
+        .legend-directed {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background-color: #27ae60;
+        }
+        .options {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Graph Generator</h1>
+        
+        <div class="controls">
+            <div class="input-group">
+                <label for="nodeCount">Number of nodes:</label>
+                <input type="number" id="nodeCount" min="1" max="26" value="8">
+                <button id="generateBtn">Generate Graph</button>
+            </div>
+            <div class="options">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="allowSelfLoops" checked>
+                    <label for="allowSelfLoops">Allow self-loops</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="directedGraph">
+                    <label for="directedGraph">Directed graph</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="curvedEdges" checked>
+                    <label for="curvedEdges">Curved edges</label>
+                </div>
+            </div>
+            <div class="instructions">
+                <h3>Instructions:</h3>
+                <p>Enter the number of nodes (1-26) and click "Generate Graph". The nodes will be labeled with capital letters A-Z. You can:</p>
+                <ul>
+                    <li>Drag nodes around to rearrange the graph</li>
+                    <li>Click on matrix cells to toggle connections between nodes</li>
+                    <li>Click on diagonal cells (self-loops) to add circular connections to the same node</li>
+                    <li>Toggle between directed and undirected graphs</li>
+                    <li>Use the "Randomize Matrix" button to generate a new random adjacency matrix</li>
+                    <li>The graph updates automatically when you modify the matrix</li>
+                </ul>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #4a6ee0;"></div>
+                        <span>Undirected connection</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-directed"></div>
+                        <span>Directed connection</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-self-loop"></div>
+                        <span>Self-loop (value 2)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-diagonal"></div>
+                        <span>Diagonal cell</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="graph-container">
+            <canvas id="graphCanvas"></canvas>
+        </div>
+        
+        <div class="matrix-container">
+            <div class="matrix-header">
+                <h2>Adjacency Matrix (Click cells to toggle connections)</h2>
+                <button id="randomizeBtn">Randomize Matrix</button>
+            </div>
+            <div id="matrixDisplay"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('graphCanvas');
+            const ctx = canvas.getContext('2d');
+            const nodeCountInput = document.getElementById('nodeCount');
+            const generateBtn = document.getElementById('generateBtn');
+            const randomizeBtn = document.getElementById('randomizeBtn');
+            const matrixDisplay = document.getElementById('matrixDisplay');
+            const allowSelfLoopsCheckbox = document.getElementById('allowSelfLoops');
+            const directedGraphCheckbox = document.getElementById('directedGraph');
+            const curvedEdgesCheckbox = document.getElementById('curvedEdges');
+            
+            // Set canvas dimensions
+            function resizeCanvas() {
+                const container = canvas.parentElement;
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            
+            let nodes = [];
+            let adjacencyMatrix = [];
+            let selectedNode = null;
+            let offsetX, offsetY;
+            
+            // Generate random color
+            function getRandomColor() {
+                const hue = Math.floor(Math.random() * 360);
+                return `hsl(${hue}, 70%, 60%)`;
+            }
+            
+            // Generate random adjacency matrix
+            function generateAdjacencyMatrix(n, allowSelfLoops, isDirected) {
+                const matrix = [];
+                // First, initialize the matrix with zeros
+                for (let i = 0; i < n; i++) {
+                    matrix[i] = [];
+                    for (let j = 0; j < n; j++) {
+                        matrix[i][j] = 0;
+                    }
+                }
+                
+                // Now populate with connections
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < n; j++) {
+                        // For diagonal cells (self-loops)
+                        if (i === j) {
+                            if (allowSelfLoops && Math.random() < 0.15) {
+                                matrix[i][j] = 2;
+                            }
+                        } else {
+                            // Connection probability depends on whether graph is directed
+                            const prob = isDirected ? 0.2 : 0.15;
+                            if (Math.random() < prob) {
+                                matrix[i][j] = 1;
+                                
+                                // For undirected graphs, ensure symmetry
+                                if (!isDirected) {
+                                    matrix[j][i] = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+                return matrix;
+            }
+            
+            // Create nodes with random positions
+            function createNodes(n) {
+                const newNodes = [];
+                const radius = 30;
+                const margin = 50;
+                
+                for (let i = 0; i < n; i++) {
+                    // Try to find a position that doesn't overlap too much
+                    let x, y, attempts = 0;
+                    do {
+                        x = margin + Math.random() * (canvas.width - 2 * margin);
+                        y = margin + Math.random() * (canvas.height - 2 * margin);
+                        attempts++;
+                    } while (isOverlapping(newNodes, x, y, radius * 2) && attempts < 100);
+                    
+                    newNodes.push({
+                        id: i,
+                        label: String.fromCharCode(65 + i), // A, B, C, ...
+                        x: x,
+                        y: y,
+                        radius: radius,
+                        color: getRandomColor(),
+                        textColor: '#FFFFFF'
+                    });
+                }
+                
+                return newNodes;
+            }
+            
+            // Check if a new node would overlap with existing nodes
+            function isOverlapping(nodes, x, y, minDistance) {
+                for (const node of nodes) {
+                    const dx = node.x - x;
+                    const dy = node.y - y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < minDistance) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            // Draw arrowhead
+            function drawArrowhead(x, y, angle, color) {
+                const size = 10;
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-size, -size/2);
+                ctx.lineTo(-size, size/2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+            
+            // Draw the graph
+            function drawGraph() {
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const isDirected = directedGraphCheckbox.checked;
+                const useCurvedEdges = curvedEdgesCheckbox.checked;
+                
+                // Draw edges
+                for (let i = 0; i < nodes.length; i++) {
+                    for (let j = 0; j < nodes.length; j++) {
+                        if (adjacencyMatrix[i][j] > 0) {
+                            // Self-loops
+                            if (i === j && adjacencyMatrix[i][j] === 2) {
+                                const node = nodes[i];
+                                
+                                ctx.strokeStyle = '#e74c3c';
+                                ctx.lineWidth = 3;
+                                
+                                // Draw self-loop as bezier curve
+                                const startAngle = Math.PI * 0.2;
+                                const endAngle = Math.PI * 1.8;
+                                const loopRadius = node.radius * 2;
+                                
+                                // Control points for bezier curve
+                                const cp1x = node.x + loopRadius * Math.cos(startAngle);
+                                const cp1y = node.y - loopRadius * Math.sin(startAngle);
+                                const cp2x = node.x + loopRadius * Math.cos(endAngle);
+                                const cp2y = node.y - loopRadius * Math.sin(endAngle);
+                                
+                                ctx.beginPath();
+                                ctx.moveTo(node.x + node.radius * Math.cos(startAngle), 
+                                          node.y - node.radius * Math.sin(startAngle));
+                                ctx.bezierCurveTo(
+                                    cp1x, cp1y,
+                                    cp2x, cp2y,
+                                    node.x + node.radius * Math.cos(endAngle),
+                                    node.y - node.radius * Math.sin(endAngle)
+                                );
+                                ctx.stroke();
+                                
+                                // Add arrowhead for self-loop
+                                const arrowAngle = Math.PI * 1.5;
+                                const arrowX = node.x + node.radius * Math.cos(endAngle);
+                                const arrowY = node.y - node.radius * Math.sin(endAngle);
+                                drawArrowhead(arrowX, arrowY, arrowAngle, '#e74c3c');
+                            } 
+                            // Regular connections
+                            else if (i !== j) {
+                                const node1 = nodes[i];
+                                const node2 = nodes[j];
+                                
+                                // Determine if this is a bidirectional connection
+                                const isBidirectional = !isDirected && adjacencyMatrix[j][i] === 1;
+                                
+                                // Set color and line width based on connection type
+                                if (isBidirectional) {
+                                    ctx.strokeStyle = '#4a6ee0';
+                                    ctx.lineWidth = 2;
+                                } else {
+                                    ctx.strokeStyle = '#27ae60';
+                                    ctx.lineWidth = 2;
+                                }
+                                
+                                // Calculate direction and control points for bezier curve
+                                const dx = node2.x - node1.x;
+                                const dy = node2.y - node1.y;
+                                const dist = Math.sqrt(dx * dx + dy * dy);
+                                const unitX = dx / dist;
+                                const unitY = dy / dist;
+                                
+                                // Start and end points (offset by node radius)
+                                const startX = node1.x + unitX * node1.radius;
+                                const startY = node1.y + unitY * node1.radius;
+                                const endX = node2.x - unitX * node2.radius;
+                                const endY = node2.y - unitY * node2.radius;
+                                
+                                if (useCurvedEdges && !isBidirectional) {
+                                    // Calculate control point for bezier curve with reduced curvature (0.1)
+                                    const midX = (startX + endX) / 2;
+                                    const midY = (startY + endY) / 2;
+                                    
+                                    // Perpendicular direction for curve
+                                    const perpX = -unitY;
+                                    const perpY = unitX;
+                                    
+                                    // Curve magnitude (reduced to 0.1 for less curvature)
+                                    const curveMagnitude = dist * 0.1;
+                                    
+                                    const controlX = midX + perpX * curveMagnitude;
+                                    const controlY = midY + perpY * curveMagnitude;
+                                    
+                                    // Draw bezier curve
+                                    ctx.beginPath();
+                                    ctx.moveTo(startX, startY);
+                                    ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+                                    ctx.stroke();
+                                    
+                                    // Draw arrowhead for directed edge
+                                    if (isDirected) {
+                                        const arrowAngle = Math.atan2(endY - controlY, endX - controlX);
+                                        drawArrowhead(endX, endY, arrowAngle, '#27ae60');
+                                    }
+                                } else {
+                                    // Draw straight line
+                                    ctx.beginPath();
+                                    ctx.moveTo(startX, startY);
+                                    ctx.lineTo(endX, endY);
+                                    ctx.stroke();
+                                    
+                                    // Draw arrowhead for directed edge
+                                    if (isDirected) {
+                                        const arrowAngle = Math.atan2(dy, dx);
+                                        drawArrowhead(endX, endY, arrowAngle, '#27ae60');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Draw nodes
+                for (const node of nodes) {
+                    // Draw node circle
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = node.color;
+                    ctx.fill();
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Draw node label
+                    ctx.fillStyle = node.textColor;
+                    ctx.font = 'bold 18px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(node.label, node.x, node.y);
+                }
+            }
+            
+            // Display adjacency matrix as HTML table with editable cells
+            function displayMatrix(matrix) {
+                const allowSelfLoops = allowSelfLoopsCheckbox.checked;
+                const isDirected = directedGraphCheckbox.checked;
+                
+                let html = '<table>';
+                
+                // Header row
+                html += '<tr><th></th>';
+                for (let i = 0; i < matrix.length; i++) {
+                    html += `<th>${String.fromCharCode(65 + i)}</th>`;
+                }
+                html += '</tr>';
+                
+                // Data rows
+                for (let i = 0; i < matrix.length; i++) {
+                    html += `<tr><th>${String.fromCharCode(65 + i)}</th>`;
+                    for (let j = 0; j < matrix[i].length; j++) {
+                        const cellValue = matrix[i][j];
+                        let cellClass = 'matrix-cell';
+                        
+                        // Add diagonal class for main diagonal cells
+                        if (i === j) {
+                            cellClass += ' diagonal';
+                        }
+                        
+                        if (cellValue === 2) {
+                            cellClass += ' self-loop';
+                        } else if (cellValue === 1) {
+                            cellClass += isDirected ? ' directed' : ' connected';
+                        }
+                        
+                        // Handle self-loops (diagonal cells)
+                        if (i === j) {
+                            if (allowSelfLoops) {
+                                html += `<td><input type="text" class="${cellClass}" value="${cellValue}" data-row="${i}" data-col="${j}"></td>`;
+                            } else {
+                                html += `<td><input type="text" class="matrix-cell diagonal" value="0" readonly></td>`;
+                            }
+                        } else {
+                            html += `<td><input type="text" class="${cellClass}" value="${cellValue}" data-row="${i}" data-col="${j}"></td>`;
+                        }
+                    }
+                    html += '</tr>';
+                }
+                
+                html += '</table>';
+                matrixDisplay.innerHTML = html;
+                
+                // Add event listeners to matrix cells
+                const matrixCells = document.querySelectorAll('.matrix-cell:not([readonly])');
+                matrixCells.forEach(cell => {
+                    cell.addEventListener('click', function() {
+                        const row = parseInt(this.getAttribute('data-row'));
+                        const col = parseInt(this.getAttribute('data-col'));
+                        const isDirected = directedGraphCheckbox.checked;
+                        
+                        // Toggle the connection
+                        if (row === col) {
+                            // Self-loop: toggle between 0 and 2
+                            adjacencyMatrix[row][col] = adjacencyMatrix[row][col] === 2 ? 0 : 2;
+                        } else {
+                            // Regular connection: toggle between 0 and 1
+                            adjacencyMatrix[row][col] = adjacencyMatrix[row][col] === 1 ? 0 : 1;
+                            
+                            // For undirected graphs, update symmetric cell
+                            if (!isDirected) {
+                                adjacencyMatrix[col][row] = adjacencyMatrix[row][col];
+                            }
+                        }
+                        
+                        // Update the matrix display
+                        displayMatrix(adjacencyMatrix);
+                        
+                        // Redraw the graph
+                        drawGraph();
+                    });
+                });
+            }
+            
+            // Find node at coordinates
+            function getNodeAt(x, y) {
+                for (let i = nodes.length - 1; i >= 0; i--) {
+                    const node = nodes[i];
+                    const dx = node.x - x;
+                    const dy = node.y - y;
+                    if (dx * dx + dy * dy <= node.radius * node.radius) {
+                        return node;
+                    }
+                }
+                return null;
+            }
+            
+            // Mouse event handlers
+            canvas.addEventListener('mousedown', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                selectedNode = getNodeAt(x, y);
+                if (selectedNode) {
+                    offsetX = x - selectedNode.x;
+                    offsetY = y - selectedNode.y;
+                }
+            });
+            
+            canvas.addEventListener('mousemove', function(e) {
+                if (selectedNode) {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    // Update node position
+                    selectedNode.x = x - offsetX;
+                    selectedNode.y = y - offsetY;
+                    
+                    // Keep node within canvas bounds
+                    selectedNode.x = Math.max(selectedNode.radius, Math.min(canvas.width - selectedNode.radius, selectedNode.x));
+                    selectedNode.y = Math.max(selectedNode.radius, Math.min(canvas.height - selectedNode.radius, selectedNode.y));
+                    
+                    drawGraph();
+                }
+            });
+            
+            canvas.addEventListener('mouseup', function() {
+                selectedNode = null;
+            });
+            
+            canvas.addEventListener('mouseleave', function() {
+                selectedNode = null;
+            });
+            
+            // Generate graph button handler
+            generateBtn.addEventListener('click', function() {
+                const nodeCount = parseInt(nodeCountInput.value);
+                
+                if (nodeCount < 1 || nodeCount > 26) {
+                    alert('Please enter a number between 1 and 26');
+                    return;
+                }
+                
+                // Generate new graph
+                const allowSelfLoops = allowSelfLoopsCheckbox.checked;
+                const isDirected = directedGraphCheckbox.checked;
+                adjacencyMatrix = generateAdjacencyMatrix(nodeCount, allowSelfLoops, isDirected);
+                nodes = createNodes(nodeCount);
+                
+                // Display matrix and draw graph
+                displayMatrix(adjacencyMatrix);
+                drawGraph();
+            });
+            
+            // Randomize matrix button handler
+            randomizeBtn.addEventListener('click', function() {
+                if (adjacencyMatrix.length > 0) {
+                    const allowSelfLoops = allowSelfLoopsCheckbox.checked;
+                    const isDirected = directedGraphCheckbox.checked;
+                    adjacencyMatrix = generateAdjacencyMatrix(adjacencyMatrix.length, allowSelfLoops, isDirected);
+                    
+                    // Display matrix and draw graph
+                    displayMatrix(adjacencyMatrix);
+                    drawGraph();
+                }
+            });
+            
+            // Update matrix when options change
+            allowSelfLoopsCheckbox.addEventListener('change', function() {
+                if (adjacencyMatrix.length > 0) {
+                    displayMatrix(adjacencyMatrix);
+                    drawGraph();
+                }
+            });
+            
+            directedGraphCheckbox.addEventListener('change', function() {
+                if (adjacencyMatrix.length > 0) {
+                    const isDirected = directedGraphCheckbox.checked;
+                    
+                    // If switching to undirected, make matrix symmetric
+                    if (!isDirected) {
+                        for (let i = 0; i < adjacencyMatrix.length; i++) {
+                            for (let j = i + 1; j < adjacencyMatrix.length; j++) {
+                                // Use OR logic: if either cell has a connection, both should
+                                const hasConnection = adjacencyMatrix[i][j] === 1 || adjacencyMatrix[j][i] === 1;
+                                adjacencyMatrix[i][j] = hasConnection ? 1 : 0;
+                                adjacencyMatrix[j][i] = hasConnection ? 1 : 0;
+                            }
+                        }
+                    }
+                    
+                    displayMatrix(adjacencyMatrix);
+                    drawGraph();
+                }
+            });
+            
+            curvedEdgesCheckbox.addEventListener('change', function() {
+                if (adjacencyMatrix.length > 0) {
+                    drawGraph();
+                }
+            });
+            
+            // Generate initial graph
+            generateBtn.click();
+        });
+    </script>
+</body>
+</html>
