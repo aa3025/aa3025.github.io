@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.95">
     <title>Advanced Graph Generator</title>
     <style>
         * {
@@ -859,13 +859,17 @@ function calculateClusteringCoefficients() {
                         <div class="property-section">
                             <h3>Special Properties</h3>
                             <div class="property-item">
-                                <span class="property-name">Eulerian:</span>
+                                <span class="property-name">Eulerian:
+        <span class="tooltip-icon" title="A graph is Eulerian if it has an Eulerian circuit - a path that visits every edge exactly once and returns to the starting vertex. For undirected graphs: all vertices have even degree. For directed graphs: all vertices have equal in-degree and out-degree.">ⓘ</span>
+    </span>
                                 <span class="property-value ${properties.special.eulerian ? 'true-value' : 'false-value'}">
                                     ${properties.special.eulerian ? 'Yes' : 'No'}
                                 </span>
                             </div>
                             <div class="property-item">
-                                <span class="property-name">Semi-Eulerian:</span>
+                                <span class="property-name">Semi-Eulerian:
+        <span class="tooltip-icon" title="A graph is Semi-Eulerian if it has an Eulerian path but not an Eulerian circuit - a path that visits every edge exactly once but starts and ends at different vertices. For undirected graphs: exactly 0 or 2 vertices have odd degree. For directed graphs: exactly one vertex has out-degree = in-degree + 1 and one has in-degree = out-degree + 1.">ⓘ</span>
+    </span>
                                 <span class="property-value ${properties.special.semiEulerian ? 'true-value' : 'false-value'}">
                                     ${properties.special.semiEulerian ? 'Yes' : 'No'}
                                 </span>
