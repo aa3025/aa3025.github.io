@@ -43,102 +43,136 @@
             -moz-appearance: textfield;
              padding-right: 0.75rem; /* 12px */
         }
+
+        /* --- NEW Queue Pipe Visualization Styles (No Animation) --- */
+        .queue-pipe-item {
+            display: inline-block;
+            padding: 4px 10px;
+            margin: 4px;
+            font-mono: 12px;
+            font-weight: 600;
+            color: #1d4ed8; /* blue-700 */
+            background-color: #dbeafe; /* blue-100 */
+            border-radius: 9999px;
+            
+            /* No animation properties */
+            transform: scale(1);
+            opacity: 1;
+        }
+        /* --- End New Styles --- */
     </style>
 </head>
 <body class="bg-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="w-full max-w-6xl bg-white rounded-lg p-6"> <!-- Increased max-width -->
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
-            BFS Grid Visualization (8-Directional)
-        </h1>
-        
-        <!-- Main container - Horizontal layout on large screens -->
-        <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Main container for layout -->
+    <div class="w-full max-w-6xl">
+        <div class="bg-white rounded-lg p-6">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+                BFS Grid Visualization (8-Directional)
+            </h1>
             
-            <!-- Visualization Area (Canvas) - Takes 60% width -->
-            <div class="flex-grow w-full lg:w-3/5">
-                <canvas id="bfs-canvas"></canvas> <!-- Size set by JS -->
-            </div>
-            
-            <!-- Controls and Info Panel - Takes 40% width -->
-            <div class="w-full lg:w-2/5 flex-shrink-0 space-y-4">
+            <!-- Top Part: Canvas and Controls -->
+            <div class="flex flex-col lg:flex-row gap-6">
                 
-                <!-- Control Buttons -->
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Controls</h2>
-                    <!-- Auto-play controls -->
-                    <div class="flex space-x-2 mb-2">
-                        <button id="start-btn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
-                            Auto-Play
-                        </button>
-                        <button id="pause-btn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-200 disabled:opacity-50" disabled>
-                            Pause
-                        </button>
-                    </div>
-                     <!-- Manual controls -->
-                    <div class="flex space-x-2 mb-2">
-                        <button id="prev-btn" class="w-full bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                            Previous
-                        </button>
-                        <button id="next-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                            Next
-                        </button>
-                        <button id="reset-btn" class="w-1/2 bg-white text-red-700 border border-red-400 font-semibold py-2 px-4 rounded-lg hover:bg-red-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                            Reset
-                        </button>
-                    </div>
-                    <!-- Settings -->
-                    <div class="grid grid-cols-1 gap-2">
-                        <!-- Grid Size Input -->
-                        <div>
-                            <label for="grid-size-input" class="block text-sm font-medium text-gray-700 mb-1">Grid Size (odd)</label>
-                            <input type="number" id="grid-size-input" value="21" min="3" max="51" step="2" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                        </div>
-                    </div>
+                <!-- Visualization Area (Canvas) - Takes 60% width -->
+                <div class="flex-grow w-full lg:w-3/5">
+                    <canvas id="bfs-canvas"></canvas> <!-- Size set by JS -->
                 </div>
-
-                <!-- Step Description -->
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-700 mb-1">Step Description</h2>
-                    <div class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
-                        <p id="step-description" class="text-lg text-gray-800">Algorithm ready. Click 'Next' or 'Auto-Play'.</p>
-                    </div>
-                </div>
-
-                <!-- Info Panels -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Stats -->
-                    <div>
-                        <h2 class="text-xl font-semibold text-gray-700 mb-1">Stats</h2>
-                        <div class="bg-white border border-gray-300 rounded-lg p-3 space-y-2">
-                            <p class="text-gray-700">Queue Size: <span id="queue-size" class="font-mono font-bold text-blue-600">0</span></p>
-                            <p class="text-gray-700">Visited Count: <span id="visited-count" class="font-mono font-bold text-green-600">0</span></p>
-                        </div>
-                    </div>
+                
+                <!-- Controls and Info Panel - Takes 40% width -->
+                <div class="w-full lg:w-2/5 flex-shrink-0 space-y-4">
                     
-                    <!-- Legend -->
+                    <!-- Control Buttons -->
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Legend</h2>
-                        <div class="space-y-2">
-                            <div class="flex items-center">
-                                <!-- Updated high-contrast colors -->
-                                <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #E5E7EB"></div>
-                                <span>Unvisited Node</span>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Controls</h2>
+                        <!-- Auto-play controls -->
+                        <div class="flex space-x-2 mb-2">
+                            <button id="start-btn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
+                                Auto-Play
+                            </button>
+                            <button id="pause-btn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-200 disabled:opacity-50" disabled>
+                                Pause
+                            </button>
+                        </div>
+                         <!-- Manual controls -->
+                        <div class="flex space-x-2 mb-2">
+                            <button id="prev-btn" class="w-full bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Previous
+                            </button>
+                            <button id="next-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Next
+                            </button>
+                            <button id="reset-btn" class="w-1/2 bg-white text-red-700 border border-red-400 font-semibold py-2 px-4 rounded-lg hover:bg-red-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Reset
+                            </button>
+                        </div>
+                        <!-- Settings -->
+                        <div class="grid grid-cols-1 gap-2">
+                            <!-- Grid Size Input -->
+                            <div>
+                                <label for="grid-size-input" class="block text-sm font-medium text-gray-700 mb-1">Grid Size (odd)</label>
+                                <input type="number" id="grid-size-input" value="21" min="3" max="51" step="2" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                             </div>
-                            <div class="flex items-center">
-                                <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #3B82F6"></div>
-                                <span>In Queue</span>
+                        </div>
+                    </div>
+
+                    <!-- Step Description -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-1">Step Description</h2>
+                        <div class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
+                            <p id="step-description" class="text-lg text-gray-800">Algorithm ready. Click 'Next' or 'Auto-Play'.</p>
+                        </div>
+                    </div>
+
+                    <!-- Info Panels: Stats and Legend -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Stats (Queue Size, Visited) -->
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-700 mb-1">Stats</h2>
+                            <div class="bg-white border border-gray-300 rounded-lg p-3 space-y-2">
+                                <p class="text-gray-700">Visited: <span id="visited-count" class="font-mono font-bold text-green-600">0</span></p>
+                                <p class="text-gray-700">Queue Size: <span id="queue-size" class="font-mono font-bold text-blue-600">0</span></p>
                             </div>
-                            <div class="flex items-center">
-                                <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #10B981"></div>
-                                <span>Visited</span>
+                        </div>
+                        
+                        <!-- Legend (Unchanged) -->
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-700 mb-2">Legend</h2>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #E5E7EB"></div>
+                                    <span>Unvisited Node</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #3B82F6"></div>
+                                    <span>In Queue</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #10B981"></div>
+                                    <span>Visited</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <!-- Bottom Part: NEW Full-Width Queue Visualization -->
+            <div class="w-full mt-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Queue Visualization</h2>
+                <div class="flex items-center w-full bg-white border border-gray-300 rounded-lg p-3 min-h-[80px]">
+                    <span class="text-sm font-semibold text-gray-600">FRONT (Dequeue) →</span>
+                    <!-- This div will contain the nodes -->
+                    <div id="queue-pipe" class="flex-1 mx-2 flex items-center flex-wrap p-2">
+                        <span id="queue-pipe-placeholder" class="text-gray-400 italic">Queue is empty...</span>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-600">→ BACK (Enqueue)</span>
+                </div>
+            </div>
+
+        </div> <!-- End of p-6 container -->
+    </div> <!-- End of max-w-6xl container -->
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -161,6 +195,10 @@
             const stepDescription = document.getElementById('step-description');
             const queueSizeEl = document.getElementById('queue-size');
             const visitedCountEl = document.getElementById('visited-count');
+            
+            // --- NEW Queue Pipe Elements ---
+            const queuePipe = document.getElementById('queue-pipe');
+            const queuePipePlaceholder = document.getElementById('queue-pipe-placeholder');
             
             const COLORS = {
                 // High contrast colors
@@ -201,6 +239,17 @@
                 };
             }
 
+            /**
+             * Converts a node object {x, y} to a single ID (1 to n^2)
+             */
+            function nodeToId(node) {
+                // Use global GRID_SIZE for calculation
+                return node.y * GRID_SIZE + node.x + 1;
+            }
+
+            /**
+             * Converts a node {x, y} to a string key for the visitedSet
+             */
             const nodeToKey = (node) => `${node.x},${node.y}`;
 
             /** * Gets valid neighbors for a given cell (8-directional).
@@ -296,36 +345,36 @@
 
             function generateBFSSteps() {
                 steps = [];
-                // Now uses global GRID_SIZE
                 let gridStates = createGrid(GRID_SIZE, 'default');
-                let queue = [];
-                let visited = createGrid(GRID_SIZE, false);
+                let queue = []; // Will store {x, y} objects
+                let visited = new Set(); // Will store "x,y" keys
                 let visitedCount = 0;
 
                 // Step 0: Initial state
                 steps.push({
                     states: deepCopyGrid(gridStates),
-                    queueSize: 0,
+                    queue: [], // Queue of IDs
                     visitedCount: 0,
                     message: "Algorithm ready. Click 'Next' or 'Auto-Play'."
                 });
 
-                // Step 1: Add start node (uses global START_NODE)
+                // Step 1: Add start node
                 queue.push(START_NODE);
-                visited[START_NODE.y][START_NODE.x] = true;
+                visited.add(nodeToKey(START_NODE));
                 gridStates[START_NODE.y][START_NODE.x] = 'inQueue';
                 
                 steps.push({
                     states: deepCopyGrid(gridStates),
-                    queueSize: queue.length,
+                    queue: queue.map(nodeToId), // Convert to IDs for the step
                     visitedCount: 0,
-                    message: `Enqueue start node (${START_NODE.x}, ${START_NODE.y}).`
+                    message: `Enqueue start node #${nodeToId(START_NODE)}.`
                 });
 
                 // Main BFS loop
                 while (queue.length > 0) {
                     const currentNode = queue.shift();
                     const { x, y } = currentNode;
+                    const currentNodeId = nodeToId(currentNode);
 
                     // Visit node
                     gridStates[y][x] = 'visited';
@@ -336,10 +385,10 @@
                     // Get all neighbors (8-directional)
                     const neighbors = getNeighbors(x, y);
                     for (const neighbor of neighbors) {
-                        if (!visited[neighbor.y][neighbor.x]) {
-                            visited[neighbor.y][neighbor.x] = true;
+                        if (!visited.has(nodeToKey(neighbor))) {
+                            visited.add(nodeToKey(neighbor));
                             gridStates[neighbor.y][neighbor.x] = 'inQueue';
-                            queue.push(neighbor);
+                            queue.push(neighbor); // Push {x, y} object
                             neighborsAdded++;
                         }
                     }
@@ -347,22 +396,45 @@
                     // Add a step for this visit and all its enqueues
                     steps.push({
                         states: deepCopyGrid(gridStates),
-                        queueSize: queue.length,
+                        queue: queue.map(nodeToId), // Convert to IDs for the step
                         visitedCount: visitedCount,
-                        message: `Visit (${x},${y}), enqueue ${neighborsAdded} unvisited neighbors.`
+                        message: `Visit #${currentNodeId}, enqueue ${neighborsAdded} unvisited neighbors.`
                     });
                 }
                 
                 // Final step
                 steps.push({
                     states: deepCopyGrid(gridStates),
-                    queueSize: 0,
+                    queue: [],
                     visitedCount: visitedCount,
                     message: "Traversal complete. Queue is empty."
                 });
             }
 
             // --- Step Rendering and Navigation ---
+
+            /**
+             * NEW: Renders the queue visualization in the bottom pipe
+             * @param {number[]} queueIds - An array of node IDs
+             */
+            function renderQueuePipe(queueIds) {
+                // Clear all previous nodes
+                queuePipe.innerHTML = ''; 
+
+                if (queueIds.length === 0) {
+                    queuePipe.appendChild(queuePipePlaceholder);
+                } else {
+                    queuePipePlaceholder.remove(); // Remove placeholder if it's there
+                    
+                    queueIds.forEach((id) => {
+                        const item = document.createElement('div');
+                        item.className = 'queue-pipe-item'; // No animation class
+                        item.textContent = id;
+                        queuePipe.appendChild(item);
+                    });
+                }
+            }
+
 
             function renderStep(index) {
                 if (index < 0 || index >= steps.length) return;
@@ -375,8 +447,11 @@
 
                 // Update UI panels
                 stepDescription.textContent = step.message;
-                queueSizeEl.textContent = step.queueSize;
+                queueSizeEl.textContent = step.queue.length; // 'step.queue' is now array of IDs
                 visitedCountEl.textContent = step.visitedCount;
+
+                // Update the new queue pipe visualization
+                renderQueuePipe(step.queue);
 
                 // Update button states
                 prevBtn.disabled = (currentStep === 0);
@@ -416,7 +491,7 @@
                     if (newSize > 51) newSize = 51;
                     gridSizeInput.value = newSize.toString();
                 }
-                GRID_SIZE = newSize;
+                GRID_SIZE = newSize; // Set global
                 
                 // --- Dynamic Size Calculation ---
                 const canvasContainer = canvas.parentElement;
