@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFS Grid Visualization (8-Directional)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the visualization */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Make canvas visually responsive but maintain aspect ratio */
+        canvas {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            border: 2px solid #E5E7EB; /* gray-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            background-color: #FFFFFF;
+        }
+        /* Style for the select dropdown */
+        select, input[type="number"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        select {
+             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        }
+        /* Hide spinner buttons on number input */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+             padding-right: 0.75rem; /* 12px */
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-6xl bg-white rounded-lg p-6"> <!-- Increased max-width for layout -->
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+            DFS Grid Visualization (8-Directional)
+        </h1>
+        
+        <!-- Main container - Back to horizontal layout on large screens -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            
+            <!-- Visualization Area (Canvas) - Takes 60% width on large screens -->
+            <div class="flex-grow w-full lg:w-3/5">
+                <canvas id="dfs-canvas"></canvas> <!-- Size set by JS -->
+            </div>
+            
+            <!-- Controls and Info Panel - Takes 40% width on large screens -->
+            <div class="w-full lg:w-2/5 flex-shrink-0 space-y-4">
+                
+                <!-- Control Buttons -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Controls</h2>
+                    <!-- Auto-play controls -->
+                    <div class="flex space-x-2 mb-2">
+                        <button id="start-btn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
+                            Auto-Play
+                        </button>
+                        <button id="pause-btn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-200 disabled:opacity-50" disabled>
+                            Pause
+                        </button>
+                    </div>
+                     <!-- Manual controls -->
+                    <div class="flex space-x-2 mb-2">
+                        <button id="prev-btn" class="w-full bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Previous
+                        </button>
+                        <button id="next-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next
+                        </button>
+                        <button id="reset-btn" class="w-1/2 bg-white text-red-700 border border-red-400 font-semibold py-2 px-4 rounded-lg hover:bg-red-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Reset
+                        </button>
+                    </div>
+                    <!-- Settings -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <!-- Grid Size Input -->
+                        <div>
+                            <label for="grid-size-input" class="block text-sm font-medium text-gray-700 mb-1">Grid Size (odd)</label>
+                            <input type="number" id="grid-size-input" value="21" min="3" max="51" step="2" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                        <!-- Search Strategy -->
+                        <div>
+                            <label for="strategy-select" class="block text-sm font-medium text-gray-700 mb-1">Search Strategy</label>
+                            <select id="strategy-select" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                <option value="random" selected>Random (8-way)</option>
+                                <option value="prefer-up">Prefer Up (8-way)</option>
+                                <option value="prefer-down">Prefer Down (8-way)</option>
+                                <option value="prefer-left">Prefer Left (8-way)</option>
+                                <option value="prefer-right">Prefer Right (8-way)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step Description -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 mb-1">Step Description</h2>
+                    <div class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
+                        <p id="step-description" class="text-lg text-gray-800">Algorithm ready. Click 'Next' or 'Auto-Play'.</p>
+                    </div>
+                </div>
+
+                <!-- Info Panels -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Stats -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-1">Stats</h2>
+                        <div class="bg-white border border-gray-300 rounded-lg p-3 space-y-2">
+                            <p class="text-gray-700">Stack Size: <span id="stack-size" class="font-mono font-bold text-yellow-600">0</span></p>
+                            <p class="text-gray-700">Visited Count: <span id="visited-count" class="font-mono font-bold text-green-600">0</span></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Legend (Updated for DFS) -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Legend</h2>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #E5E7EB"></div>
+                                <span>Unvisited Node</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #FCD34D"></div>
+                                <span>In Stack (Active Path)</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #10B981"></div>
+                                <span>Visited Node</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Constants ---
+            let PADDING = 32; // Padding around the grid
+            let NODE_RADIUS = 6; // Radius of the node dot
+            
+            // --- DOM Elements ---
+            const canvas = document.getElementById('dfs-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const strategySelect = document.getElementById('strategy-select');
+            const gridSizeInput = document.getElementById('grid-size-input');
+            
+            const stepDescription = document.getElementById('step-description');
+            const stackSizeEl = document.getElementById('stack-size');
+            const visitedCountEl = document.getElementById('visited-count');
+            
+            const COLORS = {
+                default: '#E5E7EB',   // gray-200 (unvisited node)
+                inStack: '#FCD34D', // amber-300 (node in stack)
+                visited: '#10B981', // emerald-500 (visited node)
+                edge: '#D1D5DB',      // gray-300 (grid lines)
+                diagEdge: '#E5E7EB',  // gray-200 (diagonal edges)
+                nodeBorder: '#374151' // gray-700
+            };
+
+            // --- State (Dynamic) ---
+            let GRID_SIZE = 21;
+            let START_NODE = { x: 10, y: 10 };
+            let CANVAS_WIDTH = 704;
+            let CANVAS_HEIGHT = 704;
+            let CELL_SPACING = 32;
+
+            let steps = [];
+            let currentStep = 0;
+            let isPlaying = false;
+            let timeoutId = null;
+
+            // --- Utility Functions ---
+
+            function createGrid(size, value) {
+                return Array.from({ length: size }, () => Array(size).fill(value));
+            }
+
+            function deepCopyGrid(grid) {
+                return grid.map(row => [...row]);
+            }
+            
+            function getCanvasCoords(x, y) {
+                return {
+                    x: PADDING + x * CELL_SPACING,
+                    y: PADDING + y * CELL_SPACING
+                };
+            }
+
+            const nodeToKey = (node) => `${node.x},${node.y}`;
+
+            /**
+             * Gets valid neighbors, prioritized by the selected strategy (8-directional).
+             * @param {number} x - The x-coordinate of the current node.
+             * @param {number} y - The y-coordinate of the current node.
+             * @param {string} strategy - The selected strategy from the dropdown.
+             */
+            function getPrioritizedNeighbors(x, y, strategy) {
+                // All 8 directions
+                const directions = {
+                    'up': { x: 0, y: -1 },
+                    'down': { x: 0, y: 1 },
+                    'left': { x: -1, y: 0 },
+                    'right': { x: 1, y: 0 },
+                    'up-left': { x: -1, y: -1 },
+                    'up-right': { x: 1, y: -1 },
+                    'down-left': { x: -1, y: 1 },
+                    'down-right': { x: 1, y: 1 }
+                };
+                
+                let dirOrder = [];
+                // Define the fallback/neutral order
+                const neutralOrder = [
+                    directions.up, directions.down, directions.left, directions.right,
+                    directions['up-left'], directions['up-right'], directions['down-left'], directions['down-right']
+                ];
+
+                // Create a prioritized list of directions based on strategy
+                if (strategy === 'prefer-up') {
+                    dirOrder = [
+                        directions.up, directions['up-left'], directions['up-right'],
+                        directions.left, directions.right, directions.down, directions['down-left'], directions['down-right']
+                    ];
+                } else if (strategy === 'prefer-down') {
+                    dirOrder = [
+                        directions.down, directions['down-left'], directions['down-right'],
+                        directions.left, directions.right, directions.up, directions['up-left'], directions['up-right']
+                    ];
+                } else if (strategy === 'prefer-left') {
+                    dirOrder = [
+                        directions.left, directions['up-left'], directions['down-left'],
+                        directions.up, directions.down, directions.right, directions['up-right'], directions['down-right']
+                    ];
+                } else if (strategy === 'prefer-right') {
+                    dirOrder = [
+                        directions.right, directions['up-right'], directions['down-right'],
+                        directions.up, directions.down, directions.left, directions['up-left'], directions['down-left']
+                    ];
+                } else { // 'random'
+                    dirOrder = [...neutralOrder]; // Copy all 8
+                    // Shuffle for random
+                    for (let i = dirOrder.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [dirOrder[i], dirOrder[j]] = [dirOrder[j], dirOrder[i]];
+                    }
+                }
+
+                // Filter out invalid/out-of-bounds neighbors
+                const neighbors = [];
+                for (const dir of dirOrder) {
+                    const newX = x + dir.x;
+                    const newY = y + dir.y;
+                    if (newX >= 0 && newX < GRID_SIZE && newY >= 0 && newY < GRID_SIZE) {
+                        neighbors.push({ x: newX, y: newY });
+                    }
+                }
+                return neighbors;
+            }
+
+            // --- Drawing Function ---
+
+            function drawGrid(gridStates) {
+                // Set canvas size (might have changed)
+                canvas.width = CANVAS_WIDTH;
+                canvas.height = CANVAS_HEIGHT;
+                ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                
+                // 1. Draw Diagonal Edges (Lighter)
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = COLORS.diagEdge;
+                for (let y = 0; y < GRID_SIZE - 1; y++) {
+                    for (let x = 0; x < GRID_SIZE - 1; x++) {
+                        const p1 = getCanvasCoords(x, y);
+                        const p2 = getCanvasCoords(x + 1, y + 1);
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                        
+                        const p3 = getCanvasCoords(x + 1, y);
+                        const p4 = getCanvasCoords(x, y + 1);
+                        ctx.beginPath();
+                        ctx.moveTo(p3.x, p3.y);
+                        ctx.lineTo(p4.x, p4.y);
+                        ctx.stroke();
+                    }
+                }
+                
+                // 2. Draw Horizontal/Vertical Edges (Darker)
+                ctx.lineWidth = 2; // Line width for edges
+                ctx.strokeStyle = COLORS.edge;
+                for (let i = 0; i < GRID_SIZE; i++) {
+                    const p1_h = getCanvasCoords(0, i);
+                    const p2_h = getCanvasCoords(GRID_SIZE - 1, i);
+                    ctx.beginPath();
+                    ctx.moveTo(p1_h.x, p1_h.y);
+                    ctx.lineTo(p2_h.x, p2_h.y);
+                    ctx.stroke();
+                    
+                    const p1_v = getCanvasCoords(i, 0);
+                    const p2_v = getCanvasCoords(i, GRID_SIZE - 1);
+                    ctx.beginPath();
+                    ctx.moveTo(p1_v.x, p1_v.y);
+                    ctx.lineTo(p2_v.x, p2_v.y);
+                    ctx.stroke();
+                }
+                
+                // 3. Draw Nodes (Dots)
+                ctx.lineWidth = 1; // Line width for node borders
+                ctx.strokeStyle = COLORS.nodeBorder;
+                
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        const state = gridStates[y][x];
+                        const p = getCanvasCoords(x, y);
+                        
+                        ctx.fillStyle = COLORS[state];
+                        
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, NODE_RADIUS, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke(); // Draw border
+                    }
+                }
+            }
+
+            // --- Algorithm Step Generation (DFS) ---
+
+            function generateDFSSteps(strategy) {
+                steps = [];
+                let gridStates = createGrid(GRID_SIZE, 'default');
+                let stack = [];
+                let visitedSet = new Set(); // Tracks nodes that have been visited OR are in the stack
+                let visitedCount = 0;
+                let visitedOrder = []; // For stats, not for logic
+
+                // Helper to find one unvisited neighbor based on strategy
+                function findUnvisitedNeighbor(node, visitedSet) {
+                    // Use the 8-directional, prioritized neighbor function
+                    const neighbors = getPrioritizedNeighbors(node.x, node.y, strategy);
+                    for (const neighbor of neighbors) {
+                        if (!visitedSet.has(nodeToKey(neighbor))) {
+                            return neighbor;
+                        }
+                    }
+                    return null;
+                }
+
+                // Step 0: Initial state
+                steps.push({
+                    states: deepCopyGrid(gridStates),
+                    stackSize: 0,
+                    visitedCount: 0,
+                    message: "Algorithm ready. Click 'Next' or 'Auto-Play'."
+                });
+
+                // Step 1: Push start node
+                stack.push(START_NODE);
+                visitedSet.add(nodeToKey(START_NODE));
+                gridStates[START_NODE.y][START_NODE.x] = 'inStack';
+                
+                steps.push({
+                    states: deepCopyGrid(gridStates),
+                    stackSize: stack.length,
+                    visitedCount: 0,
+                    message: `Push start node (${START_NODE.x}, ${START_NODE.y}) onto stack.`
+                });
+
+                // Main DFS loop
+                while (stack.length > 0) {
+                    const currentNode = stack[stack.length - 1]; // Peek
+                    const { x, y } = currentNode;
+
+                    // --- PREORDER VISIT ---
+                    // Visit node (color green) if it's not already visited
+                    if (gridStates[y][x] !== 'visited') {
+                        gridStates[y][x] = 'visited';
+                        visitedCount++;
+                        visitedOrder.push(currentNode); // Add to visited list
+                        steps.push({
+                            states: deepCopyGrid(gridStates),
+                            stackSize: stack.length,
+                            visitedCount: visitedCount,
+                            message: `Visit node (${x},${y}).`
+                        });
+                    }
+
+                    // --- FIND NEXT CHILD ---
+                    const neighbor = findUnvisitedNeighbor(currentNode, visitedSet);
+
+                    if (neighbor) {
+                        // Found an unvisited neighbor, push it onto stack
+                        visitedSet.add(nodeToKey(neighbor));
+                        stack.push(neighbor);
+                        gridStates[neighbor.y][neighbor.x] = 'inStack';
+                        steps.push({
+                            states: deepCopyGrid(gridStates),
+                            stackSize: stack.length,
+                            visitedCount: visitedCount,
+                            message: `Found unvisited neighbor. Push (${neighbor.x},${neighbor.y}).`
+                        });
+                    } else {
+                        // Dead end, pop from stack (backtrack)
+                        const popped = stack.pop();
+                        // State remains 'visited'
+                        steps.push({
+                            states: deepCopyGrid(gridStates),
+                            stackSize: stack.length,
+                            visitedCount: visitedCount,
+                            message: `Dead end at (${popped.x},${popped.y}). Backtrack (pop).`
+                        });
+                    }
+                }
+                
+                // Final step
+                steps.push({
+                    states: deepCopyGrid(gridStates),
+                    stackSize: 0,
+                    visitedCount: visitedCount,
+                    message: "Traversal complete. Stack is empty."
+                });
+            }
+
+            // --- Step Rendering and Navigation ---
+
+            function renderStep(index) {
+                if (index < 0 || index >= steps.length) return;
+
+                currentStep = index;
+                const step = steps[currentStep];
+
+                // Update canvas
+                drawGrid(step.states);
+
+                // Update UI panels
+                stepDescription.textContent = step.message;
+                stackSizeEl.textContent = step.stackSize;
+                visitedCountEl.textContent = step.visitedCount;
+
+                // Update button states
+                prevBtn.disabled = (currentStep === 0);
+                nextBtn.disabled = (currentStep === steps.length - 1);
+                resetBtn.disabled = (currentStep === 0);
+                
+                if (currentStep === steps.length - 1) {
+                    startBtn.disabled = true;
+                } else if (!isPlaying) {
+                    startBtn.disabled = false;
+                }
+            }
+
+            function handleNext() {
+                if (currentStep < steps.length - 1) {
+                    renderStep(currentStep + 1);
+                }
+            }
+
+            function handlePrev() {
+                if (currentStep > 0) {
+                    renderStep(currentStep - 1);
+                }
+            }
+            
+            function handleReset() {
+                handlePause();
+                
+                // Read new grid size
+                let newSize = parseInt(gridSizeInput.value, 10);
+                // Validate: must be odd, between 3 and 51
+                if (isNaN(newSize) || newSize < 3 || newSize > 51) {
+                    newSize = 21; // Reset to default
+                    gridSizeInput.value = "21";
+                } else if (newSize % 2 === 0) {
+                    newSize++; // Force to next odd number
+                    if (newSize > 51) newSize = 51;
+                    gridSizeInput.value = newSize.toString();
+                }
+                GRID_SIZE = newSize;
+                
+                // --- Dynamic Size Calculation ---
+                // Get the computed width of the canvas container
+                const canvasContainer = canvas.parentElement;
+                if (!canvasContainer) {
+                    console.error("Canvas container not found!");
+                    return;
+                }
+                // Use clientWidth which reflects the *actual* rendered width
+                const containerWidth = canvasContainer.clientWidth || 300; // Fallback
+                
+                // Calculate total grid width (nodes - 1) * spacing
+                // Subtract padding to find available space for the grid itself
+                const availableWidth = containerWidth - PADDING * 2;
+                
+                CELL_SPACING = Math.floor(availableWidth / (GRID_SIZE - 1));
+                if (CELL_SPACING < 4) CELL_SPACING = 4; // Min spacing
+                
+                // Adjust node radius based on cell spacing
+                NODE_RADIUS = Math.max(2, Math.floor(CELL_SPACING / 3));
+                if (NODE_RADIUS > 8) NODE_RADIUS = 8; // Max radius
+                
+                // Recalculate start node and canvas size
+                START_NODE = { x: Math.floor(GRID_SIZE / 2), y: Math.floor(GRID_SIZE / 2) };
+                CANVAS_WIDTH = (GRID_SIZE - 1) * CELL_SPACING + PADDING * 2;
+                CANVAS_HEIGHT = CANVAS_WIDTH; // It's a square
+                // --- End Dynamic Size Calculation ---
+                
+                currentStep = 0;
+                const strategy = strategySelect.value;
+                generateDFSSteps(strategy); // Re-generate steps
+                renderStep(0);
+                startBtn.disabled = false;
+            }
+
+            function handleStart() {
+                if (isPlaying) return;
+                isPlaying = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                resetBtn.disabled = true;
+                strategySelect.disabled = true; // Disable controls while playing
+                gridSizeInput.disabled = true;
+
+                autoPlayLoop();
+            }
+
+            function handlePause() {
+                isPlaying = false;
+                if (timeoutId) clearTimeout(timeoutId);
+                timeoutId = null;
+                
+                pauseBtn.disabled = true;
+                strategySelect.disabled = false; // Re-enable controls
+                gridSizeInput.disabled = false; 
+                // Re-enable manual controls
+                renderStep(currentStep);
+            }
+
+            function autoPlayLoop() {
+                if (!isPlaying) {
+                    // Don't do anything if paused
+                    return;
+                }
+                
+                if (currentStep >= steps.length - 1) {
+                    // Reached the end
+                    handlePause();
+                    renderStep(steps.length - 1); // Ensure last step is rendered
+                    return;
+                }
+
+                handleNext();
+                
+                // Slower speed for DFS to show the "snaking"
+                timeoutId = setTimeout(autoPlayLoop, 50); 
+            }
+
+            // --- Event Listeners ---
+            prevBtn.addEventListener('click', handlePrev);
+            nextBtn.addEventListener('click', handleNext);
+            resetBtn.addEventListener('click', handleReset);
+            startBtn.addEventListener('click', handleStart);
+            pauseBtn.addEventListener('click', handlePause);
+            strategySelect.addEventListener('change', handleReset); // Reset on change
+            gridSizeInput.addEventListener('change', handleReset); // Reset on change
+            
+            // --- Initial Setup ---
+            // Use ResizeObserver to detect container resizes
+            const observer = new ResizeObserver(entries => {
+                // Only reset if the size *actually* changed to avoid loops
+                // This check is a bit simplistic but good enough
+                if (entries[0].contentRect.width > 0) {
+                     handleReset();
+                }
+            });
+            // Observe the canvas's parent element
+            if (canvas.parentElement) {
+                observer.observe(canvas.parentElement);
+            }
+            
+            handleReset(); // Use handleReset to initialize everything
+            
+            // Fallback for window resize (e.g., if container doesn't trigger)
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(handleReset, 150);
+            });
+
+
+        });
+    </script>
+
+</body>
+</html>
