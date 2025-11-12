@@ -20,6 +20,17 @@
             border-radius: 0.5rem; /* rounded-lg */
             background-color: #FFFFFF;
         }
+        /* Style for the select dropdown */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
     </style>
 </head>
 <body class="bg-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -53,7 +64,7 @@
                         </button>
                     </div>
                      <!-- Manual controls -->
-                    <div class="flex space-x-2">
+                    <div class="flex space-x-2 mb-2">
                         <button id="prev-btn" class="w-full bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                             Previous
                         </button>
@@ -63,6 +74,17 @@
                         <button id="reset-btn" class="w-1/2 bg-white text-red-700 border border-red-400 font-semibold py-2 px-4 rounded-lg hover:bg-red-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                             Reset
                         </button>
+                    </div>
+                    <!-- Search Strategy -->
+                    <div>
+                        <label for="strategy-select" class="block text-sm font-medium text-gray-700 mb-1">Search Strategy</label>
+                        <select id="strategy-select" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                            <option value="random" selected>Random</option>
+                            <option value="prefer-up">Prefer Up</option>
+                            <option value="prefer-down">Prefer Down</option>
+                            <option value="prefer-left">Prefer Left</option>
+                            <option value="prefer-right">Prefer Right</option>
+                        </select>
                     </div>
                 </div>
 
@@ -142,6 +164,7 @@
             const resetBtn = document.getElementById('reset-btn');
             const startBtn = document.getElementById('start-btn');
             const pauseBtn = document.getElementById('pause-btn');
+            const strategySelect = document.getElementById('strategy-select');
             
             const stepDescription = document.getElementById('step-description');
             const stackSizeEl = document.getElementById('stack-size');
@@ -172,20 +195,43 @@
 
             const nodeToKey = (node) => `${node.x},${node.y}`;
 
-            /** Gets valid neighbors for a given cell */
-            function getNeighbors(x, y) {
-                const neighbors = [];
-                const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]; // 4-directional
-                
-                // Shuffle directions to make the path more organic and less biased
-                for (let i = directions.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [directions[i], directions[j]] = [directions[j], directions[i]];
+            /** * Gets valid neighbors, prioritized by the selected strategy.
+             * @param {number} x - The x-coordinate of the current node.
+             * @param {number} y - The y-coordinate of the current node.
+             * @param {string} strategy - The selected strategy from the dropdown.
+             */
+            function getPrioritizedNeighbors(x, y, strategy) {
+                const directions = {
+                    'up': { x: 0, y: -1 },    // Prefer Up (y decreases)
+                    'down': { x: 0, y: 1 },  // Prefer Down (y increases)
+                    'left': { x: -1, y: 0 }, // Prefer Left (x decreases)
+                    'right': { x: 1, y: 0 }  // Prefer Right (x increases)
+                };
+
+                let dirOrder = [];
+
+                // Create a prioritized list of directions based on strategy
+                if (strategy === 'prefer-up') {
+                    dirOrder = [directions.up, directions.left, directions.right, directions.down];
+                } else if (strategy === 'prefer-down') {
+                    dirOrder = [directions.down, directions.left, directions.right, directions.up];
+                } else if (strategy === 'prefer-left') {
+                    dirOrder = [directions.left, directions.up, directions.down, directions.right];
+                } else if (strategy === 'prefer-right') {
+                    dirOrder = [directions.right, directions.up, directions.down, directions.left];
+                } else { // 'random'
+                    dirOrder = [directions.up, directions.down, directions.left, directions.right];
+                    // Shuffle for random
+                    for (let i = dirOrder.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [dirOrder[i], dirOrder[j]] = [dirOrder[j], dirOrder[i]];
+                    }
                 }
 
-                for (const [dx, dy] of directions) {
-                    const newX = x + dx;
-                    const newY = y + dy;
+                const neighbors = [];
+                for (const dir of dirOrder) {
+                    const newX = x + dir.x;
+                    const newY = y + dir.y;
                     if (newX >= 0 && newX < GRID_SIZE && newY >= 0 && newY < GRID_SIZE) {
                         neighbors.push({ x: newX, y: newY });
                     }
@@ -238,16 +284,16 @@
 
             // --- Algorithm Step Generation (DFS) ---
 
-            function generateDFSSteps() {
+            function generateDFSSteps(strategy) {
                 steps = [];
                 let gridStates = createGrid('default');
                 let stack = [];
                 let visitedSet = new Set(); // Tracks nodes that have been visited OR are in the stack
                 let visitedCount = 0;
 
-                // Helper to find one unvisited neighbor
+                // Helper to find one unvisited neighbor based on strategy
                 function findUnvisitedNeighbor(node, visitedSet) {
-                    const neighbors = getNeighbors(node.x, node.y);
+                    const neighbors = getPrioritizedNeighbors(node.x, node.y, strategy);
                     for (const neighbor of neighbors) {
                         if (!visitedSet.has(nodeToKey(neighbor))) {
                             return neighbor;
@@ -373,7 +419,8 @@
             function handleReset() {
                 handlePause();
                 currentStep = 0;
-                generateDFSSteps(); // Re-generate steps for a new random path
+                const strategy = strategySelect.value;
+                generateDFSSteps(strategy); // Re-generate steps
                 renderStep(0);
                 startBtn.disabled = false;
             }
@@ -387,6 +434,7 @@
                 prevBtn.disabled = true;
                 nextBtn.disabled = true;
                 resetBtn.disabled = true;
+                strategySelect.disabled = true; // Disable strategy select while playing
 
                 autoPlayLoop();
             }
@@ -397,6 +445,7 @@
                 timeoutId = null;
                 
                 pauseBtn.disabled = true;
+                strategySelect.disabled = false; // Re-enable strategy select
                 // Re-enable manual controls
                 renderStep(currentStep);
             }
@@ -426,9 +475,10 @@
             resetBtn.addEventListener('click', handleReset);
             startBtn.addEventListener('click', handleStart);
             pauseBtn.addEventListener('click', handlePause);
+            strategySelect.addEventListener('change', handleReset); // Reset on change
             
             // --- Initial Setup ---
-            generateDFSSteps();
+            generateDFSSteps(strategySelect.value);
             renderStep(0); // Render the initial state
 
         });
