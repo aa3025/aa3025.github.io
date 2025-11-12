@@ -66,11 +66,11 @@
         /* --- End New Styles --- */
     </style>
 </head>
-<body class="bg-white min-h-screen flex p-4">
+<body class="bg-white min-h-screen flex flex-col items-center p-4">
 
-    <!-- Main Content (Canvas + Controls) -->
-    <div class="flex-grow">
-        <div class="w-full max-w-6xl bg-white rounded-lg p-6"> <!-- Increased max-width for layout -->
+    <!-- New Centering Wrapper -->
+    <div class="w-full max-w-7xl mx-auto">
+        <div class="bg-white rounded-lg p-6">
             <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
                 DFS Grid Visualization (8-Directional)
             </h1>
@@ -78,114 +78,118 @@
             <!-- Main container - Back to horizontal layout on large screens -->
             <div class="flex flex-col lg:flex-row gap-6">
                 
-                <!-- Visualization Area (Canvas) - Takes 60% width on large screens -->
-                <div class="flex-grow w-full lg:w-3/5">
-                    <canvas id="dfs-canvas"></canvas> <!-- Size set by JS -->
-                </div>
-                
-                <!-- Controls and Info Panel - Takes 40% width on large screens -->
-                <div class="w-full lg:w-2/5 flex-shrink-0 space-y-4">
-                    
-                    <!-- Control Buttons -->
-                    <div>
-                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Controls</h2>
-                        <!-- Auto-play controls -->
-                        <div class="flex space-x-2 mb-2">
-                            <button id="start-btn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
-                                Auto-Play
-                            </button>
-                            <button id="pause-btn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-200 disabled:opacity-50" disabled>
-                                Pause
-                            </button>
-                        </div>
-                         <!-- Manual controls -->
-                        <div class="flex space-x-2 mb-2">
-                            <button id="prev-btn" class="w-full bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                                Previous
-                            </button>
-                            <button id="next-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                                Next
-                            </button>
-                            <button id="reset-btn" class="w-1/2 bg-white text-red-700 border border-red-400 font-semibold py-2 px-4 rounded-lg hover:bg-red-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                                Reset
-                            </button>
-                        </div>
-                        <!-- Settings -->
-                        <div class="grid grid-cols-2 gap-2">
-                            <!-- Grid Size Input -->
-                            <div>
-                                <label for="grid-size-input" class="block text-sm font-medium text-gray-700 mb-1">Grid Size (odd)</label>
-                                <input type="number" id="grid-size-input" value="21" min="3" max="51" step="2" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                            </div>
-                            <!-- Search Strategy -->
-                            <div>
-                                <label for="strategy-select" class="block text-sm font-medium text-gray-700 mb-1">Search Strategy</label>
-                                <select id="strategy-select" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                                    <option value="random" selected>Random (8-way)</option>
-                                    <option value="prefer-up">Prefer Up (8-way)</option>
-                                    <option value="prefer-down">Prefer Down (8-way)</option>
-                                    <option value="prefer-left">Prefer Left (8-way)</option>
-                                    <option value="prefer-right">Prefer Right (8-way)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step Description -->
-                    <div>
-                        <h2 class="text-xl font-semibold text-gray-700 mb-1">Step Description</h2>
-                        <div class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
-                            <p id="step-description" class="text-lg text-gray-800">Algorithm ready. Click 'Next' or 'Auto-Play'.</p>
-                        </div>
-                    </div>
-
-                    <!-- NEW Info Panel: Stats and Legend -->
-                    <div class="space-y-4">
-                        <!-- Stats -->
-                        <div>
-                            <h2 class="text-xl font-semibold text-gray-700 mb-2">Stats</h2>
-                             <div class="mt-2 space-y-1 bg-white border border-gray-300 rounded-lg p-3">
-                                <p class="text-gray-700">Stack Size: <span id="stack-size" class="font-mono font-bold text-yellow-600">0</span></p>
-                                <p class="text-gray-700">Visited Count: <span id="visited-count" class="font-mono font-bold text-green-600">0</span></p>
-                            </div>
+                <!-- Main Content (Canvas + Controls) -->
+                <div class="flex-grow">
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <!-- Visualization Area (Canvas) - Takes 60% width on large screens -->
+                        <div class="flex-grow w-full lg:w-3/5">
+                            <canvas id="dfs-canvas"></canvas> <!-- Size set by JS -->
                         </div>
                         
-                        <!-- Legend -->
-                        <div>
-                            <h2 class="text-xl font-semibold text-gray-700 mb-2">Legend</h2>
-                            <div class="space-y-2 bg-white border border-gray-300 rounded-lg p-3">
-                                <div class="flex items-center">
-                                    <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #E5E7EB"></div>
-                                    <span>Unvisited Node</span>
+                        <!-- Controls and Info Panel - Takes 40% width on large screens -->
+                        <div class="w-full lg:w-2/5 flex-shrink-0 space-y-4">
+                            
+                            <!-- Control Buttons -->
+                            <div>
+                                <h2 class="text-xl font-semibold text-gray-700 mb-2">Controls</h2>
+                                <!-- Auto-play controls -->
+                                <div class="flex space-x-2 mb-2">
+                                    <button id="start-btn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
+                                        Auto-Play
+                                    </button>
+                                    <button id="pause-btn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-200 disabled:opacity-50" disabled>
+                                        Pause
+                                    </button>
                                 </div>
-                                <div class="flex items-center">
-                                    <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #FCD34D"></div>
-                                    <span>In Stack (Active Path)</span>
+                                 <!-- Manual controls -->
+                                <div class="flex space-x-2 mb-2">
+                                    <button id="prev-btn" class="w-full bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        Previous
+                                    </button>
+                                    <button id="next-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        Next
+                                    </button>
+                                    <button id="reset-btn" class="w-1/2 bg-white text-red-700 border border-red-400 font-semibold py-2 px-4 rounded-lg hover:bg-red-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        Reset
+                                    </button>
                                 </div>
-                                <div class="flex items-center">
-                                    <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #10B981"></div>
-                                    <span>Visited Node</span>
+                                <!-- Settings -->
+                                <div class="grid grid-cols-2 gap-2">
+                                    <!-- Grid Size Input -->
+                                    <div>
+                                        <label for="grid-size-input" class="block text-sm font-medium text-gray-700 mb-1">Grid Size (odd)</label>
+                                        <input type="number" id="grid-size-input" value="21" min="3" max="51" step="2" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                    </div>
+                                    <!-- Search Strategy -->
+                                    <div>
+                                        <label for="strategy-select" class="block text-sm font-medium text-gray-700 mb-1">Search Strategy</label>
+                                        <select id="strategy-select" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                            <option value="random" selected>Random (8-way)</option>
+                                            <option value="prefer-up">Prefer Up (8-way)</option>
+                                            <option value="prefer-down">Prefer Down (8-way)</option>
+                                            <option value="prefer-left">Prefer Left (8-way)</option>
+                                            <option value="prefer-right">Prefer Right (8-way)</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Step Description -->
+                            <div>
+                                <h2 class="text-xl font-semibold text-gray-700 mb-1">Step Description</h2>
+                                <div class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
+                                    <p id="step-description" class="text-lg text-gray-800">Algorithm ready. Click 'Next' or 'Auto-Play'.</p>
+                                </div>
+                            </div>
+
+                            <!-- Info Panel: Stats and Legend -->
+                            <div class="space-y-4">
+                                <!-- Stats -->
+                                <div>
+                                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Stats</h2>
+                                     <div class="mt-2 space-y-1 bg-white border border-gray-300 rounded-lg p-3">
+                                        <p class="text-gray-700">Stack Size: <span id="stack-size" class="font-mono font-bold text-yellow-600">0</span></p>
+                                        <p class="text-gray-700">Visited Count: <span id="visited-count" class="font-mono font-bold text-green-600">0</span></p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Legend -->
+                                <div>
+                                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Legend</h2>
+                                    <div class="space-y-2 bg-white border border-gray-300 rounded-lg p-3">
+                                        <div class="flex items-center">
+                                            <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #E5E7EB"></div>
+                                            <span>Unvisited Node</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #FCD34D"></div>
+                                            <span>In Stack (Active Path)</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #10B981"></div>
+                                            <span>Visited Node</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End of Stats and Legend Panel -->
+
                         </div>
                     </div>
-                    <!-- End of Stats and Legend Panel -->
+                </div> <!-- End Main Content -->
 
+                <!-- NEW Stack Panel on the far right (w-24) -->
+                <div class="w-full lg:w-24 flex-shrink-0 space-y-2">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Stack (Top ↑)</h2>
+                    <!-- This div holds the vertical stack -->
+                    <div id="stack-pipe" class="w-full h-auto lg:h-[calc(100vh-200px)] bg-white border border-gray-300 rounded-lg p-2 flex flex-col-reverse overflow-y-auto">
+                        <!-- Items will be added here by JS -->
+                        <span id="stack-pipe-placeholder" class="text-gray-400 italic p-2 text-sm">Stack is empty...</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div> <!-- End Main Content -->
-
-    <!-- NEW Stack Panel on the far right (w-24) -->
-    <div class="w-24 flex-shrink-0 ml-6 space-y-2">
-        <h2 class="text-xl font-semibold text-gray-700 mb-2">Stack (Top ↑)</h2>
-        <!-- This div holds the vertical stack -->
-        <div id="stack-pipe" class="w-full h-[calc(100vh-80px)] bg-white border border-gray-300 rounded-lg p-2 flex flex-col-reverse overflow-y-auto">
-            <!-- Items will be added here by JS -->
-            <span id="stack-pipe-placeholder" class="text-gray-400 italic p-2 text-sm">Stack is empty...</span>
-        </div>
-    </div>
-
+    </div> <!-- End Centering Wrapper -->
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -566,8 +570,15 @@
                     console.error("Canvas container not found!");
                     return;
                 }
-                const containerWidth = canvasContainer.clientWidth || 300;
                 
+                // Debounced resize handler relies on this element being correct
+                if (!canvasContainer.clientWidth) {
+                    // This can happen if the element is hidden or not yet in DOM
+                    // We can't resize, so we'll just wait for the next call.
+                    return; 
+                }
+                
+                const containerWidth = canvasContainer.clientWidth;
                 const availableWidth = containerWidth - PADDING * 2;
                 
                 CELL_SPACING = Math.floor(availableWidth / (GRID_SIZE - 1));
@@ -642,13 +653,16 @@
             
             // FIX for ResizeObserver loop: Debounce the reset function
             const debouncedReset = () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(handleReset, 150);
+                // Check if canvas parent exists and has a width
+                if (canvas.parentElement && canvas.parentElement.clientWidth > 0) {
+                    handleReset();
+                }
             };
 
             const observer = new ResizeObserver(entries => {
+                clearTimeout(resizeTimer);
                 if (entries[0].contentRect.width > 0) {
-                     debouncedReset();
+                     resizeTimer = setTimeout(debouncedReset, 150);
                 }
             });
             
@@ -656,9 +670,8 @@
                 observer.observe(canvas.parentElement);
             }
             
-            handleReset(); // Initial setup
-            
-            window.addEventListener('resize', debouncedReset); // Fallback
+            // Initial call
+            setTimeout(debouncedReset, 0); // Use setTimeout to let parent element render
 
         });
     </script>
