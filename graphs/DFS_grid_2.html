@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DFS Grid Visualization (21x21, 8-Directional)</title>
+    <title>DFS Grid Visualization (8-Directional)</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -21,15 +21,27 @@
             background-color: #FFFFFF;
         }
         /* Style for the select dropdown */
-        select {
+        select, input[type="number"] {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
             background-position: right 0.5rem center;
             background-repeat: no-repeat;
             background-size: 1.5em 1.5em;
             padding-right: 2.5rem;
+        }
+        select {
+             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        }
+        /* Hide spinner buttons on number input */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+             padding-right: 0.75rem; /* 12px */
         }
     </style>
 </head>
@@ -37,19 +49,19 @@
 
     <div class="w-full max-w-4xl bg-white rounded-lg p-6">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
-            DFS Grid Visualization (21x21, 8-Directional)
+            DFS Grid Visualization (8-Directional)
         </h1>
         
         <!-- Main container - Vertical layout -->
-        <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col gap-6">
             
             <!-- Visualization Area (Canvas) -->
-            <div class="flex-grow w-full lg:w-1/2">
-                <canvas id="dfs-canvas" width="704" height="704"></canvas>
+            <div class="flex-grow w-full">
+                <canvas id="dfs-canvas"></canvas> <!-- Size set by JS -->
             </div>
             
             <!-- Controls and Info Panel -->
-            <div class="w-full lg:w-1/2 flex-shrink-0 space-y-4">
+            <div class="w-full flex-shrink-0 space-y-4">
                 
                 <!-- Control Buttons -->
                 <div>
@@ -75,16 +87,24 @@
                             Reset
                         </button>
                     </div>
-                    <!-- Search Strategy -->
-                    <div>
-                        <label for="strategy-select" class="block text-sm font-medium text-gray-700 mb-1">Search Strategy</label>
-                        <select id="strategy-select" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                            <option value="random" selected>Random (8-way)</option>
-                            <option value="prefer-up">Prefer Up (8-way)</option>
-                            <option value="prefer-down">Prefer Down (8-way)</option>
-                            <option value="prefer-left">Prefer Left (8-way)</option>
-                            <option value="prefer-right">Prefer Right (8-way)</option>
-                        </select>
+                    <!-- Settings -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <!-- Grid Size Input -->
+                        <div>
+                            <label for="grid-size-input" class="block text-sm font-medium text-gray-700 mb-1">Grid Size (odd)</label>
+                            <input type="number" id="grid-size-input" value="21" min="3" max="51" step="2" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                        <!-- Search Strategy -->
+                        <div>
+                            <label for="strategy-select" class="block text-sm font-medium text-gray-700 mb-1">Search Strategy</label>
+                            <select id="strategy-select" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                <option value="random" selected>Random (8-way)</option>
+                                <option value="prefer-up">Prefer Up (8-way)</option>
+                                <option value="prefer-down">Prefer Down (8-way)</option>
+                                <option value="prefer-left">Prefer Left (8-way)</option>
+                                <option value="prefer-right">Prefer Right (8-way)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -134,16 +154,24 @@
         document.addEventListener('DOMContentLoaded', () => {
             
             // --- Constants ---
-            const GRID_SIZE = 21; // 21x21 nodes
-            const START_NODE = { x: 10, y: 10 }; // Center of 0-20 grid
-            
             const PADDING = 32; // Padding around the grid
-            const CELL_SPACING = 32; // Space between each node
             const NODE_RADIUS = 6; // Radius of the node dot
             
-            // Canvas size calculation
-            const CANVAS_WIDTH = (GRID_SIZE - 1) * CELL_SPACING + PADDING * 2; // 704
-            const CANVAS_HEIGHT = (GRID_SIZE - 1) * CELL_SPACING + PADDING * 2; // 704
+            // --- DOM Elements ---
+            const canvas = document.getElementById('dfs-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const strategySelect = document.getElementById('strategy-select');
+            const gridSizeInput = document.getElementById('grid-size-input');
+            
+            const stepDescription = document.getElementById('step-description');
+            const stackSizeEl = document.getElementById('stack-size');
+            const visitedCountEl = document.getElementById('visited-count');
             
             const COLORS = {
                 default: '#E5E7EB',   // gray-200 (unvisited node)
@@ -154,24 +182,13 @@
                 nodeBorder: '#374151' // gray-700
             };
 
-            // --- DOM Elements ---
-            const canvas = document.getElementById('dfs-canvas');
-            canvas.width = CANVAS_WIDTH;
-            canvas.height = CANVAS_HEIGHT;
-            const ctx = canvas.getContext('2d');
-            
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            const resetBtn = document.getElementById('reset-btn');
-            const startBtn = document.getElementById('start-btn');
-            const pauseBtn = document.getElementById('pause-btn');
-            const strategySelect = document.getElementById('strategy-select');
-            
-            const stepDescription = document.getElementById('step-description');
-            const stackSizeEl = document.getElementById('stack-size');
-            const visitedCountEl = document.getElementById('visited-count');
+            // --- State (Dynamic) ---
+            let GRID_SIZE = 21;
+            let START_NODE = { x: 10, y: 10 };
+            let CANVAS_WIDTH = 704;
+            let CANVAS_HEIGHT = 704;
+            let CELL_SPACING = 32;
 
-            // --- State ---
             let steps = [];
             let currentStep = 0;
             let isPlaying = false;
@@ -179,8 +196,8 @@
 
             // --- Utility Functions ---
 
-            function createGrid(value) {
-                return Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(value));
+            function createGrid(size, value) {
+                return Array.from({ length: size }, () => Array(size).fill(value));
             }
 
             function deepCopyGrid(grid) {
@@ -196,7 +213,8 @@
 
             const nodeToKey = (node) => `${node.x},${node.y}`;
 
-            /** * Gets valid neighbors, prioritized by the selected strategy (8-directional).
+            /**
+             * Gets valid neighbors, prioritized by the selected strategy (8-directional).
              * @param {number} x - The x-coordinate of the current node.
              * @param {number} y - The y-coordinate of the current node.
              * @param {string} strategy - The selected strategy from the dropdown.
@@ -266,6 +284,9 @@
             // --- Drawing Function ---
 
             function drawGrid(gridStates) {
+                // Set canvas size (might have changed)
+                canvas.width = CANVAS_WIDTH;
+                canvas.height = CANVAS_HEIGHT;
                 ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                 
                 // 1. Draw Diagonal Edges (Lighter)
@@ -331,10 +352,11 @@
 
             function generateDFSSteps(strategy) {
                 steps = [];
-                let gridStates = createGrid('default');
+                let gridStates = createGrid(GRID_SIZE, 'default');
                 let stack = [];
                 let visitedSet = new Set(); // Tracks nodes that have been visited OR are in the stack
                 let visitedCount = 0;
+                let visitedOrder = []; // For stats, not for logic
 
                 // Helper to find one unvisited neighbor based on strategy
                 function findUnvisitedNeighbor(node, visitedSet) {
@@ -378,6 +400,7 @@
                     if (gridStates[y][x] !== 'visited') {
                         gridStates[y][x] = 'visited';
                         visitedCount++;
+                        visitedOrder.push(currentNode); // Add to visited list
                         steps.push({
                             states: deepCopyGrid(gridStates),
                             stackSize: stack.length,
@@ -464,6 +487,33 @@
             
             function handleReset() {
                 handlePause();
+                
+                // Read new grid size
+                let newSize = parseInt(gridSizeInput.value, 10);
+                // Validate: must be odd, between 3 and 51
+                if (isNaN(newSize) || newSize < 3 || newSize > 51) {
+                    newSize = 21; // Reset to default
+                    gridSizeInput.value = "21";
+                } else if (newSize % 2 === 0) {
+                    newSize++; // Force to next odd number
+                    if (newSize > 51) newSize = 51;
+                    gridSizeInput.value = newSize.toString();
+                }
+                GRID_SIZE = newSize;
+                
+                // Recalculate cell spacing to fit canvas (approx)
+                // Use a reference width (e.g., 640) and divide by node count
+                const maxDim = Math.min(window.innerWidth, 800) * 0.9; // Max 90% of window or 800px
+                const targetWidth = Math.max(300, maxDim - PADDING * 2); // Ensure min width
+                CELL_SPACING = Math.floor(targetWidth / (GRID_SIZE - 1));
+                if (CELL_SPACING < 4) CELL_SPACING = 4; // Min spacing
+                if (NODE_RADIUS > (CELL_SPACING / 2)) NODE_RADIUS = Math.max(2, CELL_SPACING / 3);
+
+                // Recalculate start node and canvas size
+                START_NODE = { x: Math.floor(GRID_SIZE / 2), y: Math.floor(GRID_SIZE / 2) };
+                CANVAS_WIDTH = (GRID_SIZE - 1) * CELL_SPACING + PADDING * 2;
+                CANVAS_HEIGHT = CANVAS_WIDTH; // It's a square
+                
                 currentStep = 0;
                 const strategy = strategySelect.value;
                 generateDFSSteps(strategy); // Re-generate steps
@@ -480,7 +530,8 @@
                 prevBtn.disabled = true;
                 nextBtn.disabled = true;
                 resetBtn.disabled = true;
-                strategySelect.disabled = true; // Disable strategy select while playing
+                strategySelect.disabled = true; // Disable controls while playing
+                gridSizeInput.disabled = true;
 
                 autoPlayLoop();
             }
@@ -491,7 +542,8 @@
                 timeoutId = null;
                 
                 pauseBtn.disabled = true;
-                strategySelect.disabled = false; // Re-enable strategy select
+                strategySelect.disabled = false; // Re-enable controls
+                gridSizeInput.disabled = false; 
                 // Re-enable manual controls
                 renderStep(currentStep);
             }
@@ -522,10 +574,15 @@
             startBtn.addEventListener('click', handleStart);
             pauseBtn.addEventListener('click', handlePause);
             strategySelect.addEventListener('change', handleReset); // Reset on change
+            gridSizeInput.addEventListener('change', handleReset); // Reset on change
             
             // --- Initial Setup ---
-            generateDFSSteps(strategySelect.value);
-            renderStep(0); // Render the initial state
+            handleReset(); // Use handleReset to initialize everything
+            // Re-run draw/step generation on window resize
+            window.addEventListener('resize', () => {
+                // We just reset, which recalculates spacing
+                handleReset();
+            });
 
         });
     </script>
