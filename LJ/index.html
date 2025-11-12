@@ -1,0 +1,46 @@
+<html>
+
+<head>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+
+</head>
+
+<body>
+
+<h2>Lennard-Jones N-body Simulation using Leapfrog DKD method and JavaScript!</h2>
+  <div style="width:600px; height:20px;"><p align="right"><i>Alex Pedcenko 2020</i></p></div>
+
+<div style="width:600px;border:1px solid #cccccc"><p align="left">
+Number of objects is N<sup>2</sup>, enter N = <input type="text" name="N" id="N" size="3" value="16"> 
+Time-step <i>dt</i>: <input type="text" name="timestep" id="timestep" size="3" value="0.01"> &nbsp;&nbsp; damping: <input type="checkbox" name="damping" id="damping" checked /></p>
+
+Depth of potential well:  <input type="range" min="1" max="50" value="3" id="sliderbar"> <span id="well"></span>
+
+<input type="button" value="Apply" onClick="init();">
+<br><br>
+<div id="graph" style="border: 1px solid #aaaaaa; width:600px; height:600px;"></div>
+
+<p id="E"></p>
+
+<p id="time"></p>
+
+
+<script>
+var slider = document.getElementById("sliderbar");
+var output = document.getElementById("well");
+output.innerHTML = slider.value;
+
+slider.oninput = function() {
+  output.innerHTML = this.value;
+  e = this.value; 
+}
+</script>
+
+<script src="lj_lite.js"></script>
+
+</body>
+</html>
+
+
