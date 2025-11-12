@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFS Grid Visualization (21x21)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the visualization */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Make canvas visually responsive but maintain aspect ratio */
+        canvas {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            border: 2px solid #E5E7EB; /* gray-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            background-color: #FFFFFF;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-4xl bg-white rounded-lg p-6">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+            BFS Grid Visualization (21x21)
+        </h1>
+        
+        <!-- Main container - Vertical layout -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            
+            <!-- Visualization Area (Canvas) -->
+            <div class="flex-grow w-full lg:w-1/2">
+                <!-- Canvas size increased to 704x704 for 32px cell spacing + padding -->
+                <canvas id="bfs-canvas" width="704" height="704"></canvas>
+            </div>
+            
+            <!-- Controls and Info Panel -->
+            <div class="w-full lg:w-1/2 flex-shrink-0 space-y-4">
+                
+                <!-- Control Buttons -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Controls</h2>
+                    <!-- Auto-play controls -->
+                    <div class="flex space-x-2 mb-2">
+                        <button id="start-btn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
+                            Auto-Play
+                        </button>
+                        <button id="pause-btn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-200 disabled:opacity-50" disabled>
+                            Pause
+                        </button>
+                    </div>
+                     <!-- Manual controls -->
+                    <div class="flex space-x-2">
+                        <button id="prev-btn" class="w-full bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Previous
+                        </button>
+                        <button id="next-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next
+                        </button>
+                        <button id="reset-btn" class="w-1/2 bg-white text-red-700 border border-red-400 font-semibold py-2 px-4 rounded-lg hover:bg-red-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step Description -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 mb-1">Step Description</h2>
+                    <div class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
+                        <p id="step-description" class="text-lg text-gray-800">Algorithm ready. Click 'Next' or 'Auto-Play'.</p>
+                    </div>
+                </div>
+
+                <!-- Info Panels -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Stats -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-1">Stats</h2>
+                        <div class="bg-white border border-gray-300 rounded-lg p-3 space-y-2">
+                            <p class="text-gray-700">Queue Size: <span id="queue-size" class="font-mono font-bold text-blue-600">0</span></p>
+                            <p class="text-gray-700">Visited Count: <span id="visited-count" class="font-mono font-bold text-green-600">0</span></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Legend -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Legend</h2>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #E5E7EB"></div>
+                                <span>Unvisited Node</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #3B82F6"></div>
+                                <span>In Queue</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-5 h-5 rounded-full mr-2 border border-gray-700" style="background-color: #10B981"></div>
+                                <span>Visited Node</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Constants ---
+            const GRID_SIZE = 21; // 21x21 nodes
+            const START_NODE = { x: 10, y: 10 }; // Center of 0-20 grid
+            
+            const PADDING = 32; // Padding around the grid
+            const CELL_SPACING = 32; // Space between each node (increased from 30)
+            const NODE_RADIUS = 6; // Radius of the node dot
+            
+            // Canvas size calculation
+            const CANVAS_WIDTH = (GRID_SIZE - 1) * CELL_SPACING + PADDING * 2; // 704
+            const CANVAS_HEIGHT = (GRID_SIZE - 1) * CELL_SPACING + PADDING * 2; // 704
+            
+            // High-contrast colors
+            const COLORS = {
+                default: '#E5E7EB',   // gray-200 (unvisited node)
+                inQueue: '#3B82F6', // blue-500 (node in queue)
+                visited: '#10B981', // emerald-500 (visited node)
+                edge: '#D1D5DB',      // gray-300 (grid lines)
+                nodeBorder: '#374151' // gray-700
+            };
+
+            // --- DOM Elements ---
+            const canvas = document.getElementById('bfs-canvas');
+            canvas.width = CANVAS_WIDTH;
+            canvas.height = CANVAS_HEIGHT;
+            const ctx = canvas.getContext('2d');
+            
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            
+            const stepDescription = document.getElementById('step-description');
+            const queueSizeEl = document.getElementById('queue-size');
+            const visitedCountEl = document.getElementById('visited-count');
+
+            // --- State ---
+            let steps = [];
+            let currentStep = 0;
+            let isPlaying = false;
+            let timeoutId = null;
+
+            // --- Utility Functions ---
+
+            /**
+             * Creates a 2D array of GRID_SIZE x GRID_SIZE filled with `value`
+             */
+            function createGrid(value) {
+                return Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(value));
+            }
+
+            /**
+             * Creates a deep copy of the grid states
+             */
+            function deepCopyGrid(grid) {
+                return grid.map(row => [...row]);
+            }
+            
+            /**
+             * Converts grid coordinates (x, y) to canvas pixel coordinates
+             */
+            function getCanvasCoords(x, y) {
+                return {
+                    x: PADDING + x * CELL_SPACING,
+                    y: PADDING + y * CELL_SPACING
+                };
+            }
+
+            /** Gets valid 4-directional neighbors for a given cell */
+            function getNeighbors(x, y) {
+                const neighbors = [];
+                const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+                for (const [dx, dy] of directions) {
+                    const newX = x + dx;
+                    const newY = y + dy;
+                    if (newX >= 0 && newX < GRID_SIZE && newY >= 0 && newY < GRID_SIZE) {
+                        neighbors.push({ x: newX, y: newY });
+                    }
+                }
+                return neighbors;
+            }
+
+            // --- Drawing Function ---
+
+            /**
+             * Draws the entire grid, including nodes and edges (lines)
+             * based on the provided gridStates 2D array.
+             */
+            function drawGrid(gridStates) {
+                ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                ctx.lineWidth = 2; // Line width for edges
+                
+                // 1. Draw Edges (Grid Lines)
+                ctx.strokeStyle = COLORS.edge;
+                for (let i = 0; i < GRID_SIZE; i++) {
+                    // Horizontal lines
+                    const p1_h = getCanvasCoords(0, i);
+                    const p2_h = getCanvasCoords(GRID_SIZE - 1, i);
+                    ctx.beginPath();
+                    ctx.moveTo(p1_h.x, p1_h.y);
+                    ctx.lineTo(p2_h.x, p2_h.y);
+                    ctx.stroke();
+                    
+                    // Vertical lines
+                    const p1_v = getCanvasCoords(i, 0);
+                    const p2_v = getCanvasCoords(i, GRID_SIZE - 1);
+                    ctx.beginPath();
+                    ctx.moveTo(p1_v.x, p1_v.y);
+                    ctx.lineTo(p2_v.x, p2_v.y);
+                    ctx.stroke();
+                }
+                
+                // 2. Draw Nodes (Dots at intersections)
+                ctx.lineWidth = 1; // Line width for node borders
+                ctx.strokeStyle = COLORS.nodeBorder;
+                
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        const state = gridStates[y][x];
+                        const p = getCanvasCoords(x, y);
+                        
+                        ctx.fillStyle = COLORS[state];
+                        
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, NODE_RADIUS, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke(); // Draw border
+                    }
+                }
+            }
+
+            // --- Algorithm Step Generation (BFS) ---
+
+            /**
+             * Generates all steps of the BFS algorithm and stores them in the 'steps' array.
+             */
+            function generateBFSSteps() {
+                steps = []; // Clear previous steps
+                let gridStates = createGrid('default');
+                let queue = [];
+                let visited = createGrid(false); // 2D array to track visited
+                
+                // Initial state (Step 0)
+                steps.push({
+                    states: deepCopyGrid(gridStates),
+                    queueSize: 0,
+                    visitedCount: 0,
+                    message: "Algorithm ready. Click 'Next' or 'Auto-Play'."
+                });
+
+                // 1. Enqueue start node
+                queue.push(START_NODE);
+                visited[START_NODE.y][START_NODE.x] = true;
+                gridStates[START_NODE.y][START_NODE.x] = 'inQueue';
+                
+                steps.push({
+                    states: deepCopyGrid(gridStates),
+                    queueSize: queue.length,
+                    visitedCount: 0,
+                    message: `Enqueue start node (${START_NODE.x}, ${START_NODE.y}).`
+                });
+
+                let visitedCount = 0;
+                
+                // 2. Loop while queue is not empty
+                while (queue.length > 0) {
+                    // 3. Dequeue node
+                    const currentNode = queue.shift();
+                    const { x, y } = currentNode;
+                    
+                    gridStates[y][x] = 'visited';
+                    visitedCount++;
+                    
+                    steps.push({
+                        states: deepCopyGrid(gridStates),
+                        queueSize: queue.length,
+                        visitedCount: visitedCount,
+                        message: `Dequeue and visit node (${x}, ${y}).`
+                    });
+
+                    // 4. Enqueue unvisited neighbors
+                    const neighbors = getNeighbors(x, y);
+                    let enqueuedNeighbors = [];
+                    for (const neighbor of neighbors) {
+                        if (!visited[neighbor.y][neighbor.x]) {
+                            visited[neighbor.y][neighbor.x] = true;
+                            gridStates[neighbor.y][neighbor.x] = 'inQueue';
+                            queue.push(neighbor);
+                            enqueuedNeighbors.push(`(${neighbor.x},${neighbor.y})`);
+                        }
+                    }
+                    
+                    if (enqueuedNeighbors.length > 0) {
+                        steps.push({
+                            states: deepCopyGrid(gridStates),
+                            queueSize: queue.length,
+                            visitedCount: visitedCount,
+                            message: `Enqueue unvisited neighbors: ${enqueuedNeighbors.join(', ')}.`
+                        });
+                    } else {
+                         steps.push({
+                            states: deepCopyGrid(gridStates),
+                            queueSize: queue.length,
+                            visitedCount: visitedCount,
+                            message: `Node (${x},${y}) has no unvisited neighbors.`
+                        });
+                    }
+                }
+
+                // 5. Finished
+                steps.push({
+                    states: deepCopyGrid(gridStates),
+                    queueSize: 0,
+                    visitedCount: visitedCount,
+                    message: "Traversal complete. Queue is empty."
+                });
+            }
+
+            // --- Step Rendering and Navigation ---
+
+            /**
+             * Renders a specific step from the 'steps' array.
+             * @param {number} index The index of the step to render.
+             */
+            function renderStep(index) {
+                if (index < 0 || index >= steps.length) return;
+
+                currentStep = index;
+                const step = steps[currentStep];
+
+                // Update canvas
+                drawGrid(step.states);
+
+                // Update UI panels
+                stepDescription.textContent = step.message;
+                queueSizeEl.textContent = step.queueSize;
+                visitedCountEl.textContent = step.visitedCount;
+
+                // Update button states
+                prevBtn.disabled = (currentStep === 0);
+                nextBtn.disabled = (currentStep === steps.length - 1);
+                resetBtn.disabled = (currentStep === 0);
+                
+                if (currentStep === steps.length - 1) {
+                    startBtn.disabled = true;
+                } else if (!isPlaying) {
+                    startBtn.disabled = false;
+                }
+            }
+
+            function handleNext() {
+                if (currentStep < steps.length - 1) {
+                    renderStep(currentStep + 1);
+                }
+            }
+
+            function handlePrev() {
+                if (currentStep > 0) {
+                    renderStep(currentStep - 1);
+                }
+            }
+            
+            function handleReset() {
+                handlePause();
+                currentStep = 0;
+                generateBFSSteps();
+                renderStep(0);
+                startBtn.disabled = false;
+            }
+
+            function handleStart() {
+                if (isPlaying) return;
+                isPlaying = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                resetBtn.disabled = true;
+
+                autoPlayLoop();
+            }
+
+            function handlePause() {
+                isPlaying = false;
+                if (timeoutId) clearTimeout(timeoutId);
+                timeoutId = null;
+                
+                pauseBtn.disabled = true;
+                // Re-enable manual controls
+                renderStep(currentStep);
+            }
+
+            function autoPlayLoop() {
+                if (!isPlaying) {
+                    // Don't do anything if paused
+                    return;
+                }
+
+                if (currentStep >= steps.length - 1) {
+                    // Reached the end
+                    handlePause();
+                    renderStep(steps.length - 1); // Ensure last step is rendered
+                    return;
+                }
+                
+                handleNext();
+                
+                timeoutId = setTimeout(autoPlayLoop, 20); // 20ms delay
+            }
+
+            // --- Event Listeners ---
+            prevBtn.addEventListener('click', handlePrev);
+            nextBtn.addEventListener('click', handleNext);
+            resetBtn.addEventListener('click', handleReset);
+            startBtn.addEventListener('click', handleStart);
+            pauseBtn.addEventListener('click', handlePause);
+            
+            // --- Initial Setup ---
+            generateBFSSteps();
+            renderStep(0); // Render the initial state
+
+        });
+    </script>
+
+</body>
+</html>
