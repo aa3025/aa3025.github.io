@@ -10,15 +10,15 @@
 <h2>JavaScript Gravitational N-body Simulation using Runge-Kutta 4th order method</h2>
   <div style="width:600px; height:20px;"><p align="right"><i>Alex Pedcenko 2020</i></p></div>
 
-<div style="width:600px;border:1px solid #cccccc"><p align="left">
+<div style="width:1080px;border:1px solid #cccccc"><p align="left">
 Number of objects N: <input type="text" name="N" id="N" size="3" value="6"> Time-step <i>dt</i>: <input type="text" name="timestep" id="timestep" size="3" value="0.005"></p>
 <p>Initial speed: <i>V = V<sub>0</sub></i> * k, where <i>k</i>=<input type="text" name="coeff" id="coeff" size="1" value="1.2">, where <i>V<sub>0</sub></i> is Keplerian speed for circular orbit (PE = 2 * KE). For cofficient <i>k</i> less then SQRT(2), the orbits are closed, i.e. when V = SQRT(2)*<i>V<sub>0</sub></i> the speed is escape velocity.</p></div>
 
 <input type="button" value="Apply" onClick="init();">
 <br><br>
-<div id="graph" style="border: 1px solid #aaaaaa; width:600px; height:600px;"></div>
+<div id="graph" style="border: 1px solid #aaaaaa; width:1080px; height:1080px;"></div>
 <p id="E"></p>
-<div id="energy_plot" style="border: 1px solid #aaaaaa; width:600px; height:300px;"></div>
+<div id="energy_plot" style="border: 1px solid #aaaaaa; width:1080px; height:300px;"></div>
 <p id="time"></p>
 
 <script src="rk4.js"></script>

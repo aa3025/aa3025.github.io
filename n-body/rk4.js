@@ -44,7 +44,7 @@ Plotly.relayout( "graph", {
 });
 }
 
-	if(Math.max.apply(null, x.map(Math.abs))>10 || Math.max.apply(null, y.map(Math.abs))>10) {
+	if(Math.max.apply(null, x.map(Math.abs))>20 || Math.max.apply(null, y.map(Math.abs))>20) {
 	init();
 	}
 }
@@ -145,8 +145,8 @@ var layout = {
 	xaxis: { range: [ -2, 2 ] },
 	yaxis: { range: [-2, 2] },
 	showlegend: false,
-	height: 600,
-	width: 600
+	height: 1080,
+	width: 1080
 };
 
 
@@ -186,7 +186,7 @@ var layout2 = {
 	//yaxis: { range: [-240, -220] },
 	showlegend: true,
 	height: 300,
-	width: 600
+	width: 1080
 };
 
 
