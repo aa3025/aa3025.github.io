@@ -324,6 +324,11 @@ function compute () {
     vx = array_update(vx, k1_vx, k2_vx, k3_vx, k4_vx, dt);
     vy = array_update(vy, k1_vy, k2_vy, k3_vy, k4_vy, dt);
 
+    // --- FIX: Tell the plot data to use the NEW x and y arrays ---
+    data[0].x = x;
+    data[0].y = y;
+    // --- END FIX ---
+
     // --- Store history and update plots (same as before) ---
     for (var i = 0; i < n; i++) {
         X[i][k] = x[i];
