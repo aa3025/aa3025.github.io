@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFS Grid Visualization (8-Directional)</title>
+    <title>BFS Grid Visualization</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -49,7 +49,8 @@
             display: inline-block;
             padding: 4px 10px;
             margin: 4px;
-            font-mono: 12px;
+            font-family: monospace;
+            font-size: 12px;
             font-weight: 600;
             color: #1d4ed8; /* blue-700 */
             background-color: #dbeafe; /* blue-100 */
@@ -68,7 +69,7 @@
     <div class="w-full max-w-6xl">
         <div class="bg-white rounded-lg p-6">
             <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
-                BFS Grid Visualization (8-Directional)
+                BFS Grid Visualization
             </h1>
             
             <!-- Top Part: Canvas and Controls -->
@@ -106,12 +107,22 @@
                                 Reset
                             </button>
                         </div>
+                        
                         <!-- Settings -->
-                        <div class="grid grid-cols-1 gap-2">
+                        <div class="grid grid-cols-2 gap-2">
                             <!-- Grid Size Input -->
                             <div>
                                 <label for="grid-size-input" class="block text-sm font-medium text-gray-700 mb-1">Grid Size (odd)</label>
                                 <input type="number" id="grid-size-input" value="21" min="3" max="51" step="2" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                            </div>
+                            <!-- NEW: Connectivity Select -->
+                            <div>
+                                <label for="connectivity-select" class="block text-sm font-medium text-gray-700 mb-1">Connectivity</label>
+                                <select id="connectivity-select" class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                    <option value="8-way" selected>8-Way (Cardinal + Diag)</option>
+                                    <option value="4-way">4-Way (Cardinal Only)</option>
+                                    <option value="4-diag">4-Way (Diagonal Only)</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -119,7 +130,7 @@
                     <!-- Step Description -->
                     <div>
                         <h2 class="text-xl font-semibold text-gray-700 mb-1">Step Description</h2>
-                        <div class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
+                        <div class="min-h-[100px] bg-white border border-gray-300 rounded-lg p-3">
                             <p id="step-description" class="text-lg text-gray-800">Algorithm ready. Click 'Next' or 'Auto-Play'.</p>
                         </div>
                     </div>
@@ -191,17 +202,16 @@
             const startBtn = document.getElementById('start-btn');
             const pauseBtn = document.getElementById('pause-btn');
             const gridSizeInput = document.getElementById('grid-size-input');
+            const connectivitySelect = document.getElementById('connectivity-select'); // NEW
             
             const stepDescription = document.getElementById('step-description');
             const queueSizeEl = document.getElementById('queue-size');
             const visitedCountEl = document.getElementById('visited-count');
             
-            // --- NEW Queue Pipe Elements ---
             const queuePipe = document.getElementById('queue-pipe');
             const queuePipePlaceholder = document.getElementById('queue-pipe-placeholder');
             
             const COLORS = {
-                // High contrast colors
                 default: '#E5E7EB',   // gray-200 (unvisited node)
                 inQueue: '#3B82F6', // blue-500 (in queue)
                 visited: '#10B981', // emerald-500 (visited)
@@ -221,6 +231,7 @@
             let currentStep = 0;
             let isPlaying = false;
             let timeoutId = null;
+            let resizeTimer; // For debouncing resize
 
             // --- Utility Functions ---
 
@@ -239,30 +250,31 @@
                 };
             }
 
-            /**
-             * Converts a node object {x, y} to a single ID (1 to n^2)
-             */
             function nodeToId(node) {
-                // Use global GRID_SIZE for calculation
                 return node.y * GRID_SIZE + node.x + 1;
             }
 
-            /**
-             * Converts a node {x, y} to a string key for the visitedSet
-             */
             const nodeToKey = (node) => `${node.x},${node.y}`;
 
-            /** * Gets valid neighbors for a given cell (8-directional).
+            /** * NEW: Gets valid neighbors based on the selected connectivity mode.
              */
-            function getNeighbors(x, y) {
+            function getNeighbors(x, y, mode) {
                 const neighbors = [];
-                // 8 directions: 4 cardinal, 4 diagonal
-                const directions = [
-                    [0, 1], [0, -1], [1, 0], [-1, 0], // Cardinal
-                    [1, 1], [1, -1], [-1, 1], [-1, -1] // Diagonal
-                ]; 
+                const directions = {
+                    cardinal: [[0, 1], [0, -1], [1, 0], [-1, 0]],
+                    diagonal: [[1, 1], [1, -1], [-1, 1], [-1, -1]]
+                };
                 
-                for (const [dx, dy] of directions) {
+                let dirsToScan = [];
+                if (mode === '8-way') {
+                    dirsToScan = [...directions.cardinal, ...directions.diagonal];
+                } else if (mode === '4-way') {
+                    dirsToScan = directions.cardinal;
+                } else if (mode === '4-diag') {
+                    dirsToScan = directions.diagonal;
+                }
+                
+                for (const [dx, dy] of dirsToScan) {
                     const newX = x + dx;
                     const newY = y + dy;
                     if (newX >= 0 && newX < GRID_SIZE && newY >= 0 && newY < GRID_SIZE) {
@@ -274,52 +286,58 @@
 
             // --- Drawing Function ---
 
-            function drawGrid(gridStates) {
-                // Set canvas size (might have changed)
+            /**
+             * NEW: Draws the grid, now conditionally drawing edges based on connectivity mode.
+             */
+            function drawGrid(gridStates, mode) {
                 canvas.width = CANVAS_WIDTH;
                 canvas.height = CANVAS_HEIGHT;
                 ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                 
-                // 1. Draw Diagonal Edges (Lighter)
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = COLORS.diagEdge;
-                for (let y = 0; y < GRID_SIZE - 1; y++) {
-                    for (let x = 0; x < GRID_SIZE - 1; x++) {
-                        const p1 = getCanvasCoords(x, y);
-                        const p2 = getCanvasCoords(x + 1, y + 1);
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.stroke();
-                        
-                        const p3 = getCanvasCoords(x + 1, y);
-                        const p4 = getCanvasCoords(x, y + 1);
-                        ctx.beginPath();
-                        ctx.moveTo(p3.x, p3.y);
-                        ctx.lineTo(p4.x, p4.y);
-                        ctx.stroke();
+                // 1. Draw Diagonal Edges (if mode includes them)
+                if (mode === '8-way' || mode === '4-diag') {
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = COLORS.diagEdge;
+                    for (let y = 0; y < GRID_SIZE - 1; y++) {
+                        for (let x = 0; x < GRID_SIZE - 1; x++) {
+                            const p1 = getCanvasCoords(x, y);
+                            const p2 = getCanvasCoords(x + 1, y + 1);
+                            ctx.beginPath();
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                            
+                            const p3 = getCanvasCoords(x + 1, y);
+                            const p4 = getCanvasCoords(x, y + 1);
+                            ctx.beginPath();
+                            ctx.moveTo(p3.x, p3.y);
+                            ctx.lineTo(p4.x, p4.y);
+                            ctx.stroke();
+                        }
                     }
                 }
 
-                // 2. Draw Horizontal/Vertical Edges (Darker)
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = COLORS.edge;
-                for (let i = 0; i < GRID_SIZE; i++) {
-                    // Horizontal lines
-                    const p1_h = getCanvasCoords(0, i);
-                    const p2_h = getCanvasCoords(GRID_SIZE - 1, i);
-                    ctx.beginPath();
-                    ctx.moveTo(p1_h.x, p1_h.y);
-                    ctx.lineTo(p2_h.x, p2_h.y);
-                    ctx.stroke();
-                    
-                    // Vertical lines
-                    const p1_v = getCanvasCoords(i, 0);
-                    const p2_v = getCanvasCoords(i, GRID_SIZE - 1);
-                    ctx.beginPath();
-                    ctx.moveTo(p1_v.x, p1_v.y);
-                    ctx.lineTo(p2_v.x, p2_v.y);
-                    ctx.stroke();
+                // 2. Draw Horizontal/Vertical Edges (if mode includes them)
+                if (mode === '8-way' || mode === '4-way') {
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = COLORS.edge;
+                    for (let i = 0; i < GRID_SIZE; i++) {
+                        // Horizontal lines
+                        const p1_h = getCanvasCoords(0, i);
+                        const p2_h = getCanvasCoords(GRID_SIZE - 1, i);
+                        ctx.beginPath();
+                        ctx.moveTo(p1_h.x, p1_h.y);
+                        ctx.lineTo(p2_h.x, p2_h.y);
+                        ctx.stroke();
+                        
+                        // Vertical lines
+                        const p1_v = getCanvasCoords(i, 0);
+                        const p2_v = getCanvasCoords(i, GRID_SIZE - 1);
+                        ctx.beginPath();
+                        ctx.moveTo(p1_v.x, p1_v.y);
+                        ctx.lineTo(p2_v.x, p2_v.y);
+                        ctx.stroke();
+                    }
                 }
                 
                 // 3. Draw Nodes (Dots) on top
@@ -343,17 +361,20 @@
 
             // --- Algorithm Step Generation (BFS) ---
 
-            function generateBFSSteps() {
+            /**
+             * NEW: Now takes connectivity mode as an argument.
+             */
+            function generateBFSSteps(mode) {
                 steps = [];
                 let gridStates = createGrid(GRID_SIZE, 'default');
-                let queue = []; // Will store {x, y} objects
-                let visited = new Set(); // Will store "x,y" keys
+                let queue = []; 
+                let visited = new Set();
                 let visitedCount = 0;
 
                 // Step 0: Initial state
                 steps.push({
                     states: deepCopyGrid(gridStates),
-                    queue: [], // Queue of IDs
+                    queue: [],
                     visitedCount: 0,
                     message: "Algorithm ready. Click 'Next' or 'Auto-Play'."
                 });
@@ -365,7 +386,7 @@
                 
                 steps.push({
                     states: deepCopyGrid(gridStates),
-                    queue: queue.map(nodeToId), // Convert to IDs for the step
+                    queue: queue.map(nodeToId),
                     visitedCount: 0,
                     message: `Enqueue start node #${nodeToId(START_NODE)}.`
                 });
@@ -376,84 +397,64 @@
                     const { x, y } = currentNode;
                     const currentNodeId = nodeToId(currentNode);
 
-                    // Visit node
                     gridStates[y][x] = 'visited';
                     visitedCount++;
                     
-                    let neighborsAdded = 0;
+                    // Get neighbors based on mode
+                    const neighbors = getNeighbors(x, y, mode); 
+                    let enqueuedThisStep = [];
                     
-                    // Get all neighbors (8-directional)
-                    const neighbors = getNeighbors(x, y);
                     for (const neighbor of neighbors) {
                         if (!visited.has(nodeToKey(neighbor))) {
                             visited.add(nodeToKey(neighbor));
                             gridStates[neighbor.y][neighbor.x] = 'inQueue';
-                            queue.push(neighbor); // Push {x, y} object
-                            neighborsAdded++;
+                            queue.push(neighbor);
+                            enqueuedThisStep.push(nodeToId(neighbor));
                         }
                     }
-                    
-                    // Add a step for this visit and all its enqueues
+
+                    // Create a step AFTER visiting and enqueuing
                     steps.push({
                         states: deepCopyGrid(gridStates),
-                        queue: queue.map(nodeToId), // Convert to IDs for the step
+                        queue: queue.map(nodeToId), // The queue *after* enqueuing
                         visitedCount: visitedCount,
-                        message: `Visit #${currentNodeId}, enqueue ${neighborsAdded} unvisited neighbors.`
+                        message: `Visit #${currentNodeId}, enqueue ${enqueuedThisStep.length} new neighbors.` + 
+                                 (enqueuedThisStep.length > 0 ? ` (${enqueuedThisStep.sort((a,b) => a-b).join(', ')})` : '')
                     });
                 }
-                
-                // Final step
-                steps.push({
-                    states: deepCopyGrid(gridStates),
-                    queue: [],
-                    visitedCount: visitedCount,
-                    message: "Traversal complete. Queue is empty."
-                });
             }
 
             // --- Step Rendering and Navigation ---
 
-            /**
-             * NEW: Renders the queue visualization in the bottom pipe
-             * @param {number[]} queueIds - An array of node IDs
-             */
             function renderQueuePipe(queueIds) {
-                // Clear all previous nodes
                 queuePipe.innerHTML = ''; 
-
                 if (queueIds.length === 0) {
                     queuePipe.appendChild(queuePipePlaceholder);
                 } else {
-                    queuePipePlaceholder.remove(); // Remove placeholder if it's there
-                    
+                    queuePipePlaceholder.remove();
                     queueIds.forEach((id) => {
                         const item = document.createElement('div');
-                        item.className = 'queue-pipe-item'; // No animation class
+                        item.className = 'queue-pipe-item';
                         item.textContent = id;
                         queuePipe.appendChild(item);
                     });
                 }
             }
 
-
             function renderStep(index) {
                 if (index < 0 || index >= steps.length) return;
 
                 currentStep = index;
                 const step = steps[currentStep];
+                const mode = connectivitySelect.value; // Get current mode
 
-                // Update canvas
-                drawGrid(step.states);
+                drawGrid(step.states, mode); // Pass mode to drawGrid
 
-                // Update UI panels
                 stepDescription.textContent = step.message;
-                queueSizeEl.textContent = step.queue.length; // 'step.queue' is now array of IDs
+                queueSizeEl.textContent = step.queue.length;
                 visitedCountEl.textContent = step.visitedCount;
-
-                // Update the new queue pipe visualization
                 renderQueuePipe(step.queue);
 
-                // Update button states
                 prevBtn.disabled = (currentStep === 0);
                 nextBtn.disabled = (currentStep === steps.length - 1);
                 resetBtn.disabled = (currentStep === 0);
@@ -477,21 +478,22 @@
                 }
             }
             
+            /**
+             * NEW: handleReset now reads grid size AND connectivity mode.
+             */
             function handleReset() {
                 handlePause();
                 
-                // Read new grid size
                 let newSize = parseInt(gridSizeInput.value, 10);
-                // Validate: must be odd, between 3 and 51
                 if (isNaN(newSize) || newSize < 3 || newSize > 51) {
-                    newSize = 21; // Reset to default
+                    newSize = 21;
                     gridSizeInput.value = "21";
                 } else if (newSize % 2 === 0) {
-                    newSize++; // Force to next odd number
+                    newSize++;
                     if (newSize > 51) newSize = 51;
                     gridSizeInput.value = newSize.toString();
                 }
-                GRID_SIZE = newSize; // Set global
+                GRID_SIZE = newSize;
                 
                 // --- Dynamic Size Calculation ---
                 const canvasContainer = canvas.parentElement;
@@ -499,7 +501,13 @@
                     console.error("Canvas container not found!");
                     return;
                 }
-                const containerWidth = canvasContainer.clientWidth || 300;
+                
+                // Debounced resize handler relies on this element being correct
+                if (!canvasContainer.clientWidth) {
+                    return; 
+                }
+                
+                const containerWidth = canvasContainer.clientWidth;
                 const availableWidth = containerWidth - PADDING * 2;
                 
                 CELL_SPACING = Math.floor(availableWidth / (GRID_SIZE - 1));
@@ -514,7 +522,8 @@
                 // --- End Dynamic Size Calculation ---
                 
                 currentStep = 0;
-                generateBFSSteps(); // Re-generate steps
+                const mode = connectivitySelect.value; // Get new mode
+                generateBFSSteps(mode); // Re-generate steps with this mode
                 renderStep(0);
                 startBtn.disabled = false;
             }
@@ -528,7 +537,8 @@
                 prevBtn.disabled = true;
                 nextBtn.disabled = true;
                 resetBtn.disabled = true;
-                gridSizeInput.disabled = true; // Disable controls while playing
+                gridSizeInput.disabled = true;
+                connectivitySelect.disabled = true; // Disable connectivity switch
 
                 autoPlayLoop();
             }
@@ -539,8 +549,8 @@
                 timeoutId = null;
                 
                 pauseBtn.disabled = true;
-                gridSizeInput.disabled = false; // Re-enable controls
-                // Re-enable manual controls
+                gridSizeInput.disabled = false; 
+                connectivitySelect.disabled = false; // Re-enable
                 renderStep(currentStep);
             }
 
@@ -565,26 +575,32 @@
             nextBtn.addEventListener('click', handleNext);
             resetBtn.addEventListener('click', handleReset);
             startBtn.addEventListener('click', handleStart);
-            pauseBtn.addEventListener('click', handlePause);
-            gridSizeInput.addEventListener('change', handleReset); // Reset on change
+            pauseBtn.addEventListener('click', handlePause); // Fixed from 'Click'
+            gridSizeInput.addEventListener('change', handleReset);
+            connectivitySelect.addEventListener('change', handleReset); // NEW
             
             // --- Initial Setup ---
+            
+            // Debounced reset for resize
+            const debouncedReset = () => {
+                if (canvas.parentElement && canvas.parentElement.clientWidth > 0) {
+                    handleReset();
+                }
+            };
+
             const observer = new ResizeObserver(entries => {
+                clearTimeout(resizeTimer);
                 if (entries[0].contentRect.width > 0) {
-                     handleReset();
+                     resizeTimer = setTimeout(debouncedReset, 150);
                 }
             });
+            
             if (canvas.parentElement) {
                 observer.observe(canvas.parentElement);
             }
             
-            handleReset(); // Initialize
-            
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(handleReset, 150);
-            });
+            // Initial call
+            setTimeout(debouncedReset, 0); // Use setTimeout to let parent element render
 
         });
     </script>
