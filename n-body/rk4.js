@@ -56,9 +56,9 @@ Plotly.relayout( "graph", {
 ///////////////////////////////////////////////////
 function init () {
 
-n = document.getElementById('N').value;
-dt = document.getElementById('timestep').value;
-coeff = document.getElementById('coeff').value;
+n = parseInt(document.getElementById('N').value, 10); // FIX: Convert string to number
+dt = parseFloat(document.getElementById('timestep').value); // FIX: Convert string to number
+coeff = parseFloat(document.getElementById('coeff').value); // FIX: Convert string to number
 dt2=dt/2; // This is for Leapfrog, but we'll leave it. RK4 doesn't use it.
 
 //console.log(dt);
