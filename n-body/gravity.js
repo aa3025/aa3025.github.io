@@ -95,7 +95,7 @@ for (i = 0; i < n; i++) {
      Y[i][k]=y[i];
 
 }
-energy();
+energy(); // Calculate initial PE
 
 for (i = 0; i < n; i++) {	
 	
@@ -103,6 +103,9 @@ for (i = 0; i < n; i++) {
      vx[i] = -v0[i] * Math.sin(theta[i]);
      vy[i] = v0[i] * Math.cos(theta[i]);
 }
+
+// Recalculate energy now that we have velocities
+energy();
 
 init_plot();
 init_plot2();
@@ -196,15 +199,15 @@ function compute () {
 
 k += 1;
 t = k * dt;
-// Lepfrog 
+// Lepfrog (Leapfrog)
 
-// Leapfrog 1st half-step
+// Leapfrog 1st half-step (Drift)
 for (i = 0; i < n; i++) {
 	x[i] = x[i] + vx[i]*dt2;
 	y[i] = y[i] + vy[i]*dt2;
 }
 
-// forces
+// forces (Kick)
 for (i = 0; i < n; i++) {
 	ax[i]=0;
 	ay[i]=0;
@@ -219,7 +222,7 @@ for (j = 0; j < n; j++) {
 	}
 }
 
-// Leapfrog 2nd half-step
+// Leapfrog 2nd half-step (Drift)
 for (var i = 0; i < n; i++) {
 	vx[i] = vx[i] + ax[i]*dt;
 	vy[i] = vy[i] + ay[i]*dt;
@@ -244,30 +247,38 @@ document.getElementById("E").innerHTML = 'Total Energy: ' + E[k];
 //////////////////////////////////////////
 
 function energy () { // energy
-// P.E.
-//PE = 0;
-//KE = 0;
-for (i = 0; i < n; i++) {
-pe[i] = 0;
-ke[i] = 0;
-	for (j = 0; j < n; j++) {
-		if (j !== i) {
-			dx = x[i] - x[j];
-		        dy = y[i] - y[j];
-			r = Math.pow(dx*dx + dy*dy, 0.5);
-			pe[i] = pe[i] - G*m[i]*m[j]/r;
-			//console.log(pe[i]);
-		}
-	}
-ke[i] = m[i]*(vx[i]*vx[i]+vy[i]*vy[i]);
-//console.log(ke[i]);
-}
+    var ke_sum = 0;
+    var pe_sum = 0;
+    var r;
+    
+    for (i = 0; i < n; i++) {
+        pe[i] = 0;
+        ke[i] = 0;
+        
+        // This loop calculates the potential energy for particle 'i'
+        // which is needed for the init() function.
+        for (j = 0; j < n; j++) {
+            if (j !== i) {
+                dx = x[i] - x[j];
+                dy = y[i] - y[j];
+                r = Math.pow(dx*dx + dy*dy, 0.5);
+                pe[i] = pe[i] - G*m[i]*m[j]/r;
+            }
+        }
+        
+        // ***FIX 1:*** Kinetic Energy formula is 0.5 * m * v^2
+        ke[i] = 0.5 * m[i]*(vx[i]*vx[i]+vy[i]*vy[i]);
+        
+        ke_sum += ke[i];
+        pe_sum += pe[i]; // This sum double-counts the potential energy
+    }
 
-// K.E.
+    KE[k] = ke_sum;
+    
+    // ***FIX 2:*** Divide the summed PE by 2 to correct for double-counting
+    // (e.g., it counted PE(1,2) and PE(2,1) separately)
+    PE[k] = pe_sum / 2.0; 
 
-KE[k] = ke.reduce((a, b) => a + b, 0);
-PE[k] = pe.reduce((a, b) => a + b, 0);
-
-E[k]=KE[k]+PE[k];	
+    E[k]=KE[k]+PE[k];	
 }
 ///////////////////////////////////////////
