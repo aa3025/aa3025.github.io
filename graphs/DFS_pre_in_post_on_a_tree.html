@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFS Traversal Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for the 3-way toggle */
+        .toggle-container {
+            display: flex;
+            border-radius: 9999px;
+            background-color: #e5e7eb; /* gray-200 */
+            position: relative;
+            width: 100%;
+            padding: 4px;
+        }
+        .toggle-option {
+            flex: 1;
+            text-align: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            z-index: 10;
+            font-weight: 500;
+            color: #4b5563; /* gray-600 */
+            transition: color 0.3s ease;
+        }
+        .toggle-option.active {
+            color: #1f2937; /* gray-800 */
+        }
+        .toggle-handle {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            width: calc(100% / 3);
+            background-color: #ffffff; /* white */
+            border-radius: 9999px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 5;
+        }
+    </style>
+</head>
+<!-- MODIFICATION: Added justify-center and overflow-auto -->
+<body class="h-full bg-gray-100 font-sans text-gray-900 flex justify-center p-4 md:p-8 overflow-auto">
+
+    <!-- NEW: Main application wrapper to constrain width -->
+    <div class="w-full max-w-5xl flex flex-col">
+
+        <header class="mb-6">
+            <h1 class="text-3xl font-bold text-center text-gray-800">DFS Traversal Visualizer</h1>
+        </header>
+
+        <!-- Dynamic Explanation Box -->
+        <!-- MODIFICATION: Added min-h-28 (7rem) to prevent resizing 'jump' -->
+        <div id="traversal-explanation" class="mb-6 bg-blue-50 border-l-4 border-blue-500 text-blue-900 p-4 rounded-lg shadow-md min-h-28 flex flex-col justify-center" role="alert">
+            <!-- Content will be set by JavaScript -->
+        </div>
+
+        <main class="flex-1 flex flex-col gap-6">
+            
+            <!-- Top part: Canvas/Stack and Controls -->
+            <div class="flex-1 flex flex-col lg:flex-row gap-6">
+            
+                <!-- NEW: Left column wrapper for Graph + Output -->
+                <div class="lg:w-3/4 flex flex-col gap-6">
+
+                    <!-- MODIFICATION: Card is now a flex-row container -->
+                    <div class="bg-white rounded-lg shadow-xl p-4 overflow-hidden flex flex-row gap-4">
+                        
+                        <!-- MODIFICATION: SVG container is now flex-1 -->
+                        <div class="flex-1 h-[350px] md:h-[400px] flex items-center justify-center">
+                            <svg id="tree-svg" class="w-full h-full" viewBox="0 0 600 440" preserveAspectRatio="xMidYMid meet"></svg>
+                        </div>
+
+                        <!-- MODIFICATION: Stack "Margin" Container (fixed width) -->
+                        <div class="w-24 flex flex-col">
+                            <!-- MODIFICATION: Smaller title -->
+                            <h3 id="stack-title-1" class="text-base font-semibold mb-2 text-center">Stack</h3>
+                            <div id="stack-container-1" class="flex-1 flex flex-row gap-2 p-2 bg-gray-100 rounded-lg min-h-[150px]">
+                                <!-- Stack S1 Column -->
+                                <div id="stack-s1-col" class="flex-1 flex flex-col-reverse gap-2">
+                                    <!-- S1 items -->
+                                </div>
+                                <!-- Stack S2 Column -->
+                                <div id="stack-s2-col" class="flex-1 flex flex-col-reverse gap-2" style="display: none;">
+                                    <!-- S2 items -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Output section MOVED here from the bottom -->
+                    <div class="bg-white rounded-lg shadow-xl p-6 flex flex-col">
+                        <h2 class="text-xl font-semibold mb-4 text-center">Output</h2>
+                        <div id="output-container" class="flex flex-row flex-wrap gap-2 p-2 bg-gray-100 rounded-lg min-h-[5rem]">
+                            <!-- Output items will be added here -->
+                        </div>
+                    </div>
+
+                </div> <!-- END of new Left column wrapper -->
+
+                <!-- MODIFICATION: This is the start of the right column. -->
+                <div class="lg:w-1/4 flex flex-col gap-6">
+                    
+                    <!-- Controls -->
+                    <div class="bg-white rounded-lg shadow-xl p-6">
+                        <!-- <h2 class="text-xl font-semibold mb-4 text-center">Controls</h2> --> <!-- MODIFICATION: This line is removed -->
+                        
+                        <!-- 3-Way Toggle -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2 text-center">Traversal Type</label>
+                            <div class="toggle-container">
+                                <div id="toggle-handle" class="toggle-handle"></div>
+                                <div id="toggle-preorder" class="toggle-option active" onclick="selectTraversal('preorder')">Pre-order</div>
+                                <div id="toggle-inorder" class="toggle-option" onclick="selectTraversal('inorder')">In-order</div>
+                                <div id="toggle-postorder" class="toggle-option" onclick="selectTraversal('postorder')">Post-order</div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="flex justify-between gap-4 mb-4">
+                            <button id="prev-step" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
+                                Back
+                            </button>
+                            <button id="next-step" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
+                                Next
+                            </button>
+                        </div>
+                        <button id="reset" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
+                            Reset
+                        </button>
+                    </div>
+                    
+                    <!-- Step Description -->
+                    <div class="bg-white rounded-lg shadow-xl p-4">
+                        <h3 class="text-lg font-semibold mb-2 text-center">Current Step</h3>
+                        <p id="step-description" class="text-center text-gray-700 italic">Welcome! Select a traversal type and press "Next".</p>
+                    </div>
+                    
+                    <!-- Stack Card has been removed from here -->
+
+                </div> <!-- End of the right column -->
+
+            </div> <!-- End of top part wrapper -->
+
+        </main>
+
+    </div> <!-- End of new main application wrapper -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const svg = document.getElementById('tree-svg');
+            const stackContainer1 = document.getElementById('stack-container-1'); // This is the gray parent box
+            const stackS1Col = document.getElementById('stack-s1-col'); // S1 stack
+            const stackS2Col = document.getElementById('stack-s2-col'); // S2 stack
+            const stackTitle1 = document.getElementById('stack-title-1');
+            const outputContainer = document.getElementById('output-container');
+            const nextButton = document.getElementById('next-step');
+            const prevButton = document.getElementById('prev-step');
+            const resetButton = document.getElementById('reset');
+            const stepDescription = document.getElementById('step-description');
+            const explanationBox = document.getElementById('traversal-explanation');
+            const toggleHandle = document.getElementById('toggle-handle');
+            const toggleOptions = {
+                preorder: document.getElementById('toggle-preorder'),
+                inorder: document.getElementById('toggle-inorder'),
+                postorder: document.getElementById('toggle-postorder')
+            };
+
+            // --- Constants ---
+            const NODE_RADIUS = 20;
+            const COLORS = {
+                DEFAULT: '#cbd5e1', // gray-300
+                VISITED: '#f87171', // red-400
+                STACK: '#facc15',   // yellow-400
+                TEXT: '#1f2937',    // gray-800
+                LINE: '#6b7280'     // gray-500
+            };
+
+            // --- Tree Structure ---
+            const tree = {
+                id: 'A',
+                left: {
+                    id: 'B',
+                    left: {
+                        id: 'H',
+                        left: {
+                            id: 'I',
+                            left: {
+                                id: 'K',
+                                left: { id: 'L' },
+                                right: { id: 'M' }
+                            }
+                        },
+                        right: { id: 'J' }
+                    }
+                },
+                right: {
+                    id: 'C',
+                    left: {
+                        id: 'D',
+                        right: {
+                            id: 'E',
+                            left: { id: 'F' },
+                            right: { id: 'G' }
+                        }
+                    }
+                }
+            };
+
+            // Node positions for drawing
+            const nodePositions = {
+                'A': { x: 300, y: 50 },
+                'B': { x: 150, y: 120 }, 'C': { x: 450, y: 120 },
+                'H': { x: 100, y: 190 }, 'D': { x: 400, y: 190 },
+                'I': { x: 75, y: 260 }, 'J': { x: 125, y: 260 }, 'E': { x: 450, y: 260 },
+                'K': { x: 50, y: 330 }, 'F': { x: 425, y: 330 }, 'G': { x: 475, y: 330 },
+                'L': { x: 25, y: 400 }, 'M': { x: 75, y: 400 }
+            };
+
+            // --- Application State ---
+            let traversalType = 'preorder'; // 'preorder', 'inorder', 'postorder'
+            let history = [];
+            let currentStep = -1;
+
+            // --- Explanation Texts ---
+            const EXPLANATIONS = {
+                preorder: `
+                    <h3 class="font-semibold mb-1">Pre-order (DLR: Data-Left-Right)</h3>
+                    <p>Nodes are added to the output <strong class="text-blue-700">immediately when visited (popped from stack).</strong> This explores the root first, then the entire left subtree, then the entire right subtree.</p>
+                `,
+                inorder: `
+                    <h3 class="font-semibold mb-1">In-order (LDR: Left-Data-Right)</h3>
+                    <p>Nodes are added to the output <strong class="text-blue-700">after their left subtree is fully explored.</strong> This visits nodes in ascending order in a Binary Search Tree.</p>
+                `,
+                postorder: `
+                    <h3 class="font-semibold mb-1">Post-order (LRD: Left-Right-Data)</h3>
+                    <p>Nodes are added to the output <strong class="text-blue-700">after both their left and right subtrees are fully explored.</strong> Uses two stacks (S1, S2) to achieve this iteratively.</p>
+                `
+            };
+            
+            // --- Traversal History Generators ---
+
+            function generatePreorderHistory() {
+                const history = [];
+                const stack = [];
+                let output = [];
+                let visited = new Set();
+
+                // Initial state
+                history.push({
+                    stack: [],
+                    visited: new Set(),
+                    output: [],
+                    description: 'Start. Push root node "A" onto the stack.'
+                });
+
+                stack.push(tree);
+
+                history.push({
+                    stack: [...stack].map(n => n.id),
+                    visited: new Set(),
+                    output: [],
+                    description: 'Push root node "A". Ready to begin.'
+                });
+
+
+                while (stack.length > 0) {
+                    const node = stack.pop();
+                    
+                    // Add pop+visit step (combined)
+                    output.push(node.id);
+                    visited = new Set([...output]);
+                    
+                    history.push({
+                        stack: [...stack].map(n => n.id),
+                        visited: visited,
+                        output: [...output],
+                        description: `Pop "${node.id}" and add to output.`
+                    });
+                    
+                    // Add push steps (one by one)
+                    if (node.right) {
+                        stack.push(node.right);
+                        let desc = `Push right child "${node.right.id}".`;
+                        if (node.id === 'A') {
+                             desc += ` (Pushed first so it's visited *after* left)`;
+                        }
+                        history.push({
+                            stack: [...stack].map(n => n.id),
+                            visited: visited,
+                            output: [...output],
+                            description: desc
+                        });
+                    }
+                    if (node.left) {
+                        stack.push(node.left);
+                        let desc = `Push left child "${node.left.id}".`;
+                         if (node.id === 'A') {
+                             desc += ` (Pushed last so it's visited *first* - LIFO)`;
+                        }
+                        history.push({
+                            stack: [...stack].map(n => n.id),
+                            visited: visited,
+                            output: [...output],
+                            description: desc
+                        });
+                    }
+                }
+
+                history.push({
+                    stack: [],
+                    visited: new Set([...output]),
+                    output: [...output],
+                    description: 'Stack is empty. Traversal complete.'
+                });
+                return history;
+            }
+
+            function generateInorderHistory() {
+                const history = [];
+                let stack = [];
+                let output = [];
+                let current = tree;
+                let visited = new Set(); // Nodes popped and added to output
+
+                // Initial state
+                history.push({
+                    stack: [],
+                    visited: new Set(),
+                    output: [],
+                    current: null,
+                    description: 'Start. Set current to root "A".'
+                });
+
+                while (current || stack.length > 0) {
+                    // Phase 1: Go left
+                    while (current) {
+                        stack.push(current);
+                        history.push({
+                            stack: [...stack].map(n => n.id),
+                            visited: visited,
+                            output: [...output],
+                            current: current.id,
+                            description: `Current is "${current.id}". Push to stack and go left.`
+                        });
+                        current = current.left;
+                    }
+
+                    // Reached a null left child
+                    if (!current && stack.length > 0) {
+                         history.push({
+                            stack: [...stack].map(n => n.id),
+                            visited: visited,
+                            output: [...output],
+                            current: null,
+                            description: `Current is null. Pop from stack.`
+                        });
+                    }
+
+                    // Phase 2: Visit node
+                    const node = stack.pop();
+                    
+                    // Add visit/output step (combined)
+                    output.push(node.id);
+                    visited = new Set([...output]);
+
+                    history.push({
+                        stack: [...stack].map(n => n.id),
+                        visited: visited,
+                        output: [...output],
+                        current: node.id, // Show popped node as "current"
+                        description: `Pop "${node.id}", add to output. Set current to right child.`
+                    });
+
+                    // Phase 3: Go right
+                    current = node.right;
+                    if (current) {
+                        history.push({
+                            stack: [...stack].map(n => n.id),
+                            visited: visited,
+                            output: [...output],
+                            current: current.id,
+                            description: `Current is now "${current.id}". Repeat process.`
+                        });
+                    }
+                }
+
+                history.push({
+                    stack: [],
+                    visited: visited,
+                    output: [...output],
+                    current: null,
+                    description: 'Stack is empty. Traversal complete.'
+                });
+                return history;
+            }
+
+            function generatePostorderHistory() {
+                // Iterative post-order using two stacks
+                const history = [];
+                let stack1 = [];
+                let stack2 = []; // This will hold the post-order traversal
+                let output = [];
+                let visited = new Set(); // Nodes in the final output
+
+                // Initial state
+                history.push({
+                    stack1: [],
+                    stack2: [],
+                    visited: new Set(),
+                    output: [],
+                    description: 'Start. Use two stacks. Push root "A" to S1.'
+                });
+
+                stack1.push(tree);
+
+                history.push({
+                    stack1: [...stack1].map(n => n.id),
+                    stack2: [],
+                    visited: new Set(),
+                    output: [],
+                    description: 'Pushed "A" to S1.'
+                });
+
+                while (stack1.length > 0) {
+                    const node = stack1.pop();
+                    stack2.push(node); // This is the "visit"
+
+                    history.push({
+                        stack1: [...stack1].map(n => n.id),
+                        stack2: [...stack2].map(n => n.id),
+                        visited: visited,
+                        output: [...output],
+                        description: `Pop "${node.id}" from S1, push to S2.`
+                    });
+
+                    // Note: Push LEFT first, then RIGHT (opposite of pre-order)
+                    if (node.left) {
+                        stack1.push(node.left);
+                        history.push({
+                            stack1: [...stack1].map(n => n.id),
+                            stack2: [...stack2].map(n => n.id),
+                            visited: visited,
+                            output: [...output],
+                            description: `Push left child "${node.left.id}" to S1.`
+                        });
+                    }
+                    if (node.right) {
+                        stack1.push(node.right);
+                         history.push({
+                            stack1: [...stack1].map(n => n.id),
+                            stack2: [...stack2].map(n => n.id),
+                            visited: visited,
+                            output: [...output],
+                            description: `Push right child "${node.right.id}" to S1.`
+                        });
+                    }
+                }
+
+                history.push({
+                    stack1: [],
+                    stack2: [...stack2].map(n => n.id),
+                    visited: visited,
+                    output: [...output],
+                    description: 'S1 is empty. Now pop all from S2 to get output.'
+                });
+
+                // Pop from stack2 to get the final output
+                while (stack2.length > 0) {
+                    const node = stack2.pop();
+                    output.push(node.id);
+                    visited = new Set([...output]); // Mark as "visited" when added to output
+
+                    history.push({
+                        stack1: [],
+                        stack2: [...stack2].map(n => n.id),
+                        visited: visited,
+                        output: [...output],
+                        description: `Pop "${node.id}" from S2 and add to output.`
+                    });
+                }
+
+                history.push({
+                    stack1: [],
+                    stack2: [],
+                    visited: visited,
+                    output: [...output],
+                    description: 'S2 is empty. Traversal complete.'
+                });
+                
+                return history;
+            }
+
+            // --- Drawing ---
+
+            function drawTree(state = {}) {
+                svg.innerHTML = ''; // Clear SVG
+                const { 
+                    visited = new Set(), 
+                    stack = [], // Used for pre/in
+                    stack1 = [], // Used for post
+                    stack2 = [], // Used for post
+                    current = null // Used for in
+                } = state;
+
+                // 1. Draw Edges (so they are behind nodes)
+                Object.values(nodePositions).forEach(pos => {
+                    if (pos.parent) {
+                        const parentPos = nodePositions[pos.parent];
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        
+                        // --- Edge Split Logic ---
+                        const childOffset = 10; // MODIFICATION: Increased gap
+                        let startX = parentPos.x;
+                        if (pos.x < parentPos.x) { // Left child
+                            startX -= childOffset;
+                        } else { // Right child
+                            startX += childOffset;
+                        }
+                        // --- End Edge Split ---
+
+                        line.setAttribute('x1', startX);
+                        line.setAttribute('y1', parentPos.y + NODE_RADIUS); // Start from bottom of parent
+                        line.setAttribute('x2', pos.x);
+                        line.setAttribute('y2', pos.y - NODE_RADIUS); // End at top of child
+                        line.setAttribute('stroke', COLORS.LINE);
+                        line.setAttribute('stroke-width', 2);
+                        svg.appendChild(line);
+                    }
+                });
+
+                // 2. Draw Nodes
+                for (const [id, pos] of Object.entries(nodePositions)) {
+                    let color = COLORS.DEFAULT;
+                    
+                    // Combine all possible "stack" states
+                    const isInStack = stack.includes(id) || 
+                                      stack1.includes(id) || 
+                                      stack2.includes(id) || 
+                                      current === id;
+
+                    if (visited.has(id)) {
+                        color = COLORS.VISITED;
+                    } else if (isInStack) {
+                        color = COLORS.STACK;
+                    }
+
+                    // Draw Circle
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('id', `node-${id}`);
+                    circle.setAttribute('cx', pos.x);
+                    circle.setAttribute('cy', pos.y);
+                    circle.setAttribute('r', NODE_RADIUS);
+                    circle.setAttribute('fill', color);
+                    circle.setAttribute('stroke', COLORS.TEXT);
+                    circle.setAttribute('stroke-width', 2);
+                    svg.appendChild(circle);
+
+                    // Draw Text
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', pos.x);
+                    text.setAttribute('y', pos.y + 5); // Center text vertically
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('font-size', '16');
+                    text.setAttribute('font-weight', 'bold');
+                    text.setAttribute('fill', COLORS.TEXT);
+                    text.textContent = id;
+                    svg.appendChild(text);
+                }
+            }
+
+            // Function to set up node parent pointers for edge drawing
+            function setupTreePositions() {
+                const nodes = [tree];
+                while (nodes.length > 0) {
+                    const node = nodes.pop();
+                    if (node.left) {
+                        nodePositions[node.left.id].parent = node.id;
+                        nodes.push(node.left);
+                    }
+                    if (node.right) {
+                        nodePositions[node.right.id].parent = node.id;
+                        nodes.push(node.right);
+                    }
+                }
+            }
+            
+            // +++ HELPER FUNCTION to populate stack UI +++
+            function populateStack(container, stackData) {
+                container.innerHTML = '';
+                if (!stackData || stackData.length === 0) {
+                     container.innerHTML = '<span class="text-gray-400 text-sm text-center italic w-full">Empty</span>';
+                } else {
+                    stackData.forEach(nodeId => {
+                        const item = document.createElement('div');
+                        // MODIFICATION: Smaller "bricks" with less padding
+                        item.className = 'bg-yellow-400 text-gray-800 font-semibold py-1 px-2 rounded text-center shadow-sm text-sm';
+                        item.textContent = nodeId;
+                        container.appendChild(item);
+                    });
+                }
+            }
+            // +++ END HELPER FUNCTION +++
+
+            // --- State Update ---
+
+            function updateUI() {
+                if (currentStep < 0 || currentStep >= history.length) {
+                    drawTree();
+                    populateStack(stackS1Col, []);
+                    populateStack(stackS2Col, []);
+                    outputContainer.innerHTML = '<span class="text-gray-400 text-sm text-center italic w-full">Output is empty</span>';
+                    stepDescription.textContent = 'Welcome! Select a traversal type and press "Next".';
+                    return;
+                }
+
+                const step = history[currentStep];
+
+                // Draw tree
+                drawTree(step);
+
+                // Update Stacks
+                if (traversalType === 'postorder') {
+                    populateStack(stackS1Col, step.stack1);
+                    populateStack(stackS2Col, step.stack2);
+                } else {
+                    populateStack(stackS1Col, step.stack);
+                    populateStack(stackS2Col, []); // Clear S2
+                }
+
+
+                // Update Output
+                outputContainer.innerHTML = '';
+                if (step.output.length === 0) {
+                     outputContainer.innerHTML = '<span class="text-gray-400 text-sm text-center italic w-full">Output is empty</span>';
+                } else {
+                    step.output.forEach(nodeId => {
+                        const item = document.createElement('div');
+                        item.className = 'bg-red-400 text-white font-bold py-2 px-4 rounded text-center shadow-md';
+                        item.textContent = nodeId;
+                        outputContainer.appendChild(item);
+                    });
+                }
+
+                // Update Description
+                stepDescription.textContent = step.description;
+
+                // Update button states
+                prevButton.disabled = currentStep === 0;
+                nextButton.disabled = currentStep === history.length - 1;
+            }
+
+            function handleNext() {
+                if (currentStep < history.length - 1) {
+                    currentStep++;
+                    updateUI();
+                }
+            }
+
+            function handlePrev() {
+                if (currentStep > 0) {
+                    currentStep--;
+                    updateUI();
+                }
+            }
+
+            function handleReset() {
+                currentStep = -1;
+                switch (traversalType) {
+                    case 'preorder':
+                        history = generatePreorderHistory();
+                        break;
+                    case 'inorder':
+                        history = generateInorderHistory();
+                        break;
+                    case 'postorder':
+                        history = generatePostorderHistory();
+                        break;
+                }
+                updateUI();
+                prevButton.disabled = true;
+                nextButton.disabled = false;
+            }
+
+            // Expose selectTraversal to global scope for onclick attributes
+            window.selectTraversal = (type) => {
+                traversalType = type;
+                
+                // Update toggle handle
+                const offsets = {
+                    'preorder': '0%',
+                    'inorder': '100%',
+                    'postorder': '200%'
+                };
+                toggleHandle.style.transform = `translateX(${offsets[type]})`;
+
+                // Update active class
+                Object.values(toggleOptions).forEach(opt => opt.classList.remove('active'));
+                toggleOptions[type].classList.add('active');
+
+                // Update explanation box
+                explanationBox.innerHTML = EXPLANATIONS[type];
+
+                // *** NEW: Show/Hide Stack 2 ***
+                if (type === 'postorder') {
+                    stackTitle1.textContent = 'Stacks (S1, S2)';
+                    stackS2Col.style.display = 'flex';
+                } else {
+                    stackTitle1.textContent = 'Stack';
+                    stackS2Col.style.display = 'none';
+                }
+                // *** END NEW ***
+
+                handleReset();
+            }
+
+            // --- Initialization ---
+            setupTreePositions();
+            selectTraversal('preorder'); // Initialize with preorder
+            
+            nextButton.addEventListener('click', handleNext);
+            prevButton.addEventListener('click', handlePrev);
+            resetButton.addEventListener('click', handleReset);
+        });
+    </script>
+</body>
+</html>
