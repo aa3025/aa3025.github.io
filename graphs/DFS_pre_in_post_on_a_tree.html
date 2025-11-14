@@ -98,7 +98,8 @@
                     <!-- Output section MOVED here from the bottom -->
                     <div class="bg-white rounded-lg shadow-xl p-6 flex flex-col">
                         <h2 class="text-xl font-semibold mb-4 text-center">Output</h2>
-                        <div id="output-container" class="flex flex-row flex-wrap gap-2 p-2 bg-gray-100 rounded-lg min-h-[5rem]">
+                        <!-- MODIFICATION: Halved minimum height -->
+                        <div id="output-container" class="flex flex-row flex-wrap gap-2 p-2 bg-gray-100 rounded-lg min-h-[2.5rem]">
                             <!-- Output items will be added here -->
                         </div>
                     </div>
@@ -486,6 +487,7 @@
                         output: [...output],
                         description: `Pop "${node.id}" from S2 and add to output.`
                     });
+V
                 }
 
                 history.push({
@@ -644,7 +646,8 @@
                 } else {
                     step.output.forEach(nodeId => {
                         const item = document.createElement('div');
-                        item.className = 'bg-red-400 text-white font-bold py-2 px-4 rounded text-center shadow-md';
+                        // MODIFICATION: Halved vertical padding for shorter bricks
+                        item.className = 'bg-red-400 text-white font-bold py-1 px-4 rounded text-center shadow-md';
                         item.textContent = nodeId;
                         outputContainer.appendChild(item);
                     });
