@@ -15,9 +15,10 @@
 
         /* --- Global Zoom (Removed) --- */
         #app {
+	    transform: scale(0.8);
+            transform-origin: top center; /* This is the key line */
             /* The width will be set dynamically in renderState based on tree size */
             transition: min-width 0.3s ease;
-            transform: scale(0.8);
             /* Added mx-auto back to center content when width is small */
             margin-left: auto;
             margin-right: auto;
