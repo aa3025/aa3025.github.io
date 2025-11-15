@@ -540,7 +540,7 @@
                             // If they stopped or reset, just ensure the message is gone
                             renderState(); 
                         }
-                    }, 1000); // 2.5 seconds pause
+                    }, 1000); // 1.0 seconds pause
                 }
             } else {
                 stopAnimation();
@@ -667,7 +667,7 @@
             }
             else if (state.status === 'BUILD_COMPLETE_MESSAGE') {
                  statusText = `Phase 1 Complete: ${phaseDescription} Built`;
-                explanationHtml = `Step ${currentStep + 1} of ${history.length}. <b>INITIAL HEAP CONSTRUCTED!</b> ${isPausedByMe ? "Auto-resuming in 2.5s or click 'Next Step'." : ""}`;
+                explanationHtml = `Step ${currentStep + 1} of ${history.length}. <b>INITIAL HEAP CONSTRUCTED!</b> ${isPausedByMe ? "Auto-resuming in 1.0s or click 'Next Step'." : ""}`;
             }
             else if (state.phase === 'SORTING') {
                 statusText = `Phase 2: Extracting Root and Sorting (Heap Size: ${state.heapSize})`;
@@ -675,7 +675,7 @@
             }
             else if (state.status === 'HEAP_MAINTENANCE_COMPLETE') {
                 statusText = `Phase 2: Heap Maintenance Complete`;
-                explanationHtml = `Step ${currentStep + 1} of ${history.length}. <b>HEAP MAINTAINED!</b> The next step will extract the new root. ${isPausedByMe ? "Auto-resuming in 2.5s or click 'Next Step'." : ""}`;
+                explanationHtml = `Step ${currentStep + 1} of ${history.length}. <b>HEAP MAINTAINED!</b> The next step will extract the new root. ${isPausedByMe ? "Auto-resuming in 1.0s or click 'Next Step'." : ""}`;
             }
             else if (state.phase === 'FINISHED') {
                 statusText = 'Algorithm Complete! Array is Sorted.';
@@ -697,19 +697,22 @@
             statusEl.textContent = statusText;
             explanationEl.innerHTML = explanationHtml; 
 
-            // --- Render Input Array (Static) ---
+            // --- Value-Based Highlighting Setup ---
+            // Get the values currently fixed in the sorted section of the working array
+            const sortedValues = state.sortedIndices.map(i => workingArr[i]);
+            const consumedSortedValues = [...sortedValues]; // Copy to consume for one-to-one mapping
+
+            // --- Render Input Array (Static, Value-Based Highlighting) ---
             arrayContainer.innerHTML = initialArr.map((val, i) => {
                 let classes = 'flex flex-col items-center justify-center p-2 rounded-lg font-mono text-sm shadow-md transition-all duration-500 w-10 h-10 bg-gray-200 text-gray-800';
+                
+                // Find if the current value exists in the consumedSortedValues list
+                const valueIndex = consumedSortedValues.indexOf(val);
 
-                // We still highlight elements in the input array if they are part of the current comparison/swap
-                if (state.highlightNodes.includes(i)) {
-                    const isSwap = state.action.includes('Swapping') || state.action.includes('Extracting');
-                    classes = isSwap ? classes.replace('bg-gray-200', 'bg-red-500 text-white highlight-swap') : classes.replace('bg-gray-200', 'bg-yellow-400 highlight-compare');
-                }
-
-                // If the element is now sorted (fixed in its final position), mark it green in the Input Array too
-                if (state.sortedIndices.includes(i)) {
+                if (valueIndex !== -1) {
+                    // If found, apply green highlight and consume the value from the list
                     classes = classes.replace('bg-gray-200', 'bg-green-600 text-white highlight-sorted');
+                    consumedSortedValues.splice(valueIndex, 1); // Consume it so duplicates aren't over-highlighted
                 }
 
                 return `
@@ -753,7 +756,6 @@
             const requiredWidth = (maxBottomNodes * 2 * BASE_H_UNIT);
             
             // Set minimum width for the entire application wrapper (#app)
-            // Increased to +300px for robust padding/margin accounting
             appContainer.style.minWidth = `${requiredWidth + 300}px`; 
             // -----------------------------------------------------------------------------------
         }
@@ -766,4 +768,3 @@
     </script>
 </body>
 </html>
-
