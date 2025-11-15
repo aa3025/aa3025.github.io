@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Sort Visualiser</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+        }
+        /* Custom styles for bricks */
+        .brick {
+            transition: all 0.15s ease-in-out, background-color 0.15s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        /* Class for the comparing state */
+        .comparing {
+            filter: brightness(0.7);
+        }
+        /* Class for the swapping state */
+        .swapping {
+            background-color: #FBBF24 !important; /* Tailwind 'yellow-400' */
+            transform: translateY(-10px);
+        }
+        /* Class for the sorted state */
+        .sorted {
+            filter: brightness(1.2) saturate(0.8);
+        }
+
+        /* Flex container for horizontal summary stats */
+        .stats-summary-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            gap: 1rem;
+        }
+        .stats-summary-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            min-width: 120px;
+        }
+        .stats-summary-cell span:first-child {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #4b5563; /* text-gray-600 */
+            text-transform: uppercase;
+        }
+        .stats-summary-cell span:last-child {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1f2937; /* text-gray-800 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-6xl w-full bg-white p-6 rounded-xl shadow-2xl">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Bubble Sort Visualiser</h1>
+        </header>
+
+        <!-- Main Visualisation Area -->
+        <div id="visualisation-area" class="w-full min-h-[150px] flex items-end justify-center gap-1 p-4 mb-4 border border-gray-200 rounded-lg bg-gray-50 shadow-inner overflow-x-auto">
+            <!-- Bricks will be generated here -->
+        </div>
+
+        <!-- Controls -->
+        <div class="bg-white p-4 rounded-lg shadow-inner border border-gray-200 mb-4">
+            <!-- Row 1: Inputs -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <!-- N input -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2">
+                    <label for="n-input" class="block text-sm font-medium text-gray-500 mb-1 text-center">N (elements)</label>
+                    <input type="number" id="n-input" value="20" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center">
+                </div>
+                <!-- Array input -->
+                <div class="md:col-span-3 bg-gray-50 border border-gray-200 rounded-lg p-2">
+                    <label for="array-input" class="block text-sm font-medium text-gray-500 mb-1 text-center">Array (comma-separated)</label>
+                    <input type="text" id="array-input" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <!-- Row 2: Buttons -->
+            <div class="grid grid-cols-3 sm:grid-cols-7 gap-2">
+                 <button id="random-btn" class="w-full bg-blue-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                    Random
+                </button>
+                <button id="worst-case-btn" class="w-full bg-blue-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                    Worst Case
+                </button>
+                <button id="best-case-btn" class="w-full bg-blue-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                    Best Case
+                </button>
+                <button id="back-btn" class="w-full bg-gray-500 text-white py-1 px-4 rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-150">
+                    Back
+                </button>
+                 <button id="play-btn" class="w-full bg-blue-500 text-white py-1 px-4 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                    Play
+                </button>
+                 <button id="next-step-btn" class="w-full bg-green-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150">
+                    Next Step
+                </button>
+                <button id="reset-btn" class="w-full bg-red-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Log -->
+        <div id="status-log" class="text-gray-600 font-medium mb-4 h-32 p-2 border border-gray-200 rounded-lg bg-gray-50 flex justify-center items-center overflow-hidden">
+            Generate an array or enter one manually.
+        </div>
+
+        <!-- Statistics -->
+        <div id="stats-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-center">
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div class="text-sm font-medium text-gray-500 mb-1">Iteration</div>
+                <div id="iteration-count" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div class="text-sm font-medium text-gray-500 mb-1">Iteration Swaps</div>
+                <div id="iteration-swaps" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div class="text-sm font-medium text-gray-500 mb-1">Total Comparisons</div>
+                <div id="total-comparisons" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div class="text-sm font-medium text-gray-500 mb-1">Total Swaps</div>
+                <div id="total-swaps" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const nInput = document.getElementById('n-input');
+        const arrayInput = document.getElementById('array-input');
+        const randomBtn = document.getElementById('random-btn');
+        const worstCaseBtn = document.getElementById('worst-case-btn');
+        const bestCaseBtn = document.getElementById('best-case-btn');
+        const nextStepBtn = document.getElementById('next-step-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const playBtn = document.getElementById('play-btn');
+        const backBtn = document.getElementById('back-btn');
+        const visualisationArea = document.getElementById('visualisation-area');
+        const statusLog = document.getElementById('status-log');
+
+        // Stat Displays
+        const iterationCountDisplay = document.getElementById('iteration-count');
+        const iterationSwapsDisplay = document.getElementById('iteration-swaps');
+        const totalComparisonsDisplay = document.getElementById('total-comparisons');
+        const totalSwapsDisplay = document.getElementById('total-swaps');
+
+        // Algorithm State
+        let array = [];
+        let elementCount = 20; // RENAMED from n to fix SyntaxError
+        let i = 0; // Outer loop (iterations)
+        let j = 0; // Inner loop (comparisons)
+        let iterationSwaps = 0;
+        let totalSwaps = 0;
+        let totalComparisons = 0;
+        let isSorting = false;
+        let sortCompleted = false;
+        let isPlaying = false;
+        let playInterval;
+
+        // History for "Back" button
+        let history = [];
+
+        // Constants
+        const ANIMATION_DELAY = 50; // ms
+        const MIN_BRICK_HEIGHT_PX = 5; // 5px min height
+        const MAX_BRICK_HEIGHT_PERCENT = 1.0; // 100% of container
+        const MIN_BRICK_HEIGHT_PERCENT = 0.2; // 20% of container
+
+
+        // --- Initialization ---
+
+        window.onload = () => {
+            nInput.addEventListener('change', handleNChange);
+            arrayInput.addEventListener('change', handleArrayInputChange);
+            
+            randomBtn.addEventListener('click', generateRandomArray);
+            worstCaseBtn.addEventListener('click', generateWorstCaseArray);
+            bestCaseBtn.addEventListener('click', generateBestCaseArray);
+            
+            resetBtn.addEventListener('click', reset);
+            nextStepBtn.addEventListener('click', handleNextClick);
+            playBtn.addEventListener('click', handlePlayClick);
+            backBtn.addEventListener('click', handleBackClick);
+
+            // Redraw on resize to fix bar chart heights
+            window.addEventListener('resize', () => drawBricks(array));
+
+            generateArrayAndUpdateUI();
+        };
+
+        // --- UI & Array Generation ---
+
+        function handleNChange() {
+            elementCount = parseInt(nInput.value); 
+            if (elementCount < 2) elementCount = 2;
+            if (elementCount > 100) elementCount = 100;
+            nInput.value = elementCount;
+            generateArrayAndUpdateUI();
+        }
+
+        function handleArrayInputChange() {
+            try {
+                const inputText = arrayInput.value.trim();
+                if (inputText === "") {
+                    array = [];
+                    elementCount = 0; 
+                    nInput.value = 0;
+                } else {
+                    array = inputText.split(',').map(item => {
+                        const val = parseInt(item.trim());
+                        if (isNaN(val)) throw new Error('Invalid number in array');
+                        return val;
+                    });
+                    elementCount = array.length; // This is an assignment, not a declaration
+                    nInput.value = elementCount;
+                }
+                drawBricks(array);
+                resetSortState();
+                updateStatus('Array loaded. Ready to sort.');
+            } catch (error) {
+                updateStatus('Error: Invalid array format. Use comma-separated numbers.');
+                console.error(error);
+            }
+        }
+        
+        function generateRandomArray() {
+            generateArrayAndUpdateUI(false, false);
+        }
+
+        function generateWorstCaseArray() {
+            generateArrayAndUpdateUI(true, false);
+        }
+        
+        function generateBestCaseArray() {
+            generateArrayAndUpdateUI(false, true);
+        }
+
+        function generateArrayAndUpdateUI(worstCase = false, bestCase = false) {
+            array = [];
+            let maxVal = elementCount * 5; 
+            for (let k = 0; k < elementCount; k++) { 
+                // Use a value range that makes 1 the minimum for color calcs
+                array.push(Math.floor(Math.random() * maxVal) + 1);
+            }
+            
+            // Ensure at least one value is 1 if n > 0
+            if (elementCount > 0 && !array.includes(1)) { 
+                array[Math.floor(Math.random() * elementCount)] = 1; 
+            }
+
+            if (worstCase) {
+                array.sort((a, b) => b - a); // Sort descending
+            } else if (bestCase) {
+                array.sort((a, b) => a - b); // Sort ascending
+            }
+
+            arrayInput.value = array.join(', ');
+            drawBricks(array);
+            resetSortState();
+            updateStatus('New array generated. Ready to sort.');
+        }
+        
+        function drawBricks(arr) {
+            visualisationArea.innerHTML = '';
+            if (arr.length === 0) return;
+            
+            // --- FIX FOR BAR-CHART HEIGHT ---
+            // Get the container's *pixel* height
+            const containerHeight = visualisationArea.clientHeight;
+            // --- END FIX ---
+            
+            const maxVal = Math.max(...arr, 1); // Get max value in array, default to 1 if empty
+            const minVal = Math.min(...arr, 1);
+
+            // Calculate brick width based on N
+            const gap = elementCount > 50 ? 0.5 : 1; 
+            const containerWidth = visualisationArea.clientWidth;
+            
+            // Fallback width if clientWidth is 0 (e.g., hidden tab)
+            const safeContainerWidth = containerWidth > 0 ? containerWidth : 1000;
+            
+            const totalGapWidth = (elementCount - 1) * gap; 
+            let brickWidth = (safeContainerWidth - totalGapWidth) / elementCount; 
+            
+            arr.forEach((value, index) => {
+                const brick = document.createElement('div');
+                brick.classList.add('brick');
+                brick.id = `brick-${index}`;
+                
+                // --- FIX FOR BAR-CHART HEIGHT ---
+                // Scale from MIN_BRICK_HEIGHT_PERCENT (for min value) to MAX_BRICK_HEIGHT_PERCENT (for max value)
+                // Use (maxVal - minVal || 1) to avoid division by zero if all elements are the same
+                const heightRange = MAX_BRICK_HEIGHT_PERCENT - MIN_BRICK_HEIGHT_PERCENT;
+                const percentOfMax = ((value - minVal) / (maxVal - minVal || 1)) * heightRange + MIN_BRICK_HEIGHT_PERCENT;
+                
+                // Calculate pixel height based on container height
+                const heightPx = Math.max(MIN_BRICK_HEIGHT_PX, percentOfMax * containerHeight);
+                brick.style.height = `${heightPx}px`;
+                // --- END FIX ---
+                
+                // Calculate color
+                // Hue: 240 (blue) -> 120 (green) -> 60 (yellow) -> 0 (red)
+                const hue = 240 - (240 * ((value - minVal) / (maxVal - minVal || 1)));
+                brick.style.backgroundColor = `hsl(${hue}, 80%, 60%)`;
+
+                // Set flexible width
+                brick.style.flexBasis = `0`;
+                brick.style.flexGrow = `1`;
+                
+                brick.textContent = value;
+                // Hide text if bricks are too narrow
+                if (brickWidth < 20) {
+                    brick.textContent = '';
+                }
+                
+                visualisationArea.appendChild(brick);
+            });
+            
+             // Add gaps using CSS gap property on parent
+            visualisationArea.style.gap = `${gap}px`;
+        }
+
+        // --- Sorting Logic ---
+
+        function handleNextClick() {
+            if (sortCompleted) return;
+            if (!isSorting) {
+                startSort();
+            } else {
+                step();
+            }
+        }
+        
+        function handlePlayClick() {
+            if (sortCompleted) return;
+
+            if (isPlaying) {
+                pause();
+            } else {
+                if (!isSorting) {
+                    startSort();
+                }
+                play();
+            }
+        }
+
+        function handleBackClick() {
+             if (history.length <= 1) return; // Can't go back from initial state
+
+            // Stop playing if active
+            if (isPlaying) pause();
+
+            // Remove current state
+            history.pop();
+            // Get previous state
+            const prevState = history[history.length - 1];
+            
+            // Restore all state variables
+            array = [...prevState.array];
+            i = prevState.i;
+            j = prevState.j;
+            iterationSwaps = prevState.iterationSwaps;
+            totalSwaps = prevState.totalSwaps;
+            totalComparisons = prevState.totalComparisons;
+            isSorting = prevState.isSorting;
+            sortCompleted = prevState.sortCompleted;
+            elementCount = prevState.elementCount; // Restore elementCount
+
+            // Redraw the bricks and update UI
+            arrayInput.value = array.join(', ');
+            nInput.value = elementCount; // Update N input
+            drawBricks(array);
+            updateStats();
+            
+            // Re-highlight the "sorted" bricks correctly
+            for (let k = 0; k < (elementCount - 1 - i); k++) { 
+                 const brick = document.getElementById(`brick-${k}`);
+                 if (brick) brick.classList.remove('sorted');
+            }
+            for (let k = (elementCount - 1 - i); k < elementCount; k++) { 
+                 const brick = document.getElementById(`brick-${k}`);
+                 if (brick) brick.classList.add('sorted');
+            }
+
+            if (isSorting) {
+                // Highlight the *next* pair to be compared
+                highlight(j, j + 1, 'comparing');
+                updateStatus(`Rewound. Iteration ${i + 1}. Comparing ${array[j]} and ${array[j + 1]}.`);
+            } else {
+                updateStatus('Rewound to initial state.');
+            }
+            
+            // If we rewound to a completed state
+            if (sortCompleted) {
+                completeSort();
+            } else {
+                enableControls();
+            }
+        }
+        
+        function saveState() {
+            const state = {
+                array: [...array],
+                i: i,
+                j: j,
+                iterationSwaps: iterationSwaps,
+                totalSwaps: totalSwaps,
+                totalComparisons: totalComparisons,
+                isSorting: isSorting,
+                sortCompleted: sortCompleted,
+                elementCount: elementCount // Save elementCount
+            };
+            history.push(state);
+        }
+
+        function startSort() {
+            // Get array from input field in case it was manually changed
+            handleArrayInputChange();
+            
+            if (array.length < 2) {
+                updateStatus("Array is too small to sort.");
+                return;
+            }
+            
+            isSorting = true;
+            sortCompleted = false;
+            disableControls();
+            history = []; // Clear history
+            saveState(); // Save initial state
+            
+            // Highlight first pair
+            highlight(j, j + 1, 'comparing');
+            updateStatus(`Iteration ${i + 1} (Pass ${i + 1}). Comparing ${array[j]} and ${array[j + 1]}.`);
+            updateStats();
+        }
+
+        function step() {
+            if (sortCompleted || !isSorting) return;
+            
+            // --- FIX for PAUSE responsiveness ---
+            // If pause was clicked, isPlaying will be false. Stop.
+            if (!isPlaying && playBtn.textContent === 'Play') {
+                return;
+            }
+            // --- END FIX ---
+
+            // --- 1. Compare ---
+            // Clear previous highlights
+            removeHighlight(j, j + 1, 'comparing');
+
+            totalComparisons++;
+            let didSwap = false;
+            
+            if (array[j] > array[j + 1]) {
+                // --- 2. Swap ---
+                didSwap = true;
+                totalSwaps++;
+                iterationSwaps++;
+                
+                // Swap values in array
+                [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                
+                updateStatus(`Iteration ${i + 1}. Swapping ${array[j + 1]} and ${array[j]}.`);
+                
+                // Animate the swap
+                animateSwap(j, j + 1, () => {
+                    // --- 3. Move to next pair ---
+                    advancePointers(didSwap);
+                });
+            } else {
+                updateStatus(`Iteration ${i + 1}. No swap (${array[j]} <= ${array[j+1]}).`);
+                // No swap, just move to next pair
+                // Use a short delay to make non-swaps visible
+                setTimeout(() => {
+                    advancePointers(didSwap);
+                }, ANIMATION_DELAY);
+            }
+        }
+        
+        function advancePointers(didSwap) {
+             // --- FIX for PAUSE responsiveness ---
+            // If pause was clicked *during* an animation, stop before next step.
+            if (!isPlaying && playBtn.textContent === 'Play') {
+                return;
+            }
+            // --- END FIX ---
+            
+            // Save state *after* comparison/swap, *before* pointers move
+            saveState(); 
+            
+            j++; // Move to the next pair
+
+            // --- 4. Check for End of Iteration ---
+            if (j >= elementCount - 1 - i) { 
+                // End of this iteration. Mark the last element as sorted.
+                const sortedBrick = document.getElementById(`brick-${elementCount - 1 - i}`); 
+                if (sortedBrick) sortedBrick.classList.add('sorted');
+                
+                i++; // Move to next iteration
+                j = 0; // Reset inner loop
+                
+                // Check for optimised end condition
+                if (iterationSwaps === 0) {
+                    completeSort();
+                    return;
+                }
+                
+                iterationSwaps = 0; // Reset for next iteration
+
+                // Check if sort is fully complete
+                if (i >= elementCount - 1) { 
+                    completeSort();
+                    return;
+                }
+            }
+            
+            // --- 5. Ready for Next Step ---
+            // Highlight the *next* pair
+            highlight(j, j + 1, 'comparing');
+            if (array[j] !== undefined && array[j+1] !== undefined) {
+                 updateStatus(`Iteration ${i + 1}. Comparing ${array[j]} and ${array[j + 1]}.`);
+            }
+            updateStats();
+
+            // If playing, queue up the next step
+            if (isPlaying) {
+                playInterval = setTimeout(step, ANIMATION_DELAY * 2);
+            }
+        }
+        
+        function completeSort() {
+            isSorting = false;
+            sortCompleted = true;
+            if (isPlaying) pause();
+            enableControls();
+            
+            // Mark all bricks as sorted
+            visualisationArea.querySelectorAll('.brick').forEach(brick => {
+                brick.classList.add('sorted');
+                brick.classList.remove('comparing');
+            });
+            
+            // Show final stats in status log
+            const totalOps = totalComparisons + totalSwaps;
+            statusLog.innerHTML = `
+                <div class="text-center w-full">
+                    <h3 class="text-xl font-bold text-green-700 mb-3">Sort Complete!</h3>
+                    <div class="stats-summary-container">
+                        <div class="stats-summary-cell">
+                            <span>Iterations</span>
+                            <span>${i + (iterationSwaps > 0 || totalComparisons === 0 ? 1 : 0)}</span>
+                        </div>
+                        <div class="stats-summary-cell">
+                            <span>Total Comparisons</span>
+                            <span>${totalComparisons}</span>
+                        </div>
+                        <div class="stats-summary-cell">
+                            <span>Total Swaps</span>
+                            <span>${totalSwaps}</span>
+                        </div>
+                        <div class="stats-summary-cell">
+                            <span>Total Operations</span>
+                            <span>${totalOps}</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mt-2">(Bubble Sort is O(n²) in average/worst case, O(n) in best case)</p>
+                </div>
+            `;
+            // Ensure text-center is present for this new layout
+            statusLog.classList.add('text-center');
+
+            updateStats();
+            saveState(); // Save the final completed state
+        }
+        
+        function reset() {
+            if (isPlaying) pause();
+            handleNChange(); // This generates a new random array and resets state
+        }
+        
+        function resetSortState() {
+            i = 0;
+            j = 0;
+            iterationSwaps = 0;
+            totalSwaps = 0;
+            totalComparisons = 0;
+            isSorting = false;
+            sortCompleted = false;
+            history = [];
+            
+            updateStats();
+            enableControls();
+            
+            // Clear all highlights
+            visualisationArea.querySelectorAll('.brick').forEach(brick => {
+                brick.classList.remove('comparing', 'swapping', 'sorted');
+            });
+        }
+
+        // --- Animations & Highlights ---
+
+        function highlight(index1, index2, className) {
+            const brick1 = document.getElementById(`brick-${index1}`);
+            const brick2 = document.getElementById(`brick-${index2}`);
+            if (brick1) brick1.classList.add(className);
+            if (brick2) brick2.classList.add(className);
+        }
+
+        function removeHighlight(index1, index2, className) {
+            const brick1 = document.getElementById(`brick-${index1}`);
+            const brick2 = document.getElementById(`brick-${index2}`);
+            if (brick1) brick1.classList.remove(className);
+            if (brick2) brick2.classList.remove(className);
+        }
+
+        function animateSwap(index1, index2, callback) {
+            const brick1 = document.getElementById(`brick-${index1}`);
+            const brick2 = document.getElementById(`brick-${index2}`);
+
+            if (!brick1 || !brick2) {
+                if (callback) callback();
+                return;
+            }
+
+            // 1. Add swapping class (lifts them up)
+            brick1.classList.add('swapping');
+            brick2.classList.add('swapping');
+
+            // 2. Wait for lift animation, then swap positions in the DOM
+            setTimeout(() => {
+                // --- FIX for PAUSE responsiveness ---
+                // Check if paused *before* DOM swap
+                if (!isPlaying && playBtn.textContent === 'Play') {
+                    // If paused, just remove swapping class and stop
+                    brick1.classList.remove('swapping');
+                    brick2.classList.remove('swapping');
+                    return; 
+                }
+                // --- END FIX ---
+
+                // Swap in DOM
+                const parent = brick1.parentNode;
+                const nextSibling1 = brick1.nextSibling;
+                
+                if (nextSibling1 === brick2) {
+                    parent.insertBefore(brick2, brick1);
+                } else {
+                    // This handles cases where bricks might not be adjacent
+                    // (though in bubble sort, they always are)
+                    const nextSibling2 = brick2.nextSibling;
+                    parent.insertBefore(brick1, nextSibling2);
+                    parent.insertBefore(brick2, nextSibling1);
+                }
+                
+                // Update IDs
+                brick1.id = `brick-${index2}`;
+                brick2.id = `brick-${index1}`;
+
+                // 3. Wait a moment, then remove swapping class (drops them down)
+                setTimeout(() => {
+                    brick1.classList.remove('swapping');
+                    brick2.classList.remove('swapping');
+                    
+                    // 4. Update array input
+                    arrayInput.value = array.join(', ');
+
+                    // 5. Call callback
+                    if (callback) callback();
+                }, ANIMATION_DELAY);
+            }, ANIMATION_DELAY);
+        }
+        
+        function play() {
+            isPlaying = true;
+            playBtn.textContent = 'Pause';
+            playBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+            playBtn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+            
+            disableControls(true); // Disable all except pause
+            
+            // Start the loop
+            step();
+        }
+
+        function pause() {
+            isPlaying = false;
+            clearTimeout(playInterval);
+            playBtn.textContent = 'Play';
+            playBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+            playBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+            
+            enableControls();
+        }
+
+        // --- UI Updates ---
+
+        function updateStatus(message) {
+            // Only update if it's not the final summary
+            if (!sortCompleted) {
+                statusLog.innerHTML = message;
+                statusLog.classList.remove('text-center');
+            }
+        }
+
+        function updateStats() {
+            iterationCountDisplay.textContent = i + 1;
+            iterationSwapsDisplay.textContent = iterationSwaps;
+            totalComparisonsDisplay.textContent = totalComparisons;
+            totalSwapsDisplay.textContent = totalSwaps;
+        }
+        
+        function disableControls(isPlayMode = false) {
+            randomBtn.disabled = true;
+            worstCaseBtn.disabled = true;
+            bestCaseBtn.disabled = true;
+            resetBtn.disabled = true;
+            nInput.disabled = true;
+            arrayInput.disabled = true;
+            
+            if (isPlayMode) {
+                nextStepBtn.disabled = true;
+                backBtn.disabled = true;
+            } else {
+                playBtn.disabled = true;
+            }
+        }
+        
+        function enableControls() {
+            randomBtn.disabled = false;
+            worstCaseBtn.disabled = false;
+            bestCaseBtn.disabled = false;
+            resetBtn.disabled = false;
+            nInput.disabled = false;
+            arrayInput.disabled = false;
+            nextStepBtn.disabled = false;
+            playBtn.disabled = false;
+            backBtn.disabled = history.length <= 1; // Only enable if there's history
+        }
+
+    </script>
+</body>
+</html>
