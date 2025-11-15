@@ -13,6 +13,16 @@
             background-color: #f0f4f8;
         }
 
+        /* --- Global Zoom (80%) --- */
+        #app {
+            /* Scale the entire content down to 80% */
+            transform: scale(0.8);
+            /* Ensure the scaling happens from the top-left */
+            transform-origin: top left;
+            /* Adjust margin/padding to prevent scroll issues due to scaling */
+            width: 125%; /* 100% / 0.8 = 125% */
+        }
+        
         /* --- Tree Specific Styles --- */
         #heap-container {
             /* Set to relative to contain the wrapper div */
@@ -85,7 +95,7 @@
         /* --- Heap Complete Message Style --- */
         #heap-complete-message {
             position: fixed; 
-            top: 30%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 5000; /* Extremely high z-index */
@@ -96,8 +106,8 @@
         /* Apply transition and semi-transparent background (Indigo-600 is 79, 70, 229) */
         .message-content {
             transition: opacity 0.35s ease-in-out, transform 0.35s ease-in-out;
-            /* Using RGBA for semi-transparency (85% opacity) */
-            background-color: rgba(79, 70, 229, 0.5); 
+            /* Using RGBA for semi-transparency (55% opacity) */
+            background-color: rgba(79, 70, 229, 0.55); 
         }
 
     </style>
@@ -607,8 +617,9 @@
                 let subtitle = '';
 
                 if (state.status === 'BUILD_COMPLETE_MESSAGE') {
-                    title = "BUILD COMPLETE!";
-                    subtitle = "The heap structure is ready for the sorting phase.";
+                    // UPDATED MESSAGE FOR CLARITY
+                    title = "INITIAL HEAP CONSTRUCTED!";
+                    subtitle = "The O(N) heap construction phase is complete. Sorting (extraction) begins now.";
                 } else if (state.status === 'HEAP_MAINTENANCE_COMPLETE') {
                     title = "HEAP MAINTAINED!"; 
                     subtitle = "Swapping root and last leaf and pruning...";
@@ -654,7 +665,7 @@
             }
             else if (state.status === 'BUILD_COMPLETE_MESSAGE') {
                  statusText = `Phase 1 Complete: ${phaseDescription} Built`;
-                explanationHtml = `Step ${currentStep + 1} of ${history.length}. <b>BUILD COMPLETE!</b> ${isPausedByMe ? "Auto-resuming in 2.5s or click 'Next Step'." : ""}`;
+                explanationHtml = `Step ${currentStep + 1} of ${history.length}. <b>INITIAL HEAP CONSTRUCTED!</b> ${isPausedByMe ? "Auto-resuming in 2.5s or click 'Next Step'." : ""}`;
             }
             else if (state.phase === 'SORTING') {
                 statusText = `Phase 2: Extracting Root and Sorting (Heap Size: ${state.heapSize})`;
