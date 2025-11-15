@@ -13,14 +13,14 @@
             background-color: #f0f4f8;
         }
 
-        /* --- Global Zoom (80%) --- */
+        /* --- Global Zoom (Removed) --- */
         #app {
-            /* Scale the entire content down to 80% */
+            /* The width will be set dynamically in renderState based on tree size */
+            transition: min-width 0.3s ease;
             transform: scale(0.8);
-            /* Ensure the scaling happens from the top-left */
-            transform-origin: top left;
-            /* Adjust margin/padding to prevent scroll issues due to scaling */
-            width: 125%; /* 100% / 0.8 = 125% */
+            /* Added mx-auto back to center content when width is small */
+            margin-left: auto;
+            margin-right: auto;
         }
         
         /* --- Tree Specific Styles --- */
@@ -114,7 +114,7 @@
 </head>
 <body class="p-4 md:p-8">
 
-    <div id="app" class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
+    <div id="app" class="mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">Heapsort Visualizer</h1>
 
         <!-- Controls (Top Section) -->
@@ -201,6 +201,7 @@
         let isAscending = true; // true: Max-Heap (Ascending sort); false: Min-Heap (Descending sort)
         let isPausedForMessage = false; // Tracks if the animation is paused solely for the message
 
+        const appContainer = document.getElementById('app'); // Get the app container reference
         const arrayContainer = document.getElementById('array-container');
         const heapContainer = document.getElementById('heap-container');
         const outputArrayContainer = document.getElementById('output-array-container');
@@ -441,7 +442,7 @@
 
             // 3. Wrap content in a centered div
             return `
-                <div class="relative" style="width: ${maxTotalWidth}px; margin: 0 auto; height: 100%;">
+                <div class="relative" id="tree-wrapper" style="width: ${maxTotalWidth}px; margin: 0 auto; height: 100%;">
                     ${treeContentHtml}
                 </div>
             `;
@@ -538,7 +539,7 @@
                             // If they stopped or reset, just ensure the message is gone
                             renderState(); 
                         }
-                    }, 1000); // 1 seconds pause
+                    }, 2500); // 2.5 seconds pause
                 }
             } else {
                 stopAnimation();
@@ -743,6 +744,17 @@
 
             // --- Render Heap Tree ---
             heapContainer.innerHTML = renderHeapTree(workingArr, state);
+
+            // -----------------------------------------------------------------------------------
+            // Dynamic Width Adjustment based on Tree Size
+            const numLevels = Math.ceil(Math.log2(N + 1));
+            const maxBottomNodes = Math.pow(2, numLevels - 1);
+            const requiredWidth = (maxBottomNodes * 2 * BASE_H_UNIT);
+            
+            // Set minimum width for the entire application wrapper (#app)
+            // Increased to +300px for robust padding/margin accounting
+            appContainer.style.minWidth = `${requiredWidth + 300}px`; 
+            // -----------------------------------------------------------------------------------
         }
 
         // Initialize on load
@@ -753,4 +765,3 @@
     </script>
 </body>
 </html>
-
