@@ -85,7 +85,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-2">
                     <label for="n-input" class="block text-sm font-medium text-gray-500 mb-1 text-center">N (elements)</label>
-                    <input type="number" id="n-input" value="20" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center">
+                    <input type="number" id="n-input" value="10" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center">
                 </div>
                 <div class="md:col-span-3 bg-gray-50 border border-gray-200 rounded-lg p-2">
                     <label for="array-input" class="block text-sm font-medium text-gray-500 mb-1 text-center">Array (comma-separated)</label>
@@ -165,7 +165,7 @@
 
         // Algorithm State
         let array = [];
-        let elementCount = 20; // Main count, from nInput
+        let elementCount = 10; // Main count, from nInput
         let i = 0; // Outer loop (iterations)
         let j = 0; // Inner loop (comparisons)
         let iterationSwaps = 0;
@@ -188,10 +188,9 @@
         const MAX_BRICK_HEIGHT_PERCENT = 1.0; // 100% of container
         const MIN_BRICK_HEIGHT_PERCENT = 0.2; // 20% of container
         
-        // --- FIXED: UTILITY FUNCTIONS MOVED UP TO PREVENT ReferenceError ---
+        // --- UTILITY FUNCTIONS (Moved up for hoisting fix) ---
 
         function updateStatus(message) {
-            // Only update if it's not the final summary
             if (!sortCompleted) {
                 statusLog.innerHTML = message;
                 statusLog.classList.remove('text-center');
@@ -199,14 +198,13 @@
         }
 
         function updateStats() {
-            iterationCountDisplay.textContent = i + 1;
+            iterationCountDisplay.textContent = i + 1; // Display 1-based index
             iterationSwapsDisplay.textContent = iterationSwaps;
             totalComparisonsDisplay.textContent = totalComparisons;
             totalSwapsDisplay.textContent = totalSwaps;
         }
         
         function disableControls(isPlayMode = false) {
-            // Disable all array modification controls when sorting or playing
             randomBtn.disabled = true;
             worstCaseBtn.disabled = true;
             bestCaseBtn.disabled = true;
@@ -214,22 +212,17 @@
             arrayInput.disabled = true;
 
             if (isPlayMode) {
-                // In Play/Pause mode, disable Next Step and Back
                 nextStepBtn.disabled = true;
                 backBtn.disabled = true;
-                playBtn.disabled = false; // Must be enabled to allow pause
-                resetBtn.disabled = false; // Allow reset during play
+                playBtn.disabled = false; 
+                resetBtn.disabled = false; 
             } else {
-                // In Manual Step mode, Next Step/Play/Back are controlled by enableControls()
                 playBtn.disabled = false;
                 resetBtn.disabled = false;
             }
         }
         
         function enableControls() {
-            
-            // 1. Array Modification/Generation Controls (Buttons 1-3 & Inputs)
-            // Enabled if sorting is NOT running (i.e., paused, reset, or completed)
             const arrayModificationAllowed = !isSorting || sortCompleted || !isPlaying;
 
             randomBtn.disabled = !arrayModificationAllowed;
@@ -238,25 +231,19 @@
             nInput.disabled = !arrayModificationAllowed;
             arrayInput.disabled = !arrayModificationAllowed;
 
-            // 2. Sorting Execution Controls (Next Step, Play/Pause)
             const executionAllowed = isSorting || (array.length >= 2 && !sortCompleted);
 
             nextStepBtn.disabled = !executionAllowed || isPlaying; 
             playBtn.disabled = !executionAllowed;
             
-            // 3. Global Controls
             resetBtn.disabled = false;
             backBtn.disabled = history.length <= 1;
             
-            // If sort is complete, Next Step and Play are disabled
             if (sortCompleted) {
                 nextStepBtn.disabled = true;
                 playBtn.disabled = true;
             }
         }
-
-        // --- END OF MOVED UTILITY FUNCTIONS ---
-
 
         // --- Initialization ---
 
@@ -273,11 +260,8 @@
             playBtn.addEventListener('click', handlePlayClick);
             backBtn.addEventListener('click', handleBackClick);
 
-            // Redraw on resize to fix bar chart heights
             window.addEventListener('resize', () => drawBricks(array));
 
-            // This calls generateArrayAndUpdateUI, which calls resetSortState, 
-            // which calls updateStats. Now all are defined!
             generateArrayAndUpdateUI();
         };
 
@@ -308,7 +292,7 @@
                     nInput.value = elementCount;
                 }
                 drawBricks(array);
-                resetSortState(); // Calls updateStats and updateStatus
+                resetSortState(); 
                 updateStatus('Array loaded. Ready to sort.');
             } catch (error) {
                 updateStatus('Error: Invalid array format. Use comma-separated numbers.');
@@ -342,12 +326,12 @@
             if (worstCase) {
                 array.sort((a, b) => b - a); // Sort descending
             } else if (bestCase) {
-                array.sort((a, b) => a - b); // Sort ascending
+                array.sort((a, b) => a - b); // Sort ascending (Best Case)
             }
 
             arrayInput.value = array.join(', ');
             drawBricks(array);
-            resetSortState(); // Calls updateStats and updateStatus
+            resetSortState(); 
             updateStatus('New array generated. Ready to sort.');
         }
         
@@ -356,17 +340,12 @@
             if (arr.length === 0) return;
             
             const containerHeight = visualisationArea.clientHeight;
-            
             const maxVal = Math.max(...arr, 1); 
             const minVal = Math.min(...arr, 1);
-
             const gap = elementCount > 50 ? 0.5 : 1; 
             const containerWidth = visualisationArea.clientWidth;
-            
             const safeContainerWidth = containerWidth > 0 ? containerWidth : 1000;
-            
             const totalGapWidth = (elementCount - 1) * gap; 
-            let brickWidth = (safeContainerWidth - totalGapWidth) / elementCount; 
             
             arr.forEach((value, index) => {
                 const brick = document.createElement('div');
@@ -386,7 +365,7 @@
                 brick.style.flexGrow = `1`;
                 
                 brick.textContent = value;
-                if (brickWidth < 20) {
+                if ((safeContainerWidth / elementCount) < 20) {
                     brick.textContent = '';
                 }
                 
@@ -557,26 +536,32 @@
             
             j++; 
 
+            // --- 4. Check for End of Iteration ---
             if (j >= elementCount - 1 - i) { 
+                
+                // Mark the last element as sorted.
                 const sortedBrick = document.getElementById(`brick-${elementCount - 1 - i}`); 
                 if (sortedBrick) sortedBrick.classList.add('sorted');
                 
-                i++; 
-                j = 0; 
-                
-                if (iterationSwaps === 0 && isSorting && i > 1) { 
+                // *** CRITICAL FIX HERE: Check for optimised end condition BEFORE advancing i ***
+                if (iterationSwaps === 0) {
                     completeSort();
                     return;
                 }
                 
-                iterationSwaps = 0; 
+                // If we reach here, a swap occurred, so we proceed to the next iteration.
+                i++; 
+                j = 0; // Reset inner loop
+                iterationSwaps = 0; // Reset for next iteration
 
+                // Check if sort is fully complete (Worst case)
                 if (i >= elementCount - 1) { 
                     completeSort();
                     return;
                 }
             }
             
+            // --- 5. Ready for Next Step ---
             if (!sortCompleted) {
                 highlight(j, j + 1, 'comparing');
                 if (array[j] !== undefined && array[j+1] !== undefined) {
@@ -596,7 +581,8 @@
                 brick.classList.remove('comparing', 'swapping');
             });
             
-            const finalIterations = i + (iterationSwaps > 0 || totalComparisons === 0 ? 1 : 0);
+            // If the sort completed early (best case), i will be 0. We display 1 pass.
+            const finalIterations = i + 1;
             const totalOps = totalComparisons + totalSwaps;
             
             statusLog.innerHTML = `
@@ -654,7 +640,7 @@
             currentTimeout = null;
             if (isPlaying) pause(true); 
             
-            updateStats(); // This now works!
+            updateStats();
             enableControls();
             
             visualisationArea.querySelectorAll('.brick').forEach(brick => {
