@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quicksort Visualiser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+        }
+        /* Custom styles for bricks */
+        .brick {
+            /* Base transition for movement */
+            transition: all 0.15s ease-in-out, background-color 0.15s ease-in-out, opacity 0.3s ease-in-out, border-left 0.15s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative; 
+            
+            /* FIX: STATIC WIDTH (Set by JS) */
+            flex-grow: 0 !important;
+            flex-shrink: 0 !important;
+        }
+        
+        /* Main Visualization Area Container */
+        #visualisation-area {
+            position: relative;
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: flex-end;
+            
+            justify-content: space-between; 
+
+            gap: 5px; /* Gap between structural elements */
+            padding: 10px 5px; 
+            min-height: 150px; 
+        }
+        
+        /* Partition Container Styling */
+        .partition-group {
+            display: flex;
+            flex-direction: column; 
+            flex-wrap: nowrap;
+            align-items: center; /* Center the column contents (label, brick-row) */
+            
+            border: 2px solid #1F2937; /* Dark border */
+            border-radius: 8px; /* Rounded corners */
+            
+            padding: 0; 
+            
+            gap: 0; /* No vertical gap inside the column */
+            
+            flex-grow: 1; 
+            min-width: min-content; 
+
+            position: relative; 
+        }
+        
+        /* Inner Container for Bricks (to keep them aligned horizontally) */
+        .partition-brick-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 1px; /* Gap between bricks inside the row */
+        }
+
+        /* Active partition gets a slightly different border */
+        .partition-group.active {
+            border-color: #9333EA; /* Purple border for active element */
+            box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
+        }
+
+        /* Existing visual cues */
+        .comparing {
+            filter: brightness(1.2);
+            box-shadow: 0 0 0 3px #1D4ED8; 
+            z-index: 10;
+        }
+        .swapping {
+            background-color: #FBBF24 !important;
+            transform: translateY(-10px);
+            transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out;
+            z-index: 20;
+        }
+        .pivot {
+            background-color: #9333EA !important; 
+            box-shadow: 0 0 0 3px #9333EA;
+            z-index: 10;
+        }
+        .sorted {
+            filter: brightness(1.2) saturate(0.8);
+            background-color: #9333EA !important; 
+            box-shadow: none;
+            border: none;
+            z-index: 5;
+        }
+        .inactive {
+            opacity: 0.3;
+        }
+        .boundary-line {
+            border-left: 3px dashed #F59E0B; 
+            padding-left: 1px;
+            margin-left: -1px;
+        }
+
+        /* NEW STYLE: Partition Label Caption - Now statically positioned */
+        .partition-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #4B5563; 
+            background-color: #F3F4F6; 
+            padding: 0 4px;
+            border-radius: 4px;
+            z-index: 30;
+            white-space: nowrap;
+            margin-bottom: 2px; 
+        }
+        
+        /* FIX: Status Log Styling for visibility */
+        #status-log {
+             font-size: 0.8rem; /* Smaller font */
+             /* Remove overflow-y: auto and align-items: flex-start */
+             align-items: center; /* Center vertically when only one line */
+             justify-content: center; /* Center horizontally when not full width */
+             overflow: hidden; /* Prevent scrolling */
+        }
+        
+        /* Spacer block is no longer needed but kept defined for safety */
+        .spacer-block {
+            width: 10px; 
+            background-color: transparent; 
+            flex-shrink: 0;
+            height: 100%; 
+            align-self: stretch; 
+        }
+
+        /* Stats Styling */
+        .stats-summary-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            gap: 1rem;
+        }
+        .stats-summary-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            min-width: 120px;
+        }
+        .stats-summary-cell span:first-child {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #4b5563; 
+            text-transform: uppercase;
+        }
+        .stats-summary-cell span:last-child {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1f2937; 
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-6xl w-full bg-white p-6 rounded-xl shadow-2xl">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Quicksort Visualiser</h1>
+        </header>
+
+        <div id="visualisation-area" class="w-full min-h-[150px] flex items-end justify-center gap-1 p-4 mb-4 border border-gray-200 rounded-lg bg-gray-50 shadow-inner overflow-x-auto">
+            </div>
+        
+        <div class="bg-white p-4 rounded-lg shadow-inner border border-gray-200 mb-4">
+            <h3 class="text-lg font-bold text-gray-800 mb-2 text-center">Legend</h3>
+            <div class="flex flex-wrap justify-center gap-4 text-sm font-medium">
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-blue-400"></span> Active Partition (Uniform Color)</span>
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-purple-600"></span> Pivot Element</span>
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full border-2 border-blue-700"></span> Comparison Element (j)</span>
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-md border-2 border-dashed border-amber-500"></span> Boundary Line (i+1)</span>
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-purple-600"></span> Final Sorted Element (Pivot Color)</span>
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-md border-2 border-gray-700"></span> Partition Boundary Box</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg shadow-inner border border-gray-200 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-2">
+                    <label for="n-input" class="block text-sm font-medium text-gray-500 mb-1 text-center">N (elements)</label>
+                    <input type="number" id="n-input" value="20" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center">
+                </div>
+                <div class="md:col-span-3 bg-gray-50 border border-gray-200 rounded-lg p-2">
+                    <label for="array-input" class="block text-sm font-medium text-gray-500 mb-1 text-center">Array (comma-separated)</label>
+                    <input type="text" id="array-input" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 sm:grid-cols-7 gap-2">
+                 <button id="random-btn" class="w-full bg-blue-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                    Random
+                </button>
+                <button id="worst-case-btn" class="w-full bg-blue-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                    Worst Case
+                </button>
+                <button id="best-case-btn" class="w-full bg-blue-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                    Best Case
+                </button>
+                <button id="back-btn" class="w-full bg-gray-500 text-white py-1 px-4 rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-150" disabled>
+                    Back
+                </button>
+                 <button id="play-btn" class="w-full bg-blue-500 text-white py-1 px-4 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                    Play
+                </button>
+                 <button id="next-step-btn" class="w-full bg-green-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150">
+                    Next Step
+                </button>
+                <button id="reset-btn" class="w-full bg-red-600 text-white py-1 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <div id="status-log" class="text-gray-600 font-medium mb-4 h-48 p-2 border border-gray-200 rounded-lg bg-gray-50 flex items-start overflow-hidden">
+            Generate an array or enter one manually.
+        </div>
+
+        <div id="stats-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-center">
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div class="text-sm font-medium text-gray-500 mb-1">Partition Count</div>
+                <div id="iteration-count" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div class="text-sm font-medium text-gray-500 mb-1">Partition Swaps</div>
+                <div id="iteration-swaps" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div class="text-sm font-medium text-gray-500 mb-1">Total Comparisons</div>
+                <div id="total-comparisons" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div class="text-sm font-medium text-gray-500 mb-1">Total Swaps</div>
+                <div id="total-swaps" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const nInput = document.getElementById('n-input');
+        const arrayInput = document.getElementById('array-input');
+        const randomBtn = document.getElementById('random-btn');
+        const worstCaseBtn = document.getElementById('worst-case-btn');
+        const bestCaseBtn = document.getElementById('best-case-btn');
+        const nextStepBtn = document.getElementById('next-step-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const playBtn = document.getElementById('play-btn');
+        const backBtn = document.getElementById('back-btn');
+        const visualisationArea = document.getElementById('visualisation-area');
+        const statusLog = document.getElementById('status-log');
+
+        // Stat Displays
+        const iterationCountDisplay = document.getElementById('iteration-count');
+        const iterationSwapsDisplay = document.getElementById('iteration-swaps');
+        const totalComparisonsDisplay = document.getElementById('total-comparisons');
+        const totalSwapsDisplay = document.getElementById('total-swaps');
+
+        // --- ALGORITHM STATE (QUICKSORT) ---
+        // Array elements are {value: number}
+        let array = [];
+        let elementCount = 20; 
+        
+        let totalSwaps = 0;
+        let totalComparisons = 0;
+        let isSorting = false;
+        let sortCompleted = false;
+        let isPlaying = false;
+        
+        let playInterval; 
+        let currentTimeout; 
+
+        // Quicksort specific state
+        let partitionCount = 0; // Tracks number of partitions
+        let sortedIndices = new Set(); // Stores indices of final placed pivots
+        let partitionColorHue = 0; // Base hue for the current active partition
+        
+        // Stack to manage recursive partitioning ranges {low, high}
+        let q_stack = []; 
+        
+        // Stores ALL current partition boundaries {low, high, partitionNum}. 
+        let partitionBoundaries = []; 
+        
+        // State for the *current* partitioning process
+        let p_state = {
+            low: -1,
+            high: -1,
+            pivotIndex: -1,
+            pivotValue: -1,
+            i: -1, // Boundary index (smaller than pivot)
+            j: -1, // Current comparison index
+            swaps: 0,
+            initialSwap: false, 
+            finalSwap: false,
+        };
+
+        // History for "Back" button
+        let history = [];
+
+        // Constants
+        const PLAY_INTERVAL_DELAY = 250; 
+        const ANIMATION_DELAY = 100; 
+        const MIN_BRICK_HEIGHT_PX = 5; 
+        const MAX_BRICK_HEIGHT_PERCENT = 1.0; 
+        const MIN_BRICK_HEIGHT_PERCENT = 0.2; 
+        const GROUP_PADDING = 0; 
+        const GROUP_BORDER = 2; 
+        const BRICK_INNER_GAP = 1; 
+        const GROUP_MARGIN = 10; 
+
+        
+        // --- UTILITY FUNCTIONS ---
+
+        function updateStatus(message) {
+            if (!sortCompleted) {
+                // FIX: Replace entire content with the new message (show only the latest status)
+                statusLog.innerHTML = message;
+                statusLog.classList.remove('text-center');
+            }
+        }
+
+        function updateStats() {
+            iterationCountDisplay.textContent = partitionCount;
+            iterationSwapsDisplay.textContent = p_state.swaps;
+            totalComparisonsDisplay.textContent = totalComparisons;
+            totalSwapsDisplay.textContent = totalSwaps;
+        }
+        
+        function removeAllHighlights(start = 0, end = array.length - 1) {
+            for (let k = start; k <= end; k++) {
+                const brick = document.getElementById(`brick-${k}`);
+                if (brick) {
+                    // Clear all dynamic classes and inline styles
+                    brick.classList.remove('comparing', 'swapping', 'pivot', 'inactive', 'boundary-line', 'partition-separator', 'partition-end-adjust');
+                    brick.style.borderLeft = ''; 
+                    brick.style.marginLeft = ''; 
+                    brick.style.marginRight = ''; 
+
+                    if (sortedIndices.has(k)) {
+                         brick.classList.add('sorted');
+                    }
+                }
+            }
+        }
+        
+        function applyQuicksortHighlights(low, high) {
+            removeAllHighlights(); 
+
+            // Apply 'inactive' class outside current partition range
+            for (let k = 0; k < low; k++) {
+                const brick = document.getElementById(`brick-${k}`);
+                if (brick && !sortedIndices.has(k)) brick.classList.add('inactive');
+            }
+            for (let k = high + 1; k < elementCount; k++) {
+                const brick = document.getElementById(`brick-${k}`);
+                if (brick && !sortedIndices.has(k)) brick.classList.add('inactive');
+            }
+
+            // Apply partition color and specific highlights within the active range
+            for (let k = low; k <= high; k++) {
+                const brick = document.getElementById(`brick-${k}`);
+                if (brick && !sortedIndices.has(k)) {
+                    // Set the dynamic partition color
+                    brick.style.backgroundColor = `hsl(${partitionColorHue}, 50%, 65%)`;
+
+                    if (k === p_state.pivotIndex) {
+                        brick.classList.add('pivot');
+                    } else if (k === p_state.j && p_state.j < high) {
+                        brick.classList.add('comparing');
+                    }
+                }
+            }
+            
+            // --- Boundary Line Visualization ---
+            const boundaryIndex = p_state.i + 1;
+            
+            if (boundaryIndex >= low && boundaryIndex <= high) {
+                const boundaryBrick = document.getElementById(`brick-${boundaryIndex}`);
+                if (boundaryBrick) {
+                    boundaryBrick.classList.add('boundary-line');
+                }
+            } else if (p_state.i === -1 && p_state.low === 0 && elementCount > 0) {
+                 const firstBrick = document.getElementById(`brick-0`);
+                 if (firstBrick) {
+                    firstBrick.classList.add('boundary-line');
+                 }
+            }
+            // --- END Boundary Line Visualization ---
+        }
+
+        function disableControls(isPlayMode = false) {
+            randomBtn.disabled = true;
+            worstCaseBtn.disabled = true;
+            bestCaseBtn.disabled = true;
+            nInput.disabled = true;
+            arrayInput.disabled = true;
+
+            if (isPlayMode) {
+                // In play mode, only pause/reset are available
+                nextStepBtn.disabled = true;
+                backBtn.disabled = true;
+                playBtn.disabled = false; 
+                resetBtn.disabled = false; 
+            } else {
+                // In manual mode, play/next are available
+                playBtn.disabled = false;
+                resetBtn.disabled = false;
+            }
+        }
+        
+        function enableControls() {
+            const arrayModificationAllowed = !isSorting || sortCompleted || !isPlaying;
+
+            randomBtn.disabled = !arrayModificationAllowed;
+            worstCaseBtn.disabled = !arrayModificationAllowed;
+            bestCaseBtn.disabled = !arrayModificationAllowed;
+            nInput.disabled = !arrayModificationAllowed;
+            arrayInput.disabled = !arrayModificationAllowed;
+
+            const executionAllowed = isSorting || (array.length >= 2 && !sortCompleted);
+
+            nextStepBtn.disabled = !executionAllowed || isPlaying; 
+            playBtn.disabled = !executionAllowed;
+            
+            resetBtn.disabled = false;
+            backBtn.disabled = history.length <= 1;
+            
+            if (sortCompleted) {
+                nextStepBtn.disabled = true;
+                playBtn.disabled = true;
+            }
+        }
+
+        // --- INITIALIZATION ---
+
+        window.onload = () => {
+            nInput.addEventListener('change', handleNChange);
+            arrayInput.addEventListener('change', handleArrayInputChange);
+            
+            randomBtn.addEventListener('click', generateRandomArray);
+            worstCaseBtn.addEventListener('click', generateWorstCaseArray);
+            bestCaseBtn.addEventListener('click', generateBestCaseArray);
+            
+            resetBtn.addEventListener('click', reset);
+            // This is the function the Play loop now relies on
+            nextStepBtn.addEventListener('click', handleNextClick); 
+            playBtn.addEventListener('click', handlePlayClick);
+            backBtn.addEventListener('click', handleBackClick);
+
+            window.addEventListener('resize', () => drawBricks(array));
+
+            generateArrayAndUpdateUI();
+        };
+
+        // --- UI & Array Generation ---
+
+        function handleNChange() {
+            elementCount = parseInt(nInput.value); 
+            if (elementCount < 2) elementCount = 2;
+            if (elementCount > 100) elementCount = 100;
+            nInput.value = elementCount;
+            generateArrayAndUpdateUI();
+        }
+
+        function handleArrayInputChange() {
+            try {
+                const inputText = arrayInput.value.trim();
+                if (inputText === "") {
+                    array = [];
+                    elementCount = 0; 
+                    nInput.value = 0;
+                } else {
+                    // Array now only stores values
+                    array = inputText.split(',').map(item => {
+                        const val = parseInt(item.trim());
+                        if (isNaN(val)) throw new Error('Invalid number in array');
+                        return {value: val};
+                    });
+                    elementCount = array.length; 
+                    nInput.value = elementCount;
+                }
+                drawBricks(array);
+                resetSortState(); 
+                updateStatus('Array loaded. Ready to quicksort.');
+            } catch (error) {
+                updateStatus('Error: Invalid array format. Use comma-separated numbers.');
+                console.error(error);
+            }
+        }
+        
+        function generateRandomArray() {
+            generateArrayAndUpdateUI(false, false);
+        }
+
+        function generateWorstCaseArray() {
+            generateArrayAndUpdateUI(true, false);
+        }
+        
+        function generateBestCaseArray() {
+            generateArrayAndUpdateUI(false, true);
+        }
+
+        function generateArrayAndUpdateUI(worstCase = false, bestCase = false) {
+            array = [];
+            let maxVal = elementCount * 5; 
+            for (let k = 0; k < elementCount; k++) { 
+                array.push({value: Math.floor(Math.random() * maxVal) + 1});
+            }
+            
+            if (elementCount > 0 && !array.find(item => item.value === 1)) { 
+                array[Math.floor(Math.random() * elementCount)].value = 1; 
+            }
+
+            if (worstCase) {
+                array.sort((a, b) => a.value - b.value); 
+            } else if (bestCase) {
+                // Keep random for best/average case test
+            }
+
+            arrayInput.value = array.map(item => item.value).join(', ');
+            
+            // FIX: Ensure reset state is clean before drawing
+            resetSortState(); 
+            drawBricks(array);
+            
+            updateStatus('New array generated. Ready to quicksort.');
+        }
+        
+        function drawBricks(arr) {
+            visualisationArea.innerHTML = ''; 
+            if (arr.length === 0) return;
+            
+            const containerHeight = visualisationArea.clientHeight;
+            const values = arr.map(item => item.value); 
+            const maxVal = Math.max(...values, 1); 
+            const minVal = Math.min(...values, 1);
+            
+            
+            // --- Dynamic Gap Calculation and Width Calculation ---
+            const numBricks = elementCount;
+            const numGroups = Math.max(1, partitionBoundaries.length + sortedIndices.size); 
+            const safeContainerWidth = visualisationArea.clientWidth || 1000;
+
+            // 1. Calculate the dynamic gap between partition groups
+            const maxVisualGap = 10;
+            const minVisualGap = 1;
+            let groupGap = maxVisualGap;
+            if (numBricks > 30) {
+                 groupGap = 5;
+            } 
+            if (numBricks > 60) {
+                 groupGap = minVisualGap;
+            }
+            visualisationArea.style.gap = `${groupGap}px`;
+            
+            // 2. Estimate total fixed overhead
+            const totalFixedOverhead = (2 * 5) // Vis Area Padding (10px total L/R)
+                                       + (numGroups * (2 * GROUP_BORDER)) // Max group borders (2px L/R per group)
+                                       + (numBricks * BRICK_INNER_GAP) // Internal gaps between bricks
+                                       + (numGroups * groupGap); // Max group gaps
+
+            // Adjust available space
+            const availableBrickSpace = safeContainerWidth - totalFixedOverhead;
+            const brickWidth = Math.max(1, Math.floor(availableBrickSpace / numBricks));
+            // --- END Dynamic Gap Calculation and Width Calculation ---
+
+
+            let currentPartitionGroup = null;
+            let currentBrickRow = null; // New element to hold bricks horizontally
+            let currentGroupBricks = 0; 
+            
+            // 1. Determine all boundaries (active and pending)
+            const boundaries = new Set();
+            partitionBoundaries.forEach(b => boundaries.add(b.low));
+            if (arr.length > 0) boundaries.add(0); 
+            
+            // 2. Logic to dynamically create partition groups based on stored boundaries
+            for(let index = 0; index < arr.length; index++) {
+                const item = arr[index];
+                const value = item.value;
+                
+                // Determine if a new partition group should start here
+                const shouldStartNewGroup = boundaries.has(index) || (index > 0 && sortedIndices.has(index - 1) && !boundaries.has(index));
+
+                // Check if the current element is a stand-alone pivot (not part of a group)
+                const isPivotSeparator = sortedIndices.has(index) && partitionBoundaries.some(b => b.low === index && b.high === index);
+
+                if (isPivotSeparator) {
+                    if (currentPartitionGroup) {
+                         // Close the previous group
+                        const previousGroupWidth = (currentGroupBricks * brickWidth) + (Math.max(0, currentGroupBricks - 1) * BRICK_INNER_GAP) + (2 * GROUP_BORDER);
+                        currentPartitionGroup.style.minWidth = `${previousGroupWidth}px`;
+                        currentPartitionGroup.style.flexGrow = '0'; 
+                        visualisationArea.appendChild(currentPartitionGroup);
+                        currentPartitionGroup = null; 
+                    }
+                    
+                    // Append the unboxed pivot
+                    const brick = document.createElement('div');
+                    brick.classList.add('brick');
+                    brick.id = `brick-${index}`; 
+                    
+                    const heightRange = MAX_BRICK_HEIGHT_PERCENT - MIN_BRICK_HEIGHT_PERCENT;
+                    const percentOfMax = ((value - minVal) / (maxVal - minVal || 1)) * heightRange + MIN_BRICK_HEIGHT_PERCENT;
+                    const heightPx = Math.max(MIN_BRICK_HEIGHT_PX, percentOfMax * containerHeight);
+                    
+                    brick.style.height = `${heightPx}px`;
+                    const hue = 240 - (240 * ((value - minVal) / (maxVal - minVal || 1)));
+                    brick.style.backgroundColor = `hsl(${hue}, 80%, 60%)`;
+                    brick.style.width = `${brickWidth}px`; 
+                    brick.textContent = value;
+                    if (brickWidth < 20) {
+                        brick.textContent = '';
+                    }
+
+                    brick.style.flexGrow = '1';
+                    brick.style.flexShrink = '1';
+                    
+                    visualisationArea.appendChild(brick); 
+                    
+                } else if (shouldStartNewGroup) {
+                    if (currentPartitionGroup) {
+                        // Close the previous group
+                        const previousGroupWidth = (currentGroupBricks * brickWidth) + (Math.max(0, currentGroupBricks - 1) * BRICK_INNER_GAP) + (2 * GROUP_BORDER);
+                        currentPartitionGroup.style.minWidth = `${previousGroupWidth}px`;
+                        currentPartitionGroup.style.flexGrow = '0'; 
+                        visualisationArea.appendChild(currentPartitionGroup);
+                    }
+                    
+                    currentPartitionGroup = document.createElement('div');
+                    currentPartitionGroup.classList.add('partition-group');
+                    currentGroupBricks = 0; 
+
+                    currentBrickRow = document.createElement('div');
+                    currentBrickRow.classList.add('partition-brick-row');
+                    
+                    const boundary = partitionBoundaries.find(b => b.low === index);
+                    
+                    // --- CAPTION LOGIC START ---
+                    if (boundary) {
+                         const label = document.createElement('div');
+                         label.classList.add('partition-label');
+                         label.textContent = `P${boundary.partitionNum} (${boundary.low}-${boundary.high})`;
+                         currentPartitionGroup.appendChild(label); 
+                    }
+                    // --- CAPTION LOGIC END ---
+                    
+                    if (boundary) {
+                        if (boundary.low === p_state.low && boundary.high === p_state.high && p_state.low !== -1) {
+                            currentPartitionGroup.classList.add('active'); 
+                            currentPartitionGroup.style.borderColor = `#9333EA`; 
+                        } else {
+                            currentPartitionGroup.style.borderColor = `#1F2937`; 
+                        }
+                    } else if (index === 0 && !isSorting) {
+                        currentPartitionGroup.style.borderColor = `#E5E7EB`; 
+                        currentPartitionGroup.style.margin = '0';
+                    } else if (sortedIndices.has(index)) {
+                        currentPartitionGroup.style.borderColor = `#10B981`; 
+                        currentPartitionGroup.style.margin = '0 10px';
+                    } else if (index === 0 && !isSorting) {
+                        currentPartitionGroup.style.borderColor = `#E5E7EB`; 
+                        currentPartitionGroup.style.margin = '0';
+                    }
+                    
+                    // Append the brick row to the partition group
+                    currentPartitionGroup.appendChild(currentBrickRow);
+                }
+
+                if (currentPartitionGroup) {
+                    // 2. Draw the actual data block
+                    const brick = document.createElement('div');
+                    brick.classList.add('brick');
+                    brick.id = `brick-${index}`; 
+                    
+                    const heightRange = MAX_BRICK_HEIGHT_PERCENT - MIN_BRICK_HEIGHT_PERCENT;
+                    const percentOfMax = ((value - minVal) / (maxVal - minVal || 1)) * heightRange + MIN_BRICK_HEIGHT_PERCENT;
+                    const heightPx = Math.max(MIN_BRICK_HEIGHT_PX, percentOfMax * containerHeight);
+                    
+                    brick.style.height = `${heightPx}px`;
+                    
+                    const hue = 240 - (240 * ((value - minVal) / (maxVal - minVal || 1)));
+                    brick.style.backgroundColor = `hsl(${hue}, 80%, 60%)`;
+
+                    // Apply calculated static width
+                    brick.style.width = `${brickWidth}px`; 
+                    
+                    brick.textContent = value;
+                    if (brickWidth < 20) {
+                        brick.textContent = '';
+                    }
+                    
+                    // Append the brick to the new horizontal row
+                    currentBrickRow.appendChild(brick);
+                    currentGroupBricks++; 
+                }
+            }
+            
+            if (currentPartitionGroup) {
+                // Set the width of the very last group
+                const finalGroupWidth = (currentGroupBricks * brickWidth) + (Math.max(0, currentGroupBricks - 1) * BRICK_INNER_GAP) + (2 * GROUP_BORDER);
+                currentPartitionGroup.style.minWidth = `${finalGroupWidth}px`;
+                currentPartitionGroup.style.flexGrow = '0'; 
+                visualisationArea.appendChild(currentPartitionGroup);
+            }
+            
+            // Re-apply sorted and active highlights
+            sortedIndices.forEach(index => {
+                const brick = document.getElementById(`brick-${index}`);
+                if (brick) brick.classList.add('sorted');
+            });
+            
+            if (isSorting && p_state.low !== -1) {
+                applyQuicksortHighlights(p_state.low, p_state.high);
+            }
+        }
+
+        // --- Quicksort Logic Functions ---
+
+        function handleNextClick() {
+            if (sortCompleted || isPlaying) return;
+            
+            if (!isSorting) {
+                startSort();
+            } else {
+                step();
+            }
+        }
+        
+        function handlePlayClick() {
+            if (sortCompleted) return;
+
+            if (isPlaying) {
+                pause();
+            } else {
+                if (!isSorting) {
+                    startSort();
+                }
+                play();
+            }
+        }
+
+        function handleBackClick() {
+             if (history.length <= 1) return; 
+
+            if (isPlaying) pause();
+            clearTimeout(currentTimeout); 
+            currentTimeout = null;
+            
+            disableControls(true); 
+
+            history.pop();
+            const prevState = history[history.length - 1];
+            
+            // Restore all state variables
+            array = prevState.array.map(item => ({...item})); 
+            totalSwaps = prevState.totalSwaps;
+            totalComparisons = prevState.totalComparisons;
+            isSorting = prevState.isSorting;
+            sortCompleted = prevState.sortCompleted;
+            elementCount = prevState.elementCount; 
+            partitionCount = prevState.partitionCount;
+            q_stack = prevState.q_stack.map(s => ({...s})); 
+            partitionBoundaries = prevState.partitionBoundaries.map(b => ({...b})); 
+            p_state = {...prevState.p_state}; 
+            sortedIndices = new Set(prevState.sortedIndices);
+            partitionColorHue = prevState.partitionColorHue; 
+
+            arrayInput.value = array.map(item => item.value).join(', ');
+            nInput.value = elementCount; 
+            
+            drawBricks(array);
+            
+            updateStats();
+            
+            if (p_state.low !== -1) {
+                applyQuicksortHighlights(p_state.low, p_state.high);
+                updatePartitionStatus(p_state.low, p_state.high);
+            } else {
+                updateStatus(`Rewound. Ready for next partition.`);
+            }
+
+            if (sortCompleted) {
+                completeSort(); 
+            } else {
+                enableControls();
+            }
+        }
+        
+        function saveState() {
+            const state = {
+                array: array.map(item => ({...item})), 
+                totalSwaps: totalSwaps,
+                totalComparisons: totalComparisons,
+                isSorting: isSorting,
+                sortCompleted: sortCompleted,
+                elementCount: elementCount,
+                partitionCount: partitionCount,
+                q_stack: q_stack.map(s => ({...s})), 
+                partitionBoundaries: partitionBoundaries.map(b => ({...b})), 
+                p_state: {...p_state}, 
+                sortedIndices: new Set(sortedIndices),
+                partitionColorHue: partitionColorHue, 
+            };
+            history.push(state);
+            enableControls(); 
+        }
+
+        function updatePartitionStatus(low, high) {
+             // FIX: Replace Markdown ** and LaTeX $\ge$ with HTML tags
+             const pivotValHtml = `<strong>${p_state.pivotValue}</strong>`;
+             const iValHtml = `<strong>${p_state.i}</strong>`;
+             
+             const baseMsg = `Partition ${partitionCount} (${low}-${high}). Pivot: ${pivotValHtml} (Index ${p_state.pivotIndex}).`;
+             
+             if (p_state.j >= p_state.high && !p_state.finalSwap) {
+                 updateStatus(`${baseMsg} Scan complete. Boundary is at ${iValHtml}. Ready to place pivot at ${p_state.i + 1}.`);
+             } else if (p_state.finalSwap) {
+                 updateStatus(`${baseMsg} Pivot placed at final index ${iValHtml}. Sub-partitions queued.`);
+             } else if (p_state.j !== -1 && p_state.j < p_state.high) {
+                 const currentVal = array[p_state.j].value; 
+                 
+                 if (currentVal < p_state.pivotValue) {
+                     const boundaryTarget = p_state.i + 1;
+                     
+                     if (p_state.i === p_state.j - 1) { 
+                         updateStatus(`${baseMsg} Comparing ${currentVal} &lt; ${p_state.pivotValue}. <strong>Element is correctly positioned</strong> (Boundary advances to ${p_state.i + 1}).`);
+                     } else {
+                         updateStatus(`${baseMsg} Comparing ${currentVal} &lt; ${p_state.pivotValue}. Swapping ${currentVal} (Index ${p_state.j}) with boundary target (Index ${boundaryTarget}).`);
+                     }
+                     
+                 } else {
+                     updateStatus(`${baseMsg} Comparing ${currentVal} &ge; ${p_state.pivotValue}. <strong>Element is larger/equal</strong>. Left in place. Scanning next element (Index ${p_state.j + 1}).`);
+                 }
+             } else {
+                 updateStatus(`${baseMsg} Initiating partitioning.`);
+             }
+        }
+        
+        function startSort() {
+            handleArrayInputChange();
+            
+            if (array.length < 2) {
+                updateStatus("Array is too small to quicksort.");
+                return;
+            }
+            
+            isSorting = true;
+            sortCompleted = false;
+            
+            // Initial state setup
+            sortedIndices.clear();
+            // Store partition number with initial boundary
+            q_stack = [{low: 0, high: elementCount - 1}];
+            
+            // NEW: Initialize partition boundaries with partition number
+            partitionBoundaries = [{low: 0, high: elementCount - 1, partitionNum: 1}];
+            
+            if (elementCount === 1) {
+                sortedIndices.add(0);
+                completeSort();
+                return;
+            }
+            
+            history = []; 
+            resetPartitionState(); 
+            
+            partitionColorHue = Math.floor(Math.random() * 360);
+            
+            saveState(); 
+            
+            updateStatus('Quicksort started. Ready for first partition.');
+            updateStats();
+            
+            disableControls(); 
+        }
+
+        function resetPartitionState() {
+            p_state = {
+                low: -1,
+                high: -1,
+                pivotIndex: -1,
+                pivotValue: -1,
+                i: -1,
+                j: -1, 
+                swaps: 0,
+                initialSwap: false, 
+                finalSwap: false,
+            };
+        }
+        
+        function step() {
+            // Only proceed if not completed and no animation is currently running
+            if (sortCompleted) {
+                pause(true); // Stop play loop if completed
+                return;
+            }
+            if (currentTimeout) return; 
+
+            // Disable controls only if not in play mode (play mode handles its own disabled state)
+            if (!isPlaying) {
+                nextStepBtn.disabled = true;
+                backBtn.disabled = true;
+            }
+
+            // --- Phase 1: Start a new partition if the previous one is finished ---
+            if (p_state.low === -1) {
+                if (q_stack.length === 0) {
+                    completeSort();
+                    return;
+                }
+                
+                const range = q_stack.pop();
+                p_state.low = range.low;
+                p_state.high = range.high;
+                
+                if (p_state.low >= p_state.high) {
+                    if (p_state.low === p_state.high) sortedIndices.add(p_state.low);
+                    resetPartitionState();
+                    // Crucial: In the manual step path, we call step() immediately to get the next partition
+                    if (!isPlaying) step(); 
+                    return;
+                }
+
+                partitionCount++;
+                p_state.pivotIndex = p_state.high; 
+                p_state.pivotValue = array[p_state.high].value; 
+                p_state.i = p_state.low - 1; 
+                p_state.j = p_state.low; 
+                p_state.swaps = 0;
+                p_state.initialSwap = true; 
+                
+                partitionColorHue = (partitionColorHue + 75) % 360; 
+                
+                applyQuicksortHighlights(p_state.low, p_state.high);
+                updatePartitionStatus(p_state.low, p_state.high);
+                saveState();
+                enableControls();
+                return;
+            }
+            
+            // --- Phase 2: Partitioning in Progress ---
+            const {low, high, i, j, pivotValue} = p_state;
+            
+            // Check if final pivot swap is needed
+            if (j >= high) {
+                if (!p_state.finalSwap) {
+                    const finalPivotIndex = i + 1;
+                    
+                    updateStatus(`Final step. Swapping pivot (<strong>${pivotValue}</strong>) with element at boundary + 1 (<strong>${array[finalPivotIndex].value}</strong>) to place pivot at its sorted position: <strong>${finalPivotIndex}</strong>.`);
+                    
+                    p_state.finalSwap = true; 
+                    p_state.i = finalPivotIndex; 
+                    
+                    [array[finalPivotIndex], array[high]] = [array[high], array[finalPivotIndex]];
+
+                    totalSwaps++;
+                    p_state.swaps++;
+                    
+                    animateSwap(finalPivotIndex, high, () => {
+                        currentTimeout = null;
+                        advancePartition();
+                    });
+                    return;
+                }
+            } else {
+                // Comparison and conditional swap step
+                totalComparisons++;
+                
+                const compareValue = array[j].value; 
+
+                if (compareValue < pivotValue) {
+                    p_state.i++; 
+                    const swapIndex1 = p_state.i;
+                    const swapIndex2 = p_state.j;
+                    
+                    updatePartitionStatus(low, high);
+                    
+                    // --- Trivial Swap Skip Logic ---
+                    if (swapIndex1 === swapIndex2) {
+                        p_state.j++;
+                        // If no swap, advance immediately (the next step/interval call handles the pacing)
+                        advancePartition();
+                        return;
+                    }
+                    // --- End Trivial Swap Skip Logic ---
+
+                    [array[swapIndex1], array[swapIndex2]] = [array[swapIndex2], array[swapIndex1]];
+                    
+                    totalSwaps++;
+                    p_state.swaps++;
+                    
+                    animateSwap(swapIndex1, swapIndex2, () => {
+                        currentTimeout = null;
+                        p_state.j++;
+                        advancePartition();
+                    });
+                    return;
+                } else {
+                    updatePartitionStatus(low, high);
+                    
+                    // Element larger/equal, no swap, but we need a visible pause for manual step
+                    if (!isPlaying) {
+                        currentTimeout = setTimeout(() => {
+                            currentTimeout = null;
+                            p_state.j++;
+                            advancePartition();
+                        }, ANIMATION_DELAY); 
+                        return;
+                    } else {
+                        // In play mode, just update state and move on immediately (setInterval controls pace)
+                        p_state.j++;
+                        advancePartition();
+                        return;
+                    }
+                }
+            }
+            
+            advancePartition();
+        }
+        
+        function advancePartition() {
+            enableControls();
+            
+            // --- Phase 3: Partitioning is Complete ---
+            if (p_state.j >= p_state.high && p_state.finalSwap) {
+                
+                const pivotFinalIndex = p_state.i;
+                sortedIndices.add(pivotFinalIndex);
+                
+                removeAllHighlights(); 
+                
+                // 1. REMOVE the current partition from the boundary list
+                partitionBoundaries = partitionBoundaries.filter(b => b.low !== p_state.low || b.high !== p_state.high);
+
+                // Initialize a sequential counter starting from the next available ID
+                let nextNum = partitionCount + 1; // PartitionCount holds the highest ID currently processed
+
+                // 2. Add new sub-partitions to the boundary list
+                
+                // Left sub-partition
+                const leftLow = p_state.low;
+                const leftHigh = pivotFinalIndex - 1;
+                if (leftLow < leftHigh) {
+                    // Assign nextNum and then increment it
+                    partitionBoundaries.push({low: leftLow, high: leftHigh, partitionNum: nextNum}); 
+                    q_stack.push({low: leftLow, high: leftHigh});
+                    console.log(`[DEBUG] New Partition Created: P${nextNum} (${leftLow}-${leftHigh})`);
+                    nextNum++; // Increment for the next (right) partition
+                    updateStatus(`Partitioning done. Pivot at ${pivotFinalIndex}. Pushing left sub-partition (${leftLow}-${leftHigh}).`);
+                } else if (leftLow === leftHigh) {
+                    sortedIndices.add(leftLow);
+                    updateStatus(`Partitioning done. Pivot at ${pivotFinalIndex}. Single element left sub-partition (${leftLow}) marked as sorted.`);
+                }
+                
+                // Right sub-partition
+                const rightLow = pivotFinalIndex + 1;
+                const rightHigh = p_state.high;
+                if (rightLow < rightHigh) {
+                    // Assign the current nextNum (which was possibly incremented after the left partition)
+                    partitionBoundaries.push({low: rightLow, high: rightHigh, partitionNum: nextNum}); 
+                    q_stack.push({low: rightLow, high: rightHigh});
+                    console.log(`[DEBUG] New Partition Created: P${nextNum} (${rightLow}-${rightHigh})`);
+                    updateStatus(`Partitioning done. Pivot at ${pivotFinalIndex}. Pushing right sub-partition (${rightLow}-${rightHigh}).`);
+                } else if (rightLow === rightHigh) {
+                    sortedIndices.add(rightHigh);
+                    updateStatus(`Partitioning done. Pivot at ${pivotFinalIndex}. Single element right sub-partition (${rightHigh}) marked as sorted.`);
+                }
+
+                // --- PIVOT ISOLATION FIX (FINAL PLACEMENT) ---
+                // Add the pivot as its own single-element group (low=high, partitionNum removed as it's sorted)
+                partitionBoundaries.push({low: pivotFinalIndex, high: pivotFinalIndex});
+                // --- END PIVOT ISOLATION FIX ---
+
+
+                // NOTE: Redraw needs to happen *after* setting classes but *before* final state is saved
+                drawBricks(array); // Redraw to commit structural changes (boxes)
+
+                // 4. Reset partition state to signal start of Phase 1 next time
+                resetPartitionState();
+                updateStats();
+                saveState();
+                
+                // 5. Determine next action
+                if (q_stack.length === 0 && !sortCompleted) {
+                    completeSort();
+                } else {
+                    updateStatus(`Partition complete. Ready for Partition ${partitionCount + 1}.`);
+                }
+                return; 
+            }
+
+            // --- Phase 2.5: Still looping, just updated stats/highlights ---
+            applyQuicksortHighlights(p_state.low, p_state.high);
+            updateStats();
+            saveState();
+        }
+        
+        function completeSort() {
+            isSorting = false;
+            sortCompleted = true;
+            if (isPlaying) pause(true); 
+            
+            // Final Redraw: Clear visualization and draw final sorted blocks
+            visualisationArea.innerHTML = '';
+
+            const containerHeight = visualisationArea.clientHeight;
+            const values = array.map(item => item.value); 
+            const maxVal = Math.max(...values, 1); 
+            const minVal = Math.min(...values, 1);
+            const gap = 1; 
+            
+            visualisationArea.style.gap = `${gap}px`; 
+            
+            array.forEach(item => {
+                const value = item.value;
+                const brick = document.createElement('div');
+                
+                // Redraw all as simple, sorted bricks
+                brick.classList.add('brick', 'sorted');
+                
+                const heightRange = MAX_BRICK_HEIGHT_PERCENT - MIN_BRICK_HEIGHT_PERCENT;
+                const percentOfMax = ((value - minVal) / (maxVal - minVal || 1)) * heightRange + MIN_BRICK_HEIGHT_PERCENT;
+                const heightPx = Math.max(MIN_BRICK_HEIGHT_PX, percentOfMax * containerHeight);
+                
+                const safeContainerWidth = visualisationArea.clientWidth || 1000;
+                
+                // Simplified calculation for final sorted state to ensure fit
+                const finalBrickWidth = Math.max(1, Math.floor((safeContainerWidth - (elementCount * gap) - 10) / elementCount));
+                
+                brick.style.width = `${finalBrickWidth}px`; 
+                brick.style.height = `${heightPx}px`;
+                
+                brick.textContent = value;
+                
+                visualisationArea.appendChild(brick);
+            });
+
+
+            const N = elementCount;
+            const totalOps = totalComparisons + totalSwaps;
+            
+            // FIX: Calculate theoretical complexities
+            const NLogN = N > 1 ? N * (Math.log(N) / Math.log(2)) : 0;
+            const NSquared = N * N;
+            // NEW: Calculate the precise maximum comparisons
+            const NMaxComparisons = N * (N - 1) / 2;
+
+            // Show final stats in status log
+            statusLog.innerHTML = `
+                <div class="text-center w-full">
+                    <h3 class="text-xl font-bold text-green-700 mb-3">Quicksort Complete!</h3>
+                    <div class="stats-summary-container">
+                        <div class="stats-summary-cell">
+                            <span>Partitions</span>
+                            <span>${partitionCount}</span>
+                        </div>
+                        <div class="stats-summary-cell">
+                            <span>Total Comparisons</span>
+                            <span>${totalComparisons}</span>
+                        </div>
+                        <div class="stats-summary-cell">
+                            <span>Total Swaps</span>
+                            <span>${totalSwaps}</span>
+                        </div>
+                        <div class="stats-summary-cell">
+                            <span>Total Operations</span>
+                            <span>${totalOps}</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mt-4 font-bold">Theoretical Complexities (N=${N}):</p>
+                    <div class="stats-summary-container">
+                        <div class="stats-summary-cell">
+                            <span>Average Case (O(N log N))</span>
+                            <span>${NLogN.toFixed(0)}</span>
+                        </div>
+                        <div class="stats-summary-cell">
+                            <span>Max Comparisons (N(N-1)/2)</span>
+                            <span>${NMaxComparisons}</span>
+                        </div>
+                        <div class="stats-summary-cell">
+                            <span>Worst Case (O(N²))</span>
+                            <span>${NSquared}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            statusLog.classList.add('text-center');
+
+            updateStats();
+            saveState(); 
+            enableControls();
+        }
+        
+        function reset() {
+            if (isPlaying) pause();
+            clearTimeout(currentTimeout);
+            currentTimeout = null;
+            statusLog.innerHTML = "Generate an array or enter one manually.";
+            statusLog.classList.remove('text-center');
+            
+            // Clear all structural elements
+            visualisationArea.innerHTML = '';
+            
+            handleNChange(); 
+        }
+        
+        function resetSortState() {
+            totalSwaps = 0;
+            totalComparisons = 0;
+            isSorting = false;
+            sortCompleted = false;
+            history = [];
+            
+            // Quicksort specific reset
+            partitionCount = 0;
+            q_stack = [];
+            sortedIndices.clear();
+            partitionBoundaries = []; // NEW: Reset boundaries
+            resetPartitionState();
+            partitionColorHue = 0; 
+            
+            clearTimeout(currentTimeout); 
+            currentTimeout = null;
+            if (isPlaying) pause(true); 
+            
+            updateStats();
+            enableControls();
+        }
+
+        // --- Animations & Pause Logic (Adjusted for Quicksort State) ---
+
+        function animateSwap(index1, index2, callback) {
+            const brick1 = document.getElementById(`brick-${index1}`);
+            const brick2 = document.getElementById(`brick-${index2}`);
+
+            if (!brick1 || !brick2) {
+                if (callback) callback();
+                return;
+            }
+
+            brick1.classList.add('swapping');
+            brick2.classList.add('swapping');
+
+            // 1. Wait for lift animation, then swap positions in the DOM
+            currentTimeout = setTimeout(() => {
+                
+                // If paused during the animation, stop the process
+                if (isPlaying === false && playBtn.textContent === 'Pause') {
+                    // Note: playBtn.textContent is 'Pause' until pause() completes
+                    brick1.classList.remove('swapping');
+                    brick2.classList.remove('swapping');
+                    currentTimeout = null;
+                    return; 
+                }
+                
+                const parent = brick1.parentNode;
+                
+                // --- FIX: Robust Swapping using Placeholder ---
+                const placeholder = document.createElement('div');
+                parent.insertBefore(placeholder, brick1);
+                
+                const brick2_nextSibling = brick2.nextSibling;
+                
+                parent.insertBefore(brick2, placeholder);
+                
+                parent.insertBefore(brick1, brick2_nextSibling);
+
+                parent.removeChild(placeholder);
+                // --- END FIX ---
+
+                // Update IDs: The bricks swap IDs to match their *new* array positions.
+                brick1.id = `brick-${index2}`; 
+                brick2.id = `brick-${index1}`; 
+                
+                // 2. Wait for moment, then drop them down
+                currentTimeout = setTimeout(() => {
+                    // If paused during the animation, stop the process
+                    if (isPlaying === false && playBtn.textContent === 'Pause') {
+                        currentTimeout = null;
+                        return; 
+                    }
+                    
+                    brick1.classList.remove('swapping');
+                    brick2.classList.remove('swapping');
+                    
+                    arrayInput.value = array.map(item => item.value).join(', ');
+
+                    if (callback) callback();
+                }, ANIMATION_DELAY);
+            }, ANIMATION_DELAY);
+        }
+        
+        function play() {
+            isPlaying = true;
+            playBtn.textContent = 'Pause';
+            playBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+            playBtn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+            
+            disableControls(true); 
+            
+            // This loop now periodically calls step()
+            playInterval = setInterval(() => {
+                // The currentTimeout guard prevents the interval from firing
+                // the next step until the previous step's animation is done.
+                if (currentTimeout) return; 
+                
+                if (sortCompleted) {
+                    pause(true); 
+                } else {
+                    step(); // This mimics pressing the Next Step button
+                }
+            }, PLAY_INTERVAL_DELAY);
+        }
+
+        function pause(isResetOrComplete = false) {
+            isPlaying = false;
+            clearInterval(playInterval); 
+            
+            // Clear currentTimeout only if it hasn't been set by an ongoing animation.
+            // If an animation is running, it will clear currentTimeout itself and stop.
+            if (!currentTimeout) {
+                clearTimeout(currentTimeout); 
+                currentTimeout = null; 
+            }
+            
+            drawBricks(array);
+            
+            // Re-apply highlights based on current p_state
+            if (p_state.low !== -1) {
+                applyQuicksortHighlights(p_state.low, p_state.high);
+                updateStatus(`Paused. Partition ${partitionCount} (${p_state.low}-${p_state.high}). Ready to continue.`);
+            } else {
+                removeAllHighlights();
+            }
+            
+            if (!isResetOrComplete) {
+                enableControls();
+            }
+
+            playBtn.textContent = 'Play';
+            playBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+            playBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+        }
+
+    </script>
+</body>
+</html>
