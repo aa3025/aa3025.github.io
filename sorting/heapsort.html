@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heapsort Visualization</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the tree visualization */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+
+        /* --- Global Zoom --- */
+        #app {
+	        /* The width will be set dynamically in renderState based on tree size */
+            transition: min-width 0.3s ease;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* --- Tree Specific Styles --- */
+        #heap-container {
+            /* Set to relative to contain the wrapper div */
+            position: relative;
+            /* Min-height ensures the container doesn't collapse when the tree is small */
+            min-height: 550px; 
+            padding-top: 20px;
+            /* Reduced padding-bottom to bring controls closer */
+            padding-bottom: 5px; 
+        }
+
+        .heap-node {
+            /* NOTE: Transition is now DISABLED for POSITIONING, only color/scale transitions remain */
+            transition: background-color 0.9s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
+            cursor: pointer;
+            user-select: none;
+            position: absolute; /* Absolute positioning for tree layout, relative to centered wrapper */
+            width: 48px; /* w-12 */
+            height: 48px; /* h-12 */
+            border-radius: 9999px; /* rounded-full */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            z-index: 10; /* Ensure nodes are on top of lines */
+        }
+        
+        /* Class used to temporarily enable Z-index and override standard positioning during JS animation */
+        .animating-node {
+            z-index: 50;
+            transition: none !important; /* Crucial: JS controls position, not CSS */
+        }
+
+        .heap-line {
+            position: absolute; /* Absolute positioning, relative to centered wrapper */
+            height: 2px; /* Line thickness */
+            background-color: #9ca3af; /* gray-400 */
+            transform-origin: 0 0; /* Rotate from the parent end */
+            z-index: 5; /* Keep lines behind nodes */
+            transition: all 0.5s ease-in-out;
+        }
+
+        /* --- Highlight classes --- */
+        .highlight-compare {
+            background-color: #fcd34d !important; /* Yellow */
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(252, 211, 77, 0.8);
+        }
+
+        .highlight-swap {
+            background-color: #ef4444 !important; /* Red */
+            color: white;
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
+        }
+
+        .highlight-sorted {
+            background-color: #10b981 !important; /* Green */
+            color: white;
+            opacity: 0.7;
+        }
+
+        .highlight-root {
+            background-color: #3b82f6 !important; /* Blue */
+            color: white;
+            transform: scale(1.2);
+        }
+
+        /* Hide scrollbars for a cleaner look */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        /* --- Heap Complete Message Style --- */
+        #heap-complete-message {
+            position: fixed; 
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5000; /* Extremely high z-index */
+            pointer-events: none;
+        }
+        
+        /* Apply transition and semi-transparent background (Indigo-600 is 79, 70, 229) */
+        .message-content {
+            transition: opacity 0.35s ease-in-out, transform 0.35s ease-in-out;
+            /* Using RGBA for semi-transparency (55% opacity) */
+            background-color: rgba(79, 70, 229, 0.55); 
+        }
+
+        /* Reduced vertical spacing for controls */
+        #controls-bar {
+            margin-top: 5px; 
+            margin-bottom: 5px;
+        }
+
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="app" class="mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">Heapsort Visualizer</h1>
+
+        <!-- Controls (Top Section) --><div class="flex flex-wrap gap-4 items-center justify-between mb-8 p-4 bg-gray-50 rounded-lg shadow-inner">
+            <div class="flex items-center gap-4">
+                <label for="arraySize" class="text-sm font-medium text-gray-700 whitespace-nowrap">Array Size (N):</label>
+                <input type="number" id="arraySize" value="25" min="5" max="50" class="w-20 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <button onclick="init()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+                    Generate New Array
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <span class="text-sm font-medium text-gray-700">Sort Order:</span>
+                <button id="sortOrderToggle" onclick="toggleSortOrder()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-200">
+                    Ascending (Max-Heap)
+                </button>
+            </div>
+        </div>
+
+        <!-- Array Visualization --><h2 class="text-2xl font-semibold text-gray-800 mb-4 mt-6">Input Array (Original Unsorted Data)</h2>
+        <div id="array-container" class="flex flex-wrap justify-center gap-1.5 p-4 bg-gray-100 rounded-lg shadow-md hide-scrollbar overflow-x-auto">
+            <!-- Array elements will be rendered here --></div>
+        
+        <!-- Output Array Visualization --><h2 class="text-2xl font-semibold text-gray-800 mb-4 mt-8">Sorted Output Array (<span class="text-green-600">Fixed</span> elements are shown)</h2>
+        <div id="output-array-container" class="flex flex-wrap justify-center gap-1.5 p-4 bg-green-100 rounded-lg shadow-md min-h-[50px]">
+            <!-- Output elements will be rendered here --></div>
+
+        <!-- Heap Tree Visualization --><h2 class="text-2xl font-semibold text-gray-800 mb-4 mt-8">Heap Structure (Tree View - Active Elements Only)</h2>
+        <div id="heap-container" class="w-full overflow-x-auto pb-0">
+            <!-- Tree nodes and lines will be rendered here --></div>
+        
+        <!-- Heap Complete Message Overlay --><div id="heap-complete-message" class="hidden">
+            <div id="message-content" class="message-content text-white px-10 py-5 rounded-xl shadow-2xl border-4 border-white transform scale-105 opacity-0">
+                <div id="message-title" class="text-4xl font-extrabold"></div>
+                <div id="message-subtitle" class="text-lg font-medium mt-2"></div>
+            </div>
+        </div>
+        
+        <!-- Algorithm Controls (MOVED UP) --><div id="controls-bar" class="flex flex-wrap gap-3 items-center justify-center p-4 bg-white rounded-lg border">
+            <!-- UPDATED RESET BUTTON --><button id="resetBtn" onclick="resetState()" class="bg-red-500 text-white font-semibold py-3 px-8 rounded-full shadow-xl hover:bg-red-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <span class="text-xl font-bold align-middle mr-2">↺</span>
+                <span id="resetText">Reset</span>
+            </button>
+            <button id="prevBtn" onclick="prevStep()" disabled class="bg-gray-400 text-white font-semibold py-2 px-4 rounded-full shadow-lg hover:bg-gray-500 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+            </button>
+            <button id="playBtn" onclick="playPause()" disabled class="bg-green-600 text-white font-semibold py-3 px-8 rounded-full shadow-xl hover:bg-green-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                <span id="playText">Play</span>
+            </button>
+            <button id="nextBtn" onclick="nextStep()" disabled class="bg-gray-800 text-white font-semibold py-2 px-4 rounded-full shadow-lg hover:bg-gray-900 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Status and Explanation (MOVED HERE) --><div id="status-moved" class="text-center mb-1 mt-3 text-lg font-bold text-indigo-700 min-h-[30px]"></div>
+        <div id="explanation-moved" class="text-center mb-8 text-base font-medium text-gray-600 min-h-[30px]"></div>
+        
+    </div>
+
+    <script>
+        const ARRAY_SIZE_DEFAULT = 25;
+        let data = []; // Permanent: Holds the original, unsorted input data
+        let history = [];
+        let currentStep = -1;
+        let isPlaying = false;
+        let animationTimeout = null; 
+        let isAscending = true; // true: Max-Heap (Ascending sort); false: Min-Heap (Descending sort)
+        let isPausedForMessage = false; // Tracks if the animation is paused solely for the message
+
+        // Debug counters
+        let swapAnimationCount = 0;
+        let messageDisplayCount = 0;
+
+        const appContainer = document.getElementById('app'); 
+        const arrayContainer = document.getElementById('array-container');
+        const heapContainer = document.getElementById('heap-container');
+        const outputArrayContainer = document.getElementById('output-array-container');
+        const heapCompleteMessage = document.getElementById('heap-complete-message'); 
+        const messageContent = document.getElementById('message-content');
+        const messageTitle = document.getElementById('message-title');
+        const messageSubtitle = document.getElementById('message-subtitle');
+        
+        // Status elements
+        const statusEl = document.getElementById('status-moved');
+        const explanationEl = document.getElementById('explanation-moved');
+        
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const playBtn = document.getElementById('playBtn');
+        const playText = document.getElementById('playText');
+        const resetBtn = document.getElementById('resetBtn');
+        const resetText = document.getElementById('resetText'); 
+        const playIcon = document.getElementById('playIcon');
+        const sortOrderToggle = document.getElementById('sortOrderToggle');
+        const arraySizeInput = document.getElementById('arraySize');
+
+        // Tree visualization constants (Updated for Aesthetic Spacing)
+        const NODE_SIZE = 48; 
+        const NODE_RADIUS = NODE_SIZE / 2;
+        const LEVEL_HEIGHT = 100; // Vertical distance between levels (kept at 100)
+        const BASE_H_UNIT = 25; // Base unit for horizontal spacing on the deepest level
+        const HORIZONTAL_MARGIN = 0; 
+
+        // Animation duration constants
+        const SWAP_ANIMATION_DURATION = 200; // ms (0.3 seconds animation time)
+        const PLAY_INTERVAL = 600; // ms (0.4 seconds interval time)
+
+        // --- Core Algorithm Logic (Heapsort) ---
+
+        /**
+         * Logs the current state of the array and the action to the history array.
+         */
+        function logState(action, highlightNodes = [], phase = 'BUILD_HEAP', heapSize = data.length, sortedIndices = [], rootIndex = -1, workingData = [], status = '') {
+            history.push({
+                initialArray: [...data], 
+                workingArray: [...workingData], 
+                action,
+                highlightNodes,
+                phase,
+                heapSize,
+                sortedIndices: [...sortedIndices],
+                rootIndex,
+                status
+            });
+        }
+
+        /**
+         * The standard `heapify` operation (max or min) to maintain the heap property.
+         */
+        async function heapify(i, n, workingData, callerPhase) {
+            let largestOrSmallest = i;
+            const left = 2 * i + 1;
+            const right = 2 * i + 2;
+
+            // Comparison function uses workingData
+            const isCorrectOrder = (a, b) => isAscending ? (workingData[a] > workingData[b]) : (workingData[a] < workingData[b]);
+            
+            const currentState = history.length > 0 ? history[history.length - 1] : { phase: callerPhase, sortedIndices: [], rootIndex: -1 };
+
+            // Find the candidate (largest or smallest) among parent and children
+            if (left < n && isCorrectOrder(left, largestOrSmallest)) {
+                largestOrSmallest = left;
+            }
+            if (right < n && isCorrectOrder(right, largestOrSmallest)) {
+                largestOrSmallest = right;
+            }
+            
+            // Log the comparison/decision (dominant operation)
+            if (left < n || right < n) {
+                let highlightIndices = [i];
+                if (left < n) highlightIndices.push(left);
+                if (right < n) highlightIndices.push(right);
+                
+                // Get the value of the parent node
+                const parentValue = workingData[i];
+
+                logState(`Deciding largest/smallest among parent ${parentValue} and children.`, highlightIndices, currentState.phase, n, currentState.sortedIndices, currentState.rootIndex, workingData);
+            }
+
+            // If the root is not the largest/smallest, swap and continue heapifying
+            if (largestOrSmallest !== i) {
+                const parentValue = workingData[i];
+                const swapValue = workingData[largestOrSmallest];
+
+                // --- STEP 1: Log the impending swap (Highlight Only, Position UNCHANGED) ---
+                logState(`Swapping value ${parentValue} and ${swapValue}.`, [i, largestOrSmallest], currentState.phase, n, currentState.sortedIndices, currentState.rootIndex, workingData);
+                
+                // Perform array swap (DATA IS MODIFIED HERE)
+                [workingData[i], workingData[largestOrSmallest]] = [workingData[largestOrSmallest], workingData[i]]; 
+
+                // --- STEP 2: Log the Post-Swap state (Forces physical movement via transition) ---
+                // The new workingData array will cause the nodes to render at their new coordinates
+                logState(`Physical positions updated.`, [i, largestOrSmallest], currentState.phase, n, currentState.sortedIndices, currentState.rootIndex, workingData, 'POST_SWAP_MOVE');
+                
+                await heapify(largestOrSmallest, n, workingData, callerPhase);
+            }
+
+            // --- CRUCIAL: Log the completion of the entire heapify branch ---
+            // This is logged only if the call originated from the main loop (i=0) during the SORTING phase
+            // AND if we're at the top level of recursion (no further heapify calls pending)
+            if (i === 0 && callerPhase === 'SORTING' && history.length > 0) {
+                const lastState = history[history.length - 1];
+                // Only log if the last state wasn't already a heap maintenance completion
+                if (lastState.status !== 'HEAP_MAINTENANCE_COMPLETE') {
+                    logState(`Heap maintenance cycle complete.`, [i], callerPhase, n, currentState.sortedIndices, currentState.rootIndex, workingData, 'HEAP_MAINTENANCE_COMPLETE');
+                }
+            }
+        }
+
+        /**
+         * Runs the Heapsort algorithm on a copy of the input array.
+         */
+        async function heapsort(workingData) {
+            const n = workingData.length;
+            let phase = 'BUILD_HEAP';
+
+            // 1. Build Heap (Phase 1)
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                await heapify(i, n, workingData, phase);
+            }
+
+            // --- LOG THE INITIAL HEAP BUILD COMPLETION (First Pause) ---
+            logState('The initial heap structure is complete.', [], 'BUILD_COMPLETE', n, [], -1, workingData, 'BUILD_COMPLETE_MESSAGE');
+
+            // 2. Sort/Extract (Phase 2)
+            phase = 'SORTING';
+            let sortedIndices = [];
+
+            for (let i = n - 1; i > 0; i--) {
+                const rootValue = workingData[0];
+                const lastHeapValue = workingData[i];
+
+                // Log 1: Highlight the impending swap/extraction (PRE-MOVE)
+                logState(`Extracting root (${rootValue}) and placing value ${lastHeapValue} at the root.`, [0, i], phase, i + 1, sortedIndices, 0, workingData);
+                
+                // Perform swap in the working array
+                [workingData[0], workingData[i]] = [workingData[i], workingData[0]];
+
+                // --- Log 2: POST-SWAP MOVE ---
+                logState(`Physical positions updated.`, [0, i], phase, i + 1, sortedIndices, -1, workingData, 'POST_SWAP_MOVE');
+
+                // Mark the newly placed element as sorted
+                sortedIndices.push(i);
+
+                // --- Log 3: Show result of extraction, reflecting the reduced heap size 'i' and the newly sorted element. ---
+                const extractedValue = workingData[i]; // Value is now at the fixed position i
+                logState(`Element ${extractedValue} fixed in sorted position. Heap size reduced to ${i}.`, [i], phase, i, sortedIndices, -1, workingData);
+
+                // Heapify the reduced heap (size i)
+                await heapify(0, i, workingData, phase);
+                
+                // --- ADDED: Log heap maintenance completion after heapify ---
+                // This ensures the message appears BEFORE the next extraction
+                if (i > 1) { // Only show message if there are more extractions to do
+                    logState(`Heap maintenance complete. Ready for next extraction.`, [], phase, i, sortedIndices, -1, workingData, 'HEAP_MAINTENANCE_COMPLETE');
+                }
+            }
+
+            // Mark the last element (index 0) as sorted
+            sortedIndices.push(0);
+            logState('Heapsort Complete! The array is sorted.', [], 'FINISHED', 0, sortedIndices, -1, workingData);
+        }
+
+        // --- Visualization Helpers ---
+
+        function getNodeCoordinates(index, totalNodes) {
+            const numLevels = Math.ceil(Math.log2(totalNodes + 1));
+            const level = Math.floor(Math.log2(index + 1));
+            const maxBottomNodes = Math.pow(2, numLevels - 1);
+            const levelMultiplier = Math.pow(2, numLevels - 1 - level);
+            const posInLevel = index - (Math.pow(2, level) - 1);
+            const totalDiagramWidth = (maxBottomNodes * 2 * BASE_H_UNIT);
+            const startSlot = posInLevel * levelMultiplier * 2;
+            const centerSlot = startSlot + levelMultiplier; 
+            const x = HORIZONTAL_MARGIN + centerSlot * BASE_H_UNIT; 
+            const y = (level * LEVEL_HEIGHT) + NODE_RADIUS;
+
+            return { x, y, totalDiagramWidth };
+        }
+
+        function createLine(p1, p2) {
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+            const angleRad = angle * (Math.PI / 180);
+            const startX = p1.x + NODE_RADIUS * Math.cos(angleRad);
+            const startY = p1.y + NODE_RADIUS * Math.sin(angleRad);
+            const lineLength = Math.max(0, length - (2 * NODE_RADIUS));
+
+            return `
+                <div class="heap-line" style="
+                    left: ${startX}px;
+                    top: ${startY}px;
+                    width: ${lineLength}px;
+                    transform: rotate(${angle}deg);
+                "></div>
+            `;
+        }
+        
+        // --- FIXED ANIMATION FUNCTION ---
+        function animateSwapTransition(fromIndex, toIndex) {
+            swapAnimationCount++;
+            console.log(`ANIMATION START #${swapAnimationCount}:`, { fromIndex, toIndex });
+            
+            const node1 = document.getElementById(`node-${fromIndex}`);
+            const node2 = document.getElementById(`node-${toIndex}`);
+
+            if (!node1 || !node2) {
+                console.log('ANIMATION FAILED: Nodes not found');
+                return;
+            }
+
+            let startTime;
+            
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+                const progress = Math.min(1, elapsed / SWAP_ANIMATION_DURATION);
+                
+                // Easing function (simple sine ease-in-out)
+                const easedProgress = 0.5 - Math.cos(progress * Math.PI) / 2;
+
+                // Animate both nodes back to their natural positions (translate(0,0))
+                const remainingProgress = 1 - easedProgress;
+                
+                node1.style.transform = `translate(${node1._startX * remainingProgress}px, ${node1._startY * remainingProgress}px)`;
+                node2.style.transform = `translate(${node2._startX * remainingProgress}px, ${node2._startY * remainingProgress}px)`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    // Animation complete: clean up
+                    node1.classList.remove('animating-node');
+                    node2.classList.remove('animating-node');
+                    node1.style.transform = '';
+                    node2.style.transform = '';
+                    delete node1._startX;
+                    delete node1._startY;
+                    delete node2._startX;
+                    delete node2._startY;
+                    
+                    console.log(`ANIMATION COMPLETE #${swapAnimationCount}`);
+                }
+            }
+            
+            requestAnimationFrame(step);
+        }
+        // --- END ANIMATION FUNCTION ---
+
+        function renderHeapTree(arr, state) {
+            const N_original = data.length;
+            const N_active = state.heapSize; 
+            
+            const numLevels = Math.ceil(Math.log2(N_original + 1));
+            const maxBottomNodes = Math.pow(2, numLevels - 1);
+            const maxTotalWidth = (maxBottomNodes * 2 * BASE_H_UNIT);
+
+            let treeContentHtml = '';
+            let swapHighlightIndices = state.highlightNodes;
+
+            // --- CRITICAL FIX: Ensure red highlight persists during POST_SWAP_MOVE ---
+            if (state.status === 'POST_SWAP_MOVE' && currentStep > 0) {
+                // If we are in the movement phase, use the indices from the previous PRE-SWAP log
+                // to keep the red highlight on the flying nodes.
+                swapHighlightIndices = history[currentStep - 1].highlightNodes;
+            }
+            // ------------------------------------------------------------------------
+
+            // 1. Draw lines (only between active heap nodes)
+            for (let i = 0; i < N_active; i++) {
+                const parentCoords = getNodeCoordinates(i, N_original);
+                const leftChildIndex = 2 * i + 1;
+                const rightChildIndex = 2 * i + 2;
+
+                if (leftChildIndex < N_active) {
+                    const childCoords = getNodeCoordinates(leftChildIndex, N_original);
+                    treeContentHtml += createLine(parentCoords, childCoords);
+                }
+                if (rightChildIndex < N_active) {
+                    const childCoords = getNodeCoordinates(rightChildIndex, N_original);
+                    treeContentHtml += createLine(parentCoords, childCoords);
+                }
+            }
+            
+            // 2. Render Nodes (only for active heap nodes)
+            for (let i = 0; i < N_active; i++) {
+                const val = arr[i];
+                const coords = getNodeCoordinates(i, N_original);
+
+                let classes = 'heap-node font-mono text-sm bg-indigo-100 text-indigo-800';
+
+                // Apply highlights based on state
+                // Use the modified swapHighlightIndices array
+                if (swapHighlightIndices.includes(i)) {
+                    const isSwap = state.action.includes('Swapping') || state.action.includes('Extracting') || state.status === 'POST_SWAP_MOVE';
+                    
+                    // If we are in any swap/extract step, apply red/swap class
+                    if (isSwap) {
+                        classes = classes.replace('bg-indigo-100', 'bg-red-500 text-white highlight-swap');
+                    } else {
+                        // Standard comparison highlight (yellow)
+                        classes = classes.replace('bg-indigo-100', 'bg-yellow-400 text-gray-800 highlight-compare');
+                    }
+                } else if (state.rootIndex === i && state.phase === 'SORTING') {
+                    classes = classes.replace('bg-indigo-100', 'bg-blue-600 text-white highlight-root');
+                }
+                
+                // --- ASSIGN UNIQUE ID HERE FOR RELIABLE JAVASCRIPT SELECTION ---
+                treeContentHtml += `
+                    <div id="node-${i}" class="${classes}" data-index="${i}" style="
+                        left: ${coords.x - NODE_RADIUS}px;
+                        top: ${coords.y - NODE_RADIUS}px;
+                    ">
+                        <span class="text-lg font-bold">${val}</span>
+                        <span class="text-xs font-normal opacity-70">i=${i}</span>
+                    </div>
+                `;
+            }
+
+            heapContainer.style.minHeight = `${(numLevels * LEVEL_HEIGHT) + 50}px`;
+
+            // 3. Wrap content in a centered div
+            return `
+                <div class="relative" id="tree-wrapper" style="width: ${maxTotalWidth}px; margin: 0 auto; height: 100%;">
+                    ${treeContentHtml}
+                </div>
+            `;
+        }
+
+        // --- General Control Functions ---
+
+        function generateRandomArray(N) {
+            data = [];
+            for (let i = 0; i < N; i++) {
+                data.push(Math.floor(Math.random() * 90) + 10); // Numbers between 10 and 99
+            }
+        }
+        
+        // Helper to disable/enable controls during forced animation waits
+        function disableControlsDuringAnimation(disable) {
+            prevBtn.disabled = disable;
+            nextBtn.disabled = disable;
+            playBtn.disabled = disable;
+            resetBtn.disabled = disable;
+            arraySizeInput.disabled = disable;
+            document.querySelector('.flex button').disabled = disable; // Generate New Array button
+            sortOrderToggle.disabled = disable;
+        }
+
+        function init() {
+            stopAnimation();
+
+            const N = parseInt(arraySizeInput.value) || ARRAY_SIZE_DEFAULT;
+            if (N < 5 || N > 50) {
+                console.error('Error: Array size must be between 5 and 50.');
+                arraySizeInput.value = ARRAY_SIZE_DEFAULT;
+                return;
+            }
+            arraySizeInput.value = N;
+
+            generateRandomArray(N);
+            history = [];
+            currentStep = -1;
+
+            // Log initial state
+            logState('Initial Random Array', [], 'INITIAL', N, [], -1, [...data]); // Pass initial data as workingData for Step 0
+
+            // Run the algorithm to populate the history on a COPY of the data
+            (async () => {
+                await heapsort([...data]); 
+                currentStep = 0;
+                renderState();
+                playBtn.disabled = false;
+            })();
+        }
+        
+        function resetState() {
+            stopAnimation();
+            if (history.length > 0) {
+                currentStep = 0;
+                renderState();
+            }
+        }
+
+        function toggleSortOrder() {
+            isAscending = !isAscending;
+            sortOrderToggle.textContent = isAscending ? 'Ascending (Max-Heap)' : 'Descending (Min-Heap)';
+            sortOrderToggle.classList.toggle('bg-blue-500', isAscending);
+            sortOrderToggle.classList.toggle('bg-red-500', !isAscending);
+            init(); // Re-initialize with the new order
+        }
+
+       function nextStep() {
+    console.log('nextStep called:', { 
+        currentStep, 
+        historyLength: history.length, 
+        isPlaying,
+        currentPhase: currentStep >= 0 ? history[currentStep]?.phase : 'none'
+    });
+
+    // ADD SAFETY CHECK AT THE TOP
+    if (currentStep >= history.length - 1) {
+        console.log('Reached end of history, stopping animation');
+        stopAnimation();
+        return;
+    }
+    
+    const nextState = history[currentStep + 1];
+    const currentState = history[currentStep];
+
+    // IMPROVED: Better detection of swap steps
+    const isCurrentStepPreSwap = 
+        (currentState.action.includes('Swapping') || 
+         currentState.action.includes('Extracting') ||
+         currentState.action.includes('Placing')) && 
+        currentState.status !== 'POST_SWAP_MOVE';
+    
+    const isNextStepPostSwap = nextState.status === 'POST_SWAP_MOVE';
+
+    // --- CHECK FOR SWAP ANIMATION TRIGGER (Pre-Swap to Post-Swap) ---
+    if (isCurrentStepPreSwap && isNextStepPostSwap) {
+        console.log('SWAP ANIMATION TRIGGERED:', {
+            currentAction: currentState.action,
+            nextStatus: nextState.status,
+            highlightNodes: nextState.highlightNodes
+        });
+        
+        // 1. Advance to the POST-SWAP state (The state that defines the new end position)
+        currentStep++;
+        
+        // 2. Render the POST-SWAP state FIRST (this positions nodes at their final destinations)
+        renderState(); 
+        
+        // 3. Get the nodes at their NEW positions and animate them from OLD to NEW
+        const [fromIndex, toIndex] = nextState.highlightNodes; 
+        
+        // 4. Temporarily reposition nodes to their OLD positions for animation start
+        const N_original = data.length;
+        const p1_coords = getNodeCoordinates(fromIndex, N_original); // NEW position of node1
+        const p2_coords = getNodeCoordinates(toIndex, N_original);   // NEW position of node2
+        
+        const node1 = document.getElementById(`node-${fromIndex}`);
+        const node2 = document.getElementById(`node-${toIndex}`);
+        
+        if (node1 && node2) {
+            // Calculate the vector from new position to old position
+            const oldP1_coords = getNodeCoordinates(toIndex, N_original); // OLD position was where node2 is now
+            const oldP2_coords = getNodeCoordinates(fromIndex, N_original); // OLD position was where node1 is now
+            
+            const dx1 = oldP1_coords.x - p1_coords.x;
+            const dy1 = oldP1_coords.y - p1_coords.y;
+            const dx2 = oldP2_coords.x - p2_coords.x;
+            const dy2 = oldP2_coords.y - p2_coords.y;
+            
+            // Position nodes at their OLD locations to start animation
+            node1.style.transform = `translate(${dx1}px, ${dy1}px)`;
+            node2.style.transform = `translate(${dx2}px, ${dy2}px)`;
+            
+            // Store start positions for animation
+            node1._startX = dx1;
+            node1._startY = dy1;
+            node2._startX = dx2;
+            node2._startY = dy2;
+            
+            node1.classList.add('animating-node');
+            node2.classList.add('animating-node');
+            
+            console.log('Animation setup complete:', { fromIndex, toIndex, dx1, dy1, dx2, dy2 });
+        } else {
+            console.log('Nodes not found for animation:', { fromIndex, toIndex, node1: !!node1, node2: !!node2 });
+        }
+
+        // 5. Trigger the animation back to their NEW positions
+        requestAnimationFrame(() => {
+            animateSwapTransition(fromIndex, toIndex);
+        });
+
+        // 6. Pause the recursive loop for the duration of the animation
+        if (isPlaying) {
+            clearTimeout(animationTimeout);
+            
+            setTimeout(() => {
+                if (isPlaying && currentStep < history.length - 1) {
+                    // FIX: Advance to the next step AFTER animation completes
+                    currentStep++; // This was missing!
+                    console.log('Animation complete, advancing to step:', currentStep + 1);
+                    nextStep(); // Advance to the *next* comparison step
+                    startAnimation();
+                }
+            }, SWAP_ANIMATION_DURATION + 100);
+        }
+        
+        // 7. If in MANUAL mode, disable controls while the animation runs
+        else {
+            disableControlsDuringAnimation(true);
+            setTimeout(() => {
+                disableControlsDuringAnimation(false);
+                // Don't call nextStep() here for manual mode - let user click next
+                renderState(); // Final cleanup render
+            }, SWAP_ANIMATION_DURATION + 100);
+        }
+        
+        return; 
+    }
+    
+    // --- CHECK FOR MESSAGE PAUSE (Only triggered during autoplay) ---
+    const isMajorHeapCompletion = nextState.status === 'BUILD_COMPLETE_MESSAGE' || nextState.status === 'HEAP_MAINTENANCE_COMPLETE';
+    
+    if (isMajorHeapCompletion && isPlaying) {
+        console.log('MESSAGE PAUSE TRIGGERED:', nextState.status, 'at step', currentStep + 1);
+        isPausedForMessage = true;
+        clearTimeout(animationTimeout);
+        
+        // Advance to the message step first
+        currentStep++;
+        renderState();
+        
+        // 1.0 seconds pause for message visibility
+        setTimeout(() => {
+            if (isPlaying && isPausedForMessage) { 
+                isPausedForMessage = false;
+                console.log('Message pause complete, continuing to step:', currentStep + 1);
+                // Don't call nextStep() here - let the animation loop continue naturally
+                startAnimation();
+            }
+        }, 1000); 
+        return; // Exit here to wait for the message timeout
+    }
+    
+    // --- STANDARD STEP ADVANCE ---
+    else {
+        currentStep++;
+    }
+
+    renderState();
+
+    // Safety check to stop animation if we've reached the end
+    if (currentStep >= history.length - 1) {
+        stopAnimation();
+    }
+}
+
+        function prevStep() {
+            // Stop any ongoing animation loop before moving backward
+            if (isPlaying) stopAnimation();
+
+            if (currentStep > 0) {
+                // If moving backwards out of a paused state, ensure animation is stopped
+                if (history[currentStep].status === 'BUILD_COMPLETE_MESSAGE' || history[currentStep].status === 'HEAP_MAINTENANCE_COMPLETE') {
+                    // Check if the previous step was the POST_SWAP_MOVE, and go back two steps
+                    if (currentStep > 1 && history[currentStep - 1].status === 'POST_SWAP_MOVE') {
+                         currentStep -= 2;
+                    } else {
+                         currentStep--;
+                    }
+                } else if (history[currentStep].status === 'POST_SWAP_MOVE') {
+                     // If moving backward from a POST_SWAP_MOVE, go back one extra step to land on PRE-SWAP
+                     currentStep -= 2;
+                } else {
+                    currentStep--;
+                }
+                currentStep = Math.max(0, currentStep); // Ensure we don't go below 0
+                renderState();
+            }
+        }
+
+
+
+
+let animationInterval = null; // Add this global variable
+
+function startAnimation() {
+    // DON'T set isPlaying = true here
+    playText.textContent = 'Pause';
+    
+    animationInterval = setInterval(() => {
+        if (currentStep < history.length - 1) {
+            nextStep();
+        } else {
+            stopAnimation();
+        }
+    }, 600);
+}
+
+function stopAnimation() {
+    if (animationInterval) {
+        clearInterval(animationInterval);
+        animationInterval = null;
+    }
+    playText.textContent = 'Play';
+}
+
+function playPause() {
+    if (animationInterval) {
+        // We're already playing, so pause
+        stopAnimation();
+    } else {
+        // We're not playing, so start
+        startAnimation();
+    }
+}
+
+
+
+
+        /**
+         * Renders the current state of the arrays and the heap tree.
+         */
+        function renderState() {
+            if (history.length === 0 || currentStep < 0) return;
+
+            const state = history[currentStep];
+            const initialArr = history[0].workingArray; // The fixed, original array
+            const workingArr = state.workingArray; // The array being sorted
+            const N = initialArr.length; 
+
+            // --- Update UI Controls ---
+            const isPausedByMe = isPausedForMessage && isPlaying;
+            prevBtn.disabled = currentStep === 0 || isPlaying && !isPausedByMe; 
+            nextBtn.disabled = currentStep === history.length - 1 || isPlaying && !isPausedByMe;
+            playBtn.disabled = state.phase === 'FINISHED';
+            resetBtn.disabled = isPlaying && !isPausedByMe; 
+
+            // --- Control Heap Complete Message Visibility (FIXED) ---
+            const isMajorHeapCompletion = state.status === 'BUILD_COMPLETE_MESSAGE' || state.status === 'HEAP_MAINTENANCE_COMPLETE';
+
+            if (isMajorHeapCompletion) {
+                messageDisplayCount++;
+                console.log(`MESSAGE DISPLAY #${messageDisplayCount}:`, state.status);
+                
+                let title = '';
+                let subtitle = '';
+
+                if (state.status === 'BUILD_COMPLETE_MESSAGE') {
+                    title = "INITIAL HEAP CONSTRUCTED!";
+                    subtitle = "The O(N) construction phase is complete. Sorting (extraction) begins now.";
+                } else if (state.status === 'HEAP_MAINTENANCE_COMPLETE') {
+                    title = "HEAP MAINTAINED!"; 
+                    subtitle = "Heap property restored. Ready for next extraction.";
+                }
+                
+                messageTitle.textContent = title;
+                messageSubtitle.textContent = subtitle;
+                
+                heapCompleteMessage.classList.remove('hidden');
+                
+                // Use requestAnimationFrame to ensure repaint occurs before transition starts
+                requestAnimationFrame(() => {
+                    messageContent.classList.remove('opacity-0');
+                    messageContent.classList.add('opacity-100', 'scale-105'); 
+                });
+            } else {
+                // Start fade-out transition by removing opacity
+                messageContent.classList.remove('opacity-100', 'scale-105');
+                messageContent.classList.add('opacity-0');
+                
+                // Wait for transition to finish (350ms for safety) before applying 'hidden'
+                setTimeout(() => {
+                    // Only hide the parent if the message is indeed faded out
+                    if (messageContent.classList.contains('opacity-0')) {
+                        heapCompleteMessage.classList.add('hidden');
+                    }
+                }, 350);
+            }
+            // ------------------------------------------------
+
+            // --- Update Status and Explanation ---
+            let statusText = '';
+            let explanationHtml = '';
+            let phaseDescription = isAscending ? 'Max-Heap' : 'Min-Heap';
+
+            if (state.phase === 'INITIAL') {
+                statusText = 'Phase 0: Initial State';
+                explanationHtml = `Step ${currentStep + 1} of ${history.length}. Action: ${state.action}`;
+            }
+            else if (state.phase === 'BUILD_HEAP') {
+                statusText = `Phase 1: Building ${phaseDescription} (${state.heapSize} elements)`;
+                explanationHtml = `Step ${currentStep + 1} of ${history.length}. Action: ${state.action}`;
+            }
+            else if (state.status === 'BUILD_COMPLETE_MESSAGE') {
+                 statusText = `Phase 1 Complete: ${phaseDescription} Built`;
+                explanationHtml = `Step ${currentStep + 1} of ${history.length}. <b>INITIAL HEAP CONSTRUCTED!</b> ${isPausedByMe ? "Auto-resuming in 1.0s or click 'Next Step'." : ""}`;
+            }
+            else if (state.phase === 'SORTING') {
+                statusText = `Phase 2: Extracting Root and Sorting (Heap Size: ${state.heapSize})`;
+                explanationHtml = `Step ${currentStep + 1} of ${history.length}. Action: ${state.action}`;
+            }
+            else if (state.status === 'HEAP_MAINTENANCE_COMPLETE') {
+                statusText = `Phase 2: Heap Maintenance Complete`;
+                explanationHtml = `Step ${currentStep + 1} of ${history.length}. <b>HEAP MAINTAINED!</b> The next step will extract the new root. ${isPausedByMe ? "Auto-resuming in 1.0s or click 'Next Step'." : ""}`;
+            }
+            else if (state.phase === 'FINISHED') {
+                statusText = 'Algorithm Complete! Array is Sorted.';
+                
+                // Complexity Calculation
+                const actualSteps = history.length;
+                const NLogN = (N * Math.log2(N)); 
+                const NLogN_Rounded = NLogN.toFixed(0);
+                
+                explanationHtml = `
+                    The Heapsort algorithm has finished in <b>${actualSteps} steps</b> (recorded dominant operations).
+                    <br>
+                    The theoretical time complexity is <b>O(N log N)</b>. 
+                    <br>
+                    For N=${N}, the complexity factor (N log₂ N) is approximately <b>${NLogN_Rounded}</b>. The recorded steps are expected to be proportional to this factor.
+                `;
+            }
+            
+            // Check for the animation steps to display appropriate text
+            if (state.status === 'POST_SWAP_MOVE') {
+                statusEl.textContent = 'Animation Step';
+                explanationEl.innerHTML = 'Step to complete the physical swap transition.';
+            } else if (state.action.includes('Swapping') || state.action.includes('Extracting')) {
+                // Pre-swap step
+                 statusEl.textContent = 'Swap Preparation';
+                 explanationEl.innerHTML = `Step ${currentStep + 1} of ${history.length}. Action: ${state.action}`;
+            } else {
+                // All other steps
+                statusEl.textContent = statusText;
+                explanationEl.innerHTML = explanationHtml;
+            }
+
+            // --- Value-Based Highlighting Setup ---
+            // Get the values currently fixed in the sorted section of the working array
+            const sortedValues = state.sortedIndices.map(i => workingArr[i]);
+            const consumedSortedValues = [...sortedValues]; // Copy to consume for one-to-one mapping
+
+            // --- Render Input Array (Static, Value-Based Highlighting) ---
+            arrayContainer.innerHTML = initialArr.map((val, i) => {
+                let classes = 'flex flex-col items-center justify-center p-2 rounded-lg font-mono text-sm shadow-md transition-all duration-500 w-10 h-10 bg-gray-200 text-gray-800';
+                
+                // Find if the current value exists in the consumedSortedValues list
+                const valueIndex = consumedSortedValues.indexOf(val);
+
+                if (valueIndex !== -1) {
+                    // If found, apply green highlight and consume the value from the list
+                    classes = classes.replace('bg-gray-200', 'bg-green-600 text-white highlight-sorted');
+                    consumedSortedValues.splice(valueIndex, 1); // Consume it so duplicates aren't over-highlighted
+                }
+
+                return `
+                    <div class="${classes}">
+                        <span class="font-bold">${val}</span>
+                        <span class="text-xs opacity-70">i=${i}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // --- Render Output Array ---
+            const outputElements = [];
+            
+            for (let i = 0; i < N; i++) {
+                let val = '';
+                let classes = 'flex items-center justify-center p-2 rounded-lg font-mono text-lg font-bold shadow-md w-10 h-10 bg-gray-300 text-gray-800 opacity-30';
+
+                if (state.sortedIndices.includes(i)) {
+                    // Use the value from the sorted position in the working array
+                    val = workingArr[i]; 
+                    classes = 'flex items-center justify-center p-2 rounded-lg font-mono text-lg font-bold shadow-md w-10 h-10 bg-green-600 text-white transition-all duration-500';
+                } else {
+                    val = '-';
+                }
+
+                outputElements.push(`
+                    <div class="${classes}">
+                        ${val}
+                    </div>
+                `);
+            }
+            outputArrayContainer.innerHTML = outputElements.join('');
+
+            // --- Render Heap Tree ---
+            heapContainer.innerHTML = renderHeapTree(workingArr, state);
+
+            // -----------------------------------------------------------------------------------
+            // Dynamic Width Adjustment based on Tree Size
+            const numLevels = Math.ceil(Math.log2(N + 1));
+            const maxBottomNodes = Math.pow(2, numLevels - 1);
+            const requiredWidth = (maxBottomNodes * 2 * BASE_H_UNIT);
+            
+            // Set minimum width for the entire application wrapper (#app)
+            appContainer.style.minWidth = `${requiredWidth + 300}px`; 
+            // -----------------------------------------------------------------------------------
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            init();
+        };
+
+    </script>
+</body>
+</html>
