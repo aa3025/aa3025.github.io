@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assignment Marker Pro</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- JSZip for batch downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .drop-zone {
+            transition: all 0.2s ease;
+            border: 2px dashed #d1d5db;
+        }
+        .drop-zone.drag-over {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.2s; }
+        .modal-exit { opacity: 1; transform: scale(1); }
+        .modal-exit-active { opacity: 0; transform: scale(0.95); transition: all 0.2s; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-gray-800">
+
+    <!-- Top Navigation -->
+    <header class="bg-white border-b border-gray-200 h-16 flex-none flex items-center justify-between px-6 z-10">
+        <div class="flex items-center gap-3">
+            <div class="bg-blue-600 p-2 rounded-lg text-white">
+                <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight">AI Assignment Marker</h1>
+                <p class="text-xs text-gray-500">Automated Marking Assistant</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+                <select id="model-select" class="bg-transparent border-none outline-none text-gray-700 font-medium text-xs cursor-pointer focus:ring-0">                        
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                    <option value="gemini-3-pro">Gemini 3 Pro</option>
+                </select>
+            </div>
+            <button onclick="app.toggleSettings()" class="p-2 hover:bg-gray-100 rounded-full text-gray-600 transition-colors" title="Settings">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar: Configuration & Marker Info -->
+        <aside class="w-80 bg-white border-r border-gray-200 flex flex-col flex-none overflow-y-auto z-20 shadow-lg transform transition-transform duration-300 -translate-x-full absolute md:relative md:translate-x-0 h-full" id="sidebar">
+            <div class="p-5 space-y-6">
+                
+                <!-- Marker Identity Section -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="user-check" class="w-4 h-4"></i> Marker Identity
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="marker-name" class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. Dr. Jane Smith">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Title/Role</label>
+                            <input type="text" id="marker-title" class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. Senior Lecturer">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Institution</label>
+                            <input type="text" id="marker-institution" class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. University of Example">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="marker-attribution" class="rounded text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                            <label for="marker-attribution" class="text-xs text-gray-700">Include attribution in feedback</label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100">
+
+                <!-- API Configuration -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="key" class="w-4 h-4"></i> API Configuration
+                    </h3>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Gemini API Key</label>
+                        <input type="password" id="api-key" class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="AIzaSy...">
+                        <p class="text-[10px] text-gray-500 mt-1">Key is stored locally in your browser.</p>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100">
+
+                <!-- Marking Parameters -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-4 h-4"></i> Parameters
+                    </h3>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-700">Strictness</span>
+                            <span class="text-gray-500" id="strictness-label">Standard</span>
+                        </div>
+                        <input type="range" id="strictness" min="1" max="5" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                            <span>Lenient</span>
+                            <span>Strict</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-700">Temperature</span>
+                            <span class="text-gray-500" id="temperature-label">0.3</span>
+                        </div>
+                        <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    
+                    <!-- NEW BUTTON ADDED HERE -->
+                    <div class="pt-2">
+                        <button onclick="app.togglePromptEditor()" class="w-full flex items-center justify-center gap-2 text-xs text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-md py-2 font-medium transition-colors">
+                            <i data-lucide="eye" class="w-3 h-3"></i> View / Edit Prompt
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-auto p-4 bg-gray-50 border-t border-gray-200">
+                <button onclick="app.resetAll()" class="w-full flex items-center justify-center gap-2 text-xs text-red-600 hover:text-red-700 font-medium py-2">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i> Clear All Data
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col min-w-0 bg-gray-50/50">
+            
+            <!-- Dashboard Stats & Project Loaders -->
+            <div class="p-6 space-y-6 overflow-y-auto">
+                
+                <!-- Status Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-500 uppercase">Total Scripts</p>
+                            <h3 class="text-2xl font-bold text-gray-900" id="stat-total">0</h3>
+                        </div>
+                        <div class="bg-blue-50 text-blue-600 p-2.5 rounded-lg">
+                            <i data-lucide="files" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-500 uppercase">Marked</p>
+                            <h3 class="text-2xl font-bold text-green-600" id="stat-marked">0</h3>
+                        </div>
+                        <div class="bg-green-50 text-green-600 p-2.5 rounded-lg">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-500 uppercase">Pending</p>
+                            <h3 class="text-2xl font-bold text-orange-600" id="stat-pending">0</h3>
+                        </div>
+                        <div class="bg-orange-50 text-orange-600 p-2.5 rounded-lg">
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-500 uppercase">Avg Score</p>
+                            <h3 class="text-2xl font-bold text-purple-600" id="stat-avg">-</h3>
+                        </div>
+                        <div class="bg-purple-50 text-purple-600 p-2.5 rounded-lg">
+                            <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Inputs Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Scripts Loader -->
+                    <div class="lg:col-span-1 space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">1. Student Scripts (PDF)</label>
+                        <div class="drop-zone border-dashed border-2 border-gray-300 rounded-xl p-6 text-center bg-white cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors h-32 flex flex-col justify-center items-center relative" id="drop-scripts">
+                            <input type="file" multiple accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.handleFiles(this.files, 'script')">
+                            <i data-lucide="upload-cloud" class="w-8 h-8 text-gray-400 mb-2"></i>
+                            <p class="text-sm text-gray-600 font-medium">Drop PDFs here</p>
+                            <p class="text-xs text-gray-400 mt-1">or click to browse</p>
+                        </div>
+                    </div>
+
+                    <!-- Brief Loader -->
+                    <div class="lg:col-span-1 space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">2. Assignment Brief (PDF)</label>
+                        <div class="drop-zone border-dashed border-2 border-gray-300 rounded-xl p-6 text-center bg-white cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors h-32 flex flex-col justify-center items-center relative" id="drop-brief">
+                            <input type="file" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.handleFiles(this.files, 'brief')">
+                            <div id="brief-status-icon"><i data-lucide="file-text" class="w-8 h-8 text-gray-400 mb-2"></i></div>
+                            <p class="text-sm text-gray-600 font-medium" id="brief-name">Upload Brief</p>
+                            <p class="text-xs text-gray-400 mt-1" id="brief-sub">Required context</p>
+                        </div>
+                    </div>
+
+                    <!-- Marking Scheme Loader -->
+                    <div class="lg:col-span-1 space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 flex justify-between">
+                            <span>3. Marking Scheme (TXT)</span>
+                            <button onclick="app.toggleSchemeEditor()" class="text-xs text-blue-600 hover:underline">Edit</button>
+                        </label>
+                        <div class="drop-zone border-dashed border-2 border-gray-300 rounded-xl p-6 text-center bg-white cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-colors h-32 flex flex-col justify-center items-center relative" id="drop-scheme">
+                            <input type="file" accept=".txt" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.handleFiles(this.files, 'scheme')">
+                            <div id="scheme-status-icon"><i data-lucide="list-checks" class="w-8 h-8 text-gray-400 mb-2"></i></div>
+                            <p class="text-sm text-gray-600 font-medium" id="scheme-name">Upload Scheme</p>
+                            <p class="text-xs text-gray-400 mt-1" id="scheme-sub">Or paste in editor</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Bar -->
+                <div class="bg-white p-3 rounded-lg border border-gray-200 flex flex-wrap gap-2 items-center justify-between sticky top-0 z-10 shadow-sm">
+                    <div class="flex items-center gap-2">
+                        <button onclick="app.toggleSelectAll()" class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors">
+                            Select All
+                        </button>
+                        <span class="text-gray-300">|</span>
+                        <span class="text-xs text-gray-500" id="selection-count">0 selected</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <button onclick="app.exportCSV()" class="px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-2" title="Export Grades">
+                            <i data-lucide="sheet" class="w-3 h-3"></i> CSV
+                        </button>
+                        <button onclick="app.downloadZip()" class="px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-2" title="Download All HTML">
+                            <i data-lucide="download" class="w-3 h-3"></i> ZIP
+                        </button>
+                        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+                        <button onclick="app.processBatch()" id="btn-mark-selected" class="px-4 py-1.5 text-xs font-bold text-white bg-blue-600 rounded hover:bg-blue-700 shadow-sm flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i data-lucide="play" class="w-3 h-3"></i> Mark Selected
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Scripts Table -->
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
+                                    <input type="checkbox" id="header-checkbox" onclick="app.toggleSelectAll()" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="scripts-table-body">
+                            <!-- Rows injected here -->
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
+                                    No scripts loaded. Drag and drop PDF files to begin.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Marking Scheme Editor Modal -->
+    <div id="scheme-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="app.toggleSchemeEditor()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Marking Scheme Editor</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 mb-2">Define your criteria, max marks, and guidance below.</p>
+                                <textarea id="scheme-textarea" class="w-full h-96 p-4 border border-gray-300 rounded-md font-mono text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Paste or type your marking scheme here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="app.saveScheme()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Save Changes
+                    </button>
+                    <button type="button" onclick="app.toggleSchemeEditor()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Prompt Preview & Editor Modal -->
+    <div id="prompt-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="prompt-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="app.togglePromptEditor()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="prompt-modal-title">Prompt Preview & Editor</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 mb-2">This is the text prompt that will be sent to the AI (along with the attached PDFs). You can edit this to customize instructions for all subsequent marking.</p>
+                                <textarea id="prompt-textarea" class="w-full h-96 p-4 border border-gray-300 rounded-md font-mono text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50" placeholder="Generating prompt..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="button" onclick="app.savePrompt()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm">
+                        Save & Use This Prompt
+                    </button>
+                    <button type="button" onclick="app.resetPrompt()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:w-auto sm:text-sm">
+                        Reset to Default
+                    </button>
+                    <button type="button" onclick="app.togglePromptEditor()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- Configuration & State ---
+        const CONSTANTS = {
+            MODELS: {
+                'gemini-3-pro': 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent',
+                'gemini-2.5-flash': 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent'
+            },
+            LOCAL_STORAGE_KEY: 'ai_marker_app_state',
+        };
+
+        const appState = {
+            scripts: {}, // Map of filename -> { file, status, marks, feedback, selected, timestamp }
+            brief: null, // { file, name }
+            scheme: null, // { content, name }
+            processing: false,
+            markerInfo: {
+                name: '',
+                title: '',
+                institution: '',
+                attribution: true
+            },
+            settings: {
+                apiKey: '',
+                strictness: 3,
+                temperature: 0.3,
+                model: 'gemini-3-pro' // Default model
+            },
+            customPrompt: null // Stores the overridden prompt if user edits it
+        };
+
+        // --- Core Application Object ---
+        const app = {
+            init() {
+                this.loadState();
+                this.renderScriptsTable();
+                this.updateStats();
+                lucide.createIcons();
+                
+                // Event Listeners for Settings
+                ['marker-name', 'marker-title', 'marker-institution'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', (e) => {
+                        appState.markerInfo[id.replace('marker-', '')] = e.target.value;
+                        this.saveState();
+                    });
+                });
+                
+                document.getElementById('marker-attribution').addEventListener('change', (e) => {
+                    appState.markerInfo.attribution = e.target.checked;
+                    this.saveState();
+                });
+
+                document.getElementById('api-key').addEventListener('input', (e) => {
+                    appState.settings.apiKey = e.target.value;
+                    this.saveState();
+                });
+
+                document.getElementById('strictness').addEventListener('input', (e) => {
+                    appState.settings.strictness = e.target.value;
+                    const labels = ['Very Lenient', 'Lenient', 'Standard', 'Strict', 'Very Strict'];
+                    document.getElementById('strictness-label').textContent = labels[e.target.value - 1];
+                    this.saveState();
+                });
+
+                document.getElementById('temperature').addEventListener('input', (e) => {
+                    appState.settings.temperature = e.target.value;
+                    document.getElementById('temperature-label').textContent = e.target.value;
+                    this.saveState();
+                });
+
+                // Model Selector Listener
+                document.getElementById('model-select').addEventListener('change', (e) => {
+                    appState.settings.model = e.target.value;
+                    this.saveState();
+                });
+            },
+
+            loadState() {
+                const saved = localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // Merge saved settings/marker info. We don't load files from local storage due to browser security (files are ephemeral)
+                    appState.markerInfo = { ...appState.markerInfo, ...parsed.markerInfo };
+                    appState.settings = { ...appState.settings, ...parsed.settings };
+                    appState.scheme = parsed.scheme;
+                    appState.customPrompt = parsed.customPrompt || null;
+
+                    // Ensure default model if not present in saved state
+                    if (!appState.settings.model) appState.settings.model = 'gemini-3-pro';
+
+                    // Restore UI Inputs
+                    document.getElementById('marker-name').value = appState.markerInfo.name || '';
+                    document.getElementById('marker-title').value = appState.markerInfo.title || '';
+                    document.getElementById('marker-institution').value = appState.markerInfo.institution || '';
+                    document.getElementById('marker-attribution').checked = appState.markerInfo.attribution;
+                    document.getElementById('api-key').value = appState.settings.apiKey || '';
+                    document.getElementById('model-select').value = appState.settings.model;
+                    
+                    if (appState.scheme) {
+                        document.getElementById('scheme-textarea').value = appState.scheme.content;
+                        this.updateSchemeUI(true);
+                    }
+                }
+            },
+
+            saveState() {
+                const toSave = {
+                    markerInfo: appState.markerInfo,
+                    settings: appState.settings,
+                    scheme: appState.scheme,
+                    customPrompt: appState.customPrompt
+                };
+                localStorage.setItem(CONSTANTS.LOCAL_STORAGE_KEY, JSON.stringify(toSave));
+            },
+
+            // --- File Handling ---
+            handleFiles(files, type) {
+                if (!files.length) return;
+
+                if (type === 'script') {
+                    Array.from(files).forEach(file => {
+                        if (file.type !== 'application/pdf') return;
+                        if (!appState.scripts[file.name]) {
+                            appState.scripts[file.name] = {
+                                file: file,
+                                status: 'pending', // pending, processing, marked, error
+                                marks: null,
+                                feedback: null,
+                                selected: true,
+                                id: Math.random().toString(36).substr(2, 9)
+                            };
+                        }
+                    });
+                    this.renderScriptsTable();
+                } else if (type === 'brief') {
+                    const file = files[0];
+                    if (file.type !== 'application/pdf') {
+                        alert('Brief must be a PDF.');
+                        return;
+                    }
+                    appState.brief = { file: file, name: file.name };
+                    document.getElementById('brief-name').textContent = file.name;
+                    document.getElementById('brief-sub').textContent = (file.size / 1024).toFixed(1) + ' KB';
+                    document.getElementById('brief-status-icon').innerHTML = `<i data-lucide="check-circle" class="w-8 h-8 text-green-500 mb-2"></i>`;
+                    lucide.createIcons();
+                } else if (type === 'scheme') {
+                    const file = files[0];
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        appState.scheme = { content: e.target.result, name: file.name };
+                        document.getElementById('scheme-textarea').value = e.target.result;
+                        // Important: Clear custom prompt so new scheme is used
+                        appState.customPrompt = null;
+                        this.saveState();
+                        this.updateSchemeUI(true);
+                    };
+                    reader.readAsText(file);
+                }
+                this.updateStats();
+            },
+
+            updateSchemeUI(loaded) {
+                const name = appState.scheme ? (appState.scheme.name || 'Custom Scheme') : 'Upload Scheme';
+                document.getElementById('scheme-name').textContent = name;
+                document.getElementById('scheme-sub').textContent = loaded ? 'Ready' : 'Or paste in editor';
+                document.getElementById('scheme-status-icon').innerHTML = loaded 
+                    ? `<i data-lucide="check-circle" class="w-8 h-8 text-green-500 mb-2"></i>`
+                    : `<i data-lucide="list-checks" class="w-8 h-8 text-gray-400 mb-2"></i>`;
+                lucide.createIcons();
+            },
+
+            toggleSchemeEditor() {
+                const modal = document.getElementById('scheme-modal');
+                modal.classList.toggle('hidden');
+                if (!modal.classList.contains('hidden')) {
+                    // Populate if empty
+                    const val = document.getElementById('scheme-textarea').value;
+                    if(!val) {
+                         document.getElementById('scheme-textarea').value = "Example Scheme:\n\n1. Introduction (10 marks)\n- Clear thesis statement (5)\n- Overview of topic (5)\n\n2. Analysis (20 marks)\n...";
+                    }
+                }
+            },
+
+            saveScheme() {
+                const content = document.getElementById('scheme-textarea').value;
+                appState.scheme = { content: content, name: 'Custom_Scheme.txt' };
+                // Important: Clear custom prompt so new scheme is used
+                appState.customPrompt = null;
+                this.saveState();
+                this.updateSchemeUI(true);
+                this.toggleSchemeEditor();
+            },
+
+            // --- Prompt Editing Logic ---
+            togglePromptEditor() {
+                const modal = document.getElementById('prompt-modal');
+                modal.classList.toggle('hidden');
+                
+                if (!modal.classList.contains('hidden')) {
+                    // Load existing custom prompt OR generate one from current settings
+                    const text = appState.customPrompt || this.generatePromptText();
+                    document.getElementById('prompt-textarea').value = text;
+                }
+            },
+
+            savePrompt() {
+                const text = document.getElementById('prompt-textarea').value;
+                appState.customPrompt = text;
+                this.saveState();
+                this.togglePromptEditor();
+            },
+
+            resetPrompt() {
+                appState.customPrompt = null;
+                const text = this.generatePromptText();
+                document.getElementById('prompt-textarea').value = text;
+                // Note: We don't close modal, just update text area so they can see default
+            },
+
+            generatePromptText() {
+                const strictnessLabels = ["Very Lenient", "Lenient", "Standard", "Strict", "Very Strict"];
+                const sVal = parseInt(appState.settings.strictness) || 3;
+                const strictness = strictnessLabels[sVal - 1];
+                
+                const attributionContext = appState.markerInfo.attribution 
+                    ? `IMPORTANT: In the overall_feedback field, you MUST start with exactly: "This assignment has been marked by ${appState.markerInfo.name} with the assistance of AI."` 
+                    : `IMPORTANT: In the overall_feedback field, start with: "This assignment has been marked with AI assistance."`;
+                
+                const schemeContent = appState.scheme ? appState.scheme.content : "[MARKING SCHEME CONTENT WILL BE INSERTED HERE IF LOADED]";
+
+                return `SYSTEM ROLE: You are an expert academic marker with 20 years of experience.
+                                    
+Your task is to mark a student assignment PDF against a provided Marking Scheme and Assignment Brief.
+
+MARKING PARAMETERS:
+- Strictness Level: ${strictness}
+- Marker Name: ${appState.markerInfo.name || '[Please Enter Marker Name]'}
+
+INSTRUCTIONS:
+1. Review the Student Submission PDF thoroughly (text, formulas, diagrams).
+2. Apply the Marking Scheme criteria.
+3. Reference specific evidence from the PDF (page/paragraph).
+4. Calculate marks precisely based on the marking scheme criteria. Apply critique approach thoroughly. Each mark must be backed up by compliance to marking scheme exactly!
+5. Total mark above 70 must be rarely given, only for outstanding work!
+
+${attributionContext}
+
+MARKING SCHEME CONTENT:
+${schemeContent}
+
+JSON OUTPUT REQUIRED:
+You MUST return ONLY valid JSON with this exact structure (no markdown):
+{
+  "metadata": { "student_id": "string", "processing_date": "ISOString" },
+  "marks_breakdown": [
+    {
+      "section": "string",
+      "criteria": [
+        { "description": "string", "max_marks": number, "awarded_marks": number, "feedback": "string", "evidence": "string", "strengths": ["string"], "weaknesses": ["string"] }
+      ],
+      "section_total": { "awarded": number, "max_possible": number }
+    }
+  ],
+  "summary": {
+    "total_marks_awarded": number,
+    "total_marks_possible": number,
+    "overall_percentage": number,
+    "grade": "string",
+    "band": "string",
+    "overall_feedback": "string",
+    "key_strengths": ["string"],
+    "areas_for_improvement": ["string"],
+    "recommendations": ["string"]
+  }
+}`;
+            },
+
+            // --- UI Rendering ---
+            renderScriptsTable() {
+                const tbody = document.getElementById('scripts-table-body');
+                tbody.innerHTML = '';
+                const files = Object.values(appState.scripts);
+
+                if (files.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">No scripts loaded. Drag and drop PDF files to begin.</td></tr>`;
+                    document.getElementById('selection-count').textContent = '0 selected';
+                    return;
+                }
+
+                let selectedCount = 0;
+
+                files.forEach(script => {
+                    const tr = document.createElement('tr');
+                    tr.className = script.selected ? 'bg-blue-50/30' : '';
+                    
+                    if (script.selected) selectedCount++;
+
+                    let statusBadge = '';
+                    let actionButtons = '';
+                    let scoreDisplay = '-';
+
+                    switch(script.status) {
+                        case 'pending':
+                            statusBadge = `<span class="status-badge bg-gray-100 text-gray-600">Not Marked</span>`;
+                            actionButtons = `
+                                <button onclick="app.markSingle('${script.file.name}')" class="text-blue-600 hover:text-blue-900 text-xs font-medium mr-2">Mark</button>
+                                <button onclick="app.deleteScript('${script.file.name}')" class="text-red-600 hover:text-red-900 text-xs font-medium">Delete</button>
+                            `;
+                            break;
+                        case 'processing':
+                            statusBadge = `<span class="status-badge bg-orange-100 text-orange-700 animate-pulse">Processing...</span>`;
+                            actionButtons = `<span class="text-xs text-gray-400">Please wait</span>`;
+                            break;
+                        case 'marked':
+                            statusBadge = `<span class="status-badge bg-green-100 text-green-700">Marked</span>`;
+                            scoreDisplay = `<span class="font-bold text-gray-900">${script.marks.total}/${script.marks.max}</span> <span class="text-xs text-gray-500">(${script.marks.percentage}%)</span>`;
+                            actionButtons = `
+                                <button onclick="app.viewResult('${script.file.name}')" class="text-indigo-600 hover:text-indigo-900 text-xs font-medium mr-2">View</button>
+                                <button onclick="app.markSingle('${script.file.name}')" class="text-gray-500 hover:text-gray-900 text-xs font-medium mr-2">Re-mark</button>
+                                <button onclick="app.deleteScript('${script.file.name}')" class="text-red-600 hover:text-red-900 text-xs font-medium">Delete</button>
+                            `;
+                            break;
+                        case 'error':
+                            statusBadge = `<span class="status-badge bg-red-100 text-red-700">Error</span>`;
+                            actionButtons = `
+                                <button onclick="app.markSingle('${script.file.name}')" class="text-blue-600 hover:text-blue-900 text-xs font-medium mr-2">Retry</button>
+                                <button onclick="app.deleteScript('${script.file.name}')" class="text-red-600 hover:text-red-900 text-xs font-medium">Delete</button>
+                            `;
+                            break;
+                    }
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <input type="checkbox" ${script.selected ? 'checked' : ''} onchange="app.toggleSelect('${script.file.name}')" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <i data-lucide="file-text" class="flex-shrink-0 h-5 w-5 text-gray-400 mr-3"></i>
+                                <div class="text-sm font-medium text-gray-900 truncate max-w-xs" title="${script.file.name}">${script.file.name}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${scoreDisplay}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">${actionButtons}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('selection-count').textContent = `${selectedCount} selected`;
+                document.getElementById('header-checkbox').checked = selectedCount === files.length;
+                document.getElementById('btn-mark-selected').disabled = selectedCount === 0 || appState.processing;
+                lucide.createIcons();
+            },
+
+            toggleSelect(filename) {
+                if (appState.scripts[filename]) {
+                    appState.scripts[filename].selected = !appState.scripts[filename].selected;
+                    this.renderScriptsTable();
+                }
+            },
+
+            toggleSelectAll() {
+                const files = Object.values(appState.scripts);
+                const allSelected = files.every(f => f.selected);
+                files.forEach(f => f.selected = !allSelected);
+                this.renderScriptsTable();
+            },
+
+            deleteScript(filename) {
+                delete appState.scripts[filename];
+                this.renderScriptsTable();
+                this.updateStats();
+            },
+
+            resetAll() {
+                if(confirm("Are you sure? This will delete all local data and loaded files.")) {
+                    localStorage.removeItem(CONSTANTS.LOCAL_STORAGE_KEY);
+                    location.reload();
+                }
+            },
+            
+            toggleSettings() {
+                 const sidebar = document.getElementById('sidebar');
+                 if (sidebar.classList.contains('-translate-x-full')) {
+                     sidebar.classList.remove('-translate-x-full');
+                 } else {
+                     sidebar.classList.add('-translate-x-full');
+                 }
+            },
+
+            updateStats() {
+                const files = Object.values(appState.scripts);
+                document.getElementById('stat-total').textContent = files.length;
+                document.getElementById('stat-marked').textContent = files.filter(f => f.status === 'marked').length;
+                document.getElementById('stat-pending').textContent = files.filter(f => f.status === 'pending').length;
+                
+                const marked = files.filter(f => f.status === 'marked');
+                if (marked.length > 0) {
+                    const avg = marked.reduce((acc, curr) => acc + curr.marks.percentage, 0) / marked.length;
+                    document.getElementById('stat-avg').textContent = avg.toFixed(1) + '%';
+                } else {
+                    document.getElementById('stat-avg').textContent = '-';
+                }
+            },
+
+            // --- AI Logic ---
+            async markSingle(filename) {
+                if (!appState.settings.apiKey) {
+                    alert("Please enter your Gemini API Key in the settings panel.");
+                    this.toggleSettings();
+                    return;
+                }
+                if (!appState.markerInfo.name) {
+                    alert("Please enter the Marker Name in the settings panel before proceeding.");
+                    this.toggleSettings();
+                    return;
+                }
+                if (!appState.brief) {
+                    alert("Please upload an Assignment Brief.");
+                    return;
+                }
+                if (!appState.scheme) {
+                    alert("Please upload or create a Marking Scheme.");
+                    return;
+                }
+
+                const script = appState.scripts[filename];
+                if (!script) return;
+
+                script.status = 'processing';
+                this.renderScriptsTable();
+
+                try {
+                    // 1. Prepare Data
+                    const scriptBase64 = await this.fileToBase64(script.file);
+                    const briefBase64 = await this.fileToBase64(appState.brief.file);
+                    
+                    // 2. Build Prompt (Custom or Generated)
+                    const promptText = appState.customPrompt || this.generatePromptText();
+                    
+                    // 3. Select Model URL
+                    const modelKey = appState.settings.model || 'gemini-3-pro';
+                    const apiUrl = CONSTANTS.MODELS[modelKey];
+
+                    const prompt = {
+                        contents: [
+                            {
+                                role: "user",
+                                parts: [
+                                    { text: promptText },
+                                    { inlineData: { mimeType: "application/pdf", data: briefBase64 } }, // Brief
+                                    { inlineData: { mimeType: "application/pdf", data: scriptBase64 } }  // Student Script
+                                ]
+                            }
+                        ],
+                        generationConfig: {
+                            temperature: parseFloat(appState.settings.temperature),
+                            responseMimeType: "application/json"
+                        }
+                    };
+
+                    // 4. Call API
+                    const response = await fetch(`${apiUrl}?key=${appState.settings.apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(prompt)
+                    });
+
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+
+                    const data = await response.json();
+                    const textResponse = data.candidates[0].content.parts[0].text;
+                    const jsonResult = JSON.parse(textResponse);
+
+                    // 5. Update State
+                    script.status = 'marked';
+                    script.marks = {
+                        total: jsonResult.summary.total_marks_awarded,
+                        max: jsonResult.summary.total_marks_possible,
+                        percentage: jsonResult.summary.overall_percentage
+                    };
+                    script.feedback = jsonResult; // Store full JSON
+                    script.html = this.generateHTML(script, jsonResult); // Pre-generate HTML
+
+                } catch (error) {
+                    console.error("Marking Error:", error);
+                    script.status = 'error';
+                }
+
+                this.renderScriptsTable();
+                this.updateStats();
+                return script.status === 'marked';
+            },
+
+            async processBatch() {
+                const toMark = Object.values(appState.scripts).filter(s => s.selected && s.status !== 'processing');
+                if (toMark.length === 0) return;
+
+                appState.processing = true;
+                this.renderScriptsTable(); // Disable buttons
+
+                for (const script of toMark) {
+                    // Check if stopped (user unchecked processing, though UI blocks this, good safety)
+                    if (!appState.processing) break;
+                    
+                    const success = await this.markSingle(script.file.name);
+                    
+                    // Simple rate limit avoidance
+                    if (success && toMark.length > 1) {
+                        await new Promise(r => setTimeout(r, 2000));
+                    }
+                }
+
+                appState.processing = false;
+                this.renderScriptsTable();
+            },
+
+            // --- Utilities ---
+            fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        // Remove "data:application/pdf;base64," prefix
+                        const base64 = reader.result.split(',')[1];
+                        resolve(base64);
+                    };
+                    reader.onerror = error => reject(error);
+                });
+            },
+
+            viewResult(filename) {
+                const script = appState.scripts[filename];
+                if (!script || !script.html) return;
+                
+                const win = window.open('', '_blank');
+                win.document.write(script.html);
+                win.document.close();
+            },
+
+            downloadZip() {
+                const zip = new JSZip();
+                const markedScripts = Object.values(appState.scripts).filter(s => s.status === 'marked');
+                
+                if (markedScripts.length === 0) {
+                    alert("No marked scripts to download.");
+                    return;
+                }
+
+                markedScripts.forEach(script => {
+                    const name = script.file.name.replace('.pdf', '_marked.html');
+                    zip.file(name, script.html);
+                });
+
+                zip.generateAsync({type:"blob"}).then(function(content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = "Marked_Assignments.zip";
+                    link.click();
+                });
+            },
+            
+            exportCSV() {
+                const markedScripts = Object.values(appState.scripts).filter(s => s.status === 'marked');
+                if (markedScripts.length === 0) {
+                    alert("No marked scripts to export.");
+                    return;
+                }
+                
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Filename,Student ID,Total Marks,Max Marks,Percentage,Grade,Band\n";
+                
+                markedScripts.forEach(s => {
+                    const sum = s.feedback.summary;
+                    const row = [
+                        s.file.name,
+                        sum.metadata?.student_id || "N/A",
+                        sum.total_marks_awarded,
+                        sum.total_marks_possible,
+                        sum.overall_percentage,
+                        sum.grade,
+                        sum.band
+                    ].map(field => `"${field}"`).join(",");
+                    csvContent += row + "\n";
+                });
+                
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "grades_export.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+
+            generateHTML(script, json) {
+                const mi = appState.markerInfo;
+                const d = new Date();
+                const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+                
+                const modelName = appState.settings.model === 'gemini-3-pro' ? 'Gemini 3 Pro' : 'Gemini 2.5 Flash';
+
+                let breakdownHTML = '';
+                json.marks_breakdown.forEach(section => {
+                    let criteriaHTML = '';
+                    section.criteria.forEach(c => {
+                        criteriaHTML += `
+                            <div class="criteria-item">
+                                <div class="criteria-header">
+                                    <span class="criteria-title">${c.description}</span>
+                                    <span class="criteria-score">${c.awarded_marks}/${c.max_marks}</span>
+                                </div>
+                                <div class="criteria-body">
+                                    <p><strong>Feedback:</strong> ${c.feedback}</p>
+                                    ${c.evidence ? `<p class="evidence"><em>Evidence: ${c.evidence}</em></p>` : ''}
+                                    ${c.strengths && c.strengths.length ? `<p class="micro-list"><span class="tag success">Strength</span> ${c.strengths.join(', ')}</p>` : ''}
+                                    ${c.weaknesses && c.weaknesses.length ? `<p class="micro-list"><span class="tag warn">Improvement</span> ${c.weaknesses.join(', ')}</p>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    breakdownHTML += `
+                        <div class="section-block">
+                            <h3 class="section-title">${section.section} <span style="float:right">${section.section_total.awarded}/${section.section_total.max_possible}</span></h3>
+                            ${criteriaHTML}
+                        </div>
+                    `;
+                });
+
+                return `<!DOCTYPE html>
+<html>
+<head>
+    <title>Marking Sheet: ${json.metadata.student_id || 'Student'}</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 40px; background: #f9fafb; }
+        .sheet-container { background: white; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; border-top: 6px solid #2563eb; }
+        header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
+        h1 { color: #1e293b; margin: 0 0 10px 0; }
+        .metadata { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9rem; color: #64748b; }
+        .grade-card { background: #eff6ff; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 30px; display: flex; justify-content: space-around; align-items: center; border: 1px solid #dbeafe; }
+        .score { font-size: 2.5rem; font-weight: bold; color: #1e40af; }
+        .percentage { font-size: 1.5rem; color: #3b82f6; }
+        .grade-badge { background: #2563eb; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+        
+        h2 { color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-top: 30px; }
+        .section-block { margin-bottom: 25px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
+        .section-title { background: #f8fafc; padding: 10px 15px; margin: 0; font-size: 1.1rem; border-bottom: 1px solid #e2e8f0; color: #0f172a; }
+        .criteria-item { padding: 15px; border-bottom: 1px dashed #e2e8f0; }
+        .criteria-item:last-child { border-bottom: none; }
+        .criteria-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; }
+        .criteria-score { background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; }
+        .evidence { color: #64748b; font-size: 0.9rem; margin-top: 5px; }
+        .tag { font-size: 0.75rem; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-right: 5px; }
+        .tag.success { background: #dcfce7; color: #166534; }
+        .tag.warn { background: #fee2e2; color: #991b1b; }
+        .micro-list { font-size: 0.9rem; margin: 5px 0 0 0; }
+        
+        .feedback-box { background: #f0fdf4; padding: 20px; border-radius: 8px; border: 1px solid #dcfce7; margin-bottom: 20px; }
+        .attribution { font-size: 0.9rem; color: #475569; font-style: italic; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #bbf7d0; }
+        
+        footer { margin-top: 50px; text-align: center; font-size: 0.8rem; color: #94a3b8; border-top: 1px solid #eee; padding-top: 20px; }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .sheet-container { box-shadow: none; border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sheet-container">
+        <header>
+            <h1>Assignment Marking Sheet</h1>
+            <div class="metadata">
+                <div><strong>Student ID:</strong> ${json.metadata.student_id || 'Extracted from Filename'}</div>
+                <div><strong>File:</strong> ${script.file.name}</div>
+                <div><strong>Date Marked:</strong> ${dateStr}</div>
+                <div><strong>Marker:</strong> ${mi.name} ${mi.title ? `(${mi.title})` : ''}</div>
+                <div><strong>Institution:</strong> ${mi.institution || 'N/A'}</div>
+                <div><strong>Model:</strong> ${modelName}</div>
+            </div>
+        </header>
+
+        <section class="summary">
+            <div class="grade-card">
+                <div>
+                    <div class="label" style="font-size:0.8rem; text-transform:uppercase; color:#64748b; margin-bottom:5px;">Total Score</div>
+                    <div class="score">${json.summary.total_marks_awarded} / ${json.summary.total_marks_possible}</div>
+                </div>
+                <div>
+                     <div class="label" style="font-size:0.8rem; text-transform:uppercase; color:#64748b; margin-bottom:5px;">Percentage</div>
+                    <div class="percentage">${json.summary.overall_percentage}%</div>
+                </div>
+                <div>
+                     <div class="label" style="font-size:0.8rem; text-transform:uppercase; color:#64748b; margin-bottom:5px;">Grade Band</div>
+                    <div class="grade-badge">${json.summary.grade} - ${json.summary.band}</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="feedback">
+            <h2>Overall Feedback</h2>
+            <div class="feedback-box">
+                <div class="attribution">
+                    ${json.summary.overall_feedback.split('.')[0]}. <!-- First sentence is attribution -->
+                </div>
+                <p>${json.summary.overall_feedback.substring(json.summary.overall_feedback.indexOf('.') + 1)}</p>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div>
+                    <h3>Key Strengths</h3>
+                    <ul>
+                        ${json.summary.key_strengths.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                </div>
+                <div>
+                    <h3>Areas for Improvement</h3>
+                    <ul>
+                        ${json.summary.areas_for_improvement.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+             <div>
+                <h3>Recommendations</h3>
+                 <ul>
+                    ${json.summary.recommendations ? json.summary.recommendations.map(s => `<li>${s}</li>`).join('') : '<li>No specific recommendations.</li>'}
+                </ul>
+            </div>
+        </section>
+
+        <section class="detailed-marks">
+            <h2>Detailed Breakdown</h2>
+            ${breakdownHTML}
+        </section>
+
+        <footer>
+            <p>Generated by automated marking system: Reviewed by ${mi.name}</p>
+            <p>THIS SYSTEM PROVIDES AI-ASSISTED MARKING WITH HUMAN OVERSIGHT. ALL MARKS SHOULD BE REVIEWED AND VERIFIED.</p>
+        </footer>
+    </div>
+</body>
+</html>`;
+            }
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
