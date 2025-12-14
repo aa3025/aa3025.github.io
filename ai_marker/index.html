@@ -401,7 +401,7 @@
                 apiKey: '',
                 strictness: 3,
                 temperature: 0.3,
-                model: 'gemini-3-pro' // Default model
+                model: 'gemini-2.5-flash' // Default model
             },
             customPrompt: null // Stores the overridden prompt if user edits it
         };
@@ -463,7 +463,7 @@
                     appState.customPrompt = parsed.customPrompt || null;
 
                     // Ensure default model if not present in saved state
-                    if (!appState.settings.model) appState.settings.model = 'gemini-3-pro';
+                    if (!appState.settings.model) appState.settings.model = 'gemini-2.5-flash';
 
                     // Restore UI Inputs
                     document.getElementById('marker-name').value = appState.markerInfo.name || '';
@@ -816,7 +816,7 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                     const promptText = appState.customPrompt || this.generatePromptText();
                     
                     // 3. Select Model URL
-                    const modelKey = appState.settings.model || 'gemini-3-pro';
+                    const modelKey = appState.settings.model || 'gemini-2.5-flash';
                     const apiUrl = CONSTANTS.MODELS[modelKey];
 
                     const prompt = {
@@ -836,14 +836,44 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                         }
                     };
 
-                    // 4. Call API
-                    const response = await fetch(`${apiUrl}?key=${appState.settings.apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(prompt)
-                    });
+                    // 4. Call API with Retry Logic
+                    const maxRetries = 3;
+                    let attempt = 0;
+                    let response;
+                    let success = false;
+                    
+                    while (attempt <= maxRetries) {
+                        try {
+                            response = await fetch(`${apiUrl}?key=${appState.settings.apiKey}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(prompt)
+                            });
 
-                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                            if (response.status === 429) {
+                                throw new Error("429"); // Trigger retry
+                            }
+                            
+                            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                            
+                            success = true;
+                            break; // Success, exit loop
+                        } catch (e) {
+                            attempt++;
+                            if (e.message === "429" && attempt <= maxRetries) {
+                                const waitTime = Math.pow(2, attempt) * 2000; // 2s, 4s, 8s...
+                                console.warn(`Rate limit hit. Retrying in ${waitTime}ms...`);
+                                // Update status to show retrying
+                                script.status = 'processing';
+                                this.renderScriptsTable(); // Simple refresh to keep UI responsive
+                                await new Promise(r => setTimeout(r, waitTime));
+                                continue;
+                            }
+                            throw e; // Re-throw other errors
+                        }
+                    }
+
+                    if (!success) throw new Error("Failed after retries");
 
                     const data = await response.json();
                     const textResponse = data.candidates[0].content.parts[0].text;
@@ -882,9 +912,9 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                     
                     const success = await this.markSingle(script.file.name);
                     
-                    // Simple rate limit avoidance
+                    // Rate limit avoidance - Increased for safety
                     if (success && toMark.length > 1) {
-                        await new Promise(r => setTimeout(r, 2000));
+                        await new Promise(r => setTimeout(r, 5000));
                     }
                 }
 
@@ -1054,7 +1084,7 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                 <div><strong>Date Marked:</strong> ${dateStr}</div>
                 <div><strong>Marker:</strong> ${mi.name} ${mi.title ? `(${mi.title})` : ''}</div>
                 <div><strong>Institution:</strong> ${mi.institution || 'N/A'}</div>
-                <div><strong>Model:</strong> ${modelName}</div>
+                
             </div>
         </header>
 
