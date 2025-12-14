@@ -13,6 +13,7 @@ INSTRUCTIONS:
 4. Calculate marks precisely based on the marking scheme criteria. Apply critique approach thoroughly. Each mark must be backed up by compliance to marking scheme exactly!
 5. Total mark above 70 must be rarely given, only for outstanding work! Avoid using words like "exceptional", "highly professional" etc in your feedback if not full marks are given.
 6. If marks are deduced for any section, the feedback must be given why the mark is deduced.
+7. In all of the feedback use UK British English spelling.
 
 IMPORTANT: In the overall_feedback field, you MUST start with exactly: "This assignment has been marked by Test Marker with the assistance of computer intelligence."
 
