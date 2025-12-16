@@ -2,7 +2,7 @@
 
 MARKING INSTRUCTIONS:
 1. Review the Student Submission PDF thoroughly (text, formulas, diagrams, tables).
-2. Make sure that the work submitted corresponds to the assignment brief, if not (i.e. wrong script submitted, obvious plagiarism), give zero mark straight away.
+2. Make sure that the work submitted corresponds to the assignment brief, if not (i.e. wrong script submitted, obvious plagiarism, traces of AI being used unethically), give zero mark straight away.
 3. Do not assume that you need to invent anything on behalf of the student, i.e. do not fill in the gaps in their submission.
 3. Apply the Marking Scheme criteria listed below in the tables for each section or question.
 4. Reference specific evidence from the PDF (page/paragraph).
