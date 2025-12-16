@@ -70,7 +70,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-lg leading-tight">AI Assignment Marker</h1>
-                <p class="text-xs text-gray-500">Automated Marking Assistant</p>
+                <p class="text-xs text-gray-500">Automated Marking & Moderation Assistant</p>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -158,7 +158,6 @@
                         <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                     </div>
                     
-                    <!-- NEW BUTTON ADDED HERE -->
                     <div class="pt-2">
                         <button onclick="app.togglePromptEditor()" class="w-full flex items-center justify-center gap-2 text-xs text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-md py-2 font-medium transition-colors">
                             <i data-lucide="eye" class="w-3 h-3"></i> View / Edit Prompt
@@ -228,7 +227,7 @@
                     <div class="lg:col-span-1 space-y-2">
                         <label class="block text-sm font-medium text-gray-700">1. Student Scripts (PDF) <span> <a href="https://aa3025.github.io/ai_marker/Student_1234567_example.pdf" target="_blank" style="text-decoration: underline;">Example Script</a></span></label>
                         <div class="drop-zone border-dashed border-2 border-gray-300 rounded-xl p-6 text-center bg-white cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors h-32 flex flex-col justify-center items-center relative" id="drop-scripts">
-                            <input type="file" multiple accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.handleFiles(this.files, 'script')">
+                            <input type="file" multiple accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.handleFiles(this.files, 'script', this)">
                             <i data-lucide="upload-cloud" class="w-8 h-8 text-gray-400 mb-2"></i>
                             <p class="text-sm text-gray-600 font-medium">Drop PDFs here</p>
                             <p class="text-xs text-gray-400 mt-1">or click to browse</p>
@@ -237,9 +236,14 @@
 
                     <!-- Brief Loader -->
                     <div class="lg:col-span-1 space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">2. Assignment Brief (PDF)</label>
+                        <label class="block text-sm font-medium text-gray-700 flex justify-between">
+                            <span>2. Assignment Brief (PDF)</span>
+                            <button onclick="app.suggestMarkingScheme()" class="text-xs text-blue-600 hover:underline flex items-center gap-1" title="Generate Marking Scheme from Brief">
+                                <i data-lucide="sparkles" class="w-3 h-3"></i> Suggest MS
+                            </button>
+                        </label>
                         <div class="drop-zone border-dashed border-2 border-gray-300 rounded-xl p-6 text-center bg-white cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors h-32 flex flex-col justify-center items-center relative" id="drop-brief">
-                            <input type="file" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.handleFiles(this.files, 'brief')">
+                            <input type="file" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.handleFiles(this.files, 'brief', this)">
                             <div id="brief-status-icon"><i data-lucide="file-text" class="w-8 h-8 text-gray-400 mb-2"></i></div>
                             <p class="text-sm text-gray-600 font-medium" id="brief-name">Upload Brief</p>
                             <p class="text-xs text-gray-400 mt-1" id="brief-sub">Required context</p>
@@ -253,7 +257,7 @@
                             <button onclick="app.toggleSchemeEditor()" class="text-xs text-blue-600 hover:underline">Edit</button>
                         </label>
                         <div class="drop-zone border-dashed border-2 border-gray-300 rounded-xl p-6 text-center bg-white cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-colors h-32 flex flex-col justify-center items-center relative" id="drop-scheme">
-                            <input type="file" accept=".txt" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.handleFiles(this.files, 'scheme')">
+                            <input type="file" accept=".txt" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="app.handleFiles(this.files, 'scheme', this)">
                             <div id="scheme-status-icon"><i data-lucide="list-checks" class="w-8 h-8 text-gray-400 mb-2"></i></div>
                             <p class="text-sm text-gray-600 font-medium" id="scheme-name">Upload Scheme</p>
                             <p class="text-xs text-gray-400 mt-1" id="scheme-sub">Or paste in editor</p>
@@ -279,6 +283,9 @@
                             <i data-lucide="download" class="w-3 h-3"></i> ZIP
                         </button>
                         <div class="h-6 w-px bg-gray-300 mx-1"></div>
+                        <button onclick="app.processBatchModeration()" id="btn-moderate-selected" class="px-4 py-1.5 text-xs font-bold text-white bg-purple-600 rounded hover:bg-purple-700 shadow-sm flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i data-lucide="shield-check" class="w-3 h-3"></i> Moderate Selected
+                        </button>
                         <button onclick="app.processBatch()" id="btn-mark-selected" class="px-4 py-1.5 text-xs font-bold text-white bg-blue-600 rounded hover:bg-blue-700 shadow-sm flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                             <i data-lucide="play" class="w-3 h-3"></i> Mark Selected
                         </button>
@@ -295,14 +302,15 @@
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Name</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marker Score</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mod Score</th>
                                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200" id="scripts-table-body">
                             <!-- Rows injected here -->
                             <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
+                                <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">
                                     No scripts loaded. Drag and drop PDF files to begin.
                                 </td>
                             </tr>
@@ -387,7 +395,7 @@
         };
 
         const appState = {
-            scripts: {}, // Map of filename -> { file, status, marks, feedback, selected, timestamp }
+            scripts: {}, // Map of filename -> { file, status, marks, feedback, moderation, selected, timestamp }
             brief: null, // { file, name }
             scheme: null, // { content, name }
             processing: false,
@@ -491,7 +499,7 @@
             },
 
             // --- File Handling ---
-            handleFiles(files, type) {
+            handleFiles(files, type, inputElement) {
                 if (!files.length) return;
 
                 if (type === 'script') {
@@ -500,9 +508,10 @@
                         if (!appState.scripts[file.name]) {
                             appState.scripts[file.name] = {
                                 file: file,
-                                status: 'pending', // pending, processing, marked, error
+                                status: 'pending', // pending, processing, marked, moderated, error
                                 marks: null,
                                 feedback: null,
+                                moderation: null,
                                 selected: true,
                                 id: Math.random().toString(36).substr(2, 9)
                             };
@@ -533,6 +542,12 @@
                     };
                     reader.readAsText(file);
                 }
+                
+                // Clear the input value to allow re-uploading the same file if changed
+                if (inputElement) {
+                    inputElement.value = '';
+                }
+                
                 this.updateStats();
             },
 
@@ -568,6 +583,87 @@
                 this.toggleSchemeEditor();
             },
 
+            async suggestMarkingScheme() {
+                if (!appState.settings.apiKey) {
+                    alert("Please enter your Gemini API Key in the settings panel first.");
+                    app.toggleSettings();
+                    return;
+                }
+                if (!appState.brief) {
+                    alert("Please upload an Assignment Brief first.");
+                    return;
+                }
+
+                // Show loading state
+                const link = document.querySelector('button[title="Generate Marking Scheme from Brief"]');
+                const originalText = link.innerHTML;
+                link.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Generating...`;
+                lucide.createIcons();
+
+                try {
+                    const briefBase64 = await this.fileToBase64(appState.brief.file);
+                    
+                    const promptText = `SYSTEM ROLE: You are a Senior Academic Quality Officer. 
+                    
+YOUR TASK: Create a detailed, fair, and robust Marking Scheme based on the attached Assignment Brief.
+
+REQUIREMENTS:
+1. Extract the marks breakdown from the brief.
+2. For each section/question, create detailed criteria for high, medium, and low marks.
+3. INCLUDE STRICT RULES:
+   - "Zero marks must be awarded if the submission is incoherent, AI-generated nonsense, or completely unrelated to the brief."
+   - "Marks above 70% are reserved for outstanding work that exceeds expectations."
+   - Explicitly state what constitutes a "Fail" (<40%), "Pass" (40-49%), "2:2" (50-59%), "2:1" (60-69%), and "1st" (70+).
+4. Format the output as clear text that can be directly used as a Marking Scheme file. Do not include introductory conversational text.`;
+
+                    const modelKey = appState.settings.model || 'gemini-2.5-flash';
+                    const apiUrl = CONSTANTS.MODELS[modelKey];
+
+                    const prompt = {
+                        contents: [{
+                            role: "user",
+                            parts: [
+                                { text: promptText },
+                                { inlineData: { mimeType: "application/pdf", data: briefBase64 } }
+                            ]
+                        }],
+                        generationConfig: {
+                            temperature: 0.4,
+                            responseMimeType: "text/plain"
+                        }
+                    };
+
+                    const response = await fetch(`${apiUrl}?key=${appState.settings.apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(prompt)
+                    });
+
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+
+                    const data = await response.json();
+                    const suggestedScheme = data.candidates[0].content.parts[0].text;
+
+                    // Update editor and show
+                    document.getElementById('scheme-textarea').value = suggestedScheme;
+                    
+                    // Open the editor modal so user can review/edit/save
+                    const modal = document.getElementById('scheme-modal');
+                    if (modal.classList.contains('hidden')) {
+                        this.toggleSchemeEditor();
+                    }
+                    
+                    alert("Marking Scheme suggested! Please review and click 'Save Changes'.");
+
+                } catch (error) {
+                    console.error("Scheme Generation Error:", error);
+                    alert("Failed to generate marking scheme. Check API key and console.");
+                } finally {
+                    link.innerHTML = originalText;
+                    lucide.createIcons();
+                }
+            },
+
             // --- Prompt Editing Logic ---
             togglePromptEditor() {
                 const modal = document.getElementById('prompt-modal');
@@ -575,7 +671,7 @@
                 
                 if (!modal.classList.contains('hidden')) {
                     // Load existing custom prompt OR generate one from current settings
-                    const text = appState.customPrompt || this.generatePromptText();
+                    const text = appState.customPrompt || this.generatePromptText('marking');
                     document.getElementById('prompt-textarea').value = text;
                 }
             },
@@ -589,24 +685,65 @@
 
             resetPrompt() {
                 appState.customPrompt = null;
-                const text = this.generatePromptText();
+                const text = this.generatePromptText('marking');
                 document.getElementById('prompt-textarea').value = text;
                 // Note: We don't close modal, just update text area so they can see default
             },
 
-            generatePromptText() {
+            generatePromptText(mode = 'marking', existingMarks = null) {
                 const strictnessLabels = ["Very Lenient", "Lenient", "Standard", "Strict", "Very Strict"];
                 const sVal = parseInt(appState.settings.strictness) || 3;
                 const strictness = strictnessLabels[sVal - 1];
                 
-                const attributionContext = appState.markerInfo.attribution 
-                    ? `IMPORTANT: In the overall_feedback field, you MUST start with exactly: "This assignment has been marked by ${appState.markerInfo.name} with the assistance of AI."` 
-                    : `IMPORTANT: In the overall_feedback field, start with: "This assignment has been marked with AI assistance."`;
-                
                 const schemeContent = appState.scheme ? appState.scheme.content : "[MARKING SCHEME CONTENT WILL BE INSERTED HERE IF LOADED]";
 
-                return `SYSTEM ROLE: You are an expert academic marker with 20 years of experience.
-                                    
+                if (mode === 'moderation') {
+                    // MODERATION PROMPT
+                    return `SYSTEM ROLE: You are an Expert Academic Moderator with 25 years of experience. Your task is to Review and Validate the marking of a student assignment.
+
+TASK:
+1. Review the Student Submission PDF.
+2. Review the Marking Scheme and Assignment Brief.
+3. Review the Marks and Feedback already awarded by the Marker (provided below).
+4. Determine if the marking was:
+   - Fair and Accurate
+   - Too Generous (Lenient)
+   - Too Harsh (Strict)
+5. Check if marks above 70% were truly for outstanding work.
+
+EXISTING MARKER FEEDBACK TO EVALUATE:
+Total Score: ${existingMarks.total}/${existingMarks.max} (${existingMarks.percentage}%)
+Overall Feedback: ${existingMarks.overall_feedback}
+
+JSON OUTPUT REQUIRED (Moderation Report):
+You MUST return ONLY valid JSON with this exact structure:
+{
+  "moderation_status": "Approved" | "Adjustment Recommended",
+  "fairness_rating": "Fair" | "Generous" | "Harsh",
+  "moderator_comments": "string",
+  "agreed_score": number, 
+  "score_difference": number,
+  "justification": "string",
+  "flag_for_review": boolean
+}`;
+                } else {
+                    // MARKING PROMPT (Standard)
+                    const attributionContext = appState.markerInfo.attribution 
+                        ? `IMPORTANT: In the overall_feedback field, you MUST start with exactly: "This assignment has been marked by ${appState.markerInfo.name} with the assistance of AI."` 
+                        : `IMPORTANT: In the overall_feedback field, start with: "This assignment has been marked with AI assistance."`;
+
+                    const strictnessInstruction = `
+MARKING GUIDELINES (CRITICAL):
+- This is an academic assessment. Be rigorous and objective.
+- Avoid grade inflation. High marks (70%+) must be earned through exceptional insight, not just meeting basic requirements.
+- Standard Performance (50-60%): Meets the basic requirements but lacks depth or critical analysis.
+- Good Performance (60-69%): Solid understanding, good analysis, but some limitations.
+- Excellent Performance (70%+): Outstanding insight, originality, and flawless execution.
+- CURRENT STRICTNESS SETTING: ${strictness.toUpperCase()}. Adjust your expectations accordingly.
+`;
+
+                    return `SYSTEM ROLE: You are an expert academic marker with 20 years of experience.
+                                        
 Your task is to mark a student assignment PDF against a provided Marking Scheme and Assignment Brief.
 
 MARKING PARAMETERS:
@@ -619,6 +756,7 @@ INSTRUCTIONS:
 3. Reference specific evidence from the PDF (page/paragraph).
 4. Calculate marks precisely based on the marking scheme criteria. Apply critique approach thoroughly. Each mark must be backed up by compliance to marking scheme exactly!
 5. Total mark above 70 must be rarely given, only for outstanding work!
+${strictnessInstruction}
 
 ${attributionContext}
 
@@ -650,6 +788,7 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
     "recommendations": ["string"]
   }
 }`;
+                }
             },
 
             // --- UI Rendering ---
@@ -659,7 +798,7 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                 const files = Object.values(appState.scripts);
 
                 if (files.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">No scripts loaded. Drag and drop PDF files to begin.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">No scripts loaded. Drag and drop PDF files to begin.</td></tr>`;
                     document.getElementById('selection-count').textContent = '0 selected';
                     return;
                 }
@@ -674,7 +813,8 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
 
                     let statusBadge = '';
                     let actionButtons = '';
-                    let scoreDisplay = '-';
+                    let markerScoreDisplay = '-';
+                    let modScoreDisplay = '-';
 
                     switch(script.status) {
                         case 'pending':
@@ -690,10 +830,23 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                             break;
                         case 'marked':
                             statusBadge = `<span class="status-badge bg-green-100 text-green-700">Marked</span>`;
-                            scoreDisplay = `<span class="font-bold text-gray-900">${script.marks.total}/${script.marks.max}</span> <span class="text-xs text-gray-500">(${script.marks.percentage}%)</span>`;
+                            markerScoreDisplay = `<span class="font-bold text-gray-900">${script.marks.total}/${script.marks.max}</span> <span class="text-xs text-gray-500">(${script.marks.percentage}%)</span>`;
                             actionButtons = `
                                 <button onclick="app.viewResult('${script.file.name}')" class="text-indigo-600 hover:text-indigo-900 text-xs font-medium mr-2">View</button>
+                                <button onclick="app.moderateSingle('${script.file.name}')" class="text-purple-600 hover:text-purple-900 text-xs font-medium mr-2">Moderate</button>
                                 <button onclick="app.markSingle('${script.file.name}')" class="text-gray-500 hover:text-gray-900 text-xs font-medium mr-2">Re-mark</button>
+                                <button onclick="app.deleteScript('${script.file.name}')" class="text-red-600 hover:text-red-900 text-xs font-medium">Delete</button>
+                            `;
+                            break;
+                        case 'moderated':
+                            const modStatus = script.moderation.fairness_rating;
+                            const modColor = modStatus === 'Fair' ? 'bg-purple-100 text-purple-700' : 'bg-yellow-100 text-yellow-700';
+                            statusBadge = `<span class="status-badge ${modColor}">Moderated: ${modStatus}</span>`;
+                            markerScoreDisplay = `<span class="font-bold text-gray-900">${script.marks.total}/${script.marks.max}</span>`;
+                            modScoreDisplay = `<span class="font-bold text-purple-700">${script.moderation.agreed_score}</span> <span class="text-xs text-gray-500">(${script.moderation.score_difference > 0 ? '+' : ''}${script.moderation.score_difference})</span>`;
+                            actionButtons = `
+                                <button onclick="app.viewResult('${script.file.name}')" class="text-indigo-600 hover:text-indigo-900 text-xs font-medium mr-2">View Report</button>
+                                <button onclick="app.moderateSingle('${script.file.name}')" class="text-gray-500 hover:text-gray-900 text-xs font-medium mr-2">Re-mod</button>
                                 <button onclick="app.deleteScript('${script.file.name}')" class="text-red-600 hover:text-red-900 text-xs font-medium">Delete</button>
                             `;
                             break;
@@ -717,7 +870,8 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${scoreDisplay}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${markerScoreDisplay}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${modScoreDisplay}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">${actionButtons}</td>
                     `;
                     tbody.appendChild(tr);
@@ -725,7 +879,15 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
 
                 document.getElementById('selection-count').textContent = `${selectedCount} selected`;
                 document.getElementById('header-checkbox').checked = selectedCount === files.length;
-                document.getElementById('btn-mark-selected').disabled = selectedCount === 0 || appState.processing;
+                
+                const btnMark = document.getElementById('btn-mark-selected');
+                const btnMod = document.getElementById('btn-moderate-selected');
+                
+                btnMark.disabled = selectedCount === 0 || appState.processing;
+                // Only enable moderation if at least one selected item is already marked or moderated
+                const canModerate = files.some(f => f.selected && (f.status === 'marked' || f.status === 'moderated'));
+                btnMod.disabled = !canModerate || appState.processing;
+                
                 lucide.createIcons();
             },
 
@@ -887,6 +1049,7 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                         percentage: jsonResult.summary.overall_percentage
                     };
                     script.feedback = jsonResult; // Store full JSON
+                    script.moderation = null; // Reset moderation if re-marking
                     script.html = this.generateHTML(script, jsonResult); // Pre-generate HTML
 
                 } catch (error) {
@@ -899,6 +1062,106 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                 return script.status === 'marked';
             },
 
+            // --- AI Logic (Moderation) ---
+            async moderateSingle(filename) {
+                if (!appState.settings.apiKey) return;
+                
+                const script = appState.scripts[filename];
+                if (!script || !script.feedback) {
+                    alert("Script must be marked before moderation.");
+                    return;
+                }
+
+                const previousStatus = script.status;
+                script.status = 'processing';
+                this.renderScriptsTable();
+
+                try {
+                    const scriptBase64 = await this.fileToBase64(script.file);
+                    const briefBase64 = await this.fileToBase64(appState.brief.file);
+                    
+                    // Generate Moderation Prompt
+                    // Pass existing marks to the prompt generator
+                    const existingMarks = {
+                        total: script.marks.total,
+                        max: script.marks.max,
+                        percentage: script.marks.percentage,
+                        overall_feedback: script.feedback.summary.overall_feedback
+                    };
+                    
+                    const promptText = this.generatePromptText('moderation', existingMarks);
+                    
+                    const modelKey = appState.settings.model || 'gemini-2.5-flash';
+                    const apiUrl = CONSTANTS.MODELS[modelKey];
+
+                    const prompt = {
+                        contents: [
+                            {
+                                role: "user",
+                                parts: [
+                                    { text: promptText },
+                                    { inlineData: { mimeType: "application/pdf", data: briefBase64 } }, // Brief
+                                    { inlineData: { mimeType: "application/pdf", data: scriptBase64 } }  // Student Script
+                                ]
+                            }
+                        ],
+                        generationConfig: {
+                            temperature: 0.2, // Lower temp for moderation to be more objective
+                            responseMimeType: "application/json"
+                        }
+                    };
+
+                    // Retry Logic (Same as marking)
+                    const maxRetries = 3;
+                    let attempt = 0;
+                    let response;
+                    let success = false;
+                    
+                    while (attempt <= maxRetries) {
+                        try {
+                            response = await fetch(`${apiUrl}?key=${appState.settings.apiKey}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(prompt)
+                            });
+
+                            if (response.status === 429) throw new Error("429");
+                            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                            success = true;
+                            break;
+                        } catch (e) {
+                            attempt++;
+                            if (e.message === "429" && attempt <= maxRetries) {
+                                const waitTime = Math.pow(2, attempt) * 2000;
+                                await new Promise(r => setTimeout(r, waitTime));
+                                continue;
+                            }
+                            throw e;
+                        }
+                    }
+
+                    if (!success) throw new Error("Failed after retries");
+
+                    const data = await response.json();
+                    const textResponse = data.candidates[0].content.parts[0].text;
+                    const jsonResult = JSON.parse(textResponse);
+
+                    script.status = 'moderated';
+                    script.moderation = jsonResult;
+                    // Regenerate HTML to include moderation report
+                    script.html = this.generateHTML(script, script.feedback, jsonResult);
+
+                } catch (error) {
+                    console.error("Moderation Error:", error);
+                    script.status = previousStatus; // Revert if failed
+                    alert("Moderation failed. Check console.");
+                }
+
+                this.renderScriptsTable();
+                this.updateStats();
+                return script.status === 'moderated';
+            },
+
             async processBatch() {
                 const toMark = Object.values(appState.scripts).filter(s => s.selected && s.status !== 'processing');
                 if (toMark.length === 0) return;
@@ -907,13 +1170,32 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                 this.renderScriptsTable(); // Disable buttons
 
                 for (const script of toMark) {
-                    // Check if stopped (user unchecked processing, though UI blocks this, good safety)
                     if (!appState.processing) break;
-                    
                     const success = await this.markSingle(script.file.name);
-                    
-                    // Rate limit avoidance - Increased for safety
                     if (success && toMark.length > 1) {
+                        await new Promise(r => setTimeout(r, 5000));
+                    }
+                }
+
+                appState.processing = false;
+                this.renderScriptsTable();
+            },
+
+            async processBatchModeration() {
+                // Filter for scripts that are SELECTED AND (MARKED OR MODERATED)
+                const toMod = Object.values(appState.scripts).filter(s => s.selected && (s.status === 'marked' || s.status === 'moderated') && s.status !== 'processing');
+                if (toMod.length === 0) {
+                    alert("Select marked scripts to moderate.");
+                    return;
+                }
+
+                appState.processing = true;
+                this.renderScriptsTable();
+
+                for (const script of toMod) {
+                    if (!appState.processing) break;
+                    const success = await this.moderateSingle(script.file.name);
+                    if (success && toMod.length > 1) {
                         await new Promise(r => setTimeout(r, 5000));
                     }
                 }
@@ -947,7 +1229,7 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
 
             downloadZip() {
                 const zip = new JSZip();
-                const markedScripts = Object.values(appState.scripts).filter(s => s.status === 'marked');
+                const markedScripts = Object.values(appState.scripts).filter(s => s.status === 'marked' || s.status === 'moderated');
                 
                 if (markedScripts.length === 0) {
                     alert("No marked scripts to download.");
@@ -968,17 +1250,18 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
             },
             
             exportCSV() {
-                const markedScripts = Object.values(appState.scripts).filter(s => s.status === 'marked');
+                const markedScripts = Object.values(appState.scripts).filter(s => s.status === 'marked' || s.status === 'moderated');
                 if (markedScripts.length === 0) {
                     alert("No marked scripts to export.");
                     return;
                 }
                 
                 let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += "Filename,Student ID,Total Marks,Max Marks,Percentage,Grade,Band\n";
+                csvContent += "Filename,Student ID,Total Marks,Max Marks,Percentage,Grade,Band,Moderation Status,Agreed Score\n";
                 
                 markedScripts.forEach(s => {
                     const sum = s.feedback.summary;
+                    const mod = s.moderation;
                     const row = [
                         s.file.name,
                         sum.metadata?.student_id || "N/A",
@@ -986,7 +1269,9 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                         sum.total_marks_possible,
                         sum.overall_percentage,
                         sum.grade,
-                        sum.band
+                        sum.band,
+                        mod ? mod.moderation_status : "Not Moderated",
+                        mod ? mod.agreed_score : sum.total_marks_awarded
                     ].map(field => `"${field}"`).join(",");
                     csvContent += row + "\n";
                 });
@@ -1000,7 +1285,7 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                 document.body.removeChild(link);
             },
 
-            generateHTML(script, json) {
+            generateHTML(script, json, moderationJson = null) {
                 const mi = appState.markerInfo;
                 const d = new Date();
                 const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
@@ -1034,6 +1319,39 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                         </div>
                     `;
                 });
+
+                let moderationHTML = '';
+                if (moderationJson) {
+                    const statusColor = moderationJson.moderation_status === 'Approved' ? '#dcfce7' : '#fee2e2';
+                    const statusText = moderationJson.moderation_status === 'Approved' ? '#166534' : '#991b1b';
+                    
+                    moderationHTML = `
+                        <section class="moderation" style="margin-bottom: 30px; border: 2px solid ${statusText}; border-radius: 8px; overflow: hidden;">
+                            <div style="background-color: ${statusText}; color: white; padding: 10px 20px; font-weight: bold; display: flex; justify-content: space-between;">
+                                <span>Moderation Report</span>
+                                <span>${moderationJson.moderation_status}</span>
+                            </div>
+                            <div style="padding: 20px; background-color: #fff;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase;">Fairness Rating</div>
+                                        <div style="font-weight: bold; font-size: 1.1rem;">${moderationJson.fairness_rating}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase;">Agreed Score</div>
+                                        <div style="font-weight: bold; font-size: 1.1rem;">${moderationJson.agreed_score}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase;">Difference</div>
+                                        <div style="font-weight: bold; font-size: 1.1rem;">${moderationJson.score_difference > 0 ? '+' : ''}${moderationJson.score_difference}</div>
+                                    </div>
+                                </div>
+                                <p><strong>Moderator Comments:</strong> ${moderationJson.moderator_comments}</p>
+                                <p><strong>Justification:</strong> ${moderationJson.justification}</p>
+                            </div>
+                        </section>
+                    `;
+                }
 
                 return `<!DOCTYPE html>
 <html>
@@ -1084,9 +1402,11 @@ You MUST return ONLY valid JSON with this exact structure (no markdown):
                 <div><strong>Date Marked:</strong> ${dateStr}</div>
                 <div><strong>Marker:</strong> ${mi.name} ${mi.title ? `(${mi.title})` : ''}</div>
                 <div><strong>Institution:</strong> ${mi.institution || 'N/A'}</div>
-                
+                <div><strong>Model:</strong> ${modelName}</div>
             </div>
         </header>
+
+        ${moderationHTML}
 
         <section class="summary">
             <div class="grade-card">

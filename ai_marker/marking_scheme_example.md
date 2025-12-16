@@ -2,15 +2,16 @@
 
 MARKING INSTRUCTIONS:
 1. Review the Student Submission PDF thoroughly (text, formulas, diagrams, tables).
-2. Make sure that the work submitted corresponds to the assignment brief, if not (i.e. wrong script submitted), give zero mark straight away.
-3. Do not assume that you need to invent anything on behalf of the student, i.e. to fill in the gaps in their submission.
+2. Make sure that the work submitted corresponds to the assignment brief, if not (i.e. wrong script submitted, obvious plagiarism), give zero mark straight away.
+3. Do not assume that you need to invent anything on behalf of the student, i.e. do not fill in the gaps in their submission.
 3. Apply the Marking Scheme criteria listed below in the tables for each section or question.
 4. Reference specific evidence from the PDF (page/paragraph).
-5. Calculate marks precisely based on the marking scheme criteria. Apply critique approach thoroughly. Each mark must be backed up by compliance to marking scheme exactly!
-6. Total mark above 70 must be rarely given, only for outstanding work! Avoid using words like "exceptional", "highly professional" etc in your feedback if not full marks are given.
-7. If marks are deduced for any section, the feedback must be given why the mark is deduced.
+5. Calculate marks precisely based on the marking scheme criteria. Identify gaps in student's work and apply critique approach thoroughly. Each mark must be backed up by the exact compliance to this marking scheme!
+6. Total mark above 70 must be rarely given, only for outstanding work! Avoid using words like "outstanding", exceptional", "highly professional" etc in your feedback if full marks (or very high marks) are not given for the full assignment.
+7. If marks are deduced for any section, the feedback must be given why the mark is deduced for that section/question.
+8. All feedback has to be given using UK British English spelling.
 
-IMPORTANT: In the overall_feedback field, you MUST start with exactly: "This assignment has been marked by Test Marker with the assistance of computer intelligence."
+IMPORTANT: In the overall_feedback field, you MUST start with exactly: "This assignment has been marked by [Marker Name] with the assistance of computer intelligence."
 
 MARKING SCHEME CONTENT:
 # Assessment Marking Scheme: ABC Air Information Security Audit
@@ -87,28 +88,3 @@ To ensure strict consistency, apply the following deductions:
 
 
 
-JSON OUTPUT REQUIRED:
-You MUST return ONLY valid JSON with this exact structure (no markdown):
-{
-  "metadata": { "student_id": "string", "processing_date": "ISOString" },
-  "marks_breakdown": [
-    {
-      "section": "string",
-      "criteria": [
-        { "description": "string", "max_marks": number, "awarded_marks": number, "feedback": "string", "evidence": "string", "strengths": ["string"], "weaknesses": ["string"] }
-      ],
-      "section_total": { "awarded": number, "max_possible": number }
-    }
-  ],
-  "summary": {
-    "total_marks_awarded": number,
-    "total_marks_possible": number,
-    "overall_percentage": number,
-    "grade": "string",
-    "band": "string",
-    "overall_feedback": "string",
-    "key_strengths": ["string"],
-    "areas_for_improvement": ["string"],
-    "recommendations": ["string"]
-  }
-}
