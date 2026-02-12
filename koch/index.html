@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaos Game Snowflake - Glow Edition</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        #ui {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            background: rgba(20, 20, 20, 0.7);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px);
+        }
+        .label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 4px;
+        }
+        .value {
+            font-size: 24px;
+            font-weight: 300;
+        }
+        #reset-hint {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 10px;
+            opacity: 0.4;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="snowflakeCanvas"></canvas>
+    <div id="reset-hint">CLICK TO RESTART</div>
+    <div id="ui">
+        <div class="label">Total Iterations</div>
+        <div id="pointCountDisplay" class="value">0</div>
+        <div class="label" style="margin-top: 10px;">Visual Style</div>
+        <div class="value" style="font-size: 14px; color: #a0d8ff;">Glow / Additive</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('snowflakeCanvas');
+        const ctx = canvas.getContext('2d');
+        const pointCountDisplay = document.getElementById('pointCountDisplay');
+
+        let width, height;
+        let animationId;
+        let vertices = [];
+        let currentPoint = { x: 0, y: 0 };
+        let iterations = 0;
+        
+        const config = {
+            N: 6,                
+            k: 2/3,              
+            pointsPerFrame: 200, // Slightly higher for faster build-up
+            pointSize: 0.6,      
+            glowBlur: 4,         // Size of the bloom
+            colorSpeed: 0.05,    // Cycle colors slowly
+            baseSizeRatio: 0.42   
+        };
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            reset();
+        }
+
+        window.addEventListener('resize', resize);
+        canvas.addEventListener('click', reset);
+
+        function reset() {
+            cancelAnimationFrame(animationId);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+            
+            iterations = 0;
+            setupChaosGame();
+            animate();
+        }
+
+        function setupChaosGame() {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) * config.baseSizeRatio;
+            
+            vertices = [];
+            for (let i = 0; i < config.N; i++) {
+                const angle = ((-30 + (360 / config.N) * i) * Math.PI) / 180;
+                vertices.push({
+                    x: centerX + radius * Math.cos(angle),
+                    y: centerY + radius * Math.sin(angle)
+                });
+            }
+
+            // Start at a random point
+            currentPoint = { 
+                x: Math.random() * width, 
+                y: Math.random() * height 
+            };
+        }
+
+        function animate() {
+            // Use 'lighter' so points stack their brightness
+            ctx.globalCompositeOperation = 'lighter';
+            
+            for (let i = 0; i < config.pointsPerFrame; i++) {
+                const targetIdx = Math.floor(Math.random() * config.N);
+                const target = vertices[targetIdx];
+
+                currentPoint.x = currentPoint.x + config.k * (target.x - currentPoint.x);
+                currentPoint.y = currentPoint.y + config.k * (target.y - currentPoint.y);
+
+                // Skip initial points to let attractor settle
+                if (iterations > 50) {
+                    const hue = (iterations * config.colorSpeed + 180) % 360; // Starting near blue/cyan
+                    const color = `hsla(${hue}, 80%, 60%, 0.5)`;
+                    
+                    ctx.fillStyle = color;
+                    
+                    // The "Glow" properties
+                    ctx.shadowBlur = config.glowBlur;
+                    ctx.shadowColor = color;
+                    
+                    ctx.beginPath();
+                    ctx.arc(currentPoint.x, currentPoint.y, config.pointSize, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                iterations++;
+            }
+
+            // Reset shadow after batch to avoid performance overhead on other UI elements if any
+            ctx.shadowBlur = 0;
+
+            pointCountDisplay.innerText = iterations.toLocaleString();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        resize();
+    </script>
+</body>
+</html>
