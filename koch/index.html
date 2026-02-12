@@ -29,6 +29,7 @@
             border-radius: 30px;
             border: 1px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(5px);
+            min-width: 150px;
         }
         .label {
             font-size: 12px;
@@ -40,6 +41,7 @@
         .value {
             font-size: 24px;
             font-weight: 200;
+            transition: color 0.3s ease;
         }
     </style>
 </head>
@@ -56,18 +58,21 @@
         const levelDisplay = document.getElementById('levelDisplay');
 
         let width, height;
-        let progress = 0; // The fractional iteration level (e.g., 2.5 means halfway between level 2 and 3)
-        let direction = 1; // 1 for growing, -1 for shrinking
+        let progress = 0; 
+        let direction = 1; 
+        let time = 0;
         
         // --- Configuration ---
         const config = {
-            maxLevel: 5,         // Maximum recursion depth
-            speed: 0.005,        // Speed of iteration growth
-            pauseTime: 120,      // Frames to pause at max/min level
-            baseSizeRatio: 0.7,  // Size of the snowflake relative to screen
-            lineWeight: 1.5,
-            glowColor: 'rgba(255, 255, 255, 0.4)',
-            glowBlur: 10
+            maxLevel: 6,         
+            speed: 0.0025,       
+            colorSpeed: 0.5,     // Speed of color rotation
+            pauseTime: 100,      
+            baseSizeRatio: 0.6,  
+            lineWeight: 2,
+            glowBlur: 25,
+            saturation: 100,
+            lightness: 70
         };
 
         let pauseCounter = 0;
@@ -80,33 +85,20 @@
         window.addEventListener('resize', resize);
         resize();
 
-        /**
-         * Calculates the points for the Koch curve with fractional support.
-         * For a fractional part, the middle "peak" of the Koch curve 
-         * gradually pushes out from the flat line.
-         */
         function getKochPoints(p1, p2, level) {
             if (level <= 0) {
                 return [p1, p2];
             }
 
-            // Vector between p1 and p2
             const dx = p2.x - p1.x;
             const dy = p2.y - p1.y;
 
-            // Divide segment into 3 parts
             const a = { x: p1.x, y: p1.y };
             const b = { x: p1.x + dx / 3, y: p1.y + dy / 3 };
             const d = { x: p1.x + 2 * dx / 3, y: p1.y + 2 * dy / 3 };
             const e = { x: p2.x, y: p2.y };
 
-            // Calculate the peak (point c)
-            // It's the tip of an equilateral triangle based on segment (b, d)
-            // For fractional levels, we scale the height of this peak from 0 to its full height
             const heightMultiplier = Math.min(1, level);
-            
-            // Standard height of equilateral triangle is side * sqrt(3)/2
-            // Since side is 1/3 of total length:
             const h = (Math.sqrt(3) / 6) * heightMultiplier;
             
             const c = {
@@ -115,13 +107,10 @@
             };
 
             if (level > 1) {
-                // Recursive step
                 const part1 = getKochPoints(a, b, level - 1);
                 const part2 = getKochPoints(b, c, level - 1);
                 const part3 = getKochPoints(c, d, level - 1);
                 const part4 = getKochPoints(d, e, level - 1);
-                
-                // Combine and remove duplicate joining points
                 return [...part1, ...part2.slice(1), ...part3.slice(1), ...part4.slice(1)];
             } else {
                 return [a, b, c, d, e];
@@ -133,31 +122,37 @@
 
             const size = Math.min(width, height) * config.baseSizeRatio;
             const centerX = width / 2;
-            const centerY = height / 2 + (size * 0.15); // Slight offset for visual balance
+            const centerY = height / 2 + (size * 0.15);
 
-            // Define the 3 corners of the initial equilateral triangle
             const h = size * Math.sqrt(3) / 2;
             const p1 = { x: centerX - size / 2, y: centerY + h / 3 };
             const p2 = { x: centerX + size / 2, y: centerY + h / 3 };
             const p3 = { x: centerX, y: centerY - 2 * h / 3 };
 
-            // Generate points for each side of the snowflake
             const side1 = getKochPoints(p1, p2, progress);
             const side2 = getKochPoints(p2, p3, progress);
             const side3 = getKochPoints(p3, p1, progress);
 
-            ctx.strokeStyle = '#fff';
+            // Calculate current color
+            const hue = (time * config.colorSpeed) % 360;
+            const mainColor = `hsl(${hue}, ${config.saturation}%, ${config.lightness}%)`;
+            const glowColor = `hsla(${hue}, ${config.saturation}%, ${config.lightness}%, 0.6)`;
+            const fillColor = `hsla(${hue}, ${config.saturation}%, ${config.lightness}%, 0.05)`;
+
+            ctx.strokeStyle = mainColor;
             ctx.lineWidth = config.lineWeight;
             ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
 
-            // Add a subtle glow
-            ctx.shadowColor = config.glowColor;
+            // Glow Effect
+            ctx.shadowColor = glowColor;
             ctx.shadowBlur = config.glowBlur;
+
+            // Update UI color to match
+            levelDisplay.style.color = mainColor;
 
             // Draw paths
             ctx.beginPath();
-            
             const allPoints = [...side1, ...side2.slice(1), ...side3.slice(1)];
             ctx.moveTo(allPoints[0].x, allPoints[0].y);
             for (let i = 1; i < allPoints.length; i++) {
@@ -166,9 +161,9 @@
             ctx.closePath();
             ctx.stroke();
 
-            // Decorative: faint fill for depth
+            // Inner fill
             ctx.shadowBlur = 0;
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+            ctx.fillStyle = fillColor;
             ctx.fill();
         }
 
@@ -189,6 +184,7 @@
                 }
             }
 
+            time += 1; // Increment time for color cycle
             levelDisplay.innerText = progress.toFixed(2);
         }
 
@@ -198,7 +194,6 @@
             requestAnimationFrame(animate);
         }
 
-        // Start animation
         animate();
     </script>
 </body>
