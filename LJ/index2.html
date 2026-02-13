@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Molecular Shake Grid</title>
+    <title>Molecular Grid Expanded</title>
     <style>
         body {
             margin: 0;
@@ -41,28 +42,41 @@
         }
         #motion-prompt {
             position: fixed;
-            top: 50%;
+            top: 20px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
+            transform: translateX(-50%);
+            background: rgba(40, 40, 40, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 12px 24px;
+            border-radius: 30px;
             color: white;
             text-align: center;
             z-index: 1000;
             display: none;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            font-size: 13px;
+        }
+        #enable-motion {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 8px;
+            cursor: pointer;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
     <div id="fpsCounter">FPS: --</div>
-    <div id="ui">1 Finger: Nudge • 2 Fingers: Attract • Shake: Jostle</div>
+    <div id="ui">1 Finger: Nudge • 2 Fingers: Gather • Shake: Shimmer</div>
     
     <div id="motion-prompt">
-        <p>Shake interaction requires permission</p>
-        <button id="enable-motion" style="background: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">Enable Motion</button>
+        <div>Enable sensors for shake interaction?</div>
+        <button id="enable-motion">Enable Motion</button>
     </div>
 
     <canvas id="mandalaCanvas"></canvas>
@@ -98,7 +112,9 @@
             attractionStrength: 0.1, 
             interactionRadius: 200,
             attractRadius: 600,
-            shakeThreshold: 15      // Acceleration change required to trigger
+            shakeThreshold: 18,     
+            shakeJostlePower: 1.2,
+            zoom: 0.75              // Zoom level (lower = further out)
         };
 
         let particles = [];
@@ -135,11 +151,21 @@
                 }
                 this.x += this.vx;
                 this.y += this.vy;
-                const margin = 40;
-                if (this.x < margin) this.ax += config.boundaryStrength;
-                if (this.x > width - margin) this.ax -= config.boundaryStrength;
-                if (this.y < margin) this.ay += config.boundaryStrength;
-                if (this.y > height - margin) this.ay -= config.boundaryStrength;
+
+                // Boundaries (adjusted for zoom)
+                const margin = 50 / config.zoom;
+                const logicalWidth = width / config.zoom;
+                const logicalHeight = height / config.zoom;
+                
+                // Keep particles relative to center coordinate system
+                const halfW = logicalWidth / 2;
+                const halfH = logicalHeight / 2;
+                
+                if (this.x < -halfW + margin) this.ax += config.boundaryStrength;
+                if (this.x > halfW - margin) this.ax -= config.boundaryStrength;
+                if (this.y < -halfH + margin) this.ay += config.boundaryStrength;
+                if (this.y > halfH - margin) this.ay -= config.boundaryStrength;
+
                 this.ax = 0;
                 this.ay = 0;
             }
@@ -167,14 +193,11 @@
 
         function initGrid() {
             particles = [];
-            const gridWidth = (config.gridSize - 1) * config.spacing;
-            const gridHeight = (config.gridSize - 1) * config.spacing;
-            const startX = (width - gridWidth) / 2;
-            const startY = (height - gridHeight) / 2;
+            const offset = ((config.gridSize - 1) * config.spacing) / 2;
             for (let r = 0; r < config.gridSize; r++) {
                 for (let c = 0; c < config.gridSize; c++) {
-                    const x = startX + c * config.spacing;
-                    const y = startY + r * config.spacing;
+                    const x = c * config.spacing - offset;
+                    const y = r * config.spacing - offset;
                     particles.push(new Particle(x, y, c, r));
                 }
             }
@@ -183,7 +206,7 @@
         function computeForces() {
             const s6 = Math.pow(config.sigma, 6);
             const s12 = s6 * s6;
-            const cutoff = 180 * 180;
+            const cutoff = 200 * 200;
             for (let i = 0; i < particles.length; i++) {
                 const p1 = particles[i];
                 for (let j = i + 1; j < particles.length; j++) {
@@ -202,6 +225,8 @@
                         p2.ay += dy * clampedForce;
                     }
                 }
+
+                // Map touch coordinates to zoomed coordinate space
                 if (isAttracting) {
                     const adx = p1.x - attractPoint.x;
                     const ady = p1.y - attractPoint.y;
@@ -226,60 +251,44 @@
             }
         }
 
-        // --- SHAKE DETECTION ---
+        // Shake logic
         let lastX, lastY, lastZ;
+        let lastShakeTime = 0;
         function handleMotion(event) {
             const acc = event.accelerationIncludingGravity;
             if (!acc) return;
+            const now = Date.now();
+            if (now - lastShakeTime < 100) return;
             if (lastX !== undefined) {
-                const deltaX = Math.abs(acc.x - lastX);
-                const deltaY = Math.abs(acc.y - lastY);
-                const deltaZ = Math.abs(acc.z - lastZ);
-                
-                if (deltaX + deltaY + deltaZ > config.shakeThreshold) {
-                    jostleParticles();
+                if (Math.abs(acc.x - lastX) + Math.abs(acc.y - lastY) + Math.abs(acc.z - lastZ) > config.shakeThreshold) {
+                    if (navigator.vibrate) navigator.vibrate(30);
+                    particles.forEach(p => {
+                        p.vx += (Math.random() - 0.5) * config.shakeJostlePower;
+                        p.vy += (Math.random() - 0.5) * config.shakeJostlePower;
+                    });
+                    lastShakeTime = now;
                 }
             }
-            lastX = acc.x;
-            lastY = acc.y;
-            lastZ = acc.z;
+            lastX = acc.x; lastY = acc.y; lastZ = acc.z;
         }
 
-        function jostleParticles() {
-            // Vibrate phone
-            if (navigator.vibrate) navigator.vibrate(50);
-            
-            // Random energy burst to all particles
-            particles.forEach(p => {
-                p.vx += (Math.random() - 0.5) * 8;
-                p.vy += (Math.random() - 0.5) * 8;
-            });
-        }
-
-        // Handle Permissions for iOS
         const motionPrompt = document.getElementById('motion-prompt');
         const enableBtn = document.getElementById('enable-motion');
         
         function requestMotionAccess() {
             if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                DeviceMotionEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener('devicemotion', handleMotion);
-                            motionPrompt.style.display = 'none';
-                        }
-                    })
-                    .catch(console.error);
+                DeviceMotionEvent.requestPermission().then(state => {
+                    if (state === 'granted') {
+                        window.addEventListener('devicemotion', handleMotion);
+                        motionPrompt.style.display = 'none';
+                    }
+                }).catch(console.error);
             } else {
-                // Non-iOS or older browser
                 window.addEventListener('devicemotion', handleMotion);
                 motionPrompt.style.display = 'none';
             }
         }
-
         enableBtn.addEventListener('click', requestMotionAccess);
-
-        // Check if we need to show the prompt
         if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
             motionPrompt.style.display = 'block';
         } else {
@@ -296,25 +305,43 @@
             ctx.globalCompositeOperation = 'source-over';
             ctx.fillStyle = `rgba(0, 0, 0, ${config.fadeAmount})`;
             ctx.fillRect(0, 0, width, height);
+
             computeForces();
             const globalHue = (now * 0.03) % 360;
+            
+            ctx.save();
+            // Center and apply zoom
+            ctx.translate(width / 2, height / 2);
+            ctx.scale(config.zoom, config.zoom);
+            
             particles.forEach(p => { p.update(); p.draw(globalHue); });
+            ctx.restore();
+            
             requestAnimationFrame(render);
+        }
+
+        function toLogicalPos(screenX, screenY) {
+            return {
+                x: (screenX - width / 2) / config.zoom,
+                y: (screenY - height / 2) / config.zoom
+            };
         }
 
         const updateInputs = (e) => {
             touchPoints = [];
             if (e.touches && e.touches.length > 0) {
                 for (let i = 0; i < e.touches.length; i++) {
-                    touchPoints.push({ x: e.touches[i].clientX, y: e.touches[i].clientY });
+                    touchPoints.push(toLogicalPos(e.touches[i].clientX, e.touches[i].clientY));
                 }
                 if (e.touches.length === 2) {
                     isAttracting = true;
-                    attractPoint.x = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                    attractPoint.y = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    const p1 = toLogicalPos(e.touches[0].clientX, e.touches[0].clientY);
+                    const p2 = toLogicalPos(e.touches[1].clientX, e.touches[1].clientY);
+                    attractPoint.x = (p1.x + p2.x) / 2;
+                    attractPoint.y = (p1.y + p2.y) / 2;
                 } else { isAttracting = false; }
             } else if (e.clientX !== undefined) {
-                touchPoints.push({ x: e.clientX, y: e.clientY });
+                touchPoints.push(toLogicalPos(e.clientX, e.clientY));
                 isAttracting = false;
             }
         };
@@ -326,6 +353,7 @@
         window.addEventListener('touchstart', (e) => { e.preventDefault(); updateInputs(e); }, {passive: false});
         window.addEventListener('touchmove', (e) => { e.preventDefault(); updateInputs(e); }, {passive: false});
         window.addEventListener('touchend', stopInputs);
+        
         window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
