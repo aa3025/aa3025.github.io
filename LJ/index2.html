@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Thermodynamic Molecular Grid</title>
+    <title>Ethereal Molecular Grid</title>
     <style>
         body {
             margin: 0;
@@ -39,42 +39,11 @@
             text-transform: uppercase;
             pointer-events: none;
         }
-        #motion-prompt {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(40, 40, 40, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 15px 25px;
-            border-radius: 40px;
-            color: white;
-            text-align: center;
-            z-index: 1000;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            display: block;
-        }
-        #enable-motion {
-            background: #4cc9f0;
-            color: #fff;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-top: 10px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
     <div id="fpsCounter">FPS: --</div>
-    <div id="ui">Blue: Slow • Orange: Energetic • Shake to Jostle</div>
-    
-    <div id="motion-prompt">
-        <div style="font-size: 14px; font-weight: 500;">Enable Shake Sensors?</div>
-        <button id="enable-motion">Activate Sensors</button>
-    </div>
+    <div id="ui">1 Finger: Nudge • 2 Fingers: Gather • Shake/Double Tap: Shimmer</div>
 
     <canvas id="mandalaCanvas"></canvas>
 
@@ -93,7 +62,7 @@
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
         
-        // Configuration strictly as requested
+        // Exact user-provided configuration
         const config = {
             gridSize: 12,           
             spacing: 35,            
@@ -122,13 +91,14 @@
         let isAttracting = false;
         let attractPoint = { x: 0, y: 0 };
         let lastTapTime = 0;
+        let sensorsActive = false;
 
         class Particle {
             constructor(x, y) {
                 this.x = x; 
                 this.y = y;
-                this.vx = (Math.random() - 0.5) * 0.5; 
-                this.vy = (Math.random() - 0.5) * 0.5;
+                this.vx = (Math.random() - 0.5) * 1.0; 
+                this.vy = (Math.random() - 0.5) * 1.0;
                 this.ax = 0; 
                 this.ay = 0;
                 this.trail = [];
@@ -161,9 +131,9 @@
             }
 
             getColor(speed) {
-                // Map speed to hue: 230 (Blue) for 0 speed, to 30 (Orange) for high speed
-                // We'll normalize speed. Max expected "natural" speed is around 8-10.
-                const normalizedSpeed = Math.min(speed / 1, 1);
+                // Thermal mapping: 230 (Blue) -> 30 (Orange)
+                // Speed sensitivity: speed / 8
+                const normalizedSpeed = Math.min(speed / 2, 1);
                 const hue = 230 - (normalizedSpeed * 200); 
                 return `hsl(${hue}, 100%, 65%)`;
             }
@@ -171,7 +141,6 @@
             draw() {
                 const mainColor = this.getColor(this.speed);
                 
-                // Draw trails with speed-based colors
                 if (this.trail.length > 1) {
                     for (let i = 0; i < this.trail.length - 1; i++) {
                         const p1 = this.trail[i];
@@ -179,9 +148,8 @@
                         const opacity = i / this.trail.length;
                         ctx.beginPath();
                         ctx.lineWidth = 1.2;
-                        // Use the color that was captured at that moment in the trail
                         const trailColor = this.getColor(p1.speed);
-                        ctx.strokeStyle = trailColor.replace(')', `, ${opacity * 0.2})`).replace('hsl', 'hsla');
+                        ctx.strokeStyle = trailColor.replace(')', `, ${opacity * 0.15})`).replace('hsl', 'hsla');
                         ctx.moveTo(p1.x, p1.y);
                         ctx.lineTo(p2.x, p2.y);
                         ctx.stroke();
@@ -191,7 +159,7 @@
                 ctx.save();
                 ctx.shadowBlur = config.glowSize;
                 ctx.shadowColor = mainColor;
-                ctx.fillStyle = mainColor.replace('65%', '85%'); // Lighter core
+                ctx.fillStyle = mainColor.replace('65%', '85%');
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, config.particleSize, 0, Math.PI * 2);
                 ctx.fill();
@@ -261,7 +229,7 @@
         }
 
         function performJostle() {
-            if (navigator.vibrate) navigator.vibrate(40);
+            if (navigator.vibrate) navigator.vibrate(30);
             particles.forEach(p => {
                 p.vx += (Math.random() - 0.5) * config.shakeJostlePower;
                 p.vy += (Math.random() - 0.5) * config.shakeJostlePower;
@@ -285,20 +253,20 @@
             lastX = acc.x; lastY = acc.y; lastZ = acc.z;
         }
 
-        document.getElementById('enable-motion').addEventListener('click', function() {
-            if (navigator.vibrate) navigator.vibrate([20, 10, 20]);
+        function activateSensors() {
+            if (sensorsActive) return;
             if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                 DeviceMotionEvent.requestPermission().then(state => {
                     if (state === 'granted') {
                         window.addEventListener('devicemotion', handleMotion, true);
-                        document.getElementById('motion-prompt').style.display = 'none';
+                        sensorsActive = true;
                     }
-                });
+                }).catch(e => console.log('Sensor access denied'));
             } else {
                 window.addEventListener('devicemotion', handleMotion, true);
-                document.getElementById('motion-prompt').style.display = 'none';
+                sensorsActive = true;
             }
-        });
+        }
 
         function render(now) {
             frameCount++;
@@ -317,16 +285,13 @@
             ctx.translate(width / 2, height / 2);
             ctx.scale(config.zoom, config.zoom);
 
-            // Draw Interaction Glows
             if (isAttracting) {
                 const grad = ctx.createRadialGradient(attractPoint.x, attractPoint.y, 0, attractPoint.x, attractPoint.y, 150);
                 grad.addColorStop(0, 'rgba(0, 255, 120, 0.12)');
                 grad.addColorStop(1, 'rgba(0, 255, 120, 0)');
                 ctx.fillStyle = grad;
                 ctx.globalCompositeOperation = 'screen';
-                ctx.beginPath();
-                ctx.arc(attractPoint.x, attractPoint.y, 150, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(attractPoint.x, attractPoint.y, 150, 0, Math.PI * 2); ctx.fill();
                 ctx.globalCompositeOperation = 'source-over';
             } else if (touchPoints.length === 1) {
                 const tp = touchPoints[0];
@@ -335,9 +300,7 @@
                 grad.addColorStop(1, 'rgba(255, 60, 60, 0)');
                 ctx.fillStyle = grad;
                 ctx.globalCompositeOperation = 'screen';
-                ctx.beginPath();
-                ctx.arc(tp.x, tp.y, 100, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(tp.x, tp.y, 100, 0, Math.PI * 2); ctx.fill();
                 ctx.globalCompositeOperation = 'source-over';
             }
 
@@ -352,6 +315,7 @@
         }
 
         const updateInputs = (e) => {
+            activateSensors(); // Try to activate sensors on first interaction
             const now = Date.now();
             if (e.touches && e.touches.length === 1) {
                 if (now - lastTapTime < 300) performJostle(); 
