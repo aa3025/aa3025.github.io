@@ -16,22 +16,39 @@
         canvas {
             display: block;
         }
+        /* FPS Counter styling: Subtle and top-left */
         #fpsCounter {
             position: absolute;
             top: 10px;
             left: 10px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            font-family: monospace;
             pointer-events: none;
             user-select: none;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
-            z-index: 10;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
-    <div id="fpsCounter">FPS: 0</div>
+    <div id="fpsCounter">FPS: --</div>
     <canvas id="mandalaCanvas"></canvas>
+
+    <script>
+        /**
+         * CACHE BUSTER / SERVICE WORKER CLEANUP
+         * This script unregisters existing service workers to ensure 
+         * Chrome loads the latest version of your code from GitHub.
+         */
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                    console.log('Old Service Worker cleared. Refreshing might be needed.');
+                }
+            });
+        }
+    </script>
 
     <script>
         const canvas = document.getElementById('mandalaCanvas');
@@ -43,12 +60,11 @@
         let time = 0;
         let spawnRingRotation = 0;
 
-        // --- FPS Logic Variables ---
+        // FPS calculation variables
         let lastTime = performance.now();
         let frameCount = 0;
         let lastFpsUpdate = 0;
 
-        // --- Configuration ---
         const config = {
             particleCount: 20,
             trailLength: 55,
@@ -66,7 +82,6 @@
             startRadiusRatio: 0.25,
         };
 
-        // --- Particle Class ---
         class Particle {
             constructor(spawnAngle) {
                 this.maxSpeed = Math.random() * (config.maxMaxSpeed - config.minMaxSpeed) + config.minMaxSpeed;
@@ -114,7 +129,6 @@
             }
         }
 
-        // --- Animation Setup ---
         const particles = [];
         for (let i = 0; i < config.particleCount; i++) {
             particles.push(new Particle(0));
@@ -128,13 +142,12 @@
 
         const sliceAngle = (Math.PI * 2) / config.slices;
 
-        // --- Animation Loop ---
         function animate(now) {
-            // --- FPS Calculation ---
+            // FPS Counter Logic
             frameCount++;
-            if (now - lastFpsUpdate > 500) { // Update every 500ms
+            if (now - lastFpsUpdate > 500) {
                 const fps = Math.round((frameCount * 1000) / (now - lastFpsUpdate));
-                fpsDisplay.innerText = `FPS: ${fps}`;
+                fpsDisplay.textContent = `FPS: ${fps}`;
                 lastFpsUpdate = now;
                 frameCount = 0;
             }
@@ -145,10 +158,9 @@
 
             ctx.save();
             ctx.translate(width / 2, height / 2);
-            ctx.rotate(spawnRingRotation); 
+            ctx.rotate(spawnRingRotation);
 
             const currentHue = (time * config.colorSpeed) % 360;
-
             particles.forEach(p => p.update(currentHue));
 
             for (let i = 0; i < config.slices; i++) {
@@ -160,20 +172,16 @@
                         const opacity = index / p.trail.length;
                         const size = config.particleSize * opacity * 0.7;
                         if (size < 0.1) return;
-
                         ctx.fillStyle = `hsla(${point.hue}, 100%, 75%, ${opacity * 0.5})`;
-
                         ctx.beginPath();
                         ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
                         ctx.fill();
-
                         ctx.beginPath();
                         ctx.arc(point.x, -point.y, size, 0, Math.PI * 2);
                         ctx.fill();
                     });
 
                     const headHue = p.trail.length > 0 ? p.trail[p.trail.length - 1].hue : currentHue;
-
                     ctx.fillStyle = `hsla(${headHue}, 100%, 80%, ${config.glowOpacity})`;
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, config.particleSize * config.glowSizeMultiplier, 0, Math.PI * 2);
@@ -192,15 +200,12 @@
             }
 
             ctx.restore();
-
             time += config.baseSpeed;
             spawnRingRotation += config.rotationSpeed;
             requestAnimationFrame(animate);
         }
 
-        // --- Start Animation ---
         requestAnimationFrame(animate);
-
     </script>
 </body>
 </html>
