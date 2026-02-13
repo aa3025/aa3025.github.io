@@ -4,44 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Kaleidoscope Mandala</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
             background-color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         canvas {
             display: block;
         }
+        #fpsCounter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            pointer-events: none;
+            user-select: none;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
     </style>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
+    <div id="fpsCounter">FPS: 0</div>
     <canvas id="mandalaCanvas"></canvas>
-
-    <script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        // The './' is critical here
-        navigator.serviceWorker.register('./service-worker.js', { scope: './' }) 
-            .then(reg => console.log('SW registered!', reg))
-            .catch(err => console.log('SW failed:', err));
-    });
-}
-</script>
 
     <script>
         const canvas = document.getElementById('mandalaCanvas');
         const ctx = canvas.getContext('2d');
+        const fpsDisplay = document.getElementById('fpsCounter');
 
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
         let time = 0;
         let spawnRingRotation = 0;
+
+        // --- FPS Logic Variables ---
+        let lastTime = performance.now();
+        let frameCount = 0;
+        let lastFpsUpdate = 0;
 
         // --- Configuration ---
         const config = {
@@ -52,12 +57,12 @@ if ('serviceWorker' in navigator) {
             glowOpacity: 0.2,    
             fadeAmount: 0.1,      
             baseSpeed: 0.025,
-            turnSpeed: 0.1,      // Increased for more wobble!
-            minMaxSpeed: .5,     // Minimum speed for a particle
-            maxMaxSpeed: 3.8,     // Maximum speed for a particle
+            turnSpeed: 0.1,      
+            minMaxSpeed: .5,     
+            maxMaxSpeed: 3.8,     
             slices: 15,
-            colorSpeed: 100,       // Increased for more vibrant color cycling
-            rotationSpeed: 0.000, // Increased for a more noticeable spin
+            colorSpeed: 100,       
+            rotationSpeed: 0.000, 
             startRadiusRatio: 0.25,
         };
 
@@ -72,7 +77,7 @@ if ('serviceWorker' in navigator) {
             resetPosition(spawnAngle) {
                 const effectiveMinDim = Math.min(width, height);
                 const currentStartRadius = effectiveMinDim * config.startRadiusRatio;
-                
+
                 const angle = Math.random() * Math.PI * 2 + spawnAngle;
                 this.x = currentStartRadius * Math.cos(angle);
                 this.y = currentStartRadius * Math.sin(angle);
@@ -124,19 +129,28 @@ if ('serviceWorker' in navigator) {
         const sliceAngle = (Math.PI * 2) / config.slices;
 
         // --- Animation Loop ---
-        function animate() {
+        function animate(now) {
+            // --- FPS Calculation ---
+            frameCount++;
+            if (now - lastFpsUpdate > 500) { // Update every 500ms
+                const fps = Math.round((frameCount * 1000) / (now - lastFpsUpdate));
+                fpsDisplay.innerText = `FPS: ${fps}`;
+                lastFpsUpdate = now;
+                frameCount = 0;
+            }
+
             ctx.globalCompositeOperation = 'source-over';
             ctx.fillStyle = `rgba(0, 0, 0, ${config.fadeAmount})`;
             ctx.fillRect(0, 0, width, height);
-            
+
             ctx.save();
             ctx.translate(width / 2, height / 2);
-            ctx.rotate(spawnRingRotation); // Only spawn ring rotates, not the whole pattern
+            ctx.rotate(spawnRingRotation); 
 
             const currentHue = (time * config.colorSpeed) % 360;
 
             particles.forEach(p => p.update(currentHue));
-            
+
             for (let i = 0; i < config.slices; i++) {
                 ctx.save();
                 ctx.rotate(sliceAngle * i);
@@ -148,24 +162,24 @@ if ('serviceWorker' in navigator) {
                         if (size < 0.1) return;
 
                         ctx.fillStyle = `hsla(${point.hue}, 100%, 75%, ${opacity * 0.5})`;
-                        
+
                         ctx.beginPath();
                         ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
                         ctx.fill();
-                        
+
                         ctx.beginPath();
                         ctx.arc(point.x, -point.y, size, 0, Math.PI * 2);
                         ctx.fill();
                     });
-                    
+
                     const headHue = p.trail.length > 0 ? p.trail[p.trail.length - 1].hue : currentHue;
-                    
+
                     ctx.fillStyle = `hsla(${headHue}, 100%, 80%, ${config.glowOpacity})`;
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, config.particleSize * config.glowSizeMultiplier, 0, Math.PI * 2);
                     ctx.arc(p.x, -p.y, config.particleSize * config.glowSizeMultiplier, 0, Math.PI * 2);
                     ctx.fill();
-                    
+
                     ctx.fillStyle = `hsl(${headHue}, 100%, 90%)`;
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, config.particleSize, 0, Math.PI * 2);
@@ -178,19 +192,16 @@ if ('serviceWorker' in navigator) {
             }
 
             ctx.restore();
-            
+
             time += config.baseSpeed;
             spawnRingRotation += config.rotationSpeed;
             requestAnimationFrame(animate);
         }
 
         // --- Start Animation ---
-        animate();
+        requestAnimationFrame(animate);
 
     </script>
-
-
-
-
 </body>
 </html>
+
