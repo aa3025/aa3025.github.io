@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Kaleidoscope Mandala</title>
+    <title>Kaleidoscope Mandala - Dual Ring Colors</title>
     <style>
         body {
             margin: 0;
@@ -20,18 +20,28 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            font-family: monospace;
             pointer-events: none;
             user-select: none;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
-            z-index: 10;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
-    <div id="fpsCounter">FPS: 0</div>
+    <div id="fpsCounter">FPS: --</div>
     <canvas id="mandalaCanvas"></canvas>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+    </script>
 
     <script>
         const canvas = document.getElementById('mandalaCanvas');
@@ -43,53 +53,58 @@
         let time = 0;
         let spawnRingRotation = 0;
 
-        // --- FPS Logic Variables ---
-        let lastTime = performance.now();
         let frameCount = 0;
         let lastFpsUpdate = 0;
 
-        // --- Configuration ---
         const config = {
-            particleCount: 20,
+            particleCount: 40,     // Slightly more particles for better color coverage
             trailLength: 55,
             particleSize: 2,
             glowSizeMultiplier: 4, 
-            glowOpacity: 0.2,    
-            fadeAmount: 0.1,      
+            glowOpacity: 0.25,    
+            fadeAmount: 0.12,      
             baseSpeed: 0.025,
-            turnSpeed: 0.1,      
+            turnSpeed: 0.12,      
             minMaxSpeed: .5,     
-            maxMaxSpeed: 3.8,     
-            slices: 15,
-            colorSpeed: 100,       
+            maxMaxSpeed: 3.5,     
+            slices: 12,            // Adjusted for cleaner geometry
+            colorSpeed: 80,       
             rotationSpeed: 0.000, 
-            startRadiusRatio: 0.25,
+            spawnRings: [0.22, 0.48], // Two distinct spawn radii
+            hueShifts: [0, 180]       // Complementary colors for the two rings
         };
 
-        // --- Particle Class ---
         class Particle {
-            constructor(spawnAngle) {
+            constructor() {
                 this.maxSpeed = Math.random() * (config.maxMaxSpeed - config.minMaxSpeed) + config.minMaxSpeed;
-                this.resetPosition(spawnAngle);
+                // Assign to a random ring
+                this.ringIndex = Math.floor(Math.random() * config.spawnRings.length);
                 this.trail = [];
+                this.resetPosition();
             }
 
-            resetPosition(spawnAngle) {
+            resetPosition() {
                 const effectiveMinDim = Math.min(width, height);
-                const currentStartRadius = effectiveMinDim * config.startRadiusRatio;
+                const ringRatio = config.spawnRings[this.ringIndex];
+                const currentStartRadius = effectiveMinDim * ringRatio;
 
-                const angle = Math.random() * Math.PI * 2 + spawnAngle;
+                const angle = Math.random() * Math.PI * 2 + spawnRingRotation;
                 this.x = currentStartRadius * Math.cos(angle);
                 this.y = currentStartRadius * Math.sin(angle);
 
-                const initialSpeedMagnitude = this.maxSpeed * 0.8;
+                const initialSpeedMagnitude = this.maxSpeed * 0.7;
                 const distance = Math.sqrt(this.x * this.x + this.y * this.y) || 1;
+                
+                // Inward movement
                 this.vx = (-this.x / distance) * initialSpeedMagnitude + (Math.random() - 0.5);
                 this.vy = (-this.y / distance) * initialSpeedMagnitude + (Math.random() - 0.5);
             }
 
-            update(currentHue) {
-                this.trail.push({ x: this.x, y: this.y, hue: currentHue });
+            update(globalHue) {
+                // Apply the ring-specific hue shift
+                const myHue = (globalHue + config.hueShifts[this.ringIndex]) % 360;
+                
+                this.trail.push({ x: this.x, y: this.y, hue: myHue });
                 if (this.trail.length > config.trailLength) {
                     this.trail.shift();
                 }
@@ -106,35 +121,32 @@
                     this.vy = (this.vy / speed) * this.maxSpeed;
                 }
 
-                const wrapRadius = Math.max(width, height) * 0.7; 
+                const wrapRadius = Math.max(width, height) * 0.85; 
                 if (Math.sqrt(this.x*this.x + this.y*this.y) > wrapRadius) {
-                    this.resetPosition(spawnRingRotation);
+                    this.resetPosition();
                     this.trail = [];
                 }
             }
         }
 
-        // --- Animation Setup ---
         const particles = [];
         for (let i = 0; i < config.particleCount; i++) {
-            particles.push(new Particle(0));
+            particles.push(new Particle());
         }
 
         window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            particles.forEach(p => p.resetPosition(spawnRingRotation));
+            particles.forEach(p => p.resetPosition());
         });
 
         const sliceAngle = (Math.PI * 2) / config.slices;
 
-        // --- Animation Loop ---
         function animate(now) {
-            // --- FPS Calculation ---
             frameCount++;
-            if (now - lastFpsUpdate > 500) { // Update every 500ms
+            if (now - lastFpsUpdate > 500) {
                 const fps = Math.round((frameCount * 1000) / (now - lastFpsUpdate));
-                fpsDisplay.innerText = `FPS: ${fps}`;
+                fpsDisplay.textContent = `FPS: ${fps}`;
                 lastFpsUpdate = now;
                 frameCount = 0;
             }
@@ -145,63 +157,62 @@
 
             ctx.save();
             ctx.translate(width / 2, height / 2);
-            ctx.rotate(spawnRingRotation); 
 
-            const currentHue = (time * config.colorSpeed) % 360;
-
-            particles.forEach(p => p.update(currentHue));
+            const globalHue = (time * config.colorSpeed) % 360;
+            particles.forEach(p => p.update(globalHue));
 
             for (let i = 0; i < config.slices; i++) {
                 ctx.save();
                 ctx.rotate(sliceAngle * i);
 
                 particles.forEach(p => {
+                    // Draw trail
                     p.trail.forEach((point, index) => {
                         const opacity = index / p.trail.length;
-                        const size = config.particleSize * opacity * 0.7;
+                        const size = config.particleSize * opacity * 0.8;
                         if (size < 0.1) return;
-
-                        ctx.fillStyle = `hsla(${point.hue}, 100%, 75%, ${opacity * 0.5})`;
-
+                        
+                        ctx.fillStyle = `hsla(${point.hue}, 100%, 75%, ${opacity * 0.4})`;
+                        
+                        // Main and Reflected
                         ctx.beginPath();
                         ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
                         ctx.fill();
-
                         ctx.beginPath();
                         ctx.arc(point.x, -point.y, size, 0, Math.PI * 2);
                         ctx.fill();
                     });
 
-                    const headHue = p.trail.length > 0 ? p.trail[p.trail.length - 1].hue : currentHue;
+                    // Draw head and glow
+                    if (p.trail.length > 0) {
+                        const head = p.trail[p.trail.length - 1];
+                        
+                        // Glow
+                        ctx.fillStyle = `hsla(${head.hue}, 100%, 70%, ${config.glowOpacity})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, config.particleSize * config.glowSizeMultiplier, 0, Math.PI * 2);
+                        ctx.arc(p.x, -p.y, config.particleSize * config.glowSizeMultiplier, 0, Math.PI * 2);
+                        ctx.fill();
 
-                    ctx.fillStyle = `hsla(${headHue}, 100%, 80%, ${config.glowOpacity})`;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, config.particleSize * config.glowSizeMultiplier, 0, Math.PI * 2);
-                    ctx.arc(p.x, -p.y, config.particleSize * config.glowSizeMultiplier, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = `hsl(${headHue}, 100%, 90%)`;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, config.particleSize, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(p.x, -p.y, config.particleSize, 0, Math.PI * 2);
-                    ctx.fill();
+                        // Particle Core
+                        ctx.fillStyle = `hsl(${head.hue}, 100%, 85%)`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, config.particleSize, 0, Math.PI * 2);
+                        ctx.arc(p.x, -p.y, config.particleSize, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                 });
+
                 ctx.restore();
             }
 
             ctx.restore();
-
             time += config.baseSpeed;
             spawnRingRotation += config.rotationSpeed;
             requestAnimationFrame(animate);
         }
 
-        // --- Start Animation ---
         requestAnimationFrame(animate);
-
     </script>
 </body>
 </html>
-
