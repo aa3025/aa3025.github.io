@@ -179,15 +179,15 @@
         </div>
         <div class="control-group">
             <label for="numBodiesInput">Bodies</label>
-            <input type="number" id="numBodiesInput" value="12" min="1" max="100">
+            <input type="number" id="numBodiesInput" value="3" min="2" max="64">
         </div>
         <div class="control-group">
             <label for="virialKInput">Virial K</label>
-            <input type="number" id="virialKInput" value="1.1" step="0.1" min="0">
+            <input type="number" id="virialKInput" value="0.5" step="0.1" min="0">
         </div>
         <div class="control-group">
             <label for="speedScaleInput">Tail+</label>
-            <input type="range" id="speedScaleInput" value="200" min="0" max="500">
+            <input type="range" id="speedScaleInput" value="400" min="0" max="500">
             <span id="speedScaleValue" class="control-value-display">200</span>
         </div>
         <div class="control-group">
@@ -237,7 +237,7 @@
         
         const config = {
             scheme: 'euler-cromer',
-            numBodies: 12,           
+            numBodies: 3,           
             G: 250,                 
             softening: 1.0,         
             dt: 0.1,               
@@ -250,7 +250,7 @@
             zoom: 0.6,
             damping: 1.0,           
             r0: 180,                
-            virialK: 1.1,           
+            virialK: 0.5,           
             orbitWidth: 2,
             orbitOpacity: 0.7,
             isPaused: false,
