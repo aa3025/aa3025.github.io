@@ -88,7 +88,7 @@
             background: #222;
         }
         .control-group input[type="number"] {
-            width: 35px;
+            width: 45px;
         }
         .control-group input[type="range"] {
             -webkit-appearance: none;
@@ -163,6 +163,7 @@
         <div id="energyCounter" class="stats-item">E: --</div>
         <div id="driftCounter" class="stats-item">DRIFT: 0.000%</div>
         <div id="comCounter" class="stats-item">COM: (0,0)</div>
+        <div id="zoomCounter" class="stats-item">ZOOM: --</div>
     </div>
     
     <div id="controls">
@@ -179,7 +180,7 @@
         </div>
         <div class="control-group">
             <label for="numBodiesInput">Bodies</label>
-            <input type="number" id="numBodiesInput" value="3" min="2" max="64">
+            <input type="number" id="numBodiesInput" value="3" min="1" max="100">
         </div>
         <div class="control-group">
             <label for="virialKInput">Virial K</label>
@@ -188,17 +189,17 @@
         <div class="control-group">
             <label for="speedScaleInput">Tail+</label>
             <input type="range" id="speedScaleInput" value="400" min="0" max="500">
-            <span id="speedScaleValue" class="control-value-display">200</span>
+            <span id="speedScaleValue" class="control-value-display">400</span>
         </div>
         <div class="control-group">
             <label for="dtInput">Step</label>
-            <input type="range" id="dtInput" value="0.1" min="0.001" max="0.2" step="0.001">
-            <span id="dtValue" class="control-value-display">0.100</span>
+            <input type="range" id="dtInput" value="0.001" min="0.0001" max="0.1" step="0.0001">
+            <span id="dtValue" class="control-value-display">0.001</span>
         </div>
         <div class="control-group">
             <label for="subStepsInput">Substeps</label>
-            <input type="range" id="subStepsInput" value="10" min="1" max="1000">
-            <span id="subStepsValue" class="control-value-display">10</span>
+            <input type="range" id="subStepsInput" value="1000" min="1" max="2000">
+            <span id="subStepsValue" class="control-value-display">1000</span>
         </div>
         <div class="action-btns">
             <button id="pauseBtn" class="action-btn">Pause</button>
@@ -219,6 +220,7 @@
         const energyDisplay = document.getElementById('energyCounter');
         const driftDisplay = document.getElementById('driftCounter');
         const comDisplay = document.getElementById('comCounter');
+        const zoomDisplay = document.getElementById('zoomCounter');
         
         const schemeSelector = document.getElementById('schemeSelector');
         const numBodiesInput = document.getElementById('numBodiesInput');
@@ -240,14 +242,14 @@
             numBodies: 3,           
             G: 250,                 
             softening: 1.0,         
-            dt: 0.1,               
-            subSteps: 10,           
+            dt: 0.001,               
+            subSteps: 1000,           
             trailLength: 2000,      
             minTadpoleLength: 10,    
-            tadpoleSpeedScale: 200,   
+            tadpoleSpeedScale: 400,   
             particleSize: 7,
             glowSize: 25,           
-            zoom: 0.6,
+            zoom: 1.0, // Default zoom factor set to 1.0
             damping: 1.0,           
             r0: 180,                
             virialK: 0.5,           
@@ -255,7 +257,8 @@
             orbitOpacity: 0.7,
             isPaused: false,
             initialEnergy: 0,
-            driftThreshold: 0.01 // 1%
+            driftThreshold: 0.01,
+            safetyCheckEnabled: true 
         };
 
         let bodies = [];
@@ -419,11 +422,9 @@
                 case 'rk4':
                     const x0 = bodies.map(b => ({x: b.x, y: b.y}));
                     const v0 = bodies.map(b => ({x: b.vx, y: b.vy}));
-
                     getAccels();
                     const k1v = bodies.map(b => ({x: b.ax, y: b.ay}));
                     const k1x = v0;
-
                     bodies.forEach((b, i) => {
                         b.x = x0[i].x + k1x[i].x * dt * 0.5;
                         b.y = x0[i].y + k1x[i].y * dt * 0.5;
@@ -431,7 +432,6 @@
                     getAccels();
                     const k2v = bodies.map(b => ({x: b.ax, y: b.ay}));
                     const k2x = bodies.map((b, i) => ({x: v0[i].x + k1v[i].x * dt * 0.5, y: v0[i].y + k1v[i].y * dt * 0.5}));
-
                     bodies.forEach((b, i) => {
                         b.x = x0[i].x + k2x[i].x * dt * 0.5;
                         b.y = x0[i].y + k2x[i].y * dt * 0.5;
@@ -439,7 +439,6 @@
                     getAccels();
                     const k3v = bodies.map(b => ({x: b.ax, y: b.ay}));
                     const k3x = bodies.map((b, i) => ({x: v0[i].x + k2v[i].x * dt * 0.5, y: v0[i].y + k2v[i].y * dt * 0.5}));
-
                     bodies.forEach((b, i) => {
                         b.x = x0[i].x + k3x[i].x * dt;
                         b.y = x0[i].y + k3x[i].y * dt;
@@ -447,7 +446,6 @@
                     getAccels();
                     const k4v = bodies.map(b => ({x: b.ax, y: b.ay}));
                     const k4x = bodies.map((b, i) => ({x: v0[i].x + k3v[i].x * dt, y: v0[i].y + k3v[i].y * dt}));
-
                     bodies.forEach((b, i) => {
                         b.x = x0[i].x + (dt/6) * (k1x[i].x + 2*k2x[i].x + 2*k3x[i].x + k4x[i].x);
                         b.y = x0[i].y + (dt/6) * (k1x[i].y + 2*k2x[i].y + 2*k3x[i].y + k4x[i].y);
@@ -461,13 +459,15 @@
 
         function initSimulation() {
             config.scheme = schemeSelector.value;
-            config.numBodies = parseInt(numBodiesInput.value) || 12;
-            config.virialK = parseFloat(virialKInput.value) || 1.1;
+            config.numBodies = parseInt(numBodiesInput.value);
+            config.virialK = parseFloat(virialKInput.value);
             config.tadpoleSpeedScale = parseInt(speedScaleInput.value);
             config.trailLength = 500 + (config.tadpoleSpeedScale * 10);
             config.dt = parseFloat(dtInput.value);
-            config.subSteps = parseInt(subStepsInput.value) || 10;
+            config.subSteps = parseInt(subStepsInput.value);
+            
             config.isPaused = false;
+            config.safetyCheckEnabled = true; 
             
             pauseBtn.textContent = 'Pause';
             pauseBtn.classList.remove('paused');
@@ -492,7 +492,7 @@
                 }
             }
             
-            const v0 = config.virialK * Math.sqrt((config.G * sumInvDist) / n);
+            const v0 = config.virialK * Math.sqrt((config.G * sumInvDist) / (n || 1));
             bodies.forEach((b, i) => {
                 const theta = (i / n) * Math.PI * 2;
                 b.vx = -v0 * Math.sin(theta);
@@ -519,17 +519,31 @@
             input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { initSimulation(); input.blur(); } });
         });
         resetBtn.addEventListener('click', initSimulation);
+        
         pauseBtn.addEventListener('click', () => {
+            if (config.isPaused) {
+                if (pauseBtn.textContent.includes('Exploded')) {
+                    config.safetyCheckEnabled = false; 
+                }
+                
+                const { total } = calculateEnergyAndCOM();
+                if (isFinite(total) && total !== 0) {
+                    config.initialEnergy = total;
+                }
+                driftDisplay.classList.remove('warning');
+            }
+            
             config.isPaused = !config.isPaused;
             pauseBtn.textContent = config.isPaused ? 'Resume' : 'Pause';
             pauseBtn.classList.toggle('paused', config.isPaused);
         });
+
         speedScaleInput.addEventListener('input', () => {
             config.tadpoleSpeedScale = parseInt(speedScaleInput.value);
             config.trailLength = 500 + (config.tadpoleSpeedScale * 10);
             speedScaleValue.textContent = speedScaleInput.value;
         });
-        dtInput.addEventListener('input', () => { config.dt = parseFloat(dtInput.value); dtValue.textContent = config.dt.toFixed(3); });
+        dtInput.addEventListener('input', () => { config.dt = parseFloat(dtInput.value); dtValue.textContent = config.dt.toFixed(4); });
         subStepsInput.addEventListener('input', () => { config.subSteps = parseInt(subStepsInput.value); subStepsValue.textContent = subStepsInput.value; });
 
         function render(now) {
@@ -544,16 +558,13 @@
             ctx.fillRect(0, 0, width, height);
             
             if (!config.isPaused) {
-                // RUN PHYSICS SUBSTEPS WITH SAFETY CHECKS INSIDE THE LOOP
                 for (let s = 0; s < config.subSteps; s++) {
                     stepSimulation();
                     
-                    // Frequent stability check for high substep values
-                    if (s % 5 === 0) { 
+                    if (config.safetyCheckEnabled && s % 5 === 0) { 
                         const { total } = calculateEnergyAndCOM();
-                        const drift = Math.abs((total - config.initialEnergy) / config.initialEnergy);
+                        const drift = Math.abs((total - config.initialEnergy) / (config.initialEnergy || 1));
                         
-                        // Safety pause if drift > 1% OR if numbers explode (NaN/Infinity)
                         if (drift > config.driftThreshold || !isFinite(total)) {
                             config.isPaused = true;
                             pauseBtn.textContent = 'Exploded (Resume?)';
@@ -567,12 +578,13 @@
             }
 
             const { total, comX, comY } = calculateEnergyAndCOM();
-            const driftPerc = Math.abs((total - config.initialEnergy) / config.initialEnergy) * 100;
+            const driftPerc = Math.abs((total - config.initialEnergy) / (config.initialEnergy || 1)) * 100;
             
             simTimeDisplay.textContent = `T: ${simulationTime.toFixed(2)}s`;
             energyDisplay.textContent = `E: ${total.toFixed(6)}`;
             driftDisplay.textContent = `DRIFT: ${driftPerc.toFixed(3)}%`;
             comDisplay.textContent = `COM: (${comX.toFixed(2)}, ${comY.toFixed(2)})`;
+            zoomDisplay.textContent = `ZOOM: ${config.zoom.toFixed(3)}x`;
 
             ctx.save();
             ctx.translate(width / 2, height / 2);
