@@ -207,7 +207,7 @@
         </div>
     </div>
 
-    <div id="ui-hint">N-body Simulation • Scroll or Pinch to Zoom</div>
+    <div id="ui-hint">N-body Simulation • Pan & Zoom to Explore</div>
 
     <canvas id="mandalaCanvas"></canvas>
 
@@ -250,6 +250,8 @@
             particleSize: 7,
             glowSize: 25,           
             zoom: 1.0,
+            panX: 0,
+            panY: 0,
             damping: 1.0,           
             r0: 180,                
             virialK: 0.5,           
@@ -266,9 +268,12 @@
         let lastFpsUpdate = 0;
         let simulationTime = 0;
 
-        // Pinch Zoom State
+        // Interaction State
         let initialPinchDist = null;
         let initialZoomOnPinch = 1.0;
+        let isDragging = false;
+        let lastDragX = 0;
+        let lastDragY = 0;
 
         class Body {
             constructor(x, y, vx, vy, hue) {
@@ -350,8 +355,8 @@
 
             return {
                 total: totalKinetic + totalPotential,
-                comX: sumMX / totalMass,
-                comY: sumMY / totalMass
+                comX: sumMX / (totalMass || 1),
+                comY: sumMY / (totalMass || 1)
             };
         }
 
@@ -463,7 +468,7 @@
 
         function initSimulation() {
             config.scheme = schemeSelector.value;
-            config.numBodies = parseInt(numBodiesInput.value);
+            config.numBodies = parseInt(numBodiesInput.value) || 1;
             config.virialK = parseFloat(virialKInput.value);
             config.tadpoleSpeedScale = parseInt(speedScaleInput.value);
             config.trailLength = 500 + (config.tadpoleSpeedScale * 10);
@@ -520,9 +525,38 @@
             }
         }, { passive: false });
 
-        // Touch Pinch Zoom
+        // Mouse Drag Pan
+        window.addEventListener('mousedown', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'BUTTON') {
+                isDragging = true;
+                lastDragX = e.clientX;
+                lastDragY = e.clientY;
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const dx = e.clientX - lastDragX;
+                const dy = e.clientY - lastDragY;
+                config.panX += dx;
+                config.panY += dy;
+                lastDragX = e.clientX;
+                lastDragY = e.clientY;
+            }
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        // Touch Interaction (Pan & Zoom)
         window.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
+            
+            if (e.touches.length === 1) {
+                isDragging = true;
+                lastDragX = e.touches[0].pageX;
+                lastDragY = e.touches[0].pageY;
+            } else if (e.touches.length === 2) {
+                isDragging = false; // Disable pan while zooming
                 const dx = e.touches[0].pageX - e.touches[1].pageX;
                 const dy = e.touches[0].pageY - e.touches[1].pageY;
                 initialPinchDist = Math.sqrt(dx * dx + dy * dy);
@@ -531,8 +565,17 @@
         }, { passive: false });
 
         window.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2 && initialPinchDist !== null) {
-                e.preventDefault();
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
+            e.preventDefault();
+
+            if (e.touches.length === 1 && isDragging) {
+                const dx = e.touches[0].pageX - lastDragX;
+                const dy = e.touches[0].pageY - lastDragY;
+                config.panX += dx;
+                config.panY += dy;
+                lastDragX = e.touches[0].pageX;
+                lastDragY = e.touches[0].pageY;
+            } else if (e.touches.length === 2 && initialPinchDist !== null) {
                 const dx = e.touches[0].pageX - e.touches[1].pageX;
                 const dy = e.touches[0].pageY - e.touches[1].pageY;
                 const currentDist = Math.sqrt(dx * dx + dy * dy);
@@ -540,16 +583,14 @@
                 if (initialPinchDist > 0) {
                     const ratio = currentDist / initialPinchDist;
                     config.zoom = initialZoomOnPinch * ratio;
-                    // Clamp
                     config.zoom = Math.min(Math.max(config.zoom, 0.0001), 100);
                 }
             }
         }, { passive: false });
 
         window.addEventListener('touchend', (e) => {
-            if (e.touches.length < 2) {
-                initialPinchDist = null;
-            }
+            if (e.touches.length < 2) initialPinchDist = null;
+            if (e.touches.length === 0) isDragging = false;
         });
 
         // UI Listeners
@@ -565,14 +606,10 @@
                 if (pauseBtn.textContent.includes('Exploded')) {
                     config.safetyCheckEnabled = false; 
                 }
-                
                 const { total } = calculateEnergyAndCOM();
-                if (isFinite(total) && total !== 0) {
-                    config.initialEnergy = total;
-                }
+                if (isFinite(total) && total !== 0) config.initialEnergy = total;
                 driftDisplay.classList.remove('warning');
             }
-            
             config.isPaused = !config.isPaused;
             pauseBtn.textContent = config.isPaused ? 'Resume' : 'Pause';
             pauseBtn.classList.toggle('paused', config.isPaused);
@@ -600,11 +637,9 @@
             if (!config.isPaused) {
                 for (let s = 0; s < config.subSteps; s++) {
                     stepSimulation();
-                    
                     if (config.safetyCheckEnabled && s % 5 === 0) { 
                         const { total } = calculateEnergyAndCOM();
                         const drift = Math.abs((total - config.initialEnergy) / (config.initialEnergy || 1));
-                        
                         if (drift > config.driftThreshold || !isFinite(total)) {
                             config.isPaused = true;
                             pauseBtn.textContent = 'Exploded (Resume?)';
@@ -627,7 +662,8 @@
             zoomDisplay.textContent = `ZOOM: ${config.zoom.toFixed(3)}x`;
 
             ctx.save();
-            ctx.translate(width / 2, height / 2);
+            // Applying Pan + Initial Screen Center
+            ctx.translate(width / 2 + config.panX, height / 2 + config.panY);
             ctx.scale(config.zoom, config.zoom);
             drawCOM(comX, comY);
             bodies.forEach(b => b.draw());
