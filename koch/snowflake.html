@@ -13,16 +13,17 @@
   mX=W/2, mY=H/2;
   clear();
 
-  for(t+=PI/120, i=2e4; i--;)
-    i>6 ? (
+  // Changed i>8 and i^8 to accommodate 8-sided symmetry (PI/4)
+  for(t+=PI/240, i=2e4; i--;)
+    i>8 ? (
       d = 7 * cos(mag(k=i%25-12, e=i/800)/3 + t/2),
       // 2. Multiply coordinates by S to scale the drawing
       point(
         (k*4 + d*k*sin(d+e/9+t)) * S + mX, 
         (e*2 - d*9 - d*9*cos(d+t)) * S + mY
       )
-    ) : i^6 ? 
-      rotate(PI/3).image(p, -mX, -mY) : 
+    ) : i^8 ? 
+      rotate(PI/4).image(p, -mX, -mY) : 
       (p=get()) + stroke(255, 150).background(9).translate(mX, mY)
 
   // FPS Counter - Using push/pop to prevent affecting the animation stroke
