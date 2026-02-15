@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
             background-color: #000;
-            overflow: hidden; /* Ensures no scrollbars */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -20,7 +20,6 @@
         }
         canvas {
             display: block;
-            box-shadow: none;
         }
         #ui-layer {
             position: absolute;
@@ -94,7 +93,7 @@
         let viewZoom = 1.0;
         let viewOffsetX = 0;
         let viewOffsetY = 0;
-        let pg; // Off-screen buffer for the fractal segment
+        let pg; // Internal buffer for high-performance symmetry
         
         let lastPinchDist = 0;
         let prevMouseX, prevMouseY;
@@ -105,14 +104,14 @@
         }
 
         function setup() {
-            // Set canvas to 99% of window dimensions, ensuring at least 1px
             const w = max(1, windowWidth * 0.99);
             const h = max(1, windowHeight * 0.99);
             createCanvas(w, h);
             
-            // The buffer should be square based on the larger dimension 
-            const maxDim = max(1, w, h);
-            pg = createGraphics(maxDim, maxDim);
+            // Create a square buffer to draw the base segment
+            // This ensures we capture the pattern independently of the view transform
+            const bufferSize = min(windowWidth, windowHeight);
+            pg = createGraphics(bufferSize, bufferSize);
             pg.pixelDensity(1);
             
             pixelDensity(1); 
@@ -120,35 +119,26 @@
         }
 
         function draw() {
-            // Safety check: Don't draw if the buffer isn't ready or has 0 dimensions
-            if (!pg || pg.width <= 0 || pg.height <= 0) return;
-
             background(0); 
 
             const centerX = width / 2;
             const centerY = height / 2;
             const pgMid = pg.width / 2;
-            
             const baseScale = min(width, height) / 350;
 
-            // 1. Draw the "base segment" into the buffer
+            // 1. Draw the segment points into the buffer once per frame
             pg.clear();
-            
-            // Refined stroke weight (from 1.2 to 0.75) and reduced alpha (from 180 to 140)
-            // for a much crisper, more detailed look at default zoom.
-            pg.stroke(255, 200); 
-            pg.strokeWeight(0.80);
-            
+            pg.stroke(255, 140);
+            pg.strokeWeight(0.75);
             for (let i = 2e4; i--;) {
-                if (i > 8) {
-                    let k = i % 25 - 12;
-                    let e = i / 800;
-                    let d = 7 * cos(mag(k, e) / 3 + fractalTime / 2);
-                    
-                    let px = (k * 4 + d * k * sin(d + e / 9 + fractalTime)) * baseScale + pgMid;
-                    let py = (e * 2 - d * 9 - d * 9 * cos(d + fractalTime)) * baseScale + pgMid;
-                    pg.point(px, py);
-                }
+                // We only calculate points for the base segment
+                let k = i % 25 - 12;
+                let e = i / 800;
+                let d = 7 * cos(mag(k, e) / 3 + fractalTime / 2);
+                
+                let px = (k * 4 + d * k * sin(d + e / 9 + fractalTime)) * baseScale + pgMid;
+                let py = (e * 2 - d * 9 - d * 9 * cos(d + fractalTime)) * baseScale + pgMid;
+                pg.point(px, py);
             }
 
             // 2. Render to main canvas with Pan and Zoom
@@ -157,6 +147,8 @@
             scale(viewZoom);
             translate(-centerX, -centerY);
 
+            // Apply 8-way symmetry by rotating the buffer
+            // This is computationally very light compared to drawing 160k points
             for (let r = 0; r < 8; r++) {
                 push();
                 translate(centerX, centerY);
@@ -182,9 +174,7 @@
         }
 
         function mousePressed() {
-            // Check if we clicked on a UI element
             if (mouseX > width - 100 && mouseY < 50) return; 
-            
             prevMouseX = mouseX;
             prevMouseY = mouseY;
         }
@@ -230,12 +220,11 @@
         }
 
         function windowResized() {
-            // Ensure dimensions are always at least 1 to prevent drawImage errors
             const w = max(1, windowWidth * 0.99);
             const h = max(1, windowHeight * 0.99);
             resizeCanvas(w, h);
-            const maxDim = max(1, w, h);
-            if (pg) pg.resizeCanvas(maxDim, maxDim);
+            const bufferSize = min(w, h);
+            if (pg) pg.resizeCanvas(bufferSize, bufferSize);
         }
     </script>
 </body>
