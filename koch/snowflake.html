@@ -97,6 +97,7 @@
         
         let lastPinchDist = 0;
         let prevMouseX, prevMouseY;
+        let isMobile = false;
 
         function toggleFullscreen() {
             let fs = fullscreen();
@@ -107,6 +108,9 @@
             const w = max(1, windowWidth * 0.99);
             const h = max(1, windowHeight * 0.99);
             createCanvas(w, h);
+            
+            // Platform detection
+            isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
             // Re-enabling high resolution for mobile
             // displayDensity() returns 2 or 3 on most modern phones
@@ -131,7 +135,11 @@
             // 1. Draw the segment points into the buffer once per frame
             pg.clear();
             pg.stroke(255, 140);
-            pg.strokeWeight(0.75);
+            
+            // Adaptive stroke weight based on platform
+            let sw = isMobile ? 0.70 : 0.80;
+            pg.strokeWeight(sw);
+
             for (let i = 2e4; i--;) {
                 let k = i % 25 - 12;
                 let e = i / 800;
