@@ -1,45 +1,239 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Symmetric Fractal Explorer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-  </head>
-  <body>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden; /* Ensures no scrollbars */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            touch-action: none;
+        }
+        canvas {
+            display: block;
+            box-shadow: none;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            pointer-events: none;
+            user-select: none;
+            z-index: 10;
+            text-shadow: 1px 1px 2px black;
+        }
+        .btn-fullscreen {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-size: 12px;
+            z-index: 20;
+            pointer-events: auto;
+            transition: all 0.2s;
+        }
+        .btn-fullscreen:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        #credits {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            z-index: 10;
+            pointer-events: auto;
+        }
+        #credits a {
+            color: inherit;
+            text-decoration: none;
+        }
+        #credits a:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div id="ui-layer">
+        <div id="fps" style="font-weight: bold;">FPS: 0</div>
+        <div id="zoom-label">Zoom: 1.00x</div>
+        <div style="font-size: 0.75em; margin-top: 8px; opacity: 0.8;">
+            DRAG to Pan<br>
+            WHEEL / PINCH to Zoom
+        </div>
+    </div>
+
+    <button class="btn-fullscreen" onclick="toggleFullscreen()">Fullscreen</button>
+
+    <div id="credits">
+        <a href="https://x.com/yuruyurau" target="_blank">@yuruyurau</a>
+    </div>
+
     <script>
-      t=0,draw=$=>{
-  // 1. Setup Canvas and Scale Factor
-  t||createCanvas(W=windowWidth, H=windowHeight);
-  S = min(W, H) / 400; // This calculates how much bigger your screen is than 400px
-  
-  mX=W/2, mY=H/2;
-  clear();
+        let fractalTime = 0;
+        let viewZoom = 1.0;
+        let viewOffsetX = 0;
+        let viewOffsetY = 0;
+        let pg; // Off-screen buffer for the fractal segment
+        
+        let lastPinchDist = 0;
+        let prevMouseX, prevMouseY;
 
-  // Changed i>8 and i^8 to accommodate 8-sided symmetry (PI/4)
-  for(t+=PI/180, i=2e4; i--;)
-    i>8 ? (
-      d = 7 * cos(mag(k=i%25-12, e=i/800)/3 + t/2),
-      // 2. Multiply coordinates by S to scale the drawing
-      point(
-        (k*4 + d*k*sin(d+e/9+t)) * S + mX, 
-        (e*2 - d*9 - d*9*cos(d+t)) * S + mY
-      )
-    ) : i^8 ? 
-      rotate(PI/4).image(p, -mX, -mY) : 
-      (p=get()) + stroke(255, 150).background(9).translate(mX, mY)
+        function toggleFullscreen() {
+            let fs = fullscreen();
+            fullscreen(!fs);
+        }
 
-  // FPS Counter - Using push/pop to prevent affecting the animation stroke
-  push();
-  resetMatrix();
-  fill(255);
-  noStroke();
-  textSize(16);
-  text("FPS: " + floor(frameRate()), 10, 20);
-  pop();
-}
+        function setup() {
+            // Set canvas to 99% of window dimensions, ensuring at least 1px
+            const w = max(1, windowWidth * 0.99);
+            const h = max(1, windowHeight * 0.99);
+            createCanvas(w, h);
+            
+            // The buffer should be square based on the larger dimension 
+            const maxDim = max(1, w, h);
+            pg = createGraphics(maxDim, maxDim);
+            pg.pixelDensity(1);
+            
+            pixelDensity(1); 
+            background(0);
+        }
 
-function windowResized() { resizeCanvas(windowWidth, windowHeight); }
+        function draw() {
+            // Safety check: Don't draw if the buffer isn't ready or has 0 dimensions
+            if (!pg || pg.width <= 0 || pg.height <= 0) return;
 
+            background(0); 
 
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const pgMid = pg.width / 2;
+            
+            const baseScale = min(width, height) / 350;
+
+            // 1. Draw the "base segment" into the buffer
+            pg.clear();
+            pg.stroke(255, 180);
+            pg.strokeWeight(1.2);
+            
+            for (let i = 2e4; i--;) {
+                if (i > 8) {
+                    let k = i % 25 - 12;
+                    let e = i / 800;
+                    let d = 7 * cos(mag(k, e) / 3 + fractalTime / 2);
+                    
+                    let px = (k * 4 + d * k * sin(d + e / 9 + fractalTime)) * baseScale + pgMid;
+                    let py = (e * 2 - d * 9 - d * 9 * cos(d + fractalTime)) * baseScale + pgMid;
+                    pg.point(px, py);
+                }
+            }
+
+            // 2. Render to main canvas with Pan and Zoom
+            push();
+            translate(centerX + viewOffsetX, centerY + viewOffsetY);
+            scale(viewZoom);
+            translate(-centerX, -centerY);
+
+            for (let r = 0; r < 8; r++) {
+                push();
+                translate(centerX, centerY);
+                rotate(r * PI / 4);
+                image(pg, -pgMid, -pgMid);
+                pop();
+            }
+            pop();
+
+            fractalTime += PI / 180;
+
+            document.getElementById('fps').innerText = `FPS: ${floor(frameRate())}`;
+            document.getElementById('zoom-label').innerText = `Zoom: ${viewZoom.toFixed(2)}x`;
+        }
+
+        // --- INTERACTION HANDLERS ---
+
+        function mouseWheel(event) {
+            let zoomSpeed = 0.001;
+            viewZoom -= event.delta * zoomSpeed * viewZoom;
+            viewZoom = constrain(viewZoom, 0.05, 50);
+            return false;
+        }
+
+        function mousePressed() {
+            // Check if we clicked on a UI element
+            if (mouseX > width - 100 && mouseY < 50) return; 
+            
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+        }
+
+        function mouseDragged() {
+            if (touches.length < 2) {
+                viewOffsetX += (mouseX - prevMouseX);
+                viewOffsetY += (mouseY - prevMouseY);
+                prevMouseX = mouseX;
+                prevMouseY = mouseY;
+            }
+        }
+
+        function touchMoved() {
+            if (touches.length === 2) {
+                let d = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+                if (lastPinchDist > 0) {
+                    let diff = d - lastPinchDist;
+                    viewZoom += diff * 0.01 * viewZoom;
+                    viewZoom = constrain(viewZoom, 0.05, 50);
+                }
+                lastPinchDist = d;
+            } else if (touches.length === 1) {
+                viewOffsetX += (touches[0].x - prevMouseX);
+                viewOffsetY += (touches[0].y - prevMouseY);
+                prevMouseX = touches[0].x;
+                prevMouseY = touches[0].y;
+            }
+            return false; 
+        }
+
+        function touchStarted() {
+            if (touches.length === 2) {
+                lastPinchDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+            } else {
+                prevMouseX = touches[0].x;
+                prevMouseY = touches[0].y;
+            }
+        }
+
+        function touchEnded() {
+            lastPinchDist = 0;
+        }
+
+        function windowResized() {
+            // Ensure dimensions are always at least 1 to prevent drawImage errors
+            const w = max(1, windowWidth * 0.99);
+            const h = max(1, windowHeight * 0.99);
+            resizeCanvas(w, h);
+            const maxDim = max(1, w, h);
+            if (pg) pg.resizeCanvas(maxDim, maxDim);
+        }
     </script>
-  </body>
+</body>
 </html>
-
