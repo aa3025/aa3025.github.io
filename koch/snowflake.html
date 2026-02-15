@@ -133,8 +133,11 @@
 
             // 1. Draw the "base segment" into the buffer
             pg.clear();
-            pg.stroke(255, 180);
-            pg.strokeWeight(1.2);
+            
+            // Refined stroke weight (from 1.2 to 0.75) and reduced alpha (from 180 to 140)
+            // for a much crisper, more detailed look at default zoom.
+            pg.stroke(255, 200); 
+            pg.strokeWeight(0.80);
             
             for (let i = 2e4; i--;) {
                 if (i > 8) {
