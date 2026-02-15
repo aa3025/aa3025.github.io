@@ -14,7 +14,7 @@
   clear();
 
   // Changed i>8 and i^8 to accommodate 8-sided symmetry (PI/4)
-  for(t+=PI/240, i=2e4; i--;)
+  for(t+=PI/180, i=2e4; i--;)
     i>8 ? (
       d = 7 * cos(mag(k=i%25-12, e=i/800)/3 + t/2),
       // 2. Multiply coordinates by S to scale the drawing
