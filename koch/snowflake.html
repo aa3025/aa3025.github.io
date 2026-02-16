@@ -123,6 +123,13 @@
                 </div>
             </div>
             <div class="control-group">
+                <label>Speed</label>
+                <div class="slider-row">
+                    <input type="range" id="speed-slider" min="0" max="5" step="0.1" value="1">
+                    <span class="val-display" id="val-speed">1.0</span>
+                </div>
+            </div>
+            <div class="control-group">
                 <label>Amplitude</label>
                 <div class="slider-row">
                     <input type="range" id="amp-slider" min="1" max="25" step="0.5" value="7">
@@ -200,7 +207,7 @@
                     let k = i % 25 - 12;
                     let e = i / 800;
                     let d = amp * Math.cos(Math.hypot(k, e) / freq + t / 2);
-                    let px = (k * 4 + d * k * Math.sin(d + e / comp + t)) * S + mX;
+                    let px = (k * 4 + d * k * Math.sin(d + e / 9 + t)) * S + mX;
                     let py = (e * 2 - d * 9 - d * 9 * Math.cos(d + t)) * S + mY;
                     ctx.fillRect(px - sw/2, py - sw/2, sw, sw);
                 }
@@ -228,7 +235,8 @@
             freq: 3,
             comp: 9,
             count: 20000,
-            petals: 8
+            petals: 8,
+            speed: 1.0
         };
 
         function toggleFullscreen() {
@@ -268,6 +276,10 @@
                 params.petals = parseInt(e.target.value);
                 document.getElementById('val-petals').innerText = params.petals;
             };
+            document.getElementById('speed-slider').oninput = (e) => {
+                params.speed = parseFloat(e.target.value);
+                document.getElementById('val-speed').innerText = params.speed.toFixed(1);
+            };
             document.getElementById('amp-slider').oninput = (e) => {
                 params.amp = parseFloat(e.target.value);
                 document.getElementById('val-amp').innerText = params.amp.toFixed(1);
@@ -294,7 +306,8 @@
             const centerX = width / 2;
             const centerY = height / 2;
 
-            fractalTime += (PI / 180) * (deltaTime / 16.67);
+            // Updated with params.speed for dynamic evolution rate control
+            fractalTime += (PI / 180) * (deltaTime / 16.67) * params.speed;
 
             if (!workerBusy) {
                 workerBusy = true;
@@ -335,7 +348,7 @@
         }
 
         function mousePressed() {
-            if (mouseX < 220 && mouseY < 280) return;
+            if (mouseX < 220 && mouseY < 320) return;
             if (mouseY < 60 && mouseX > width - 100) return;
             
             prevMouseX = mouseX; prevMouseY = mouseY;
@@ -368,7 +381,7 @@
             if (touches.length === 2) {
                 lastPinchDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
             } else {
-                if (touches[0].x < 220 && touches[0].y < 280) {
+                if (touches[0].x < 220 && touches[0].y < 320) {
                     prevMouseX = undefined;
                     return;
                 }
