@@ -12,13 +12,14 @@
             background-color: #000;
             overflow: hidden;
             display: flex;
-            justify(content): center;
+            justify-content: center;
             align-items: center;
             height: 100vh;
             width: 100vw;
             touch-action: none;
         }
         canvas { display: block; }
+        
         #ui-layer {
             position: absolute;
             top: 15px;
@@ -29,6 +30,36 @@
             user-select: none;
             z-index: 10;
         }
+
+        #control-box {
+            background: rgba(20, 20, 20, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            pointer-events: auto;
+            backdrop-filter: blur(5px);
+            width: 180px;
+        }
+
+        .control-group {
+            margin-bottom: 8px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .control-group input[type=range] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: rgba(255, 255, 255, 0.5);
+        }
+
         .btn-fullscreen {
             position: absolute;
             top: 15px;
@@ -41,7 +72,15 @@
             cursor: pointer;
             z-index: 20;
             pointer-events: auto;
+            transition: all 0.2s;
+            font-size: 12px;
         }
+
+        .btn-fullscreen:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
         #credits {
             position: absolute;
             bottom: 10px;
@@ -56,9 +95,29 @@
 </head>
 <body>
     <div id="ui-layer">
-        <div id="fps" style="font-weight: bold;">FPS: 0</div>
-        <div id="zoom-label">Zoom: 1.00x</div>
-        <div style="font-size: 0.75em; margin-top: 8px;">Worker: Active</div>
+        <div id="status">
+            <span id="fps" style="font-weight: bold;">FPS: 0</span> • 
+            <span id="zoom-label">Zoom: 1.00x</span>
+        </div>
+
+        <div id="control-box">
+            <div class="control-group">
+                <label>Amplitude</label>
+                <input type="range" id="amp-slider" min="1" max="25" step="0.5" value="7">
+            </div>
+            <div class="control-group">
+                <label>Frequency</label>
+                <input type="range" id="freq-slider" min="0.5" max="10" step="0.1" value="3">
+            </div>
+            <div class="control-group">
+                <label>Complexity</label>
+                <input type="range" id="comp-slider" min="1" max="20" step="0.5" value="9">
+            </div>
+            <div class="control-group">
+                <label>Points</label>
+                <input type="range" id="points-slider" min="2000" max="50000" step="1000" value="20000">
+            </div>
+        </div>
     </div>
 
     <button class="btn-fullscreen" onclick="toggleFullscreen()">Fullscreen</button>
@@ -74,7 +133,7 @@
         let dPR = 1;
 
         self.onmessage = function(e) {
-            const { type, w, h, time, mobile, density, logicalW, logicalH } = e.data;
+            const { type, w, h, time, mobile, density, logicalW, logicalH, params } = e.data;
             
             if (type === 'init') {
                 canvas = e.data.canvas;
@@ -82,32 +141,37 @@
                 isMobile = mobile;
                 dPR = density;
             } else if (type === 'render') {
-                render(w, h, time, logicalW, logicalH);
+                render(w, h, time, logicalW, logicalH, params);
             }
         };
 
-        function render(w, h, t, logicalW, logicalH) {
+        function render(w, h, t, logicalW, logicalH, params) {
             if (!ctx) return;
             
             ctx.clearRect(0, 0, w, h);
             
-            // Physics math must use LOGICAL dimensions to match S = min(W,H)/350
             const mX = w / 2;
             const mY = h / 2;
             const S = (Math.min(logicalW, logicalH) / 350) * dPR;
             const sw = (isMobile ? 0.70 : 0.80) * dPR;
 
-            // Matching original stroke(255, 150) -> 150/255 = 0.58 alpha
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            // Use dynamic parameters from the main thread
+            const amp = params.amp;
+            const freq = params.freq;
+            const comp = params.comp;
+            const count = params.count;
 
-            for (let i = 2e4; i--;) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.58)';
+
+            for (let i = count; i--;) {
                 if (i > 8) {
                     let k = i % 25 - 12;
                     let e = i / 800;
-                    let d = 7 * Math.cos(Math.hypot(k, e) / 3 + t / 2);
                     
-                    // The coordinate math now uses the scaled S (corrected for dPR)
-                    let px = (k * 4 + d * k * Math.sin(d + e / 9 + t)) * S + mX;
+                    // Core math now uses interactive parameters
+                    let d = amp * Math.cos(Math.hypot(k, e) / freq + t / 2);
+                    
+                    let px = (k * 4 + d * k * Math.sin(d + e / comp + t)) * S + mX;
                     let py = (e * 2 - d * 9 - d * 9 * Math.cos(d + t)) * S + mY;
                     
                     ctx.fillRect(px - sw/2, py - sw/2, sw, sw);
@@ -120,7 +184,7 @@
 
     <script>
         let fractalTime = 0;
-        let viewZoom = 0.7;
+        let viewZoom = 1.0;
         let viewOffsetX = 0;
         let viewOffsetY = 0;
         let lastPinchDist = 0;
@@ -130,6 +194,14 @@
         let worker;
         let offscreenCanvas; 
         let workerBusy = false;
+
+        // Current parameters linked to sliders
+        const params = {
+            amp: 7,
+            freq: 3,
+            comp: 9,
+            count: 20000
+        };
 
         function toggleFullscreen() {
             fullscreen(!fullscreen());
@@ -163,6 +235,12 @@
                 if (e.data.type === 'rendered') workerBusy = false;
             };
 
+            // Slider Listeners
+            document.getElementById('amp-slider').oninput = (e) => params.amp = parseFloat(e.target.value);
+            document.getElementById('freq-slider').oninput = (e) => params.freq = parseFloat(e.target.value);
+            document.getElementById('comp-slider').oninput = (e) => params.comp = parseFloat(e.target.value);
+            document.getElementById('points-slider').oninput = (e) => params.count = parseInt(e.target.value);
+
             background(0);
         }
 
@@ -172,15 +250,19 @@
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // Frame-rate independent rotation
+            fractalTime += (PI / 180) * (deltaTime / 16.67);
+
             if (!workerBusy) {
                 workerBusy = true;
                 worker.postMessage({
                     type: 'render',
                     w: offscreenCanvas.width,
                     h: offscreenCanvas.height,
-                    logicalW: width, // Passing logical width for math consistency
+                    logicalW: width,
                     logicalH: height,
-                    time: fractalTime
+                    time: fractalTime,
+                    params: params // Send current slider states to worker
                 });
             }
 
@@ -199,8 +281,6 @@
                 pop();
             }
             pop();
-
-            fractalTime += PI / 240;
             
             document.getElementById('fps').innerText = `FPS: ${floor(frameRate())}`;
             document.getElementById('zoom-label').innerText = `Zoom: ${viewZoom.toFixed(2)}x`;
@@ -212,15 +292,21 @@
         }
 
         function mousePressed() {
+            // Only allow dragging if we aren't interacting with UI
+            if (mouseX < 220 && mouseY < 250) return;
             if (mouseY < 60 && mouseX > width - 100) return;
+            
             prevMouseX = mouseX; prevMouseY = mouseY;
         }
 
         function mouseDragged() {
             if (touches.length < 2) {
-                viewOffsetX += (mouseX - prevMouseX);
-                viewOffsetY += (mouseY - prevMouseY);
-                prevMouseX = mouseX; prevMouseY = mouseY;
+                // If the drag started on the canvas, move view
+                if (prevMouseX !== undefined) {
+                    viewOffsetX += (mouseX - prevMouseX);
+                    viewOffsetY += (mouseY - prevMouseY);
+                    prevMouseX = mouseX; prevMouseY = mouseY;
+                }
             }
         }
 
@@ -229,7 +315,7 @@
                 let d = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
                 if (lastPinchDist > 0) viewZoom = constrain(viewZoom + (d - lastPinchDist) * 0.01 * viewZoom, 0.05, 50);
                 lastPinchDist = d;
-            } else {
+            } else if (prevMouseX !== undefined) {
                 viewOffsetX += (touches[0].x - prevMouseX);
                 viewOffsetY += (touches[0].y - prevMouseY);
                 prevMouseX = touches[0].x; prevMouseY = touches[0].y;
@@ -238,11 +324,22 @@
         }
 
         function touchStarted() {
-            if (touches.length === 2) lastPinchDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
-            else { prevMouseX = touches[0].x; prevMouseY = touches[0].y; }
+            if (touches.length === 2) {
+                lastPinchDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+            } else {
+                // Prevent canvas drag if touching UI
+                if (touches[0].x < 220 && touches[0].y < 250) {
+                    prevMouseX = undefined;
+                    return;
+                }
+                prevMouseX = touches[0].x; prevMouseY = touches[0].y; 
+            }
         }
 
-        function touchEnded() { lastPinchDist = 0; }
+        function touchEnded() { 
+            lastPinchDist = 0; 
+            prevMouseX = undefined;
+        }
 
         function windowResized() {
             const w = max(1, windowWidth * 0.99);
