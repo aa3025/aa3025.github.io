@@ -98,7 +98,7 @@
             const sw = (isMobile ? 0.70 : 0.80) * dPR;
 
             // Matching original stroke(255, 150) -> 150/255 = 0.58 alpha
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.58)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
 
             for (let i = 2e4; i--;) {
                 if (i > 8) {
@@ -200,7 +200,7 @@
             }
             pop();
 
-            fractalTime += PI / 180;
+            fractalTime += PI / 240;
             
             document.getElementById('fps').innerText = `FPS: ${floor(frameRate())}`;
             document.getElementById('zoom-label').innerText = `Zoom: ${viewZoom.toFixed(2)}x`;
