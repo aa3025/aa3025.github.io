@@ -39,7 +39,7 @@
             margin-top: 10px;
             pointer-events: auto;
             backdrop-filter: blur(5px);
-            width: 180px;
+            width: 200px;
         }
 
         .control-group {
@@ -54,10 +54,24 @@
             margin-bottom: 4px;
         }
 
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .control-group input[type=range] {
-            width: 100%;
+            flex-grow: 1;
             cursor: pointer;
             accent-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .val-display {
+            font-size: 11px;
+            font-family: monospace;
+            min-width: 35px;
+            text-align: right;
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .btn-fullscreen {
@@ -97,25 +111,44 @@
     <div id="ui-layer">
         <div id="status">
             <span id="fps" style="font-weight: bold;">FPS: 0</span> • 
-            <span id="zoom-label">Zoom: 1.00x</span>
+            <span id="zoom-label">Zoom: 0.67x</span>
         </div>
 
         <div id="control-box">
             <div class="control-group">
+                <label>Petals</label>
+                <div class="slider-row">
+                    <input type="range" id="petals-slider" min="3" max="24" step="1" value="8">
+                    <span class="val-display" id="val-petals">8</span>
+                </div>
+            </div>
+            <div class="control-group">
                 <label>Amplitude</label>
-                <input type="range" id="amp-slider" min="1" max="25" step="0.5" value="7">
+                <div class="slider-row">
+                    <input type="range" id="amp-slider" min="1" max="25" step="0.5" value="7">
+                    <span class="val-display" id="val-amp">7.0</span>
+                </div>
             </div>
             <div class="control-group">
                 <label>Frequency</label>
-                <input type="range" id="freq-slider" min="0.5" max="10" step="0.1" value="3">
+                <div class="slider-row">
+                    <input type="range" id="freq-slider" min="0.5" max="10" step="0.1" value="3">
+                    <span class="val-display" id="val-freq">3.0</span>
+                </div>
             </div>
             <div class="control-group">
                 <label>Complexity</label>
-                <input type="range" id="comp-slider" min="1" max="20" step="0.5" value="9">
+                <div class="slider-row">
+                    <input type="range" id="comp-slider" min="1" max="20" step="0.5" value="9">
+                    <span class="val-display" id="val-comp">9.0</span>
+                </div>
             </div>
             <div class="control-group">
                 <label>Points</label>
-                <input type="range" id="points-slider" min="2000" max="50000" step="1000" value="20000">
+                <div class="slider-row">
+                    <input type="range" id="points-slider" min="2000" max="50000" step="1000" value="20000">
+                    <span class="val-display" id="val-points">20k</span>
+                </div>
             </div>
         </div>
     </div>
@@ -155,7 +188,6 @@
             const S = (Math.min(logicalW, logicalH) / 350) * dPR;
             const sw = (isMobile ? 0.70 : 0.80) * dPR;
 
-            // Use dynamic parameters from the main thread
             const amp = params.amp;
             const freq = params.freq;
             const comp = params.comp;
@@ -167,13 +199,9 @@
                 if (i > 8) {
                     let k = i % 25 - 12;
                     let e = i / 800;
-                    
-                    // Core math now uses interactive parameters
                     let d = amp * Math.cos(Math.hypot(k, e) / freq + t / 2);
-                    
                     let px = (k * 4 + d * k * Math.sin(d + e / comp + t)) * S + mX;
                     let py = (e * 2 - d * 9 - d * 9 * Math.cos(d + t)) * S + mY;
-                    
                     ctx.fillRect(px - sw/2, py - sw/2, sw, sw);
                 }
             }
@@ -184,7 +212,7 @@
 
     <script>
         let fractalTime = 0;
-        let viewZoom = 0.67;
+        let viewZoom = 0.67; 
         let viewOffsetX = 0;
         let viewOffsetY = 0;
         let lastPinchDist = 0;
@@ -195,12 +223,12 @@
         let offscreenCanvas; 
         let workerBusy = false;
 
-        // Current parameters linked to sliders
         const params = {
             amp: 7,
             freq: 3,
             comp: 9,
-            count: 20000
+            count: 20000,
+            petals: 8
         };
 
         function toggleFullscreen() {
@@ -235,11 +263,27 @@
                 if (e.data.type === 'rendered') workerBusy = false;
             };
 
-            // Slider Listeners
-            document.getElementById('amp-slider').oninput = (e) => params.amp = parseFloat(e.target.value);
-            document.getElementById('freq-slider').oninput = (e) => params.freq = parseFloat(e.target.value);
-            document.getElementById('comp-slider').oninput = (e) => params.comp = parseFloat(e.target.value);
-            document.getElementById('points-slider').oninput = (e) => params.count = parseInt(e.target.value);
+            // Slider Listeners with Value Displays
+            document.getElementById('petals-slider').oninput = (e) => {
+                params.petals = parseInt(e.target.value);
+                document.getElementById('val-petals').innerText = params.petals;
+            };
+            document.getElementById('amp-slider').oninput = (e) => {
+                params.amp = parseFloat(e.target.value);
+                document.getElementById('val-amp').innerText = params.amp.toFixed(1);
+            };
+            document.getElementById('freq-slider').oninput = (e) => {
+                params.freq = parseFloat(e.target.value);
+                document.getElementById('val-freq').innerText = params.freq.toFixed(1);
+            };
+            document.getElementById('comp-slider').oninput = (e) => {
+                params.comp = parseFloat(e.target.value);
+                document.getElementById('val-comp').innerText = params.comp.toFixed(1);
+            };
+            document.getElementById('points-slider').oninput = (e) => {
+                params.count = parseInt(e.target.value);
+                document.getElementById('val-points').innerText = (params.count / 1000) + 'k';
+            };
 
             background(0);
         }
@@ -250,7 +294,6 @@
             const centerX = width / 2;
             const centerY = height / 2;
 
-            // Frame-rate independent rotation
             fractalTime += (PI / 180) * (deltaTime / 16.67);
 
             if (!workerBusy) {
@@ -262,7 +305,7 @@
                     logicalW: width,
                     logicalH: height,
                     time: fractalTime,
-                    params: params // Send current slider states to worker
+                    params: params
                 });
             }
 
@@ -273,10 +316,10 @@
 
             const ctx = drawingContext;
 
-            for (let r = 0; r < 8; r++) {
+            for (let r = 0; r < params.petals; r++) {
                 push();
                 translate(centerX, centerY);
-                rotate(r * PI / 4);
+                rotate(r * (TWO_PI / params.petals));
                 ctx.drawImage(offscreenCanvas, -centerX, -centerY, width, height);
                 pop();
             }
@@ -292,8 +335,7 @@
         }
 
         function mousePressed() {
-            // Only allow dragging if we aren't interacting with UI
-            if (mouseX < 220 && mouseY < 250) return;
+            if (mouseX < 220 && mouseY < 280) return;
             if (mouseY < 60 && mouseX > width - 100) return;
             
             prevMouseX = mouseX; prevMouseY = mouseY;
@@ -301,7 +343,6 @@
 
         function mouseDragged() {
             if (touches.length < 2) {
-                // If the drag started on the canvas, move view
                 if (prevMouseX !== undefined) {
                     viewOffsetX += (mouseX - prevMouseX);
                     viewOffsetY += (mouseY - prevMouseY);
@@ -327,8 +368,7 @@
             if (touches.length === 2) {
                 lastPinchDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
             } else {
-                // Prevent canvas drag if touching UI
-                if (touches[0].x < 220 && touches[0].y < 250) {
+                if (touches[0].x < 220 && touches[0].y < 280) {
                     prevMouseX = undefined;
                     return;
                 }
