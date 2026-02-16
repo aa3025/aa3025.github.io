@@ -209,6 +209,7 @@
             const S = (Math.min(logicalW, logicalH) / 350) * dPR;
             const sw = (isMobile ? 0.70 : 0.80) * dPR;
 
+            // Extract dynamic parameters
             const amp = params.amp;
             const freq = params.freq;
             const comp = params.comp;
@@ -220,9 +221,14 @@
                 if (i > 8) {
                     let k = i % 25 - 12;
                     let e = i / 800;
-                    let d = amp * Math.cos(Math.hypot(k, e) / 3 + t / 2);
-                    let px = (k * 4 + d * k * Math.sin(d + e / 9 + t)) * S + mX;
+                    
+                    // freq affects the radial ripple speed/density (Math.hypot / freq)
+                    let d = amp * Math.cos(Math.hypot(k, e) / freq + t / 2);
+                    
+                    // comp affects the complexity of the sin folding (e / comp)
+                    let px = (k * 4 + d * k * Math.sin(d + e / comp + t)) * S + mX;
                     let py = (e * 2 - d * 9 - d * 9 * Math.cos(d + t)) * S + mY;
+                    
                     ctx.fillRect(px - sw/2, py - sw/2, sw, sw);
                 }
             }
@@ -264,7 +270,6 @@
         }
 
         function takeScreenshot() {
-            // p5.js saveCanvas saves the current frame of the main canvas
             saveCanvas('fractal_explorer_' + floor(Date.now() / 1000), 'png');
         }
 
@@ -296,7 +301,7 @@
                 if (e.data.type === 'rendered') workerBusy = false;
             };
 
-            // Slider Listeners
+            // Slider Listeners - Ensuring params are updated before being sent to worker
             document.getElementById('petals-slider').oninput = (e) => {
                 params.petals = parseInt(e.target.value);
                 document.getElementById('val-petals').innerText = params.petals;
@@ -331,12 +336,10 @@
             const centerX = width / 2;
             const centerY = height / 2;
 
-            // Only update time if not paused
             if (!isPaused) {
                 fractalTime += (PI / 180) * (deltaTime / 16.67) * params.speed;
             }
 
-            // Always render current state (allows zooming/panning while paused)
             if (!workerBusy) {
                 workerBusy = true;
                 worker.postMessage({
@@ -376,10 +379,8 @@
         }
 
         function mousePressed() {
-            // Updated UI boundary check
             if (mouseX < 220 && mouseY < 350) return;
             if (mouseY < 120 && mouseX > width - 120) return;
-            
             prevMouseX = mouseX; prevMouseY = mouseY;
         }
 
@@ -414,7 +415,6 @@
                     prevMouseX = undefined;
                     return;
                 }
-                // Check top-right buttons
                 if (touches[0].x > width - 120 && touches[0].y < 120) {
                     prevMouseX = undefined;
                     return;
