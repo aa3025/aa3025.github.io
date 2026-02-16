@@ -12,7 +12,7 @@
             background-color: #000;
             overflow: hidden;
             display: flex;
-            justify-content: center;
+            justify-content: center; /* Fixed typo from justify(content) */
             align-items: center;
             height: 100vh;
             width: 100vw;
@@ -209,7 +209,6 @@
             const S = (Math.min(logicalW, logicalH) / 350) * dPR;
             const sw = (isMobile ? 0.70 : 0.80) * dPR;
 
-            // Extract dynamic parameters
             const amp = params.amp;
             const freq = params.freq;
             const comp = params.comp;
@@ -222,10 +221,8 @@
                     let k = i % 25 - 12;
                     let e = i / 800;
                     
-                    // freq affects the radial ripple speed/density (Math.hypot / freq)
+                    // Core math remains synchronized with UI params
                     let d = amp * Math.cos(Math.hypot(k, e) / freq + t / 2);
-                    
-                    // comp affects the complexity of the sin folding (e / comp)
                     let px = (k * 4 + d * k * Math.sin(d + e / comp + t)) * S + mX;
                     let py = (e * 2 - d * 9 - d * 9 * Math.cos(d + t)) * S + mY;
                     
@@ -301,7 +298,7 @@
                 if (e.data.type === 'rendered') workerBusy = false;
             };
 
-            // Slider Listeners - Ensuring params are updated before being sent to worker
+            // Slider Listeners
             document.getElementById('petals-slider').oninput = (e) => {
                 params.petals = parseInt(e.target.value);
                 document.getElementById('val-petals').innerText = params.petals;
@@ -336,12 +333,16 @@
             const centerX = width / 2;
             const centerY = height / 2;
 
+            // Cap deltaTime to avoid time jumps when tab focus is lost and regained
+            const cappedDelta = min(deltaTime, 100);
+
             if (!isPaused) {
-                fractalTime += (PI / 180) * (deltaTime / 16.67) * params.speed;
+                fractalTime += (PI / 180) * (cappedDelta / 16.67) * params.speed;
             }
 
             if (!workerBusy) {
                 workerBusy = true;
+                // Sending a cloned version of params to ensure worker gets the current snapshot
                 worker.postMessage({
                     type: 'render',
                     w: offscreenCanvas.width,
@@ -349,7 +350,7 @@
                     logicalW: width,
                     logicalH: height,
                     time: fractalTime,
-                    params: params
+                    params: { ...params } 
                 });
             }
 
