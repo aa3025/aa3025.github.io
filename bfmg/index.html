@@ -55,6 +55,14 @@
         .toggle-checkbox:checked + .toggle-label .toggle-dot {
             transform: translateX(1.25rem);
         }
+
+        /* Cursor styles for panning */
+        #mainCanvas {
+            cursor: grab;
+        }
+        #mainCanvas:active {
+            cursor: grabbing;
+        }
     </style>
 </head>
 <body class="bg-zinc-50 text-zinc-900 overflow-hidden">
@@ -190,9 +198,9 @@
                     <div class="bg-zinc-50 rounded-xl p-4 border border-zinc-200 flex items-start gap-3">
                         <i data-lucide="mouse-pointer-2" class="text-zinc-400 w-4 h-4 mt-0.5 shrink-0"></i>
                         <div>
-                            <h4 class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest mb-1">Zoom Limits</h4>
+                            <h4 class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest mb-1">Interaction</h4>
                             <p class="text-[11px] text-zinc-500 leading-tight">
-                                Minimum zoom set to 100%. Use scroll wheel to dive into the structure.
+                                Left-click & drag to pan. Scroll to zoom.
                             </p>
                         </div>
                     </div>
@@ -202,7 +210,7 @@
             <!-- Canvas Area -->
             <div class="flex-1 bg-zinc-100 p-8 relative flex items-center justify-center">
                 <div class="w-full h-full relative">
-                    <canvas id="mainCanvas" class="w-full h-full rounded-2xl shadow-xl bg-white cursor-crosshair border border-zinc-200"></canvas>
+                    <canvas id="mainCanvas" class="w-full h-full rounded-2xl shadow-xl bg-white border border-zinc-200"></canvas>
                 </div>
                 
                 <!-- Info Modal -->
@@ -214,7 +222,7 @@
                             A Hexflake is a fractal constructed by repeatedly replacing a hexagon with seven smaller ones. 
                         </p>
                         <p class="text-zinc-600 mb-6 leading-relaxed text-sm">
-                            Use your <strong>mouse wheel</strong> to zoom in. The renderer automatically prunes details that are too small to see, ensuring a smooth experience even at high complexity levels.
+                            Use your <strong>mouse wheel</strong> to zoom in and <strong>left mouse button</strong> to pan. The renderer automatically prunes details that are too small to see.
                         </p>
                         <button id="closeInfoBtn" class="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-bold transition-colors shadow-lg shadow-zinc-900/20">
                             Start Exploring
@@ -253,20 +261,27 @@
         const closeInfoBtn = document.getElementById('closeInfoBtn');
         const modalOverlay = document.getElementById('modalOverlay');
 
-        // State Management - ensure initial values match updated defaults
+        // State Management
         const state = {
             depth: parseInt(depthInput.value),
             color: fgColorInput.value,
             bgColor: bgColorInput.value,
             rotation: parseInt(rotationInput.value),
             scale: parseFloat(scaleInput.value),
-            showCenter: centerToggle.checked, // Initialized as false (unchecked)
-            text: textContentInput.value,     // Initialized as "BFMG"
-            fontSize: parseInt(fontSizeInput.value), // Initialized as 76
-            fontFamily: fontFamilyInput.value, // Initialized as 'Libre Baskerville'
+            offsetX: 0,
+            offsetY: 0,
+            showCenter: centerToggle.checked, 
+            text: textContentInput.value,     
+            fontSize: parseInt(fontSizeInput.value), 
+            fontFamily: fontFamilyInput.value, 
             isBold: false,
             isItalic: false
         };
+
+        // Internal Interaction State
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
 
         // Drawing Logic
         function drawHexagon(x, y, radius) {
@@ -315,13 +330,17 @@
             ctx.lineWidth = Math.max(0.2, (1.5 - state.depth * 0.1) / (state.scale * 0.5));
 
             ctx.save();
-            ctx.translate(width / 2, height / 2);
-            ctx.rotate((state.rotation * Math.PI) / 180);
+            // Move to center + user pan offset
+            ctx.translate(width / 2 + state.offsetX, height / 2 + state.offsetY);
             
+            // Fractal Drawing - Rotated
+            ctx.save();
+            ctx.rotate((state.rotation * Math.PI) / 180);
             const baseRadius = (Math.min(width, height) / 2) * state.scale;
             drawHexflake(0, 0, baseRadius, state.depth);
+            ctx.restore();
 
-            // Draw Text
+            // Text Drawing - Not Rotated
             if (state.text.trim()) {
                 const currentFontSize = state.fontSize * state.scale;
                 const fontStyle = `${state.isItalic ? 'italic ' : ''}${state.isBold ? 'bold ' : ''}`;
@@ -342,7 +361,35 @@
             render();
         }
 
-        // Interaction Handlers
+        // Mouse Pan Interaction Handlers
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) { // Left click
+                isDragging = true;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const dx = e.clientX - lastMouseX;
+            const dy = e.clientY - lastMouseY;
+            
+            state.offsetX += dx;
+            state.offsetY += dy;
+            
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            
+            render();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Other Interaction Handlers
         depthInput.addEventListener('input', (e) => {
             state.depth = parseInt(e.target.value);
             depthLabel.textContent = `Level ${state.depth}`;
@@ -411,6 +458,8 @@
         resetBtn.addEventListener('click', () => {
             state.rotation = 0;
             state.scale = 1.0;
+            state.offsetX = 0;
+            state.offsetY = 0;
             state.showCenter = false; 
             state.text = 'BFMG'; 
             state.fontSize = 76; 
