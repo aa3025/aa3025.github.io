@@ -183,6 +183,16 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Transparent Export Option -->
+                        <div class="flex items-center justify-between bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                            <span class="text-xs text-zinc-700 font-medium">Transparent Export</span>
+                            <div class="relative inline-block w-10 h-5 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" name="trans-toggle" id="transparentToggle" class="toggle-checkbox absolute opacity-0 w-10 h-5 cursor-pointer z-10" />
+                                <label for="transparentToggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-200 cursor-pointer transition-colors duration-200">
+                                    <span class="toggle-dot block w-4 h-4 mt-0.5 ml-0.5 rounded-full bg-white shadow-sm transform transition-transform"></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -244,7 +254,7 @@
                             <li><strong>Vector SVG:</strong> Exports the fractal as a scale-independent vector file for design software.</li>
                         </ul>
                         <button id="closeInfoBtn" class="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-bold transition-colors shadow-lg shadow-zinc-900/20">
-                            Got it!
+                            Start Exploring
                         </button>
                     </div>
                 </div>
@@ -266,6 +276,7 @@
         const italicBtn = document.getElementById('italicBtn');
         const fgColorInput = document.getElementById('fgColorInput');
         const bgColorInput = document.getElementById('bgColorInput');
+        const transparentToggle = document.getElementById('transparentToggle');
         const fgHex = document.getElementById('fgHex');
         const bgHex = document.getElementById('bgHex');
         const fgRgb = document.getElementById('fgRgb');
@@ -293,6 +304,7 @@
             depth: parseInt(depthInput.value),
             color: fgColorInput.value,
             bgColor: bgColorInput.value,
+            transparentExport: transparentToggle.checked,
             rotation: parseInt(rotationInput.value),
             scale: parseFloat(scaleInput.value),
             offsetX: 0,
@@ -398,8 +410,11 @@
             offscreen.height = size;
             const octx = offscreen.getContext('2d');
 
-            octx.fillStyle = state.bgColor;
-            octx.fillRect(0, 0, size, size);
+            // Conditional background fill
+            if (!state.transparentExport) {
+                octx.fillStyle = state.bgColor;
+                octx.fillRect(0, 0, size, size);
+            }
 
             octx.save();
             octx.translate(size / 2 + state.offsetX, size / 2 + state.offsetY);
@@ -425,7 +440,7 @@
             octx.restore();
 
             const link = document.createElement('a');
-            link.download = `hexflake-4k.png`;
+            link.download = `hexflake-4k${state.transparentExport ? '-transparent' : ''}.png`;
             link.href = offscreen.toDataURL('image/png', 1.0);
             link.click();
             exportDropdown.classList.add('hidden');
@@ -464,9 +479,12 @@
                     ${state.text}
                 </text>` : "";
 
+            // Conditional background rect
+            const bgRect = state.transparentExport ? "" : `<rect width="100%" height="100%" fill="${state.bgColor}" />`;
+
             const svgString = `
                 <svg viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="100%" height="100%" fill="${state.bgColor}" />
+                    ${bgRect}
                     <g transform="translate(${size/2 + state.offsetX}, ${size/2 + state.offsetY})">
                         <g transform="rotate(${state.rotation})" stroke="${state.color}" stroke-width="${lineWidth}">
                             ${svgPaths}
@@ -480,7 +498,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `hexflake.svg`;
+            link.download = `hexflake${state.transparentExport ? '-transparent' : ''}.svg`;
             link.click();
             URL.revokeObjectURL(url);
             exportDropdown.classList.add('hidden');
@@ -532,6 +550,7 @@
         });
 
         centerToggle.addEventListener('change', (e) => { state.showCenter = e.target.checked; render(); });
+        transparentToggle.addEventListener('change', (e) => { state.transparentExport = e.target.checked; });
 
         fgColorInput.addEventListener('input', (e) => {
             state.color = e.target.value;
@@ -562,10 +581,12 @@
         resetBtn.addEventListener('click', () => {
             state.rotation = 0; state.scale = 1.0; state.offsetX = 0; state.offsetY = 0;
             state.showCenter = false; state.text = 'BFMG'; state.fontSize = 76;
+            state.transparentExport = false;
             textContentInput.value = 'BFMG'; fontSizeInput.value = 76;
             fontSizeLabel.textContent = '76px'; rotationInput.value = 0;
             rotationLabel.textContent = '0°'; scaleInput.value = 1.0;
             scaleLabel.textContent = '100%'; centerToggle.checked = false;
+            transparentToggle.checked = false;
             boldBtn.classList.remove('bg-zinc-900', 'text-white');
             italicBtn.classList.remove('bg-zinc-900', 'text-white');
             render();
