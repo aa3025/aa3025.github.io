@@ -1,0 +1,814 @@
+%\documentclass[11pt,aspectratio=1610,handout]{beamer}
+\documentclass[11pt,aspectratio=1610]{beamer}
+\input{../../preamble12}
+
+
+%\title[Week 1: Introduction, Sets and Logic]{Week 1: Sets and Logic}
+
+
+\title{4001CMD: Mathematical Skills for Computing Professionals}
+\subtitle[Week 1.2: Logic 1]{Week 1.2: Logic I: Propositions and Proofs}
+\date{Semester 1, 2025-26}
+\author{Lectures: \textbf{Alex Pedcenko}}
+% Let's get started
+
+\begin{document}
+	
+	\begin{frame}
+		\titlepage
+	\end{frame}
+
+
+\section{Introduction}	
+%	\begin{frame}{4001CMD -- Mathematics for Computer Science}
+%		
+%		\vspace{0cm}
+%		\begin{center}
+%			{\huge \textbf{Week 1.1: Introduction, Mathematical \\ \vspace{3mm} Thinking, Symbolic Logic and Sets. }}\\
+%
+%\vspace{1cm}
+%
+%{\large 
+%	Lectures: \textbf{Alex Pedcenko}\\
+%	\vspace{5mm}
+%	4001CMD 2025-26 Semester 1}
+%	
+%	\end{center}
+%		
+%		
+%\end{frame}
+
+
+
+
+\subsection*{About the module}	
+
+%\begin{frame}{About the Module}
+%	
+%	\begin{itemize}
+%		\item \textbf{What this module is about?} \p
+%	\end{itemize}
+%	
+%	\begin{center}
+%		
+%		\begin{tikzpicture}
+%		  	\node[draw,rounded corners, fill=blue!20, thick, inner sep=1em, blur shadow={shadow blur steps=5}] at (0,0) {\large \textbf{Discrete Mathematics !}};
+%		\end{tikzpicture}
+%		
+%%		\fbox{\parbox{0.3\linewidth}}}
+%	\end{center}
+%	\p	
+%	\begin{itemize}\itemsep7mm
+%		\item What is \textbf{discrete mathematics}? \p
+%		\begin{itemize}\itemsep3mm
+%			\item Mathematically, it's counting, combinatorics (ways of combining things), logic, basic set theory, basic number theory... other things. 
+%			
+%			\item It is NOT calculus, geometry, physics, mechanics, or anything involving continuous stuff. 
+%			
+%			\item Practically, it is the basis for \emph{how computers "think"}.
+%		\end{itemize}
+%		\item Broadly speaking, we'll be looking at two big mathematical topics this semester and their applications to computer science:
+%		\begin{itemize}\itemsep3mm
+%			\item Number theory (Application: Cryptography)
+%			\item Graph theory (Applications: Algorithms, Data compression, binary encoding, and error correction)
+%		\end{itemize}
+%	\end{itemize}
+%\end{frame}
+
+
+
+
+
+%\begin{frame}{Weekly Topics}
+%	
+%	
+%	\textbf{\large Provisional Weekly Topics}
+%	
+%	\begin{columns}		
+%		\begin{column}{0.5\linewidth}
+%			\begin{enumerate}
+%				\item Sets, Propositions and Basic Logic
+%				\item Symbolic Logic cont., Rules of Inference, Proofs.
+%				\item Axiomatic Proof and Induction
+%				\item Functions and Cardinality
+%				\item Combinatorics
+%				\item Number Theory
+%			\end{enumerate}	\p
+%			--------------- \\
+%			Online Core Assignment (pass/fail, starts in Week 7, 3 attempts (Weeks 7,8,9))	\p	
+%		\end{column}
+%		\begin{column}{0.5\linewidth}
+%			\begin{enumerate}
+%				\setcounter{enumi}{6}
+%				\item Modular Arithmetic \& RSA
+%				\item Algorithms \& Graph Theory
+%				\item Graph Traversal \& Searching Algorithms, Trees
+%				\item Heapsort and Huffman encoding
+%				\item Humming codes and bin packing
+%			\end{enumerate}	\p
+%			--------------- \\
+%			Applied Core Assignment (module mark $\ge 40$)\p\\
+%			starts: Week 9, due: end of Week 12
+%		\end{column}		
+%				
+%	\end{columns}
+%	
+%	
+%	
+%\end{frame}
+
+%\include{Intro}
+
+	
+	\hypersetup{linkcolor=blue}
+	\begin{frame}{Outline of Today (Lecture 1.2)}
+	
+%	\textbf{Week 1.2}\\
+	\vspace{3mm}
+
+%	\tableofcontents[sections={1}]
+
+\begin{center}
+
+\begin{columns}[t]
+	\begin{column}{20mm}
+		~
+	\end{column}
+
+			\begin{column}{.5\textwidth}
+				
+				
+\textbf{1.2 Propositions and Proofs}\\
+\vspace{5mm}
+
+				\tableofcontents[sections={2-3}]
+			\end{column}
+			
+
+
+
+			\begin{column}{.5\textwidth}
+%\textbf{1.2 Sets}\\
+%\vspace{5mm}
+%
+%				\tableofcontents[sections={4-9}]
+			\end{column}
+\end{columns}
+
+\end{center}		
+	\end{frame}
+	\hypersetup{linkcolor=mygray}
+	
+
+\section{Thinking with numbers}
+%\subsection{Math thinking}
+
+
+
+
+		
+\begin{frame}{Thinking with numbers}
+	\vspace{-3mm} \p
+	\begin{examplen}
+		\textbf{Statement.} 15 is a multiple of $3$. \pause ~~~~~~~ Or  ~~~~~~~	$\exists k \in \N : 15=3k$ \pause
+	\end{examplen}
+	
+	Let's unpack: \p 
+\begin{itemize}
+		\item the statement "15 is multiple of 3" mathematically can mean (identically)
+	\begin{itemize}
+			\item If we divide 15 by 3, then there is zero remainder \p
+			
+			\begin{center}
+				\mathbox{40mm}{\Large $15 \div 3 = k  + 0$}
+			\end{center}\p
+			
+			\item Or we can find some (whole) number $k$, which is when multiplied by 3, will produce 15: \p
+			
+			\begin{center}
+				\mathbox{40mm}{\Large $3 \times k = 15$}
+			\end{center}\p
+			
+	\item The same as saying:
+	
+	\vspace{-4mm}\centered{\Large \mathbox{40mm}{$\exists k \in \N : 15=3k$}}		\p
+	
+	\vspace{2mm}
+
+\hspace{-5mm}{\mathbox{5mm}{\Large $\exists$} -- "there exist", \p ~~\mathbox{15mm}{\Large $k \in \N$} -- $k$ is in the set of Natural numbers ~~\p ~\mathbox{2mm}{\Large $:$} -- "such that"} 
+
+	\end{itemize}
+\end{itemize}
+
+	
+	
+
+\end{frame}
+
+
+
+
+
+\begin{frame}{Thinking with numbers}
+%	\begin{example}
+%		\textbf{Statement.} 15 is a multiple of $3$. \pause Or  	$\exists k \in \N : 15=3k$ \pause
+%	\end{example}
+	
+%	
+%	\begin{proof}
+%		The statement means that there exists ($\exists$) a natural number $k$ ($k \in \N$) for which (:) $15 = 3k$. This is true: $k=5$. 
+%	\end{proof}
+%	
+	\pause
+	
+	\begin{example}
+		\textbf{Statement.} 20 is a multiple of $3$. \hspace{3mm} $\exists k \in \N : 20=3k$
+	\end{example}
+	
+	\pause
+	
+	\begin{proof}
+		If $20 = 3k$ for some positive integer $k$, then \p
+		
+		
+		\begin{itemize}
+			\item since $18 = 3(6)$ and $21 = 3(7)$, \p
+			\item this integer $k$ would need to lie between 6 and 7.\p
+			\item There are no such integers.\p
+			\item Hence, \textbf{this proposition is false}.
+		\end{itemize}
+		
+		
+		     
+	\end{proof}
+	\vspace{3in}
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+\section{Propositions and Proofs}
+\subsection{Terminology}
+			
+		\begin{frame}{Statements and proofs: definitions}
+			\begin{itemize}\itemsep5mm
+				\item A \textbf{proposition} is a statement that is either true or false.\p
+				\item An \textbf{axiom}, \textbf{postulate}, or \textbf{assumption} is a statement that is taken to be true, to serve as a premise or starting point for further reasoning and arguments. \p
+				\item In classic philosophy, an axiom is a statement that is so evident or well-established, that it is \textit{accepted without controversy or question}.\p
+				\item A true statement is called a \textbf{theorem}. \p
+				\item A false statement is a \textbf{nontheorem}. Its negation is a theorem. \p
+				\item A mathematically and logically valid explanation for why a theorem is true is a \textbf{proof}. 
+			\end{itemize}
+		
+		
+%		But what is \textbf{proof} anyway? \p 
+		
+	\end{frame}
+	
+	
+	
+	
+		\begin{frame}{Proof}
+			\begin{columns}
+				\begin{column}{0.4\linewidth}
+								\includegraphics[width=1\linewidth]{proof}
+				\end{column}
+				
+				
+				\begin{column}{0.6\linewidth}
+					\p
+					A \textbf{proof} is a logical argument that tries to show that a statement is true. In math, and computer science, a proof has to be well thought out and tested before being accepted. But even then, a proof can be discovered to have been wrong. 
+					\p
+			\vspace{5mm}		
+			\begin{definition}[Proof]
+				A \textbf{proof} is a finite sequence of statements, each of which is either an \textbf{axiom}, an \textbf{assumption}, or follows from the preceding statements by a rule of \textbf{inference}, concluding with the statement that is being proven. 
+			\end{definition}
+		    \end{column}		
+				
+				
+				
+				
+			\end{columns}
+			
+			
+			
+			
+
+		
+		
+		
+	\end{frame}
+	
+\subsection{Compound Statements}		
+		\begin{frame}{Compound statements: \textbf{and} and \textbf{or}, truth tables}
+			
+			In English, we can modify, combine, and relate propositions with words such as “not” ($\neg$), “and” ($\land$), “or”($\lor$), “implies” ($\implies$), and “if-then”. For example, are the following statements true? \p
+			
+			\begin{columns}[t]
+				\begin{column}{5mm}
+					~
+				\end{column}
+				
+				\begin{column}{0.5\textwidth}
+				\vspace{-1mm}
+				\begin{examplen}
+					200 is a multiple of 2 \textbf{and} 5. \p
+				\end{examplen}
+				
+				\begin{examplen}
+					81 is a multiple of 3 \textbf{and} 5. \p
+				\end{examplen}
+				
+				\begin{examplen}
+					81 is a multiple of 3 \textbf{or} 5. \p
+				\end{examplen}
+				
+				\begin{examplen}
+					60 is a multiple of 6 \textbf{or} 10. \p
+				\end{examplen}
+				\end{column}
+				
+				\begin{column}{0.05\textwidth}
+					~
+				\end{column}				
+				
+				\begin{column}{0.4\textwidth}
+				\p
+				
+				\vspace{-3mm}
+				\textbf{Truth Tables}:
+				
+				\vspace{2mm}
+\p
+\mathbox{5cm}{\textbf{Negation (NOT)}:\\ \vspace{1mm}
+				\begin{tabular}{c|c}
+							$P$	& $\neg P$ \\
+							\hline
+							T	& F \\
+							F	& T \\
+				\end{tabular}}
+%				\newline 
+
+\vspace{2mm}			
+\p							
+\mathbox{5cm}{\textbf{AND and OR}: \\ \vspace{1mm}
+\begin{tabular}{c|c|c|c}
+$P$	& $Q$ & $P \land Q$ & $P\lor Q$ \\
+					\hline
+T & F & F & T\\
+F & T & F & T\\
+T & T & T & T\\
+F & F & F & F\\
+	
+\end{tabular}}
+			\end{column}
+			\end{columns}
+			
+			
+			
+
+			
+				
+%				\begin{itemize}
+%					\item \textbf{True:} $81 = 3(27)$. (The fact that 81 is not a multiple of 5 does not make this statement false!)
+%				\end{itemize}
+%				\item 81 is a multiple of 3 \textbf{and} 5. 
+%				\begin{itemize}
+%					\item \textbf{False:} 81 is not a multiple of 5. 
+%				\end{itemize}
+%				\item 60 is a multiple of 6 \textbf{or} 10. 
+%				\begin{itemize}
+%					\item \textbf{True:} $60 = 6(10)$. 
+%				\end{itemize}
+
+		
+		
+		
+	\end{frame}
+
+
+%IMPLIES
+		
+	\begin{frame}{Compound propositions: implication \textbf{if ... then} ($\rightarrow $ or $\implies$) }
+		\vspace{-1mm}	
+		The least intuitive connecting word is “\textbf{implies}.” \p
+		\begin{definition}[implication]
+			An implication is true exactly when the if-part is false or the then-part is true.		
+		\end{definition}	
+		\p
+		
+		\vspace{-2mm}	
+		\begin{examplen}
+			If the Riemann Hypothesis is true, then $x^2\ge 0$ for every real number x.
+		\end{examplen}
+		\vspace{2mm}
+		\p
+	
+		\begin{columns}[t]
+			\begin{column}[t]{110mm}
+			\mathbox{110mm}{The answer is true {(\scriptsize and it does not matter if Riemann Hypothesis is true or false)}.
+			\p
+		
+			{What about the following example?} \p
+			\begin{itemize}
+				\item \textbf{If} I am a vegetarian, \textbf{then} I won't have chicken tonight for dinner. 
+				\begin{itemize}\p
+					\item \textbf{True.} This logically follows. \p
+				\end{itemize}
+				\item \textbf{If} 30,000,000 is a multiple of 375, \textbf{then} so is 60,000,000. \p
+				\begin{itemize}
+					\item \textbf{True.} If $30,000,000 = 375k$, then $60,000,000 = 375(2k)$, so 60,000,000 would also then be a multiple of 375.
+				\end{itemize}
+			\end{itemize}
+		}
+			%\end{minipage}			
+			\end{column}\p
+			
+			\begin{column}[t]{35mm}
+			\mathbox{35mm}{\textbf{Truth table for $P\implies Q$}\\
+				\vspace{5mm}
+			\begin{tabular}{c c|c}
+						P & Q & $P \implies Q$ \\
+						\hline
+						\textbf{T} & \textbf{T}  & \textbf{T} \\
+						T & F & F \\
+						\textbf{F} & \textbf{T} & \textbf{T} \\
+						\textbf{F} & \textbf{F} & \textbf{T}
+			\end{tabular}	}
+			\end{column}			
+		\end{columns}	
+
+		\end{frame}
+	
+	
+
+%% IFF
+	
+	
+\begin{frame}{Compound propositions: IFF "\textbf{if and only if... then}" ($\iff$) }
+	\p
+	
+\begin{itemize}\itemsep2mm
+	\item The implication "\textbf{If} I am a vegetarian, \textbf{then} I won't have chicken tonight for dinner " certainly "restricts" vegetarians having chicken for a dinner.\p
+	
+	\item However non-vegetarians (last two lines in the truth-table) can have either chicken or anything else for dinner. The statement will still be True.\p
+	
+	\item What if we wanted to restrict the option of "\textit{not having a chicken}" for dinner to only vegetatians (i.e. \textit{non-vegetarians must eat chicken regardless})? \p
+	
+	\item In this case we must say "\textbf{Only if} I am a vegetarian, then I will not have chicken ..." \p
+	
+	\item Mathematicians make it more dramatic and instead of saying "\textbf{only if}" they say "\textbf{if and only if}" \p
+	
+	\item Notice that now if you are \textbf{not having chicken}, that means \textbf{you are certainly a vegetarian}. Hence both parts of this proposition (if part and then part) becomes equivalent! \p
+	
+	\item it becomes an implication both ways: "if you are vegetarian $\implies$ you didn't have chicken" and "if you didn't have chicken $\implies$ you are (certainly) a vegetarian". 
+\end{itemize}
+
+ 
+
+
+
+ 
+	
+	
+\end{frame}	
+	
+	
+	
+\begin{frame}{Compound propositions: IFF "\textbf{if and only if... then}" ($\iff$) }
+	
+	\vspace{0mm}
+\begin{columns}[t]
+		
+	\begin{column}[t]{0.6\textwidth}
+			\p
+	The proposition \textbf{“$P$ if and only if $Q$”} asserts that \textbf{$P$ and $Q$ are logically equivalent}; that is, either both are true or both are false. \p In other words: $(P\implies Q) \land (Q \implies P)$ is equivalent to $P\iff Q$.
+	\p
+	\end{column}
+		
+	\begin{column}[t]{0.4\textwidth}
+	\vspace{-3mm}
+	\begin{examplen}
+	$x^2-4 \ge 0 \iff |x| \ge 2 $
+	\end{examplen}
+	
+	\p
+	
+	
+	
+	\end{column}		
+	\end{columns}
+	\vspace{2mm}
+	
+For some values of $x$, both inequalities are true. For other values of $x$, neither inequality is true. In every case, however, the proposition as a whole is true.\vspace{0mm}
+		\p
+\begin{center}
+	
+\mathbox{7cm}{\large \begin{center}\textbf{Truth table for "IFF"}: \\
+	\vspace{3mm}
+	
+\begin{tabular}{c c|c}
+	P & Q & $P \iff Q$ \\
+	\hline 
+	 &   &  \\
+	\textbf{T} & \textbf{T}  & \textbf{T} \\
+	T & F & F \\
+	F & T & F \\
+	\textbf{F} & \textbf{F} & \textbf{T}
+\end{tabular}\end{center}
+}
+\end{center}
+
+
+	\end{frame}
+	
+	
+	\begin{frame}{Compound statements: summary}
+		\begin{columns}[t]			
+			\begin{column}{0.3\textwidth}
+			\textbf{Notations:}
+			\vspace{2mm}
+			
+			\mathbox{45mm}{\small
+				\renewcommand{\arraystretch}{1.5}
+				\begin{tabular}{c|c}
+				\textbf{English} & \textbf{Symbolic}\\
+				\hline 
+			NOT($P$)	& $\neg P$ or $\bar{P}$ \\			
+			$P$ AND $Q$	& $P\land Q$ \\
+			$P$ OR $Q$	& $P \lor Q$ \\						
+			$P$ IMPLIES $Q$	& $P \implies Q$ \\				
+			if $P$ then $Q$	& $P \implies Q$ \\				
+			$P$ IFF $Q$	& $P\iff Q$
+			\end{tabular}
+		\renewcommand{\arraystretch}{1.0}
+		}
+	\p
+	\textbf{Quantifiers}:\\
+	\vspace{2mm}
+	\begin{tabular}{l|l}
+	$\exists$	&  There exists -- Existential quantifier\\
+		$\forall$	& For all  -- Universal quantifier\\
+	\end{tabular}			
+			\end{column}
+	\p			
+		\begin{column}{0.7\textwidth}
+			\vspace{-5mm}
+			\begin{itemize}\itemsep2mm
+				\item $P$ \textbf{and} $Q$ --- true when both $P$ and $Q$ are true statements. 
+				\begin{itemize}
+					\item \textbf{Example:} I am from the United Kingdom, and I studied maths. 
+				\end{itemize}
+				\item $P$ \textbf{or} $Q$ --- true when at least one of $P$ or $Q$ is true --- or both!
+				\item \textbf{Example:} I am a doctor of philosophy, or I am a doctor of medicine. 
+				\item \textbf{If} $P$, \textbf{then} $Q$ --- The statement $Q$ \emph{logically follows from} $P$. 
+				\begin{itemize}
+					\item \textbf{IMPORTANT:} \textit{This does not mean that $P$ itself is true!!!} 					
+				\end{itemize}
+				\item \textbf{If and only if $P$ then $Q$} --- $Q$ follows from $P$, and $P$ follows from $Q$.				
+			\end{itemize}
+		\end{column}	
+	
+		\end{columns}
+		\vspace{2mm}
+		
+\textbf{Note}: $P\implies Q$ is logically equivalent to $\neg P \implies \neg Q $		
+		
+		
+	\end{frame}
+	
+\subsection{Existential statements}		
+		\begin{frame}{Existential statements}
+			\begin{itemize}
+				\item Let's think back to our first example... 
+			\end{itemize}
+			\vspace{2mm}
+			
+			\textbf{Theorem.} 15 is a multiple of 3. \p
+			\begin{itemize}
+				\item To say that a (whole) number $x$ is a multiple of 3 means that there is some other (whole) number $n$ for which $3\times n = x$. \p
+				\item So the theorem can be rewritten as: 
+			\end{itemize}
+			\vspace{2mm}
+			
+			
+			\textbf{Theorem.} There is a whole number $n$ for which $3 \times n = 15$. \p
+			\begin{itemize}
+				\item This is an \emph{existential statement:} it is a statement that asserts the \textit{existence} of a number with a particular property (in this case, the property of the number is that its product with 3 is 15). 
+			\end{itemize}
+		\end{frame}
+
+
+		
+		\begin{frame}{Examples of existential statements}
+			\p
+			\begin{examplen}
+				There exists ($\exists$) natural number $n$ such that $n^2 = 169$. ~~~ $\exists n\in \N : n^2=169$
+			\end{examplen}
+			\p
+			\begin{itemize}
+				\item Is this statement true? \p
+				\begin{itemize}
+					\item \emph{Yes!} This works for $n=13$, since $13^2 = 169$. \p
+				\end{itemize}\p
+			\end{itemize}
+			\begin{examplen}
+				There are numbers $a, b, c$ for which $a^2 + b^2 = c^2$. 
+			\end{examplen}\p
+			\begin{itemize}
+				\item Is this statement true? \p
+				\begin{itemize}
+					\item \emph{Yes!} We can take $a=3$, $b=4$, $c=5$, since $3^2 + 4^2 = 9 + 16 = 25 = 5^2$, so $3^2 + 4^2 = 5^2$. \p
+					\item This also works with $a=5$, $b=12$, and $c=13$: $5^2 + 12^2 = 25 + 144 = 169 = 13$. \p
+				\end{itemize}
+				\item Existential statements do not necessarily say that the object whose existence is asserted is \emph{unique}: there may be more than one in question (such as was the case in the last Example 11). 
+			\end{itemize}
+		\end{frame}
+		
+		\begin{frame}{Proving existential statements}\p
+			\vspace{-2mm}
+			\begin{itemize}
+				\item \textbf{Question.} How do we prove that an existential statement like ``There are numbers $a,b,c$ for which $a^2 + b^2 = c^2$ is true? \p
+				\item \textbf{Answer.} Find (at least one) example! In the above, $a=3$, $b=4$, $c=5$ does the trick, and shows that such an $a$, $b$, and $c$ do exist. \p
+				\item In general, to prove an existence statement, only one example needs to be produced. \p
+				\item But in some cases, proving the existence may be very difficult... \p
+			\end{itemize}
+			\begin{example}
+				There exist numbers $a$, $b$, $c$ for which $a^3 + b^3 = c^3$. 
+			\end{example}\p
+			\begin{itemize}
+				\item Is this statement true?\p ~ \textbf{NO!} \p... Actually, it took mathematicians hundreds of years to answer... \p  
+				\item Another example: \\ \finger \textbf{Euler conjecture}:\fbox{$a^4+b^4+c^4=d^4$ has no solution for positive integers $a,b,c,d$}. \\ \vspace{1mm} It took 218 years to find a solution satisfying this equation and prove the proposition is false! ($a=95800,~b=217519,~c=414560,~d=422481$)
+			\end{itemize}
+		\end{frame}
+		
+		
+		
+		
+		
+\begin{frame}{Disproving existential statements}
+		
+	The true statement, it turns out, is: \p
+		
+		
+		\begin{theorem}
+			There are no numbers $a$, $b$, $c$ for which $a^3 + b^3 = c^3$.			
+		\end{theorem}\p
+		
+
+			\begin{itemize}
+				\item But how do you prove it? You certainly can't check it with every possible triple of numbers $a,b,c$. \p
+				\item You need to show that something is true for \emph{every} choice of $a,b,c$: that $a^3 + b^3 \neq c^3$. \p
+				\item So another way to write the statement is: 
+			\end{itemize}
+		
+		\begin{theorem}
+			For all numbers $a,b,c$: $a^3 + b^3 \neq c^3$.			
+		\end{theorem}
+		\p
+		
+	
+			\begin{itemize}
+				\item Statements that make claims about \textit{all} numbers are \textit{\textbf{universal statements}}. \p
+				\item See the difference: An \textbf{existential statement} claims that a certain property holds for \textbf{some} number; perhaps one, perhaps several, perhaps all, but at least one. A \textbf{universal statement} claims that a certain property holds for \textbf{all} numbers. 
+			\end{itemize}
+		\end{frame}
+
+\subsection{Universal Statements}
+		
+		\begin{frame}{Universal statements: examples}
+			\begin{itemize}\itemsep5mm
+				\item The statement ``For all numbers $a,b,c$: $a^3 + b^3 \neq c^3$ is exceptionally hard to prove. \p
+				\item Actually, it's a specific case of a more general, very famous universal statement: \p
+			\end{itemize}\vspace{2mm}
+			
+			\textbf{Theorem.} For all numbers $n$, there are no numbers $a,b,c$ for which $a^n + b^n = c^n$. 
+			\vspace{3mm}
+			
+			\begin{itemize}\p
+				\item Let's look at a simpler example: 
+			\end{itemize}
+			\begin{example}
+				For all whole numbers $n$, the number $n^2 + n$ is even. 
+			\end{example}\p
+			\begin{itemize}
+				\item Is this true? \pause 
+				\item It turns out the answer is \emph{yes:}
+			\end{itemize}
+		\end{frame}
+		
+		\begin{frame}{Universal statements: examples}
+%			\begin{itemize}
+%				
+%			\end{itemize}
+			\textbf{Theorem.} For all numbers $n$ (i.e. $\forall n \in N$), the number $n^2 + n$ is even. \newline \p
+			\textbf{Proof.} \p
+			\begin{itemize}
+				\item We need to show that there is an integer $k$ for which $n^2 + n = 2k$. \p
+				\item A number $n$ is either even or odd. \p
+				\item \emph{Case 1:} $n$ is even, say $n=2r$  \p
+				\vspace{2mm}
+				
+				\begin{itemize}
+					\item Then $n^2 + n = 4r^2 + 2r = 2(2r^2 + r)$, which is even: $\therefore ~ k = 2r^2 + r$.  \p
+				\end{itemize}
+				\item \emph{Case 2:} $n$ is odd, say $n=2r+1$.  \p
+				\vspace{2mm}
+				
+				\begin{itemize}
+					\item Then $n^2 = (2r+1)^2 = 4r^2 + 4r + 1$. \p So, $$n^2 + n = \p \underbrace{4r^2 + 4r + 1}_{n^2} + \underbrace{2r + 1}_{n} = \p 4r^2 + 6r + 2 = \p 2(2r^2 + 3r + 1).$$ \p So again, $n^2 + n$ is even: $k = 2r^2 + 3r + 1$. \qed 
+				\end{itemize}
+				\item This is often a common way of proving universal statements: show that there are \textbf{finitely many} cases, and show that it works in each such case. 
+			\end{itemize}
+		\end{frame}
+%		
+%		\begin{frame}{Universal statements: examples}
+%			\begin{example}
+%				For all whole numbers $n$, $4n-1$ is prime. 
+%			\end{example}
+%			\textbf{False:} This is not true when $n = 4$, for then, $4(4) - 1 = 15 = 3 \times 5$. 
+%			\vspace{3in}
+%		\end{frame}
+
+\subsection{Proof by Contradiction}
+
+\begin{frame}{Proof by Contradiction: The Method}
+	Proof by contradiction, also known as \textit{reductio ad absurdum}, is a powerful indirect proof technique used to establish the truth of a statement.\vspace{3mm}
+	\begin{itemize}
+		\item \textbf{The Steps:}
+		\begin{enumerate}\itemsep3mm
+			\item Assume the \textbf{negation} of the statement you want to prove is true.
+			\item Use a logical chain of reasoning to follow from this assumption.
+			\item Arrive at a \textbf{contradiction}. This is a statement that is logically impossible, such as $x > 0$ and $x \leq 0$.
+			\item Since a false premise must have led to this contradiction, our initial assumption must be false.
+			\item Therefore, the original statement we wanted to prove must be true.
+		\end{enumerate}
+	\end{itemize}
+\end{frame}
+
+% The example slide
+\begin{frame}{Proof by Contradiction: An Example}
+	\begin{itemize}\itemsep3mm
+		\item \textbf{Example: Proving $\sqrt{2}$ is Irrational}
+		\vspace{3mm}
+		\begin{enumerate}\itemsep3mm
+			\item \textbf{Statement:} $\sqrt{2}$ is irrational.\p
+			\item \textbf{Assume the opposite:} $\sqrt{2}$ is rational, \p i.e. $\sqrt{2}$ can be expressed as a rational fraction. \p 
+			\item Then by definition, $\sqrt{2} = \frac{p}{q}$ where $p$ and $q$ are integers, $q \neq 0$, and $\frac{p}{q}$ is in its simplest form.\p
+			\item Squaring both sides: $2 = \frac{p^2}{q^2} \implies 2q^2 = p^2$. This means $p^2$ is even, so $p$ must be even. \p
+			\item Let $p = 2k$ for some integer $k$. Substituting this gives $2q^2 = (2k)^2 = 4k^2 \implies q^2 = 2k^2$. \p
+			\item This means $q^2$ is even, so $q$ must also be even (any product with even number is even). \p
+			\item \textbf{Contradiction!} We have shown that both $p$ and $q$ are even, which contradicts our initial assumption that the fraction $\frac{p}{q}$ was in its simplest form. \p
+			\item Therefore, the original statement is true: $\sqrt{2}$ is irrational. 
+		\end{enumerate}
+	\end{itemize}
+\end{frame}
+
+
+
+\subsection{Summary on Proofs}		
+		\begin{frame}{Summary: Techniques of proof}
+			\begin{itemize}\itemsep4mm
+				\item Let's review some of the basic proof techniques we've seen so far: \p
+				\item \textbf{To prove an existential statement is true, produce an example}. 
+				\begin{itemize}
+					\item E.g., ``15 is a multiple of 3'' (one example is enough).
+				\end{itemize}\p
+				\item \textbf{To prove a universal statement is \underline{false}, produce a counterexample}. 
+				\begin{itemize}
+					\item E.g., ``For all numbers $n$, $4n-1$ is prime'' was proven false because it fails to be true when $n=4$. 
+				\end{itemize}\p
+				\item These can still be difficult to do in general. \p
+				\item Another powerful technique is \emph{``\textbf{proof by contradiction}''}: assume the statement you're trying to prove is false, and arrive at a false conclusion. 
+				\begin{itemize}
+					\item E.g., ``20 is not a multiple of 3'' was proven by contradiction. \p 
+				\end{itemize}
+				\item This list is not exhaustive! There are many other types of proofs. Some are easier or harder than others. But there is no strategy that works for proving every true statement. 
+			\end{itemize}
+		\end{frame}
+
+\begin{frame}{Next Week...}
+	
+	\begin{itemize}\itemsep8mm
+		\item We will be continuing with logic, rules of inference and proofs next week.
+		\item Finish Quiz 1 ! (Quiz 2 on Logic will be given on next Tuesday)
+		\item End of this week: Prepare Tutorial questions for your 1st Tutorial Session: Tutorial Sheets can be found on Aula in Week 1 section.
+		\item One of the Tutorial groups will have their first Tutorial on Monday!
+	\end{itemize}
+	
+	
+	
+\end{frame}
+
+
+%\include{Sets}
+			
+%\input{./Week_1.2_Sets_incl}	
+	
+		\end{document}

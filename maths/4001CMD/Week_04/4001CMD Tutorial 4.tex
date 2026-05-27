@@ -1,0 +1,332 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[normalem]{ulem}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{mathdots}
+\usepackage{arydshln}
+\usepackage{textcomp}
+%\usepackage{bbold}
+\usepackage[margin=1in]{geometry}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,      
+	urlcolor=cyan,
+}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand\blank{\hphantom{==}}
+
+\DeclareFontFamily{U}{MnSymbolC}{}
+\DeclareSymbolFont{MnSyC}{U}{MnSymbolC}{m}{n}
+\DeclareFontShape{U}{MnSymbolC}{m}{n}{
+	<-6>  MnSymbolC5
+	<6-7>  MnSymbolC6
+	<7-8>  MnSymbolC7
+	<8-9>  MnSymbolC8
+	<9-10> MnSymbolC9
+	<10-12> MnSymbolC10
+	<12->   MnSymbolC12}{}
+\DeclareMathSymbol{\intprod}{\mathbin}{MnSyC}{'270}
+
+\numberwithin{equation}{section}
+%\numberwithin{theorem}{section}
+
+%%% THEOREM STYLES %%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem*{lemma*}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{conjecture}{Conjecture}
+
+%%% DEFINITION STYLES %%%
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem*{definition*}{Definition}
+\newtheorem{example}{Example}
+\newtheorem*{example*}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{remark*}{Remark}
+\newtheorem{fact}{Fact}
+\newtheorem{problem}{Problem}
+\newtheorem*{problem*}{Problem}
+\newtheorem*{solution*}{Solution}
+\newtheorem*{claim*}{Claim}
+\newtheorem{exercise}{Exercise}
+
+%%% FUNCTIONS %%%
+\newcommand{\Aut}{\mathrm{Aut}}
+\newcommand{\Sym}{\mathrm{Sym}}
+\newcommand{\Syl}{\mathrm{Syl}}
+\newcommand{\intersection}{\mathop{\bigcap}}
+\newcommand{\union}{\mathop{\bigcup}}
+\newcommand{\disjointunion}{\mathop{\bigsqcup}}
+\newcommand{\evaluated}{\Big|}
+\newcommand{\re}{\mathrm{Re}}
+\newcommand{\im}{\mathrm{Im}}
+\newcommand{\Log}{\mathrm{Log}}
+\newcommand{\Res}{\mathrm{Res}}
+\newcommand{\Sk}{\mathrm{Sk}}
+\newcommand{\disc}{\mathrm{disc}}
+\newcommand{\then}{\Longrightarrow}
+\newcommand{\Int}{\mathrm{int}}
+\newcommand{\bd}{\mathrm{bd}}
+\newcommand{\diam}{\mathrm{diam}}
+\newcommand{\lcm}{\mathrm{lcm}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\del}{\partial}
+\newcommand{\len}{\mathrm{len}}
+\newcommand{\res}{\mathrm{res}}
+\newcommand{\esssup}{\mathrm{ess} \, \mathrm{sup}}
+\newcommand{\wlim}{\displaystyle\mathop{\mathrm{w}\textrm{-}\mathrm{lim}}}
+\newcommand{\vlim}{\displaystyle \mathop{\mathrm{v}\textrm{-}\mathrm{lim}}}
+\newcommand{\condE}[2]{\mathbb E\left[ #1 \,\middle|\, #2\right]}
+\newcommand{\condP}[2]{\mathbb P\left[ #1 \, \middle| \, #2\right]}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\Poi}{\mathrm{Poi}}
+
+%%% FONTS %%%
+\newcommand{\boldZ}{\boldsymbol{\mathrm{Z}}}
+\newcommand{\boldC}{\boldsymbol{\mathrm{C}}}
+\newcommand{\boldN}{\boldsymbol{\mathrm{N}}}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\U}{\mathbb U}
+\newcommand{\D}{\mathbb D}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Sbb}{\mathbb S}
+\newcommand{\Kbb}{\mathbb K}
+\newcommand{\F}{\mathbb F}
+\newcommand{\Pbb}{\mathbb P}
+\newcommand{\Ts}{\mathcal T}
+\newcommand{\Cs}{\mathcal C}
+\newcommand{\As}{\mathcal A}
+\newcommand{\Ss}{\mathcal S}
+\newcommand{\Ms}{\mathcal M}
+\newcommand{\Bs}{\mathcal B}
+\newcommand{\Ps}{\mathcal P}
+\newcommand{\Ds}{\mathcal D}
+\newcommand{\Ls}{\mathcal L}
+\newcommand{\Ns}{\mathcal N}
+\newcommand{\Rs}{\mathcal R}
+\newcommand{\Fs}{\mathcal F}
+\newcommand{\Os}{\mathcal O}
+\newcommand{\Ks}{\mathcal K}
+\newcommand{\Es}{\mathcal E}
+\newcommand{\Gs}{\mathcal G}
+\newcommand{\Us}{\mathcal U}
+\newcommand{\Zs}{\mathcal Z}
+\newcommand{\fp}{\mathfrak p}
+\newcommand{\fm}{\mathfrak m}
+\newcommand{\diff}{\,d}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\Span}{\mathrm{span}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand*{\charone}{\text{\usefont{U}{bbold}{m}{n}1}}
+\newcommand{\dlim}{\displaystyle\lim}
+\newcommand{\dsum}{\displaystyle\sum}
+\newcommand{\dint}{\displaystyle\int}
+\newcommand{\Var}{\mathbf{Var}}
+\newcommand{\Cov}{\mathbf{Cov}}
+\newcommand{\Lip}{\mathrm{Lip}}
+\newcommand{\sgn}{\mathrm{sgn}}
+
+\newcommand{\done}{\flushright$\diamondsuit$}
+
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+\let\oldphi\phi
+\let\phi\varphi
+\let\oldepsilon\epsilon
+\let\epsilon\varepsilon
+\let\oldIm\Im
+\let\oldRe\Re
+\renewcommand{\Im}{\mathrm{Im}\,}
+\renewcommand{\Re}{\mathrm{Re}\,}
+\let\oldtilde\tilde
+\let\tilde\widetilde
+\let\oldhat\hat
+\let\hat\widehat
+
+\begin{document}
+
+\begin{center}
+\Large{Tutorial Exercises - Week 3} \\
+\vspace{3mm}
+\large{4001CMD - Mathematical Skills for Computing Professionals} \\
+\vspace{5mm}
+\end{center}
+
+
+The following exercises should be attempted before your next tutorial session this week. 
+
+
+\section*{Functions}
+
+\begin{problem}
+	Write down the values $s(1)$ through $s(6)$ of the function $s : \N \to \N$ defined recursively by 
+	\[
+	s(1) = 1, \quad s(2) = 2, \quad s(n+1) = 2s(n) - s(n-1) \quad (n \geq 2).
+	\]
+	Make a conjecture about an explicit, non-recursive formula for $s(n)$, and prove this formula with induction. 
+\end{problem}
+
+\begin{problem}
+	Suppose that the sets $A$ and $B$ are given by $A = \{a,b,c,d\}$, and $B = \{1,2,3,4,5\}$, and the functions $p : A \to B$, $q : B \to B$, and $r : B \to A$ are defined as follows. 
+	\begin{center}
+		\begin{tabular}{ccc}
+			$p(a) = 3$ & $q(1) = 3$ & $ r(1) = a$ \\
+			$p(b) = 4$ & $q(2) = 5$ & $r(2) = c$ \\
+			$p(c) = 2$ & $q(3) = 1$ & $r(3) = b$ \\
+			$p(d) = 4$ & $q(4) = 4$ & $r(4) = a$ \\
+			& $q(5) = 2$ & $r(5) = d$
+		\end{tabular}
+	\end{center}
+	Which of these functions are injections? Which are surjections? Which are bijections? 
+\end{problem}
+
+\begin{problem}
+	Which of the following functions from $\N$ to $\N$ are surjections, which are injections, and which are bijections?
+	\begin{enumerate}[label=(\alph*)]
+		\item $f(n) = n^3$ \\
+		\item $g(n) = n+3$ \\
+		\item $h(n) = \displaystyle \begin{cases} n+1 & \textrm{if $n$ is odd,} \\ n-1 & \textrm{if $n$ is even}\end{cases}$
+	\end{enumerate}
+\end{problem}
+
+\begin{problem}
+	The function $u$ from $\N$ to $\N$ is defined recursively by the following rules: \[
+	u(1) = 1, \quad u(n+1)= \begin{cases}
+	\frac 1 2 u(n) & \textrm{if $u(n)$ is even,} \\
+	3u(n)+1 & \textrm{otherewise.}
+	\end{cases}
+	\]
+	\begin{enumerate}[label=(\alph*)]
+			\item Show that $u$ is neither an injection nor a surjection. 
+			\item Suppose that $u$ is redefined so that $u(1) = 5$ instead of $u(1) = 1$, and $u(n+1)$ is defined as before for $n \geq 1$. Is $u$ an injection now? A surjection? 
+			\item Choose some specific number $k \in \N$ instead of $k=1$ or $k=5$ (I recommend choosing a number between 4 and 10), and define $u(n)$ as before. Now is $u$ an injection? A surjection?
+	\end{enumerate} 
+	
+	\emph{Remark:} You should find that if we define $u$ this way for $u(1) = 1$ and $u(1) = 5$, in both cases, $u$ is not a surjection or an injection, for the same reason in both cases. Probably you found that $u$ is neither a surjection or injection for the number you chose in (c) either. One question you might ask yourself is: ``is there \emph{some} number $k$ that we can start with for $u(1)$ so that $u$ is an injection?'' This problem is known as the \emph{Collatz conjecture}, and it is one of the most notoriously difficult unsolved problems in mathematics. The Japanese company Bakuage Co has offered a prize of \textyen 120 million, or around \textsterling 700,000, to whoever can solve this problem. 
+\end{problem}
+
+\begin{problem}
+	The functions $s : \N \to \N$ and $t : \N \to \N$ are defined by \[
+	s(x) = x+1, \quad t(x) = 2x \quad (x \in \N).
+	\]
+	Show that $t \circ s$ and $s \circ t$ are different functions. Find explicit formulas for each of $t \circ s$ and $s \circ t$. 
+\end{problem}
+
+\begin{problem}
+	Prove that if $f$ and $g$ are bijections, and $g \circ f$ is defined, then the inverse of $g \circ f$ is $f^{-1} \circ g^{-1}$. 
+\end{problem}
+
+\begin{problem}
+	The function $ f : X \to Y$ is said to have a \emph{left inverse} $l : Y \to X$ if $l \circ f$ is the identity function on $X$. Prove that $f$ has a left inverse if and only if $f$ is an injection. (Remember, this means you need to show both sides of the implication.) 
+\end{problem}
+
+\begin{problem}
+	Let $X = \{1,2,3,4,5\}$ and let $f : X \to X$ be the function defined by 
+	\[
+	f(1) = 2, \quad f(2) = 2, \quad f(3) = 4, \quad f(4) = 4, \quad f(5) = 4.
+	\]
+	\begin{enumerate}[label=(\alph*)]
+		\item Show that $f \circ f = f$. 
+		\item Find a different function $g$ that has the property that $f \circ g = f$ and $g \circ f = f$. (\emph{Remark:} This isn't a hard thing to do mathematically, but there isn't a straightforward procedure. You need to think about it and get your hands messy. Try it with a couple different functions that you cook up. Don't be afraid to play with some different ideas, even if they don't work right away. There are at least two different answers, one of which is very simple.)
+	\end{enumerate}
+\end{problem}
+
+\begin{problem}
+	Construct bijections $s, t : S \to S$, where $S$ is the set $\{1,2,3\}$, having the following properties (where $i : S \to S$ is the identity function): 
+	\begin{enumerate}[label=(\alph*)]
+	\item $s \circ s = i$, $s \neq i$
+	\item $t\circ t \circ t = i$, $t \neq i$
+\end{enumerate}
+Describe the inverse functions $s^{-1}$ and $t^{-1}$, in terms of $s$ and $t$. 
+\end{problem}
+
+\begin{problem}
+	Let $S = \{1,2,3\}$ as in the preceding problem. How many different bijections $f$ are there from $S$ to $S$, and how many of them satisfy $f = f^{-1}$? (\emph{Remark:} The set of all bijections from $S$ to $S$ is a very important object in abstract algebra, called a \emph{group}. Groups can be very useful in all areas of science, especially physics and computer science.)
+\end{problem}
+
+\section*{Cardinality and counting}
+
+\begin{problem}
+	Prove that the cardinality of a finite set is unique (i.e., a finite set cannot have more than one ``size''). Specifically, prove that if $A$ is a finite set, and $f : A \to \{1,\ldots, m\}$ and $g : A \to \{1, \ldots, n\}$ are two bijections, then $m = n$. (\emph{Hint.} Apply the pigeonhole principle to the composed functions $g \circ f^{-1}$ and $f \circ g^{-1}$.)
+\end{problem}
+
+\begin{problem}
+	Let $X = \{1,2,3\}$ and $Y = \{0,1\}$. 
+	\begin{enumerate}[label=(\alph*)]
+		\item Give an example of a function $f : X \to Y$. 
+		\item Let $F$ denote the set of all functions $f : X \to Y$. Show that $\#F = 8$ by listing out the members of $F$, calling them $f_1, \ldots, f_8$. 
+	\end{enumerate}
+\end{problem}
+
+\begin{problem}
+	If $\#X = m$ and $\#Y = 2$, what is the size of the set $F$ of all functions $f : X \to Y$? Make a conjecture, and prove your conjecture with induction. (\emph{Hint:} If you're stuck, try doing it with a few examples, e.g., $m = 3$, $m = 4$, $m=5$...)
+\end{problem}
+
+\begin{problem}
+	Four students have to be assigned to a tutor. There are seven possible tutors, and none of them will accept more than one new student. In how many ways can the assignment be carried out? (\emph{Hint:} If you're stuck, try doing it with 2 students and 2 tutors, then 3 students and 3 tutors, and then 4 students and 4 tutors. Do you see a pattern? What if there are more tutors?)
+\end{problem}
+
+\begin{problem}
+	A blindfolded man has a heap of 10 grey socks and 10 brown socks in a drawer. How many must he select in order to guarantee that, among them, there is a matching pair?
+\end{problem}
+
+\begin{problem}
+	Let $S$ be any set of 12 natural numbers. Show that $S$ must contain two distinct numbers $s_1, s_2 \in S$ such that $s_1 - s_2$ is a (possibly negative) multiple of 11. 
+\end{problem}
+
+\begin{problem}
+Let $X$ be a subset of $\{1, 2, \ldots, 2n\}$, and let $Y$ be a set of odd numbers $\{1, 3, \ldots, 2n-1\}$. Define a function $f : X \to Y$ by the rule 
+\[
+f(x) = \textrm{ the greatest member of $Y$ that evenly divides $x$}.
+\]
+Show that if $\#X \geq n+1$ then $f$ is not an injection, and deduce that in this case $X$ contains distinct numbers $x_1$ and $x_2$ such that $x_1$ is a multiple of $x_2$. (\emph{Hint:} After showing $f$ is not an injection, assume $f(x_1) = f(x_2)$ with $x_1 > x_2$. If $x_2$ is odd, what is $f(x_2)$? What happens if $x_2$ is even?)
+\end{problem}
+
+\begin{problem}
+	With the notation as in the preceding problem, show that it is possible to find a subset $X$ of $\{1, \ldots, 2n\}$ which has $n$ members and is such that no member of $X$ is a multiple of another. 
+\end{problem}
+
+\begin{problem}
+	By constructing a bijection from $\N$ to $S$, show that each of the following sets $S$ is countably infinite. 
+	\begin{enumerate}[label=(\alph*)]
+		\item $S = \{n \in \N : n \geq 10^6\}$ 
+		\item $S = \{n \in \N: n \textrm{ is a multiple of 3}\}$. 
+	\end{enumerate}
+\end{problem}
+
+\begin{problem}
+	Prove that if $X$ is a subset of $Y$, and $X$ is infinite, then $Y$ is infinite. (Recall that ``infinite'' means that there is no $m \in \N$ such that $\#X = m$.)
+\end{problem}
+
+\begin{problem}
+	Let $X$ be a non-empty subset of $\N$ which has no greatest member. 
+	\begin{enumerate}[label=(\alph*)] 
+		\item Using the Axioms of Algebra and the results of Week 2's lectures (such as the well-ordering principle), show that we can choose members $x_1, x_2, \ldots$ of $X$ such that $x_{n+1} > x_n$ for all $n \in \N$. 
+		\item Use the preceding exercise to conclude that $X$ is infinite. 
+		\item Prove the converse: that if $X$ is infinite, there is a sequence $x_1, x_2, \ldots$ with $x_{n+1} > x_n$ for all $n$. 
+	\end{enumerate}
+\end{problem}
+
+\end{document}

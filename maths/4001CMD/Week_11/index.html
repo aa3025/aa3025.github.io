@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 11: Topics in Computing</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for aesthetics */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f9;
+        }
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-white shadow-xl rounded-2xl p-8 md:p-10">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-blue-800">
+                Lecture 11: Topics in Computing
+            </h1>
+            <p class="text-lg text-gray-500 mt-2">
+                Select a part to continue your study.
+            </p>
+        </header>
+
+        <!-- Links Container (Grid for responsiveness) -->
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            
+            <!-- Link 1: Part 1 - Hamming Codes -->
+            <a href="./lecture_11_1.html" class="card block p-6 bg-white border border-gray-200 rounded-xl shadow-lg hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 text-blue-500">
+                        <!-- Icon for Error Correction -->
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944v0A11.955 11.955 0 014.382 8.984m5.618-4.016H9.375M12 12V6m2.625 6H14m-1.25 0V6"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-1">
+                            Part 1: Hamming Codes
+                        </h2>
+                        <p class="text-sm text-gray-600">
+                            Data Reliability, Error Detection, and Correction.
+                        </p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Link 2: Part 2 - Bin Packing -->
+            <a href="./lecture_11_2.html" class="card block p-6 bg-white border border-gray-200 rounded-xl shadow-lg hover:bg-green-50 focus:outline-none focus:ring-4 focus:ring-green-300">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 text-green-500">
+                        <!-- Icon for Optimization -->
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10m0-10l8-4"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-1">
+                            Part 2: Bin Packing Algorithms
+                        </h2>
+                        <p class="text-sm text-gray-600">
+                            Optimization, Heuristics, and NP-Hard Problems.
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Footer / Context -->
+        <footer class="mt-10 text-center text-sm text-gray-400">
+            <p>Mathematics for Computing Professionals - Week 11</p>
+        </footer>
+    </div>
+</body>
+</html>

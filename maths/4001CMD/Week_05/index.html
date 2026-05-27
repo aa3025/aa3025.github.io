@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 5 - Basic Combinatorics (Full Notes)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: { ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
+        };
+    </script>
+    <!-- Load MathJax -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Custom styles copied from Lecture_4.html for professional academic look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; /* Light gray background */
+        }
+        .lecture-section {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            position: relative; /* CRITICAL: Enables absolute positioning of the audio button */
+        }
+        
+        /* New wrapper for title and progress bar */
+        .section-heading-wrapper {
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            /* No border-bottom here, the slider takes its place */
+        }
+        
+        .section-heading-wrapper h2 {
+            font-size: 1.5rem; 
+            font-weight: 700;
+        }
+
+        h1, h2 { color: #1f2937; } /* Default dark text */
+
+        /* Style for primary subheadings (h3) */
+        h3 { 
+            color: #2b6cb0; /* Deep blue text */
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem; 
+        }
+
+        /* Style for secondary subheadings (h4) */
+        .frame-title {
+            color: #2b6cb0; /* Deep blue text */
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* Applying the math-box style to MathJax output divs */
+        .MathJax > div {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background-color: #ebf8ff; /* Light blue background for math */
+            border-left: 5px solid #3182ce; /* Solid blue border */
+            overflow-x: auto;
+        }
+        
+        .table-wrapper { 
+            overflow-x: auto; 
+            margin-top: 1rem; 
+        }
+        .pascal-table th, .pascal-table td {
+            text-align: center;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+        .pascal-table th {
+            background-color: #e9d8fd; /* Light purple header */
+            color: #553c9a; /* Deep purple text */
+        }
+        .pascal-diagram-wrap {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid #dbeafe;
+            border-radius: 0.75rem;
+            background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+            overflow-x: auto;
+        }
+        .pascal-svg {
+            width: 100%;
+            min-width: 720px;
+            height: auto;
+            display: block;
+        }
+        .pascal-link {
+            stroke: #94a3b8;
+            stroke-width: 2;
+            stroke-linecap: round;
+            opacity: 0.9;
+        }
+        .pascal-node {
+            fill: #1d4ed8;
+            stroke: #dbeafe;
+            stroke-width: 2;
+        }
+        .pascal-node-edge {
+            fill: #0f766e;
+            stroke: #ccfbf1;
+            stroke-width: 2;
+        }
+        .pascal-node-row-highlight {
+            fill: #7c3aed;
+            stroke: #ede9fe;
+            stroke-width: 2;
+        }
+        .pascal-text {
+            fill: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            font-family: 'Inter', sans-serif;
+        }
+        .pascal-row-label {
+            fill: #334155;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+        .pascal-sum-group {
+            cursor: pointer;
+            outline: none;
+        }
+        .pascal-parent-link {
+            stroke: #f59e0b;
+            stroke-width: 3;
+            stroke-linecap: round;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .pascal-hotspot {
+            fill: transparent;
+            stroke: transparent;
+        }
+        .pascal-hover-ring {
+            fill: none;
+            stroke: #f59e0b;
+            stroke-width: 3;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .pascal-sum-group:hover .pascal-parent-link,
+        .pascal-sum-group:focus .pascal-parent-link,
+        .pascal-sum-group:active .pascal-parent-link,
+        .pascal-sum-group:hover .pascal-hover-ring,
+        .pascal-sum-group:focus .pascal-hover-ring,
+        .pascal-sum-group:active .pascal-hover-ring {
+            opacity: 1;
+        }
+        .header-bg {
+            background-color: #4c51bf; /* Indigo header background */
+        }
+        
+        .toc-list a { transition: color 0.1s; text-decoration: none; }
+        .toc-link {
+            color: #4c51bf; /* Indigo color for links */
+            transition: color 0.2s;
+        }
+        .toc-link:hover {
+            color: #6b46c1; /* Darker indigo on hover */
+        }
+
+        /* Fixed status bar for audio messages */
+        #status-message {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.75rem;
+            background-color: #48bb78; /* Green background */
+            color: white;
+            text-align: center;
+            font-weight: 600;
+            transition: transform 0.3s ease-out;
+            transform: translateY(100%); /* Start hidden */
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .status-show {
+            transform: translateY(0);
+        }
+
+        /* ------------------ CUSTOM AUDIO SLIDER STYLES ------------------ */
+        .audio-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: background 0.1s ease;
+            --slider-progress: 0%;
+            background: linear-gradient(to right, 
+                #4f46e5 0%, 
+                #4f46e5 var(--slider-progress), 
+                #e0e7ff var(--slider-progress), 
+                #e0e7ff 100%
+            );
+        }
+
+        /* Hide the slider thumb (dot) completely */
+        .audio-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 1px;
+            width: 1px;
+            opacity: 0;
+            cursor: pointer;
+            background: transparent;
+        }
+        .audio-slider::-moz-range-thumb {
+            height: 1px;
+            width: 1px;
+            opacity: 0;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+        }
+
+        .seeking-active {
+            cursor: grabbing;
+        }
+        /* ---------------------------------------------------------------- */
+
+    </style>
+</head>
+<body class="p-4 sm:p-8 lg:p-12 text-gray-800">
+    <div class="max-w-4xl mx-auto">
+        <!-- HEADER (Updated class: header-bg) -->
+        <header class="mb-8 p-4 text-center rounded-xl header-bg text-white shadow-xl">
+            <h1 class="text-3xl font-extrabold border-none pb-0 mb-0 text-white">Lecture 5 - Basic Combinatorics</h1>
+            <h2 class="text-xl font-semibold mt-2 border-none text-white">Mathematical Skills for Computing Professionals</h2>
+            <p class="text-sm italic mt-1">October 14 2025</p>
+        </header>
+
+        <!-- Section 0: TABLE OF CONTENTS (Slide 0) -->
+        <div class="lecture-section bg-gray-50 shadow-lg mb-8" id="section-0">
+            <!-- Audio Controls for Slide 0 (Table of Contents) -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_00.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold text-blue-800">Table of Contents</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 toc-list">
+                <ul class="list-none space-y-1">
+                    <li><a href="#section-1" class="toc-link">1. What is combinatorics?</a></li>
+                    <li><a href="#section-2" class="toc-link">2. A famously hard problem: $p(n)$</a></li>
+                    <li><a href="#section-3" class="toc-link">3. The Addition Principle</a></li>
+                    <li><a href="#section-4" class="toc-link">4. Extensions of the Addition Principle</a></li>
+                    <li><a href="#section-5" class="toc-link">5. Double- and Triple- counting</a></li>
+                    <li><a href="#section-6" class="toc-link">6. The Sieve Principle (Inclusion-Exclusion)</a></li>
+                    <li><a href="#section-7" class="toc-link">7. Example of the Sieve Principle (Two Sets)</a></li>
+                    <li><a href="#section-8" class="toc-link">8. Example of the Sieve Principle (Three Sets)</a></li>
+                    <li><a href="#section-9" class="toc-link">9. Functions, words and selections</a></li>
+                    <li><a href="#section-10" class="toc-link">10. Example: The power set</a></li>
+                    <li><a href="#section-11" class="toc-link">11. Encoding information (Ordered Selection with Replacement)</a></li>
+                    <li><a href="#section-12" class="toc-link">12. Ordered selections without repetition (Permutations)</a></li>
+                </ul>
+                <ul class="list-none space-y-1">
+                    <li><a href="#section-13" class="toc-link">13. Unordered selections without repetition (Combinations)</a></li>
+                    <li><a href="#section-14" class="toc-link">14. Calculating binomial coefficients</a></li>
+                    <li><a href="#section-15" class="toc-link">15. Recursive formula for binomial coefficients (Pascal's Identity)</a></li>
+                    <li><a href="#section-16" class="toc-link">16. Pascal's Triangle</a></li>
+                    <li><a href="#section-17" class="toc-link">17. A non-recursive formula for binomial coefficients</a></li>
+                    <li><a href="#section-18" class="toc-link">18. Example of binomial calculation (Stars and Bars)</a></li>
+                    <li><a href="#section-19" class="toc-link">19. Unordered selection with replacement</a></li>
+                    <li><a href="#section-20" class="toc-link">20. A look at binomials</a></li>
+                    <li><a href="#section-21" class="toc-link">21. Binomials and selections</a></li>
+                    <li><a href="#section-22" class="toc-link">22. Binomials in general</a></li>
+                    <li><a href="#section-23" class="toc-link">23. The Binomial Theorem</a></li>
+                    <li><a href="#section-24" class="toc-link">24. Further examples</a></li>
+                    <li><a href="#section-25" class="toc-link">25. Conclusion</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 1: What is combinatorics? (Slide 1) -->
+        <section class="lecture-section" id="section-1">
+            <!-- Audio Controls for Slide 1 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_01.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">1. What is combinatorics?</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p class="mb-4">Combinatorics is the branch of pure mathematics that focuses on <b>counting</b>, <b>ordering</b>, and <b>arranging</b> collections of discrete objects. It is often referred to as "the art of counting" and is fundamental to computer science, probability, and statistics.</p>
+            <p class="mb-4">In a practical sense, combinatorics provides the tools needed to calculate the number of possible outcomes for events or the total number of configurations a system can have. The primary goal is to find systematic ways to count things without having to list every possibility.</p>
+
+            <h3>Core Areas of Study</h3>
+            <ul class="list-disc list-inside ml-4 space-y-1">
+                <li><b>Enumeration:</b> Counting the number of ways certain patterns can be formed (e.g., sequences, subsets, partitions).</li>
+                <li><b>Combinatorial Design:</b> Constructing systems of sets with specific intersection properties (e.g., block designs).</li>
+                <li><b>Combinatorial Optimization:</b> Finding the "best" element, such as the shortest path in a graph.</li>
+            </ul>
+
+            <h3>Examples (What type of questions combinatorics addresses?)</h3>
+            <ul class="list-disc list-inside ml-4 space-y-1">
+                <li>How many different functions are there $f: \{1, 2, 3\} \rightarrow \{0, 1\}$? (Related to the size of the power set, $2^3=8$).</li>
+                <li>How many unique sets of 5 students can be selected from a class of 30? (A <b>combination</b> problem).</li>
+                <li>In how many different orders can 7 processes be executed by a CPU? (A <b>permutation</b> problem).</li>
+                <li>What is the $p(n)$ (partition number) for $n=10$? (A complex counting problem without a simple closed-form).</li>
+            </ul>
+            <p class="mt-4">Combinatorics is deeply interconnected with other mathematical fields, including functions, sets, cardinality, number theory, and logic. The techniques often involve applying the Addition and Multiplication Principles.</p>
+        </section>
+
+        <!-- Section 2: A famously hard problem (The Partition Number) (Slide 2) -->
+        <section class="lecture-section" id="section-2">
+            <!-- Audio Controls for Slide 2 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_02.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">2. A famously hard problem: The Partition Number $p(n)$</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>While many combinatorial problems have simple closed-form solutions (like factorials or powers), some problems are fundamentally much harder. One such problem is calculating the Partition Number $p(n)$.</p>
+
+            <h3>Definition of $p(n)$</h3>
+            <p>The partition number $p(n)$ is the number of ways a positive integer $n$ can be written as a sum of positive integers, where the order of the summands does not matter.</p>
+            
+            <h3>Examples: Counting Partitions</h3>
+            <ul class="list-disc list-inside ml-4 space-y-4 mt-2">
+                <li>
+                    For $n=4$, $p(4)=5$. The partitions are:
+                    <ul class="list-circle list-inside ml-4 text-sm text-gray-600 space-y-0.5">
+                        <li>$4$</li>
+                        <li>$3 + 1$</li>
+                        <li>$2 + 2$</li>
+                        <li>$2 + 1 + 1$</li>
+                        <li>$1 + 1 + 1 + 1$</li>
+                    </ul>
+                </li>
+                <li>
+                    For $n=5$, $p(5)=7$. The partitions are:
+                    <ul class="list-circle list-inside ml-4 text-sm text-gray-600 space-y-0.5">
+                        <li>$5$</li>
+                        <li>$4 + 1$</li>
+                        <li>$3 + 2$</li>
+                        <li>$3 + 1 + 1$</li>
+                        <li>$2 + 2 + 1$</li>
+                        <li>$2 + 1 + 1 + 1$</li>
+                        <li>$1 + 1 + 1 + 1 + 1$</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Asymptotic Formula (Ramanujan and Hardy)</h3>
+            <p class="mt-4">Since no simple closed-form expression exists for $p(n)$, the best way to understand its growth is through an asymptotic formula. G. H. Hardy and Srinivasa Ramanujan derived this approximation in 1918, showing how $p(n)$ behaves as $n$ becomes very large. The $\sim$ symbol means the ratio of the two sides approaches 1 as $n \to \infty$.</p>
+
+            $$ p(n) \sim \frac{1}{4n\sqrt{3}} e^{\pi \sqrt{2n/3}} $$
+        </section>
+
+        <!-- Section 3: The Addition Principle (Slide 3) -->
+        <section class="lecture-section" id="section-3">
+            <!-- Audio Controls for Slide 3 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_03.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">3. The Addition Principle</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <h3>The Addition Principle (or Rule of Sum)</h3>
+            <p>If two tasks, $T_1$ ($n_1$ ways) and $T_2$ ($n_2$ ways), cannot be performed simultaneously (i.e., the tasks are disjoint), then the number of ways to perform either $T_1$ or $T_2$ is $n_1 + n_2$.</p>
+            <p>Set Theory equivalence: For two disjoint sets $A$ and $B$ (where $A \cap B = \emptyset$):</p>
+            $$ |A \cup B| = |A| + |B| $$
+            <h3>Example:</h3>
+            <p>A department has 17 Computer Science faculty and 8 Mathematics faculty. In how many ways can you choose a computer scientist OR a mathematician to be on a committee?</p>
+            <p>Total ways: $17 + 8 = \mathbf{25}$.</p>
+        </section>
+
+        <!-- Section 4: Extensions of the Addition Principle (Slide 4) -->
+        <section class="lecture-section" id="section-4">
+            <!-- Audio Controls for Slide 4 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_04.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">4. Extensions of the Addition Principle</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <h3>The Multiplication Principle (or Rule of Product)</h3>
+            <p>If two tasks, $T_1$ ($n_1$ ways) and $T_2$ ($n_2$ ways), are independent, the number of ways to perform both $T_1$ and $T_2$ is $n_1 \times n_2$. This principle is used for sequences of events where the outcome of one does not affect the number of choices for the next.</p>
+
+            <h3>Set Theory Equivalence: The Cartesian Product</h3>
+            <p>In set theory, the multiplication principle corresponds directly to finding the size of the Cartesian Product of two or more sets. The Cartesian product, $A \times B$, is the set of all possible ordered pairs $(a, b)$ where $a \in A$ and $b \in B$.</p>
+            
+            <p>For two sets $A$ and $B$, the size of their Cartesian product is:</p>
+            $$ |A \times B| = |A| \cdot |B| $$
+        </section>
+
+        <!-- Section 5: Double- and Triple- counting (Slide 5) -->
+        <section class="lecture-section" id="section-5">
+            <!-- Audio Controls for Slide 5 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_05.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">5. Double- and Triple- counting</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <h3>The Problem of Non-Disjoint Sets</h3>
+            <p>When applying the Addition Principle to sets that are not disjoint ($A \cap B \ne \emptyset$), we are double-counting the elements in the intersection $A \cap B$.</p>
+            <p>To correct this, we use the Principle of Inclusion-Exclusion (PIE).</p>
+        </section>
+
+        <!-- Section 6: The Sieve Principle (Slide 6) -->
+        <section class="lecture-section" id="section-6">
+            <!-- Audio Controls for Slide 6 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_06.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">6. The Sieve Principle (Inclusion-Exclusion)</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p class="mb-4">The Principle of Inclusion-Exclusion (PIE), sometimes called the Sieve Principle, is the formal method used to correctly calculate the size of the union of non-disjoint sets. When we simply add the cardinalities of overlapping sets, we are counting the shared elements multiple times. PIE provides a systematic way to include all elements, then exclude the overlaps, and repeat as necessary to correct for over- and under-counting.</p>
+            
+            <h3>PIE for Two Sets (The simplest case)</h3>
+            <p>For two sets, $A$ and $B$, any element belonging to both sets (i.e., in $A \cap B$) is counted once in $|A|$ and once in $|B|$. This means the intersection is double-counted. To fix this, we subtract the count of the intersection exactly once:</p>
+            $$ |A \cup B| = |A| + |B| - |A \cap B| $$
+
+            <h3>PIE for Three Sets (The complexity of overlap)</h3>
+            <p>When dealing with three sets, $A, B, C$, the overlaps are more complex, requiring an alternating process:</p>
+            <p class="mt-4">The final formula is:</p>
+            $$ |A \cup B \cup C| = (|A| + |B| + |C|) - (|A \cap B| + |A \cap C| + |B \cap C|) + |A \cap B \cap C| $$
+        </section>
+
+        <!-- Section 7: Example of the Sieve Principle (Two Sets) (Slide 7) -->
+        <section class="lecture-section" id="section-7">
+            <!-- Audio Controls for Slide 7 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_07.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">7. Example of the Sieve Principle (Two Sets)</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <h3>Example: Divisible by 3 OR 5 (up to 1000)</h3>
+            <p>Find the number of positive integers $\le 1000$ divisible by $3$ OR $5$.</p>
+            
+            <p class="mt-2">Set $A$ (divisible by 3): $|A| = \lfloor 1000/3 \rfloor = 333$.</p>
+            <p>Set $B$ (divisible by 5): $|B| = \lfloor 1000/5 \rfloor = 200$.</p>
+            <p>Intersection $A \cap B$ (divisible by 15): $|A \cap B| = \lfloor 1000/15 \rfloor = 66$.</p>
+            
+            <p class="mt-4">Applying PIE:</p>
+            $$ |A \cup B| = |A| + |B| - |A \cap B| = 333 + 200 - 66 = \mathbf{467} $$
+        </section>
+
+        <!-- Section 8: Example of the Sieve Principle (Three Sets) (Slide 8) -->
+        <section class="lecture-section" id="section-8">
+            <!-- Audio Controls for Slide 8 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_08.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">8. Example of the Sieve Principle (Three Sets)</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <h3>Example: University of Pennsylvania Music Students</h3>
+            <p>There are 73 students in a first-year Humanities class at the University of Pennsylvania. Among them, a total of 52 can play the piano, 25 can play the violin, and 20 can play the flute; 17 can play both piano and violin, 12 can play piano and flute, and 7 can play violin and flute. But only Osbert Smugg can play all three instruments. How many in the class cannot play any of them?</p>
+            
+            <p class="mt-4">Applying PIE:</p>
+            $$ |P \cup V \cup F| = (52 + 25 + 20) - (17 + 12 + 7) + 1 $$
+            $$ |P \cup V \cup F| = 97 - 36 + 1 = \mathbf{62} $$
+            
+            <p class="mt-4">Final Result (Cannot play any):</p>
+            $$ \text{Cannot play any} = 73 - 62 = \mathbf{11} $$
+        </section>
+
+
+        <!-- Section 9: Functions, words and selections (Slide 9) -->
+        <section class="lecture-section" id="section-9">
+            <!-- Audio Controls for Slide 9 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_09.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">9. Functions, words and selections</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>The number of functions $f: \{1, \ldots, n\} \rightarrow \{1, \ldots, k\}$ is equivalent to the number of words of length $n$ from an alphabet of size $k$.</p>
+            
+            <h3>Result (Ordered Selection with Replacement):</h3>
+            <p>The total number of functions is:</p>
+            $$ \underbrace{k \times k \times \cdots \times k}_{n \text{ times}} = k^n $$
+        </section>
+
+        <!-- Section 10: Example: The power set (Slide 10) -->
+        <section class="lecture-section" id="section-10">
+            <!-- Audio Controls for Slide 10 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_10.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">10. Example: The power set</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>The number of subsets of a set $A$ ($|\mathcal{P}(A)|$) is equivalent to the number of binary words of length $|A|$, where each element is either 'in' (1) or 'not in' (0) the subset.</p>
+            <h3>Theorem:</h3>
+            $$ |\mathcal{P}(A)| = 2^{|A|} $$
+
+            <h3>Importance and Applications</h3>
+            <p>The concept of the power set is foundational because it directly links the size of a set to the total number of decisions that can be made about its elements, which is critical in computing. For a set of size $n$, there are $n$ independent binary choices, resulting in $\mathbf{2^n}$ total outcomes.</p>
+        </section>
+
+        <!-- Section 11: Encoding information (Slide 11) -->
+        <section class="lecture-section" id="section-11">
+            <!-- Audio Controls for Slide 11 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_11.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">11. Encoding information (Ordered Selection with Replacement)</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>This counting technique is fundamental to how information is encoded, modeled as generating "words" or sequences where <b>order matters</b> and <b>repetition is allowed</b>.</p>
+
+            <h3>The Counting Principle: $k^n$</h3>
+            <p>If we have an alphabet (a set of choices) of size $k$ and we are creating a sequence (a <b>word</b>) of length $n$, the total number of possible sequences is $k^n$.</p>
+            
+            $$ \underbrace{k \times k \times \cdots \times k}_{n \text{ positions}} = k^n $$
+
+            <h3>Example: Bit Strings (Direct CS Application)</h3>
+            <p>How many distinct 8-bit binary strings (bytes) are possible? $k=2$ (digits $\{0, 1\}$) and $n=8$ (length).</p>
+            <p>Result: $2^8 = \mathbf{256}$.</p>
+        </section>
+
+        <!-- Section 12: Ordered selections without repetition (Permutations) (Slide 12) -->
+        <section class="lecture-section" id="section-12">
+            <!-- Audio Controls for Slide 12 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_12.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">12. Ordered selections without repetition (Permutations)</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>A <b>Permutation</b> is an arrangement of objects where <b>order matters</b> and <b>repetition is not allowed</b>.</p>
+            
+            <h3>The Permutation Formula</h3>
+            <p>The number of $k$-permutations of $n$ elements, denoted $P(n, k)$ or $_nP_k$, is defined as:</p>
+            $$ P(n, k) = n \cdot (n-1) \cdot (n-2) \cdots (n-k+1) = \frac{n!}{(n-k)!} $$
+            
+            <h3>Example 2: Process Scheduling (CS Application)</h3>
+            <p>An OS has 5 processes and must schedule the first 3 in sequence ($n=5, k=3$).</p>
+            <p>Result: $P(5, 3) = 5 \times 4 \times 3 = \mathbf{60}$ possible execution sequences.</p>
+        </section>
+
+        <!-- Section 13: Unordered selections (Slide 13) -->
+        <section class="lecture-section" id="section-13">
+            <!-- Audio Controls for Slide 13 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_13.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">13. Unordered selections without repetition (Combinations)</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>A <b>Combination</b> is a selection of items where the <b>order of selection does not matter</b> and <b>repetition is not allowed</b>.</p>
+            
+            <h3>The Combination Formula (Binomial Coefficient)</h3>
+            <p>The number of $k$-combinations of $n$ elements, denoted $\binom n k$, is:</p>
+            $$ \binom n k = \frac{P(n, k)}{k!(n-k)!} $$
+
+            <h3>Example: Selecting Features for a Model</h3>
+            <p>How many unique sets of $k=4$ features can be selected from a set of $n=10$ available features?</p>
+            $$ \binom {10} 4 = \frac{10!}{4!6!} = \mathbf{210} $$
+        </section>
+
+        <!-- Section 14: Calculating binomial coefficients (Slide 14) -->
+        <section class="lecture-section" id="section-14">
+            <!-- Audio Controls for Slide 14 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_14.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">14. Calculating binomial coefficients</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <h3>Example: Selecting a Committee</h3>
+            <p>Select a committee of $k=3$ members from a pool of $n=8$ candidates.</p>
+            $$ \binom 8 3 = \frac{8!}{3!5!} = \mathbf{56} $$
+            
+            <h3>Symmetry Property:</h3>
+            <p>Choosing $k$ items is the same as choosing $n-k$ items to exclude.</p>
+            $$ \binom n k = \binom n {n-k} $$
+        </section>
+
+        <!-- Section 15: Recursive formula for binomial coefficients (Slide 15) -->
+        <section class="lecture-section" id="section-15">
+            <!-- Audio Controls for Slide 15 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_15.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">15. Recursive formula for binomial coefficients (Pascal's Identity)</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <h3>Pascal's Identity (Recurrence Relation)</h3>
+            <p>The binomial coefficients can be calculated recursively:</p>
+            $$ \binom n k = \binom {n-1} k + \binom {n-1} {k-1} $$
+            <p class="mt-2">Base Cases: $\binom n 0 = 1$ and $\binom n n = 1$.</p>
+
+            <!-- EXPANDED EXAMPLE -->
+            <h3>Numerical Example: Calculating $\binom 5 3$</h3>
+            <p>To calculate $\binom 5 3$ using the recurrence relation, we must work up from the base cases (the edges of the triangle) to find the required components.</p>
+
+            <h4 class="frame-title">Row $n=2$</h4>
+            <ul class="list-disc list-inside ml-4 space-y-1">
+                <li>$\binom 2 1 = \binom 1 1 + \binom 1 0 = 1 + 1 = \mathbf{2}$</li>
+            </ul>
+
+            <h4 class="frame-title">Row $n=3$</h4>
+            <ul class="list-disc list-inside ml-4 space-y-1">
+                <li>$\binom 3 1 = \binom 2 1 + \binom 2 0 = 2 + 1 = \mathbf{3}$</li>
+                <li>$\binom 3 2 = \binom 2 2 + \binom 2 1 = 1 + 2 = \mathbf{3}$</li>
+            </ul>
+
+            <h4 class="frame-title">Row $n=4$ (The components needed for $n=5$)</h4>
+            <p>We need $\binom 4 3$ and $\binom 4 2$ to calculate $\binom 5 3$.</p>
+            <ul class="list-disc list-inside ml-4 space-y-1">
+                <li>$\binom 4 2 = \binom 3 2 + \binom 3 1 = 3 + 3 = \mathbf{6}$</li>
+                <li>$\binom 4 3 = \binom 3 3 + \binom 3 2 = 1 + 3 = \mathbf{4}$</li>
+            </ul>
+
+            <h4 class="frame-title">Row $n=5$ (Final Calculation)</h4>
+            <p>Now, we apply the identity using the values calculated in Row $n=4$:</p>
+            $$ \binom 5 3 = \binom {4} 3 + \binom {4} 2 = 4 + 6 = \mathbf{10} $$
+            <p class="mt-2">The coefficient $\mathbf{10}$ is the number of ways to choose 3 items from a set of 5.</p>
+        </section>
+
+        <!-- Section 16: Pascal's Triangle (Slide 16) -->
+        <section class="lecture-section" id="section-16">
+            <!-- Audio Controls for Slide 16 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_16.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">16. Pascal's Triangle</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>A triangular arrangement of the binomial coefficients, which visually represents Pascal's Identity.</p>
+            <p class="mt-2 text-sm text-gray-700">Inner nodes are formed by adding the two directly above. Hover, tap, or focus an interior node to highlight its two parent links. The highlighted bottom row is $n=6$.</p>
+
+            <div class="pascal-diagram-wrap">
+                <svg class="pascal-svg" viewBox="0 0 840 540" role="img" aria-label="Pascal triangle with connecting lines between parent and child coefficients">
+                    <path class="pascal-link" d="
+                        M420 48 L392 122 M420 48 L448 122
+                        M392 122 L364 196 M392 122 L420 196
+                        M448 122 L420 196 M448 122 L476 196
+                        M364 196 L336 270 M364 196 L392 270
+                        M420 196 L392 270 M420 196 L448 270
+                        M476 196 L448 270 M476 196 L504 270
+                        M336 270 L308 344 M336 270 L364 344
+                        M392 270 L364 344 M392 270 L420 344
+                        M448 270 L420 344 M448 270 L476 344
+                        M504 270 L476 344 M504 270 L532 344
+                        M308 344 L280 418 M308 344 L336 418
+                        M364 344 L336 418 M364 344 L392 418
+                        M420 344 L392 418 M420 344 L448 418
+                        M476 344 L448 418 M476 344 L504 418
+                        M532 344 L504 418 M532 344 L560 418
+                        M280 418 L252 492 M280 418 L308 492
+                        M336 418 L308 492 M336 418 L364 492
+                        M392 418 L364 492 M392 418 L420 492
+                        M448 418 L420 492 M448 418 L476 492
+                        M504 418 L476 492 M504 418 L532 492
+                        M560 418 L532 492 M560 418 L588 492
+                    " />
+
+                    <text class="pascal-row-label" x="190" y="52">n=0</text>
+                    <text class="pascal-row-label" x="190" y="126">n=1</text>
+                    <text class="pascal-row-label" x="190" y="200">n=2</text>
+                    <text class="pascal-row-label" x="190" y="274">n=3</text>
+                    <text class="pascal-row-label" x="190" y="348">n=4</text>
+                    <text class="pascal-row-label" x="190" y="422">n=5</text>
+                    <text class="pascal-row-label" x="190" y="496">n=6</text>
+
+                    <circle class="pascal-node-edge" cx="420" cy="48" r="16" /><text class="pascal-text" x="420" y="48">1</text>
+
+                    <circle class="pascal-node-edge" cx="392" cy="122" r="16" /><text class="pascal-text" x="392" y="122">1</text>
+                    <circle class="pascal-node-edge" cx="448" cy="122" r="16" /><text class="pascal-text" x="448" y="122">1</text>
+
+                    <circle class="pascal-node-edge" cx="364" cy="196" r="16" /><text class="pascal-text" x="364" y="196">1</text>
+                    <circle class="pascal-node" cx="420" cy="196" r="16" /><text class="pascal-text" x="420" y="196">2</text>
+                    <circle class="pascal-node-edge" cx="476" cy="196" r="16" /><text class="pascal-text" x="476" y="196">1</text>
+
+                    <circle class="pascal-node-edge" cx="336" cy="270" r="16" /><text class="pascal-text" x="336" y="270">1</text>
+                    <circle class="pascal-node" cx="392" cy="270" r="16" /><text class="pascal-text" x="392" y="270">3</text>
+                    <circle class="pascal-node" cx="448" cy="270" r="16" /><text class="pascal-text" x="448" y="270">3</text>
+                    <circle class="pascal-node-edge" cx="504" cy="270" r="16" /><text class="pascal-text" x="504" y="270">1</text>
+
+                    <circle class="pascal-node-edge" cx="308" cy="344" r="16" /><text class="pascal-text" x="308" y="344">1</text>
+                    <circle class="pascal-node" cx="364" cy="344" r="16" /><text class="pascal-text" x="364" y="344">4</text>
+                    <circle class="pascal-node" cx="420" cy="344" r="16" /><text class="pascal-text" x="420" y="344">6</text>
+                    <circle class="pascal-node" cx="476" cy="344" r="16" /><text class="pascal-text" x="476" y="344">4</text>
+                    <circle class="pascal-node-edge" cx="532" cy="344" r="16" /><text class="pascal-text" x="532" y="344">1</text>
+
+                    <circle class="pascal-node-edge" cx="280" cy="418" r="16" /><text class="pascal-text" x="280" y="418">1</text>
+                    <circle class="pascal-node" cx="336" cy="418" r="16" /><text class="pascal-text" x="336" y="418">5</text>
+                    <circle class="pascal-node" cx="392" cy="418" r="16" /><text class="pascal-text" x="392" y="418">10</text>
+                    <circle class="pascal-node" cx="448" cy="418" r="16" /><text class="pascal-text" x="448" y="418">10</text>
+                    <circle class="pascal-node" cx="504" cy="418" r="16" /><text class="pascal-text" x="504" y="418">5</text>
+                    <circle class="pascal-node-edge" cx="560" cy="418" r="16" /><text class="pascal-text" x="560" y="418">1</text>
+
+                    <circle class="pascal-node-row-highlight" cx="252" cy="492" r="16" /><text class="pascal-text" x="252" y="492">1</text>
+                    <circle class="pascal-node-row-highlight" cx="308" cy="492" r="16" /><text class="pascal-text" x="308" y="492">6</text>
+                    <circle class="pascal-node-row-highlight" cx="364" cy="492" r="16" /><text class="pascal-text" x="364" y="492">15</text>
+                    <circle class="pascal-node-row-highlight" cx="420" cy="492" r="16" /><text class="pascal-text" x="420" y="492">20</text>
+                    <circle class="pascal-node-row-highlight" cx="476" cy="492" r="16" /><text class="pascal-text" x="476" y="492">15</text>
+                    <circle class="pascal-node-row-highlight" cx="532" cy="492" r="16" /><text class="pascal-text" x="532" y="492">6</text>
+                    <circle class="pascal-node-row-highlight" cx="588" cy="492" r="16" /><text class="pascal-text" x="588" y="492">1</text>
+
+                    <!-- Interactive parent-link overlays for interior nodes -->
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="2 equals 1 plus 1">
+                        <title>2 = 1 + 1</title>
+                        <line class="pascal-parent-link" x1="392" y1="122" x2="420" y2="196" />
+                        <line class="pascal-parent-link" x1="448" y1="122" x2="420" y2="196" />
+                        <circle class="pascal-hover-ring" cx="420" cy="196" r="20" />
+                        <circle class="pascal-hotspot" cx="420" cy="196" r="20" />
+                    </g>
+
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="3 equals 1 plus 2">
+                        <title>3 = 1 + 2</title>
+                        <line class="pascal-parent-link" x1="364" y1="196" x2="392" y2="270" />
+                        <line class="pascal-parent-link" x1="420" y1="196" x2="392" y2="270" />
+                        <circle class="pascal-hover-ring" cx="392" cy="270" r="20" />
+                        <circle class="pascal-hotspot" cx="392" cy="270" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="3 equals 2 plus 1">
+                        <title>3 = 2 + 1</title>
+                        <line class="pascal-parent-link" x1="420" y1="196" x2="448" y2="270" />
+                        <line class="pascal-parent-link" x1="476" y1="196" x2="448" y2="270" />
+                        <circle class="pascal-hover-ring" cx="448" cy="270" r="20" />
+                        <circle class="pascal-hotspot" cx="448" cy="270" r="20" />
+                    </g>
+
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="4 equals 1 plus 3">
+                        <title>4 = 1 + 3</title>
+                        <line class="pascal-parent-link" x1="336" y1="270" x2="364" y2="344" />
+                        <line class="pascal-parent-link" x1="392" y1="270" x2="364" y2="344" />
+                        <circle class="pascal-hover-ring" cx="364" cy="344" r="20" />
+                        <circle class="pascal-hotspot" cx="364" cy="344" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="6 equals 3 plus 3">
+                        <title>6 = 3 + 3</title>
+                        <line class="pascal-parent-link" x1="392" y1="270" x2="420" y2="344" />
+                        <line class="pascal-parent-link" x1="448" y1="270" x2="420" y2="344" />
+                        <circle class="pascal-hover-ring" cx="420" cy="344" r="20" />
+                        <circle class="pascal-hotspot" cx="420" cy="344" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="4 equals 3 plus 1">
+                        <title>4 = 3 + 1</title>
+                        <line class="pascal-parent-link" x1="448" y1="270" x2="476" y2="344" />
+                        <line class="pascal-parent-link" x1="504" y1="270" x2="476" y2="344" />
+                        <circle class="pascal-hover-ring" cx="476" cy="344" r="20" />
+                        <circle class="pascal-hotspot" cx="476" cy="344" r="20" />
+                    </g>
+
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="5 equals 1 plus 4">
+                        <title>5 = 1 + 4</title>
+                        <line class="pascal-parent-link" x1="308" y1="344" x2="336" y2="418" />
+                        <line class="pascal-parent-link" x1="364" y1="344" x2="336" y2="418" />
+                        <circle class="pascal-hover-ring" cx="336" cy="418" r="20" />
+                        <circle class="pascal-hotspot" cx="336" cy="418" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="10 equals 4 plus 6">
+                        <title>10 = 4 + 6</title>
+                        <line class="pascal-parent-link" x1="364" y1="344" x2="392" y2="418" />
+                        <line class="pascal-parent-link" x1="420" y1="344" x2="392" y2="418" />
+                        <circle class="pascal-hover-ring" cx="392" cy="418" r="20" />
+                        <circle class="pascal-hotspot" cx="392" cy="418" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="10 equals 6 plus 4">
+                        <title>10 = 6 + 4</title>
+                        <line class="pascal-parent-link" x1="420" y1="344" x2="448" y2="418" />
+                        <line class="pascal-parent-link" x1="476" y1="344" x2="448" y2="418" />
+                        <circle class="pascal-hover-ring" cx="448" cy="418" r="20" />
+                        <circle class="pascal-hotspot" cx="448" cy="418" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="5 equals 4 plus 1">
+                        <title>5 = 4 + 1</title>
+                        <line class="pascal-parent-link" x1="476" y1="344" x2="504" y2="418" />
+                        <line class="pascal-parent-link" x1="532" y1="344" x2="504" y2="418" />
+                        <circle class="pascal-hover-ring" cx="504" cy="418" r="20" />
+                        <circle class="pascal-hotspot" cx="504" cy="418" r="20" />
+                    </g>
+
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="6 equals 1 plus 5">
+                        <title>6 = 1 + 5</title>
+                        <line class="pascal-parent-link" x1="280" y1="418" x2="308" y2="492" />
+                        <line class="pascal-parent-link" x1="336" y1="418" x2="308" y2="492" />
+                        <circle class="pascal-hover-ring" cx="308" cy="492" r="20" />
+                        <circle class="pascal-hotspot" cx="308" cy="492" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="15 equals 5 plus 10">
+                        <title>15 = 5 + 10</title>
+                        <line class="pascal-parent-link" x1="336" y1="418" x2="364" y2="492" />
+                        <line class="pascal-parent-link" x1="392" y1="418" x2="364" y2="492" />
+                        <circle class="pascal-hover-ring" cx="364" cy="492" r="20" />
+                        <circle class="pascal-hotspot" cx="364" cy="492" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="20 equals 10 plus 10">
+                        <title>20 = 10 + 10</title>
+                        <line class="pascal-parent-link" x1="392" y1="418" x2="420" y2="492" />
+                        <line class="pascal-parent-link" x1="448" y1="418" x2="420" y2="492" />
+                        <circle class="pascal-hover-ring" cx="420" cy="492" r="20" />
+                        <circle class="pascal-hotspot" cx="420" cy="492" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="15 equals 10 plus 5">
+                        <title>15 = 10 + 5</title>
+                        <line class="pascal-parent-link" x1="448" y1="418" x2="476" y2="492" />
+                        <line class="pascal-parent-link" x1="504" y1="418" x2="476" y2="492" />
+                        <circle class="pascal-hover-ring" cx="476" cy="492" r="20" />
+                        <circle class="pascal-hotspot" cx="476" cy="492" r="20" />
+                    </g>
+                    <g class="pascal-sum-group" tabindex="0" role="button" aria-label="6 equals 5 plus 1">
+                        <title>6 = 5 + 1</title>
+                        <line class="pascal-parent-link" x1="504" y1="418" x2="532" y2="492" />
+                        <line class="pascal-parent-link" x1="560" y1="418" x2="532" y2="492" />
+                        <circle class="pascal-hover-ring" cx="532" cy="492" r="20" />
+                        <circle class="pascal-hotspot" cx="532" cy="492" r="20" />
+                    </g>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Section 17: A non-recursive formula for binomial coefficients (Slide 17) -->
+        <section class="lecture-section" id="section-17">
+            <!-- Audio Controls for Slide 17 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_17.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">17. A non-recursive formula for binomial coefficients</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>This formula provides a direct, non-recursive way to calculate the number of **combinations**, as introduced in <a href="#section-13" class="toc-link font-semibold">Section 13 (Unordered Selections)</a>.</p>
+            <h3>The Non-Recursive Definition</h3>
+            <p>The number of ways to choose $k$ items from $n$ items without regard to order is:</p>
+            $$ \binom n k = \frac{n!}{k!(n-k)!} $$
+            <p>The symmetry property remains: $\binom n k = \binom n {n-k}$.</p>
+        </section>
+
+        <!-- Section 18: Example of binomial calculation (Stars and Bars) (Slide 18) -->
+        <section class="lecture-section" id="section-18">
+            <!-- Audio Controls for Slide 18 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_18.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">18. Example of binomial calculation (Stars and Bars)</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>This is a technique for Unordered Selection with Replacement.</p>
+            <h3>Example:</h3>
+            <p>In how many different ways can you distribute $k=6$ indistinguishable balls (stars) into $n=4$ distinguishable bins (types)?</p>
+            <p>The formula for choosing $k$ items from $n$ types with replacement is:</p>
+            $$ \binom {k+n-1} k $$
+            <p>Result:</p>
+            $$ \binom {6+4-1} 6 = \binom 9 6 = \mathbf{84} $$
+        </section>
+
+        <!-- Section 19: Unordered selection with replacement (Slide 19) -->
+        <section class="lecture-section" id="section-19">
+            <!-- Audio Controls for Slide 19 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_19.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">19. Unordered selection with replacement</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <h3>Formula Recap</h3>
+            <p>The number of ways to choose $k$ objects from $n$ types with replacement is:</p>
+            $$ \binom {k+n-1} k = \binom {n+k-1} {n-1} $$
+            <h3>Example (Ice Cream):</h3>
+            <p>How many ways can you choose $k=3$ scoops of ice cream from $n=4$ different flavors?</p>
+            <p>Result:</p>
+            $$ \binom {3+4-1} 3 = \binom 6 3 = \mathbf{20} $$
+        </section>
+
+        <!-- Section 20: A look at binomials (Slide 20) -->
+        <section class="lecture-section" id="section-20">
+            <!-- Audio Controls for Slide 20 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_20.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">20. A look at binomials</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <h3>The Combinatorial Meaning of $(a+b)^n$</h3>
+            <p>When expanding $(a+b)^n = (a+b)(a+b)\cdots(a+b)$, a term of the form $a^{n-k}b^k$ is generated by selecting $b$ from exactly $k$ of the $n$ factors, and $a$ from the remaining $n-k$ factors.</p>
+            <p>The coefficient of this term is the number of ways to choose which $k$ factors will contribute a $b$.</p>
+        </section>
+
+        <!-- Section 21: Binomials and selections (Slide 21) -->
+        <section class="lecture-section" id="section-21">
+            <!-- Audio Controls for Slide 21 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_21.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">21. Binomials and selections</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>The number of times the term $a^{n-k}b^k$ appears is equal to the number of ways to choose $k$ positions for $b$'s (or $n-k$ positions for $a$'s) out of the $n$ factors.</p>
+            <p>This number is the combination:</p>
+            $$ \binom n k $$
+        </section>
+
+        <!-- Section 22: Binomials in general (Slide 22) -->
+        <section class="lecture-section" id="section-22">
+            <!-- Audio Controls for Slide 22 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_22.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">22. Binomials in general</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p>Since the coefficient of $a^{n-k}b^k$ is the number of ways to choose $k$ positions for $b$, this coefficient is $\binom n k$.</p>
+            <p>Due to the symmetry property, this is also equal to the number of ways to choose $n-k$ positions for $a$: $\binom n {n-k}$.</p>
+            $$ \binom n k = \binom n {n-k} $$
+        </section>
+
+        <!-- Section 23: The Binomial Theorem (Slide 23) -->
+        <section class="lecture-section" id="section-23">
+            <!-- Audio Controls for Slide 23 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_23.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">23. The Binomial Theorem</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <h3>Theorem (The Binomial Theorem)</h3>
+            <p>If $n \ge 1$ and $a, b$ are numbers, the expansion of $(a+b)^n$ is:</p>
+            $$ (a + b)^n = \sum_{k=0}^n \binom n k a^{n-k} b^k $$
+            <h3>Example: $(a+b)^6$</h3>
+            $$ (a+b)^6 = a^6 + 6a^5b + 15a^4b^2 + 20a^3 b^3 + 15a^2 b^4 + 6ab^5 + b^6 $$
+        </section>
+
+        <!-- Section 24: Further examples (Slide 24) -->
+        <section class="lecture-section" id="section-24">
+            <!-- Audio Controls for Slide 24 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_24.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">24. Further examples</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <h3>Example 1: Sum of Binomial Coefficients</h3>
+            <p>Setting $a=1$ and $b=1$ in the Binomial Theorem yields:</p>
+            $$ 2^n = \sum_{k=0}^n \binom n k $$
+            <p>Result: The sum of the coefficients in row $n$ of Pascal's Triangle is $\mathbf{2^n}$ (the total number of subsets of a set with $n$ elements).</p>
+            <h3>Example 2: Alternating Sum</h3>
+            <p>Setting $a=1$ and $b=-1$ in the Binomial Theorem yields:</p>
+            $$ \sum_{k=0}^n (-1)^k \binom n k = 0 $$
+            <p>Result: For $n \ge 1$, the alternating sum of the binomial coefficients is $\mathbf{0}$.</p>
+        </section>
+
+        <!-- Section 25: Conclusion (Slide 25) -->
+        <section class="lecture-section" id="section-25">
+            <!-- Audio Controls for Slide 25 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_25.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">25. Conclusion</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <p><a href="#section-1" class="toc-link font-semibold">Combinatorics</a> gives us a structured way to count rather than relying on guesswork or case-by-case listing. Over the lecture, we moved from foundational counting rules to more refined techniques for handling overlap, order, and repetition.</p>
+            <p>The <a href="#section-3" class="toc-link font-semibold">Addition Principle</a> handles disjoint either-or choices, while the <a href="#section-4" class="toc-link font-semibold">Multiplication Principle</a> handles step-by-step independent choices. When overlap appears, the <a href="#section-6" class="toc-link font-semibold">Principle of Inclusion-Exclusion</a> corrects the overcounting and gives accurate totals.</p>
+            <p>We also classified selection problems using two key questions: does order matter, and is repetition allowed? That classification gave us the four central models:</p>
+            <ul class="list-disc list-inside ml-4 space-y-1">
+                <li><a href="#section-11" class="toc-link font-semibold">Ordered selection with replacement</a>: $k^n$</li>
+                <li><a href="#section-12" class="toc-link font-semibold">Ordered selection without repetition</a>: $P(n,k)$</li>
+                <li><a href="#section-13" class="toc-link font-semibold">Unordered selection without repetition</a>: $\binom n k$</li>
+                <li><a href="#section-19" class="toc-link font-semibold">Unordered selection with replacement</a>: $\binom{n+k-1}{k}$</li>
+            </ul>
+            <p>Finally, we linked these counting ideas to algebra through <a href="#section-14" class="toc-link font-semibold">binomial coefficients</a>, <a href="#section-16" class="toc-link font-semibold">Pascal's Triangle</a>, and the <a href="#section-23" class="toc-link font-semibold">Binomial Theorem</a>. One of the most important takeaways is that these formulas are not isolated facts: they arise from clear counting structures that can be explained, justified, and reconstructed.</p>
+            <p>That is the deeper lesson of this week. If you can identify the structure of a problem, you can usually choose the right counting method and solve it with confidence.</p>
+        </section>
+
+        <footer class="text-center text-sm text-gray-500 mt-8 pt-4 border-t border-gray-300">
+            End of Lecture Notes.
+        </footer>
+    </div>
+
+    <!-- Status message bar -->
+    <div id="status-message" class="status-show">
+        Ready for voiceover playback. Click the play button on any section!
+    </div>
+
+    <script>
+        const statusMessage = document.getElementById('status-message');
+
+        /**
+         * Formats seconds into M:SS string.
+         */
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${remainingSeconds}`;
+        }
+
+        /**
+         * Displays a temporary status message using the global status div.
+         */
+        function showStatus(message) {
+            statusMessage.textContent = message;
+            statusMessage.classList.add('status-show');
+            clearTimeout(statusMessage.timer);
+            statusMessage.timer = setTimeout(() => {
+                statusMessage.classList.remove('status-show');
+            }, 3000);
+        }
+
+        /**
+         * Toggles the disabled state and visual appearance of the button.
+         */
+        function togglePlaybackButton(button, isEnabled) {
+            button.disabled = !isEnabled;
+        }
+
+        /**
+         * Main function to initialize all audio players on the page.
+         */
+        function initAudioPlayers() {
+            document.querySelectorAll('.lecture-section').forEach(section => {
+                const audioPlayer = section.querySelector('.section-audio');
+                const slider = section.querySelector('.playback-slider');
+                const playPauseBtn = section.querySelector('.play-pause-btn');
+                
+                if (!audioPlayer || !slider || !playPauseBtn) return; // Skip if elements are missing
+
+                /**
+                 * Updates the slider value (which is visually tied to the progress bar fill via CSS) and time display.
+                 */
+                const syncVisuals = (timeOverride = null) => {
+                    const time = timeOverride !== null ? timeOverride : audioPlayer.currentTime;
+                    
+                    // 1. Update the slider value
+                    if (!slider.classList.contains('seeking-active')) {
+                        slider.value = time;
+                    }
+
+                    // 2. Update the progress bar fill (CSS variable)
+                    if (audioPlayer.duration) {
+                        const progressPercent = (time / audioPlayer.duration) * 100;
+                        slider.style.setProperty('--slider-progress', `${progressPercent}%`);
+                    }
+
+                    // 3. Update the time display
+                    const currentTimeSpan = slider.closest('.section-heading-wrapper').querySelector('.current-time');
+                    if (currentTimeSpan) {
+                        currentTimeSpan.textContent = formatTime(time);
+                    }
+                };
+
+                // Use requestAnimationFrame for smooth, synchronized updates when playing
+                const updateLoop = () => {
+                    if (!audioPlayer.paused) {
+                        syncVisuals();
+                        audioPlayer.__animationFrameId = requestAnimationFrame(updateLoop);
+                    }
+                };
+                
+                // Set initial max value of slider after metadata loads
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    slider.max = audioPlayer.duration;
+                    syncVisuals(0); // Initial sync to 0:00
+                });
+
+                // --- SEEKING/SEEKED HANDLERS ---
+                audioPlayer.addEventListener('seeking', () => {
+                    togglePlaybackButton(playPauseBtn, false);
+                });
+
+                audioPlayer.addEventListener('seeked', () => {
+                    if (audioPlayer.__wasPlaying) {
+                        audioPlayer.play().catch(e => console.error("Play resume failed after seek:", e));
+                        audioPlayer.__wasPlaying = false; 
+                    } else {
+                        togglePlaybackButton(playPauseBtn, true);
+                        showStatus(`Ready to play from ${formatTime(audioPlayer.currentTime)}.`);
+                    }
+                    syncVisuals(); // Final sync after seek is complete
+                });
+                // --- END SEEKING HANDLERS ---
+
+                // Handle Play/Pause Button
+                playPauseBtn.addEventListener('click', () => {
+                    if (playPauseBtn.disabled) return; 
+
+                    const isPlaying = playPauseBtn.dataset.state === 'playing';
+                    
+                    // Pause all other players
+                    document.querySelectorAll('.section-audio').forEach(otherAudio => {
+                        if (otherAudio !== audioPlayer && !otherAudio.paused) {
+                            otherAudio.pause();
+                            cancelAnimationFrame(otherAudio.__animationFrameId); 
+                        }
+                    });
+
+                    if (isPlaying) {
+                        audioPlayer.pause();
+                    } else {
+                        audioPlayer.play().catch(e => console.error("Play failed:", e));
+                    }
+                });
+
+                // UI Update Listeners
+                audioPlayer.addEventListener('play', () => {
+                    playPauseBtn.dataset.state = 'playing';
+                    togglePlaybackButton(playPauseBtn, true); 
+                    // Set Pause Icon
+                    playPauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M160,216H96a16,16,0,0,1-16-16V56a16,16,0,0,1,16-16h64a16,16,0,0,1,16,16V200A16,16,0,0,1,160,216Z"></path></svg>';
+                    showStatus("Audio Playing.");
+                    // Start the smooth update loop
+                    audioPlayer.__animationFrameId = requestAnimationFrame(updateLoop);
+                });
+
+                audioPlayer.addEventListener('pause', () => {
+                    playPauseBtn.dataset.state = 'paused';
+                    togglePlaybackButton(playPauseBtn, true);
+                    // Set Play Icon
+                    playPauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>';
+                    showStatus("Audio Paused.");
+                    // Stop the smooth update loop
+                    cancelAnimationFrame(audioPlayer.__animationFrameId); 
+                });
+                
+                audioPlayer.addEventListener('ended', () => {
+                    syncVisuals(0); // Final sync to 0:00
+                    showStatus("Playback finished.");
+                });
+
+
+                // --- SLIDER INTERACTION HANDLERS (Seeking) ---
+
+                // Prepare for seeking on drag/click start
+                slider.addEventListener('mousedown', (e) => {
+                    // CRITICAL FIX: Prevent default range input behavior (which causes the 100% flash)
+                    e.preventDefault(); 
+
+                    audioPlayer.__wasPlaying = !audioPlayer.paused; 
+                    if (!audioPlayer.paused) { audioPlayer.pause(); }
+                    e.target.classList.add('seeking-active');
+                    // Stop the animation loop while dragging
+                    cancelAnimationFrame(audioPlayer.__animationFrameId); 
+                });
+                slider.addEventListener('touchstart', (e) => {
+                    // CRITICAL FIX: Prevent default range input behavior (which causes the 100% flash)
+                    e.preventDefault(); 
+                    
+                    audioPlayer.__wasPlaying = !audioPlayer.paused;
+                    if (!audioPlayer.paused) { audioPlayer.pause(); }
+                    e.target.classList.add('seeking-active');
+                    // Stop the animation loop while dragging
+                    cancelAnimationFrame(audioPlayer.__animationFrameId);
+                });
+
+                // Update visual progress during drag (input event)
+                slider.addEventListener('input', (e) => {
+                    const newTime = parseFloat(e.target.value);
+                    if (e.target.classList.contains('seeking-active') && audioPlayer.duration) {
+                        // While dragging, we update the bar and time based on the slider's value
+                        const progressPercent = (newTime / audioPlayer.duration) * 100;
+                        e.target.style.setProperty('--slider-progress', `${progressPercent}%`);
+
+                        const currentTimeSpan = e.target.closest('.section-heading-wrapper').querySelector('.current-time');
+                        if (currentTimeSpan) {
+                            currentTimeSpan.textContent = formatTime(newTime);
+                        }
+                    }
+                });
+                
+                /**
+                 * Core logic to handle seeking on mouseup/touchend, calculating time based on bar click position.
+                 */
+                const endSeekHandler = (e) => {
+                    if (!slider.classList.contains('seeking-active')) return;
+                    if (!audioPlayer.duration) return;
+
+                    // 1. Determine click/touch coordinates
+                    let clientX;
+                    const isTouch = e.changedTouches && e.changedTouches.length > 0;
+                    
+                    if (isTouch) {
+                        clientX = e.changedTouches[0].clientX;
+                    } else if (e.clientX !== undefined) {
+                        clientX = e.clientX;
+                    } else {
+                        slider.classList.remove('seeking-active');
+                        return;
+                    }
+
+                    // 2. Calculate new time based on click position relative to the slider bar
+                    const rect = slider.getBoundingClientRect();
+                    
+                    // Use barWidth to calculate percentage
+                    const barWidth = rect.width > 0 ? rect.width : slider.offsetWidth;
+                    
+                    if (barWidth === 0) {
+                        slider.classList.remove('seeking-active');
+                        return;
+                    }
+
+                    const clickPosition = clientX - rect.left;
+                    const duration = audioPlayer.duration;
+                    
+                    let newTime = (clickPosition / barWidth) * duration;
+                    
+                    // Clamp time to ensure it's within bounds
+                    newTime = Math.max(0, Math.min(duration, newTime));
+
+                    // 3. Update audio player time and immediately sync visuals
+                    audioPlayer.currentTime = newTime; // Seek audio
+                    
+                    // The syncVisuals call will set slider.value and the CSS progress
+                    syncVisuals(newTime); 
+
+                    slider.classList.remove('seeking-active');
+                };
+
+                // Finalize seek on drag/click release
+                slider.addEventListener('mouseup', endSeekHandler);
+                slider.addEventListener('touchend', endSeekHandler);
+            });
+            
+            showStatus("Lecture Notes Ready for audio.");
+        }
+        
+        // Start initialization once the window is loaded
+        window.onload = initAudioPlayers;
+    </script>
+</body>
+</html>

@@ -1,0 +1,742 @@
+%\documentclass[11pt,aspectratio=1610,handout]{beamer}
+\documentclass[11pt,aspectratio=1610]{beamer}
+\input{../../preamble12}
+
+
+%\title[Week 1: Introduction, Sets and Logic]{Week 1: Introduction, Sets and Logic}
+
+
+\title{4001CMD: Mathematical Skills for Computing Professionals}
+\subtitle[Week 1: Sets and Logic]{Week 1: Introduction, Sets and Basic Logic}
+\date{Semester 1, 2025-26}
+\author{Lectures: \textbf{Alex Pedcenko}}
+% Let's get started
+
+\begin{document}
+	
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	
+	\section{Introduction}	
+	%	\begin{frame}{4001CMD -- Mathematics for Computer Science}
+		%		
+		%		\vspace{0cm}
+		%		\begin{center}
+			%			{\huge \textbf{Week 1.1: Introduction, Mathematical \\ \vspace{3mm} Thinking, Symbolic Logic and Sets. }}\\
+			%
+			%\vspace{1cm}
+			%
+			%{\large 
+				%	Lectures: \textbf{Alex Pedcenko}\\
+				%	\vspace{5mm}
+				%	4001CMD 2025-26 Semester 1}
+			%	
+			%	\end{center}
+		%		
+		%		
+		%\end{frame}
+		
+		
+		
+		
+		\subsection*{About the module}	
+		
+		\begin{frame}{About the Module}
+			
+			\begin{itemize}
+				\item \textbf{What this module is about?} \p
+			\end{itemize}
+			
+			\begin{center}
+				
+				\begin{tikzpicture}
+					\node[draw,rounded corners, fill=blue!20, thick, inner sep=1em, blur shadow={shadow blur steps=5}] at (0,0) {\large \textbf{Discrete Mathematics !}};
+				\end{tikzpicture}
+				
+				%		\fbox{\parbox{0.3\linewidth}}}
+		\end{center}
+		\p	
+		\begin{itemize}\itemsep7mm
+			\item What is \textbf{discrete mathematics}? \p
+			\begin{itemize}\itemsep3mm
+				\item Mathematically, it's counting, combinatorics (ways of combining things), logic, basic set theory, basic number theory... other things. 
+				
+				\item It is NOT calculus, geometry, physics, mechanics, or anything involving continuous stuff. 
+				
+				\item Practically, it is the basis for \emph{how computers "think"}.
+			\end{itemize}
+			\item Broadly speaking, we'll be looking at two big mathematical topics this semester and their applications to computer science:
+			\begin{itemize}\itemsep3mm
+				\item Number theory (Application: Cryptography)
+				\item Graph theory (Applications: Algorithms, Data compression, binary encoding, and error correction)
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	
+	
+	
+	
+	\begin{frame}{Weekly Topics}
+		
+		
+		\textbf{\large Provisional Weekly Topics}
+		
+		\begin{columns}		
+			\begin{column}{0.5\linewidth}
+				\begin{enumerate}\itemsep3mm
+					\item Sets, Propositions and Basic Logic
+					\item Symbolic Logic cont., Rules of Inference, Proofs.
+					\item Axiomatic Proof and Induction
+					\item Functions and Cardinality
+					\item Combinatorics
+					\item Number Theory
+				\end{enumerate}	\p
+				--------------- \\
+				Online Core Assignment (pass/fail, starts in Week 7, 3 attempts (Weeks 7,8,9))	\p	
+			\end{column}
+			\begin{column}{0.5\linewidth}
+				\begin{enumerate}\itemsep4mm
+					\setcounter{enumi}{6}
+					\item Modular Arithmetic \& RSA
+					\item Algorithms \& Graph Theory
+					\item Graph Traversal \& Searching Algorithms, Trees
+					\item Heapsort and Huffman encoding
+					\item Humming codes and bin packing
+				\end{enumerate}	\p
+				--------------- \\
+				Applied Core Assignment (module mark $\ge 40$)\p\\
+				starts: Week 9, due: end of Week 12
+			\end{column}		
+			
+		\end{columns}
+		
+		
+		
+	\end{frame}
+	
+	%\include{Intro}
+
+	
+	\hypersetup{linkcolor=blue}
+	\begin{frame}{Outline of Today (Lecture 1.1)}
+		
+		%	\textbf{Week 1.2}\\
+%		\vspace{3mm}
+		
+		\hspace{15mm}\begin{minipage}{0.4\textwidth}
+
+		\tableofcontents[sections={1}]
+		\vspace{2mm}
+		 
+			
+					
+					\textbf{1.1 Sets}\\
+					\vspace{2mm}
+					
+					\tableofcontents[sections={2-6}]
+					
+      \end{minipage}
+      \begin{minipage}{0.4\textwidth}
+      	\vspace{21mm}
+        	
+      	\tableofcontents[sections={7-15}]
+      	
+      \end{minipage}
+		
+	\end{frame}
+	\hypersetup{linkcolor=mygray}
+
+
+			
+%\input{./Week_1.2_Sets_incl}	
+	
+
+
+\section{Sets -- Definitions}
+
+\begin{frame}{Introduction to Sets}
+\begin{itemize}\itemsep5mm
+	\item We now turn to the 1st class of fundamental objects: \emph{\Large Sets} \p
+
+
+	\item	\textbf{\Large Set theory is the foundation of modern mathematics.} \p
+	
+	
+
+	
+
+
+		\item Sets are fundamental building blocks used to describe collections of objects.\p
+		\item They provide a formal way to structure and organise data.\p
+		\item Many concepts in computer science, from data structures to databases, are built upon the principles of set theory.\p
+		\item In this lecture, we will explore the basic definitions, operations, and properties of sets.
+	\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{What is a set?}
+	\begin{itemize}\itemsep3mm
+		
+		\item A \emph{set} is (roughly speaking) a \textbf{collection of things}. They can be numbers, words, symbols, poems, anything. \p
+		
+		\item Sets can be \textbf{finite}, or \textbf{infinite}. \p 
+		
+		\item Examples: \p
+		\begin{itemize}\itemsep2mm
+			\item $A = \{1, 2, 5\}$ (the set containing the numbers 1, 2, and 5) \p
+			\item $B = \{\textrm{John}, \textrm{Paul}, \textrm{George}, \textrm{Ringo}\}$ \p
+			\item $X = \{a,b,c\}$ (the set containing $a$, $b$, and $c$ --- an \emph{abstract} set with three elements) \p
+			\item $Y = \{n : n \textrm{ is a multiple of } 11\}$
+		\end{itemize}
+		\item Here ":" reads as "such that" (alternative symbol is "$|$").
+	\end{itemize}
+\end{frame}
+
+
+\section{Sets Notations}
+
+\begin{frame}{Set notation} \p
+	\begin{itemize} 
+		\item Notice a few things: \p
+		\begin{itemize}\itemsep2mm
+			\item A set is always denoted with the braces $\{ \ldots \}$, and is usually given a name, like $A$, $B$, $X$, or $Y$ etc. \p
+			\item A \textbf{finite} set is written as a \emph{list}, separated by commas:
+			\vspace{2mm}
+			
+			\item[\finger] \textbf{Roster notation}:~~~~~~~~~~~~~~~~ $A = \{1, 2, 5\}$ \p
+			\vspace{2mm}
+			
+			\item An \textbf{infinite} set cannot be listed in this way. So we describe the members of the set with a \emph{general pattern}: \p
+		
+			\item[\finger] \textbf{Set-builder notation}:~~~~~~~~~~~ $Y = \{n : n \textrm{ is a multiple of } 11\}$ 
+			\p \vspace{2mm}
+			%				\[
+			%				Z = \{n : \textrm{there is a number } k \textrm{ for which } n = 2k+1\}
+			%				\]
+		
+		\item You would read the above as: ``$Y$ is the set of all numbers $n$ such that $n$ is a multiple of 11.'' \p
+		
+			\item The symbol ``$:$'' is read as ``such that''. On the left is the \emph{type of object} in the set; on the right is the \emph{property} that these objects must satisfy. \p
+			\item Sometimes the symbol ``$|$'' is used instead of ``$:$'', like so: 
+			\[
+			Y = \{n \,|\, n \textrm{ is a multiple of } 11\}\p
+			\]
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\section{Elements of Sets}
+
+\begin{frame}{Elements of sets}\p
+	\begin{itemize}
+		\item Objects in a set are called \emph{\textbf{elements}} or \emph{\textbf{members}} of the set. \p
+		\item Example: Consider the set $A = \{1,2,5\}$. Then 2 is an element of $A$. \p
+		\item The symbol ``$\in$'' is used to show that something is an element of a set. \p Like so: 
+		\[
+		2 \in A \quad \iff \quad 2 \textrm{ is an element of } A \quad \iff \quad 2 \textrm{ is in } A.
+		\]
+		\item What about the set\\ \centered{\mathbox{6cm}{$Y = \{n : n \textrm{ is a multiple of 11}\}$ ?} } \p
+		\begin{itemize}
+			\item $22 \in Y$, $55 \in Y$, and $121 \in Y$ because 22, 55, and 121 are all multiples of 11. They are all \emph{elements} of $Y$. 
+		\end{itemize}\p
+		\item But $23$ is \emph{not} a multiple of 11, and so is \emph{not} an element of $Y$. \p We express this with the symbol ``$\not\in$''. In this case, $23 \not\in Y$, or:\p
+		\[
+		23 \not\in \{n : n \textrm{ is a multiple of 11}\}.\p
+		\]
+		Another way to write this is $23 \in Y^c$, where $Y^c$ is \textbf{the \emph{complement} of $Y$} --- everything not in $Y$. 
+	\end{itemize}
+\end{frame}
+
+\section{Sets of numbers}
+
+\begin{frame}{Sets of Numbers}
+	\begin{itemize}
+		\item Some sets of numbers show up so often that we give them special names. \p There are four in particular that we'll look at from time to time: \p
+		\begin{itemize}\itemsep2mm
+			\item $\N = \{1,2,3,4,\ldots\}$ is the set of \emph{natural numbers}.\p
+			\item $\Z = \{\ldots, -3, -2, -1, 0, 1, 2, 3, \ldots \}$ is the set of \emph{integers} (whole numbers with their negatives).\p
+			\item $\Q$ is the set of \emph{rational numbers}, or quotients of integers. \p Formally: 
+			\[
+			\Q = \left\{ r : r = \frac p q, \: p, q \in \Z\right\}
+			\]
+			\item $\R$ is the set of \emph{real numbers}, or all rational and irrational numbers together. \p
+		\end{itemize}
+		\item We can use these sets to be more precise in how we write sets formally. For example: \p
+		\[
+		Y = \{n \in \N: n \textrm{ is a multiple of 11}\}
+		\]\p
+		would be read aloud as ``$Y$ is the set of \textit{all natural numbers} $n$ such that $n$ is a multiple of 11''. 
+	\end{itemize}
+\end{frame}
+
+\section{Subsets}
+
+\begin{frame}{Subsets}
+	\begin{itemize}\itemsep4mm
+		\item \textbf{Question:} If $n$ is a natural number, is $n$ an integer? \p 
+		\item \textbf{Answer:} Yes! The integers contain all \emph{positive or negative} whole numbers. \p
+		\item So \emph{every natural number is also an integer.} To put it another way, \emph{every element of $\N$ is an element of $\Z$.}\p
+		\item Whenever $A$ and $B$ are sets, and every element of $A$ is an element of $B$, then we say $A$ is a \emph{subset} of $B$, and write $A \subseteq B$. \p
+		\item Example: $A = \{14,49,77\}$, and $B = \{n \in \N: n \textrm{ is a multiple of 7}\}$. \p
+		
+		Every element of $A$ is a multiple of 7, so every element of $A$ is also in $B$, so $A \subseteq B$. \p Or, 
+		\vspace{2mm}
+		
+				\centered{\large $\{14, 49, 77\} \subseteq \{n \in \N: n \textrm{ is a mulitple of 7}\}$.}
+		\item Notice that \textbf{every set is a subset of itself:} $A \subseteq A$ for every set $A$. 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Subsets versus elements}\p
+	\begin{itemize}
+		\item A set can be finite --- it can contain a single element, for example. The set $\{1\}$ is a set; it's the set containing 1. \p
+		\item \textbf{But this is not the same as the number 1.} It's the same thing as the difference between a biscuit, and a box that contains a biscuit. \p
+		\item \textit{\textbf{Subsets}} are smaller collections within a set, and are denoted with $\subseteq$. \emph{\textbf{Elements}} are individual members of that set, and are denoted with $\in$: \p
+		\[
+		2 \in \N, \quad \{2, 4, 6, 8, \ldots\} \subseteq \N, \quad \{2\} \subseteq \N
+		\]
+		\item The following statements are ``grammatically correct'': 
+		\[
+		\color{olive}{2 \in \N, \quad \{2\} \subseteq \N} \p
+		\]
+		and the following are ``grammatically incorrect'': 
+		\[
+		\color{red}{\{2\} \in \N, \quad 2 \subseteq \N.} 
+		\]
+	\end{itemize}
+\end{frame}
+
+\section{Equal sets}
+
+\begin{frame}{When are sets equal?}
+	\begin{itemize}\itemsep3mm
+		\item The notion of ``\textbf{subsets}'' is analogous to the notion of ``\textbf{less than [or equal]}'' for numbers; in a sense, if $A$ and $B$ are sets and $A \subseteq B$, then $A$ is ``smaller than'' $B$. \p
+		\item When are sets \emph{equal?} \p
+		\item Sets $A$ and $B$ are equal if they have the exact same elements. Or... \p
+		\item $A = B$ if every element of $A$ is an element of $B$, and every element of $B$ is an element of $A$. Or... \p
+		\item $A = B$ if $A \subseteq B$ and $B \subseteq A$. \p
+		\begin{itemize}
+			\item Notice this is starting to look like a compound statement in logic... (which we will be looking at in next part of Week 1).
+		\end{itemize}\p
+		\item Note (again): $A \subseteq A$ for every subset. \p
+		\item A subset of a set that is \emph{not} equal to the main set is called a \textbf{proper subset} (e.g., $\N$ is a proper subset of $\Z$). 
+	\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Example: Equal sets}
+	Suppose $$C = \{n \in \N: n \textrm{ is a multiple of }6\},$$ \p $$D = \{n \in \N : n \textrm{ is a multiple of $3$ and a multiple of }2\}.$$  \p Is it true that $C = D$? 
+	\newline\newline
+	This would mean two things:\p
+	\begin{itemize}
+		\item every element of $C$ is an element of $D$ (i.e., every multiple of 6 is a multiple of both 3 and 2); and, \p
+		\item every element of $D$ is an element of $C$ (i.e., every number that's a multiple of both 3 and 2 is also a multiple of 6). 
+	\end{itemize} 
+\end{frame}
+
+\begin{frame}{Example: Equal sets}
+	\textbf{Theorem.} $C = D$, where $$C = \{n \in \N: n \textrm{ is a multiple of }6\},$$ $$D = \{n \in \N : n \textrm{ is a multiple of $3$ and a multiple of }2\}.$$ \p 
+	\textbf{Proof.} If $n \in C$, then $n = 6k$ for some $k \in \N$. \p 
+	
+	Then, $n = 3(2k)$, and $n = 2(3k)$, \p so $n$ is a multiple of both 3 and 2, \p so $n \in D$. \p Therefore $C \subseteq D$. \vspace{2mm}
+	
+	Now, if $n \in D$, then $n = 2k$ and $n = 3r$ for $k,r \in \N$. \p \\
+	
+	\vspace{2mm}
+	This means $2k = 3r$, so $r$ must be even. \p \\
+	
+	\vspace{2mm}
+	So, $r = 2p$ for some $p \in \N$, so $n = 3r = 3(2p) = 6p$, \p \\
+	
+	\vspace{2mm}
+	so $n$ is a multiple of 6: $n \in C$. \p \\
+	\vspace{2mm}
+	
+	So $D \subseteq C$. \qed
+	
+\end{frame}
+
+\section{Empty set}
+
+\begin{frame}{The empty set}
+	\begin{itemize} \p
+		\item There's one more very important set: the so-called \emph{\textbf{empty set}}, $\emptyset = \{\}$. \p
+		\item The empty set is the set that contains --- \textit{nothing!} \p
+		\item It's a surprisingly useful set to consider in abstract set theory, particularly because \emph{it is a subset of every set}:
+		\[
+		\emptyset \subseteq A \quad \textrm{for every set } A. 
+		\] \p
+		\item If this sounds weird, suppose you have four books in your flat. Those four books form a set. \p
+		\item You're carrying some of those books in your bag --- a \emph{subset} of those books. \p
+		\item You could have one book, or two, or three, or all four (your entire collection would then be in your bag; the subset of books in your collection that you're carrying is equal to the set of all books in your collection).\p
+		\item Or you could have \textit{none} in your bag. Your bag could be \textit{empty}. The subset of books from your collection that you're carrying contains an empty set --- no books. 
+	\end{itemize}
+\end{frame}
+
+\section{Union, Intersection, Difference, Symmetric Difference}
+
+\begin{frame}{Operations with Sets}
+ 
+	\begin{tabular}{c|c|c}
+\scriptsize \textbf{Operation}	& \scriptsize \textbf{Notation} & \scriptsize \textbf{Definition} \normalsize \\
+		\hline
+\textbf{Union}		& \parbox{55mm}{$A~\cup~ B = \{ x \mid x \in A \text{~or~} x \in B \}$} & \parbox{6cm}{\small \vspace{2mm} is a new set that contains all the elements that are in set A, or in set B, or in both (OR) \vspace{2mm}}\\
+		\hline
+\textbf{Intersection}		& \parbox{55mm}{$A ~\cap~ B = \{ x \mid x \in A \text{~and~} x \in B \}$}  &  \parbox{6cm}{\small\vspace{2mm}is a new set that contains all the elements that are common to both set A and set B (AND).\vspace{2mm}}\\
+		\hline
+\textbf{Complement}		& \parbox{55mm}{$A^c$ or $\bar{A} = \{ x \mid x\in U \text{~and~} x\notin A\}$}&  \parbox{6cm}{\small\vspace{2mm}is the set of all elements that are not in A, but are within a larger, predefined set called the universal set $U$.\vspace{2mm}}\\
+		\hline
+\textbf{Difference}		& \parbox{55mm}{$A \setminus B = \{x\mid x\in A \text{~and~} x\notin B\}$ }  &  \parbox{6cm}{\small\vspace{2mm}is a new set that contains all the elements that are in set A but are not in set B.\vspace{2mm}}\\
+		\hline
+\parbox{2cm}{\vspace{2mm}\textbf{Symmetric Difference}\vspace{2mm}}		& \parbox{55mm}{$A ~\triangle ~B=\{x \mid (x\in A \text{~and~} x \notin B) \text{~or~} (x\notin A \text{~and~} x\in B)\}$} &  \parbox{6cm}{\small\vspace{2mm} is a new set that contains all the elements that are in either set $A$ or $B$, but not in both (XOR)\vspace{2mm}}\\
+	\end{tabular}
+	
+	
+\end{frame}
+
+%\begin{frame}{Operations with Sets} % empty table for inspera questions	
+%	\begin{center}
+%	\begin{tabular}{c|c}
+%		\scriptsize \textbf{Operation}	&  \scriptsize \textbf{Definition} \normalsize \\
+%
+%\hline
+%		
+%		\hspace{4cm}		&  \parbox{7cm}{\vspace{2mm}is a new set that contains all the elements that are common to both set A \textbf{and} set B \vspace{2mm}}\\
+%
+%		
+%\hline
+%		
+%		\hspace{4cm}&		  \parbox{7cm}{\vspace{2mm} is a new set that contains all the elements that are in either set $A$ \textbf{or} $B$, but \textbf{not in both}\vspace{2mm}}\\
+%		
+%\hline
+%		
+%		\hspace{4cm}	&	 \parbox{7cm}{\vspace{2mm}is the set of all elements that are not in A, but are within a larger, predefined set called the universal set $U$.\vspace{2mm}}\\
+%\hline
+%		
+%		\hspace{4cm}		 & \parbox{7cm}{ \vspace{2mm} is a new set that contains all the elements that are in set A, \textbf{or} in set B, \textbf{or} in both \vspace{2mm}}\\
+%		
+%		
+%\hline
+%
+%	\hspace{4cm}		&  \parbox{7cm}{\vspace{2mm}is a new set that contains all the elements that are in set A but are not in set B.\vspace{2mm}}\\
+%		
+%
+%		
+%
+%	\end{tabular}
+%\end{center}	
+%\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{frame}{AND/OR or sets}
+	\begin{itemize}
+		\item Consider the sets $A = \{2, 4, 6, 8, 10, 12\}$, and $B = \{3, 6, 9, 12, 15\}$. \p
+		\item Consider the following: 
+		\[
+		C = \{n : n \in A \textrm{ and } n \in B\}, \quad D = \{n : n \in A \textrm{ or } n \in B\}.
+		\]\p \vspace{-2mm}
+		\item We give ``AND'' and ``OR'' special names in set theory: \p
+			\vspace{2mm}
+		
+		\item[\finger] The \emph{intersection} of sets $A$ and $B$ is the set containing elements in $A$ \textbf{and} $B$:
+		\[
+		C = A \cap B = \{x : x \in A \textrm{ and } x \in B\}.
+		\]\p
+	
+		
+		\item[\finger] The \emph{union} is the set containing elements of $A$ \textbf{or} $B$:
+		\[
+		D = A \cup B = \{x : x \in A \textrm{ or } x \in B\}.
+		\]\p
+		\item In this example, 
+		\[
+		A \cap B = \{6,12\}, \quad A \cup B = \{2,3,4,6,8,10,12,15\}
+		\]
+	\end{itemize}
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+\begin{frame}{Set Difference $A\setminus B$ and Symmetric Difference $A~\triangle~B$ }
+	
+	\begin{itemize}
+		\item The \textbf{set difference} of two sets $A$ and $B$, is a set, denoted
+		
+		$$A\setminus B~~~~~~~\text{or}~~~~~~~A--B,$$
+		
+		 whose elements are those that belong to A, but not to $B$, that is
+
+	$$ A\setminus B=\{x\mid x\in A~~~\cap~~~ x\not \in B\}$$ \p 
+	
+	\item The \textbf{symmetric difference} of two sets $A$ and $B$ is the set containing
+	\begin{itemize}
+		\item elements of set $A$, which are not in $B$, 
+		
+		AND
+		
+		\item elements of set $B$, which are not in $A$ \p 
+	\end{itemize}
+	
+	
+	$$A \triangle B = \{x \mid (x \in A \land x \notin B) \lor (x \notin A \land x \in B)\}$$
+	
+	\end{itemize}
+	
+	
+\end{frame}
+
+
+
+\section{Venn diagrams}			
+
+\begin{frame}{Venn diagrams}
+	
+	A \textbf{Venn diagram} is a widely used diagram style that shows the logical relation between sets, popularized by John Venn (1834–1923) in the 1880s. \p
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.4\linewidth]{venn}
+		
+		\textit{\small Example: Venn diagram showing the uppercase glyphs shared by the Greek (upper left), Latin (upper right), and Russian Cyrillic (bottom) alphabets} [\href{https://en.wikipedia.org/wiki/Venn_diagram}{Wikipedia::Venn diagram}]
+	\end{figure}
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{Venn diagrams}
+	\begin{itemize}\p
+		\item It is sometimes useful to consider the intersection, union, difference and symmetric difference of sets by drawing \emph{Venn diagrams}. \p
+		\begin{center}
+			\includegraphics[scale=0.3]{intersection}\p \includegraphics[scale=0.3]{union} \p
+			\includegraphics[scale=0.3]{difference} \p \includegraphics[scale=0.3]{symmdiff}
+		\end{center}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Disjoint sets}
+	\begin{itemize}\p
+		\item Suppose $A$ and $B$ are sets that have \emph{no} elements in common. Then $A \cap B = \emptyset$. We say that $A$ and $B$ are \emph{disjoint}. 
+		\begin{center}\p
+			\includegraphics[scale=0.3]{venn-disj}
+		\end{center}
+	\end{itemize}
+\end{frame}
+
+\section*{Properties of union $\cup$ and intersection $\cap$}			
+\begin{frame}{Properties of union $\cup$ and intersection $\cap$}	
+	\small
+	\begin{itemize}%\itemsep3mm
+		\item If $A \subseteq B$, then $A \cap B = A$.
+		\vspace{0.2cm}
+		If set $A$ is a subset of set $B$, it means every element in $A$ is also present in $B$. Therefore, the elements that are common to both sets (their intersection) will simply be all the elements of $A$.
+		
+		\item $A \cap B = B \cap A$.
+		\vspace{0.2cm}
+		This is the \textbf{commutative property} of intersection. The order in which you intersect two sets does not change the result; the set of elements common to $A$ and $B$ is the same as the set of elements common to $B$ and $A$.
+		
+		\item $A \cup B = B \cup A$.
+		\vspace{0.2cm}
+		This is the \textbf{commutative property} of union. Similar to intersection, the order in which you combine the elements of two sets does not matter; the resulting set is the same.
+		
+		\item $A \cup (B \cup C) = (A \cup B) \cup C$.
+		\vspace{0.2cm}
+		This is the \textbf{associative property} of union. When taking the union of three or more sets, the way they are grouped does not affect the final result. All elements from all three sets will be in the final union.
+		
+		\item $A \cap (B \cap C) = (A \cap B) \cap C$.
+		\vspace{0.2cm}
+		This is the \textbf{associative property} of intersection. When finding the intersection of three or more sets, you can group them in any way you want and the result will still be the set of elements common to all three.
+	\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%% pictures
+
+
+
+\begin{frame}{Subset-Intersection Property}
+	\begin{center}
+		a.k.a. \textbf{Absorption Law for Subsets: $A \subseteq B \Rightarrow A \cap B = A$}
+	\end{center}
+	\vspace{0.2cm}
+	If set $A$ is a subset of set $B$, it means every element in $A$ is also present in $B$. Therefore, the elements that are common to both sets (their intersection) will simply be all the elements of $A$.
+	
+	\begin{center}
+		\begin{tikzpicture}
+			\draw (0,0) circle [radius=1.5] node[above right=5mm] {$B$};
+			\fill[gray, opacity=0.6] (0,0) circle [radius=0.75];
+			\draw (0,0) circle [radius=0.75] node[above right=-2mm] {$A$};
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}{Commutative Property of Intersection}
+	\begin{center}
+		\textbf{Commutative Property of Intersection: $A \cap B = B \cap A$}
+	\end{center}
+	\vspace{0.2cm}
+	This is the \textbf{commutative property} of intersection. The order in which you intersect two sets does not change the result; the set of elements common to $A$ and $B$ is the same as the set of elements common to $B$ and $A$.
+	
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{scope}
+				\clip (0,0) circle (1.5);
+				\fill[gray, opacity=0.6] (1.8,0) circle (1.0);
+			\end{scope}
+			\draw (0,0) circle [radius=1.5] node[below, left=0.1cm] {$B$};
+			\draw (1.8,0) circle [radius=1.0] node[below, right=0.1cm] {$A$};
+		\end{tikzpicture}
+		\quad
+		\begin{tikzpicture}
+			\begin{scope}
+				\clip (0,0) circle (1.0);
+				\fill[gray, opacity=0.6] (1.8,0) circle (1.5);
+			\end{scope}
+			\draw (0,0) circle [radius=1.0] node[below, left=0.1cm] {$A$};
+			\draw (1.8,0) circle [radius=1.5] node[below, right=0.1cm] {$B$};
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}{Commutative Property of Union}
+	\begin{center}
+		\textbf{Commutative Property of Union: $A \cup B = B \cup A$}
+	\end{center}
+	\vspace{0.2cm}
+	This is the \textbf{commutative property} of union. Similar to intersection, the order in which you combine the elements of two sets does not matter; the resulting set is the same.
+	
+	\begin{center}
+		\begin{tikzpicture}
+			\fill[gray] (0,0) circle (1.0);
+			\fill[gray] (2.1,0) circle (1.5);
+			\draw (0,0) circle [radius=1.0] node[below, left=0.1cm] {$A$};
+			\draw (2.1,0) circle [radius=1.5] node[below, right=0.1cm] {$B$};
+		\end{tikzpicture}
+		\quad
+		\begin{tikzpicture}
+			\fill[gray] (0,0) circle (1.5);
+			\fill[gray] (2.1,0) circle (1.0);
+			\draw (0,0) circle [radius=1.5] node[below, left=0.1cm] {$B$};
+			\draw (2.1,0) circle [radius=1.0] node[below, right=0.1cm] {$A$};
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}{Associative Property of Union}
+	\begin{center}
+		\textbf{Associative Property of Union: $A \cup (B \cup C) = (A \cup B) \cup C$}
+	\end{center}
+	\vspace{0.2cm}
+	This is the \textbf{associative property} of union. When taking the union of three or more sets, the way they are grouped does not affect the final result. All elements from all three sets will be in the final union.
+	
+	\begin{center}
+		\begin{tikzpicture}
+			\fill[gray] (-1,0) circle [radius=1.4];
+			\fill[gray] (1,0) circle [radius=1.4];
+			\fill[gray] (0,1.732) circle [radius=1.4];
+			\draw (-1,0) circle [radius=1.4] node[below] {$A$};
+			\draw (1,0) circle [radius=1.4] node[below] {$B$};
+			\draw (0,1.732) circle [radius=1.4] node[above] {$C$};
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}{Associative Property of Intersection}
+	\begin{center}
+		\textbf{Associative Property of Intersection: $A \cap (B \cap C) = (A \cap B) \cap C$}
+	\end{center}
+	\vspace{0.2cm}
+	This is the \textbf{associative property} of intersection. When finding the intersection of three or more sets, you can group them in any way you want and the result will still be the set of elements common to all three.
+	
+	\begin{center}
+		\begin{tikzpicture}
+			\coordinate (A) at (-1, -1.732/2);
+			\coordinate (B) at (1, -1.732/2);
+			\coordinate (C) at (0, 1.732/2);
+			
+			\begin{scope}
+				\clip (A) circle [radius=1.4];
+				\clip (B) circle [radius=1.4];
+				\clip (C) circle [radius=1.4];
+				\fill[gray] (-2,-2) rectangle (2,2);
+			\end{scope}
+			
+			\draw (A) circle [radius=1.4] node[below] {$A$};
+			\draw (B) circle [radius=1.4] node[below] {$B$};
+			\draw (C) circle [radius=1.4] node[above] {$C$};
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\begin{frame}{Example: Union and intersection}
+	Is the following statement true? \p
+	\begin{center}
+		For any sets $A, B, C,$ we have $A \cup (B \cap C) = C\cup (B \cap A).$
+	\end{center}\p
+	\vspace{-0.1in}
+	\begin{itemize} 
+		\item \textbf{Solution.} Looking at the Venn diagrams, the answer seems to be no: \p
+		\begin{center}
+			\includegraphics[scale=0.2]{venn-trips}
+		\end{center} \p
+		\item However, \textbf{\textit{this is not a proof!!}}  \p We need to find a concrete counter-example. \p
+		\item One option: $A =\{a\}$, $B = \{b\}$, and $C = \{c\}$. \p Then $B \cap C \p = B \cap A \p = \emptyset$,\p ~but
+	\end{itemize}	\[
+	A \cup (B \cap C) = \p \{a\} \cup \emptyset \p = \{a\} \neq \{c\} \p = \{c\} \cup \emptyset \p = C \cup (B \cap A). 
+	\]
+\end{frame}
+
+
+
+
+\section{Sets' Summary}		
+\begin{frame}{Summary: Set theory}
+	\large
+	\begin{itemize}\itemsep3mm 
+		\item A set is a (finite or infinite) collection. \p
+		\item The objects in a set are \emph{elements}, written as $x \in A$ to mean ``$x$ is an element of the set $A$''. \p
+		\item A \emph{subset} is a collection that is contained in a larger set. This collection may be empty, or it may be the entire set.\p
+		\item Two sets $A$ and $B$ are equal if $A \subseteq B$ and $B \subseteq A$. \p
+		\item The \emph{union} of sets $A \cup B$ is the set of points contained in \emph{one of} $A$ or $B$ (or both). \p
+		\item The \emph{intersection} of sets $A \cap B$ is the set of points contained in \emph{both $A$ and $B$}. Two sets are disjoint if $A \cap B = \emptyset$. \p
+		\item You can study complex intersections and unions by looking at Venn diagrams. 
+	\end{itemize}
+\end{frame}	
+	
+\begin{frame}{Quiz}
+\begin{center}
+	Quiz! -- \href{https://coventryassessment.inspera.com}{https://coventryassessment.inspera.com}\\
+	
+	\includegraphics[width=0.5\linewidth]{figures/Sets_QR}
+\end{center}
+\end{frame}	
+	
+\end{document}

@@ -1,0 +1,614 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[normalem]{ulem}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{mathdots}
+\usepackage{arydshln}
+\usepackage{textcomp}
+%\usepackage{bbold}
+\usepackage[margin=1in]{geometry}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,      
+	urlcolor=cyan,
+}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand\blank{\hphantom{==}}
+
+\DeclareFontFamily{U}{MnSymbolC}{}
+\DeclareSymbolFont{MnSyC}{U}{MnSymbolC}{m}{n}
+\DeclareFontShape{U}{MnSymbolC}{m}{n}{
+	<-6>  MnSymbolC5
+	<6-7>  MnSymbolC6
+	<7-8>  MnSymbolC7
+	<8-9>  MnSymbolC8
+	<9-10> MnSymbolC9
+	<10-12> MnSymbolC10
+	<12->   MnSymbolC12}{}
+\DeclareMathSymbol{\intprod}{\mathbin}{MnSyC}{'270}
+
+\numberwithin{equation}{section}
+%\numberwithin{theorem}{section}
+
+%%% THEOREM STYLES %%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem*{lemma*}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{conjecture}{Conjecture}
+
+%%% DEFINITION STYLES %%%
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem*{definition*}{Definition}
+\newtheorem{example}{Example}
+\newtheorem*{example*}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{remark*}{Remark}
+\newtheorem{fact}{Fact}
+\newtheorem{problem}{Problem}
+\newtheorem*{problem*}{Problem}
+\newtheorem*{solution*}{Solution}
+\newtheorem*{claim*}{Claim}
+\newtheorem{exercise}{Exercise}
+
+%%% FUNCTIONS %%%
+\newcommand{\Aut}{\mathrm{Aut}}
+\newcommand{\Sym}{\mathrm{Sym}}
+\newcommand{\Syl}{\mathrm{Syl}}
+\newcommand{\intersection}{\mathop{\bigcap}}
+\newcommand{\union}{\mathop{\bigcup}}
+\newcommand{\disjointunion}{\mathop{\bigsqcup}}
+\newcommand{\evaluated}{\Big|}
+\newcommand{\re}{\mathrm{Re}}
+\newcommand{\im}{\mathrm{Im}}
+\newcommand{\Log}{\mathrm{Log}}
+\newcommand{\Res}{\mathrm{Res}}
+\newcommand{\Sk}{\mathrm{Sk}}
+\newcommand{\disc}{\mathrm{disc}}
+\newcommand{\then}{\Longrightarrow}
+\newcommand{\Int}{\mathrm{int}}
+\newcommand{\bd}{\mathrm{bd}}
+\newcommand{\diam}{\mathrm{diam}}
+\newcommand{\lcm}{\mathrm{lcm}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\del}{\partial}
+\newcommand{\len}{\mathrm{len}}
+\newcommand{\res}{\mathrm{res}}
+\newcommand{\esssup}{\mathrm{ess} \, \mathrm{sup}}
+\newcommand{\wlim}{\displaystyle\mathop{\mathrm{w}\textrm{-}\mathrm{lim}}}
+\newcommand{\vlim}{\displaystyle \mathop{\mathrm{v}\textrm{-}\mathrm{lim}}}
+\newcommand{\condE}[2]{\mathbb E\left[ #1 \,\middle|\, #2\right]}
+\newcommand{\condP}[2]{\mathbb P\left[ #1 \, \middle| \, #2\right]}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\Poi}{\mathrm{Poi}}
+
+%%% FONTS %%%
+\newcommand{\boldZ}{\boldsymbol{\mathrm{Z}}}
+\newcommand{\boldC}{\boldsymbol{\mathrm{C}}}
+\newcommand{\boldN}{\boldsymbol{\mathrm{N}}}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\U}{\mathbb U}
+\newcommand{\D}{\mathbb D}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Sbb}{\mathbb S}
+\newcommand{\Kbb}{\mathbb K}
+\newcommand{\F}{\mathbb F}
+\newcommand{\Pbb}{\mathbb P}
+\newcommand{\Ts}{\mathcal T}
+\newcommand{\Cs}{\mathcal C}
+\newcommand{\As}{\mathcal A}
+\newcommand{\Ss}{\mathcal S}
+\newcommand{\Ms}{\mathcal M}
+\newcommand{\Bs}{\mathcal B}
+\newcommand{\Ps}{\mathcal P}
+\newcommand{\Ds}{\mathcal D}
+\newcommand{\Ls}{\mathcal L}
+\newcommand{\Ns}{\mathcal N}
+\newcommand{\Rs}{\mathcal R}
+\newcommand{\Fs}{\mathcal F}
+\newcommand{\Os}{\mathcal O}
+\newcommand{\Ks}{\mathcal K}
+\newcommand{\Es}{\mathcal E}
+\newcommand{\Gs}{\mathcal G}
+\newcommand{\Us}{\mathcal U}
+\newcommand{\Zs}{\mathcal Z}
+\newcommand{\fp}{\mathfrak p}
+\newcommand{\fm}{\mathfrak m}
+\newcommand{\diff}{\,d}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\Span}{\mathrm{span}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand*{\charone}{\text{\usefont{U}{bbold}{m}{n}1}}
+\newcommand{\dlim}{\displaystyle\lim}
+\newcommand{\dsum}{\displaystyle\sum}
+\newcommand{\dint}{\displaystyle\int}
+\newcommand{\Var}{\mathbf{Var}}
+\newcommand{\Cov}{\mathbf{Cov}}
+\newcommand{\Lip}{\mathrm{Lip}}
+\newcommand{\sgn}{\mathrm{sgn}}
+
+\newcommand{\done}{\flushright$\diamondsuit$}
+
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+\let\oldphi\phi
+\let\phi\varphi
+\let\oldepsilon\epsilon
+\let\epsilon\varepsilon
+\let\oldIm\Im
+\let\oldRe\Re
+\renewcommand{\Im}{\mathrm{Im}\,}
+\renewcommand{\Re}{\mathrm{Re}\,}
+\let\oldtilde\tilde
+\let\tilde\widetilde
+\let\oldhat\hat
+\let\hat\widehat
+
+\begin{document}
+
+\begin{center}
+\Large{Tutorial Exercises - Week 3} \\
+\vspace{3mm}
+\large{4001CMD - Mathematical Skills for Computing Professionals} \\
+\vspace{5mm}
+\end{center}
+
+
+The following exercises should be attempted before your next tutorial session this week. 
+
+\section*{Functions}
+
+\begin{problem}
+	Write down the values $s(1)$ through $s(6)$ of the function $s : \N \to \N$ defined recursively by 
+	\[
+	s(1) = 1, \quad s(2) = 2, \quad s(n+1) = 2s(n) - s(n-1) \quad (n \geq 2).
+	\]
+	Make a conjecture about an explicit, non-recursive formula for $s(n)$, and prove this formula with induction. 
+\end{problem}
+
+\begin{solution*}
+	The values of $s(1)$ through $s(6)$ are:
+	\begin{itemize}
+		\item $s(1) = 1$
+		\item $s(2) = 2$
+		\item $s(3) = 2s(2) - s(1) = 4 - 1 = 3$
+		\item $s(4) = 2s(3) - s(2) = 6 - 2 = 4$
+		\item $s(5) = 2s(4) - s(3) = 8 - 3 = 5$
+		\item $s(6) = 2s(5) - s(4) = 10 - 4 = 6$
+	\end{itemize}
+	\textbf{Conjecture.} $\boxed{s(n) = n}$.
+	\begin{proof}
+		We know this is true for $n=1$ and $n=2$. Suppose $s(k) = k$ and $s(k-1) = k-1$, for some $k$. Then: 
+		\[
+		s(k+1) = 2s(k) - s(k-1) = 2k - (k-1) = 2k - k + 1 = k + 1
+		\]
+		So $s(n)= n$ when $n=k+1$ if $s(k) = k$ and $s(k-1) = k-1$. By induction, $s(n) = n$ for all $n$. 
+	\end{proof}
+\end{solution*}
+
+\begin{problem}
+	Suppose that the sets $A$ and $B$ are given by $A = \{a,b,c,d\}$, and $B = \{1,2,3,4,5\}$, and the functions $p : A \to B$, $q : B \to B$, and $r : B \to A$ are defined as follows. 
+	\begin{center}
+		\begin{tabular}{ccc}
+			$p(a) = 3$ & $q(1) = 3$ & $ r(1) = a$ \\
+			$p(b) = 4$ & $q(2) = 5$ & $r(2) = c$ \\
+			$p(c) = 2$ & $q(3) = 1$ & $r(3) = b$ \\
+			$p(d) = 4$ & $q(4) = 4$ & $r(4) = a$ \\
+			& $q(5) = 2$ & $r(5) = d$
+		\end{tabular}
+	\end{center}
+	Which of these functions are injections? Which are surjections? Which are bijections? 
+\end{problem}
+
+\begin{solution*}
+	$p$ is neither an injection nor a surjection: $p(b) = p(d) = 4$, so $p$ is not an injection, and there is no $x \in \{a,b,c,d\}$ so that $p(x) = 1$, so $p$ is not a surjection. 
+	\begin{center}
+		\includegraphics[scale=0.3]{prob2p}
+	\end{center}
+	$q$ is both a surjection and an injection: there are no repeated outputs, so if $q(x) = q(y)$ for $x,y \in \{1,2,3,4,5\}$, then $x=y$; and every one of the elements in $\{1,2,3,4,5\}$ has an element that gets sent to it under $A$: for every $z \in \{1,2,3,4,5\}$, there is an $x \in \{1,2,3,4,5\}$ so that $q(x) = z$. So $q$ is surjective. 
+	\begin{center}
+		\includegraphics[scale=0.3]{prob2q}
+	\end{center}
+	Finally, $r$ is not injective, because $r(1) = r(4) = a$; but $r$ is surjective, because all of $a,b,c,$ and $d$ have corresponding inputs in $\{1,2,3,4,5\}$. 
+	\begin{center}
+		\includegraphics[scale=0.3]{prob2r}
+	\end{center}
+\end{solution*}
+
+\begin{problem}
+	Which of the following functions from $\N$ to $\N$ are surjections, which are injections, and which are bijections?
+	\begin{enumerate}[label=(\alph*)]
+		\item $f(n) = n^3$ \\
+		\item $g(n) = n+3$ \\
+		\item $h(n) = \displaystyle \begin{cases} n+1 & \textrm{if $n$ is odd,} \\ n-1 & \textrm{if $n$ is even}\end{cases}$
+	\end{enumerate}
+\end{problem}
+
+\begin{solution*}
+	(a) $f$ is an injection, because if $n^3 = m^3$, then $n = m$. But $f$ is not a surjection, because $2$ has no cube root. More specifically, $f(n) \geq n$ for all $n$, so if 2 has a cube root, that cube root is either 2 or 1; but $1^3 = 1$ and $2^3 = 8$. 
+	
+	(b) $g$ is an injection, because if $n+3 = m+3$, then $m=n$ (see Problem 6 in the Tutorial 2 exercises). But $g$ is not a surjection $\N\to\N$, because 1 has no preimage: if $g(n) = n+3 = 1$, then $1 = n+3 > 3$, but $3 > 1$, contradicting Axiom 10. 
+	
+	(c) Suppose $h(n) = h(m)$. If $n$ is even and $m$ is odd, then $n+1 = m-1$, so $n+2 = m$. But then both $m$ and $n$ are even, or both $n$ and $m$ are odd, contradiction. So $n$ and $m$ are either both even or both odd. Suppose $n$ and $m$ are both even. Then $h(n) = h(m)$ implies $n-1 = m-1$, so $n = m$. Similarly, $m$ if $h(n) = h(m)$ and $m$ and $n$ are both odd. So $h$ is injective. 
+	
+	Now suppose $m \in \N$. If $m$ is odd, then $m + 1$ is even and $m+1 \in \N$, so $h(m+1) = (m+1) - 1 = m$. If $m$ is even, then $m \geq 2$, so $m-1 \geq 1$ and $m-1$ is odd. So $h(m-1) = (m-1)+1 = m$. So either way, there is an $n \in \N$ so that $h(n) = m$ (either $n = m+1$ if $m$ is odd or $n = m-1$ if $m$ is even). So $h$ is surjective. Since $h$ is both surjective and injective, $h$ is bijective. 
+\end{solution*}
+
+\begin{problem}
+	The function $u$ from $\N$ to $\N$ is defined recursively by the following rules: \[
+	u(1) = 1, \quad u(n+1)= \begin{cases}
+	\frac 1 2 u(n) & \textrm{if $u(n)$ is even,} \\
+	3u(n)+1 & \textrm{otherewise.}
+	\end{cases}
+	\]
+	\begin{enumerate}[label=(\alph*)]
+		\item Show that $u$ is neither an injection nor a surjection. 
+		\item Suppose that $u$ is redefined so that $u(1) = 5$ instead of $u(1) = 1$, and $u(n+1)$ is defined as before for $n \geq 1$. Is $u$ an injection now? A surjection? 
+		\item Choose some specific number $k \in \N$ instead of $k=1$ or $k=5$ (I recommend choosing a number between 4 and 10), and define $u(n)$ as before. Now is $u$ an injection? A surjection?
+	\end{enumerate} 
+	%\emph{Remark:} You should find that if we define $u$ this way for $u(1) = 1$ and $u(1) = 5$, in both cases, $u$ is not a surjection or an injection, for the same reason in both cases. Probably you found that $u$ is neither a surjection or injection for the number you chose in (c) either. One question you might ask yourself is: ``is there \emph{some} number $k$ that we can start with for $u(1)$ so that $u$ is an injection?'' This problem is known as the \emph{Collatz conjecture}, and it is one of the most notoriously difficult unsolved problems in mathematics. The Japanese company Bakuage Co has offered a prize of \textyen 120 million, or around \textsterling 700,000, to whoever can solve this problem. 
+\end{problem}
+
+\begin{solution*}
+	(a) $u(1) = 1$ is odd, so $u(2) = 3u(1) + 1 = 3 + 1 = 4$. $u(2) = 4$ is even, so $u(3) = \frac 1 2 u(2) = 2$. $u(3) = 2$ is even, so $u(4) = \frac 1 2 u(3) = 1$. Since $u(1) = u(4)$, $u$ is not injective. But $u : \N\to \N$ is not surjective either, because $u(n+1)$ depends on the value of $u(n)$, so the function $u$ just cycles through 4, 2, and 1. 
+	
+	(b) We find: 
+	\begin{itemize}
+		\item $u(1) = 5$
+		\item $u(2) = 15 + 1 = 16$
+		\item $u(3) = 16/2 = 8$
+		\item $u(4) = 8/2 = 4$
+		\item $u(5) = 4/2 = 2$
+		\item $u(6) = 2/2 = 1$
+	\end{itemize}
+	As before, we end up in a 4-2-1 loop. 
+	
+	(c) Let's try it with $u(1) = 6$. Then: 
+	\begin{itemize}
+		\item $u(1) = 6$
+		\item $u(2) = 6/2 = 3$
+		\item $u(3) = 9+1 = 10$
+		\item $u(4) = 10/2 = 5$
+		\item $u(5) = 15+1=16$ 
+		\item $u(6) = 16/2 = 8$
+		\item $u(7) = 8/2 = 4$
+		\item $u(8) = 4/2 = 2$
+		\item $u(9) = 2/2 = 1$
+	\end{itemize}
+	Let's try it with $u(1) = 7$. Then: 
+	\begin{itemize}
+		\item $u(1) = 7$
+		\item $u(2) = 21 + 1 = 22$
+		\item $u(3) = 22/2 = 11$
+		\item $u(4) = 33+1 = 34$
+		\item $u(5) = 34/2 = 17$
+		\item $u(6) = 17(3) + 1 = 52$
+		\item $u(7) = 52/2 = 26$
+		\item $u(8) = 26/2 = 13$
+		\item $u(9) = 13(3) + 1 = 40$
+		\item $u(10) = 40/2 = 20$
+		\item $u(11) = 20/2 = 10$
+		\item $u(12) = 10/2 = 5$
+		\item $u(13) = 5(3)+1 = 16$
+		\item $u(14) = 16/2 = 8$
+		\item $u(15) = 8/2 = 4$
+		\item $u(16) = 4/2 = 2$
+		\item $u(17) = 2/2 = 1$
+	\end{itemize}
+	Again and again, we end up in a 4-2-1 loop. Weird! (Scientists have tested this result for $u(1)$ up to $2^{68} \approx 3\times 10^{20}$. We still don't know if it's true for all numbers, but we've never found a counterexample.)
+\end{solution*}
+
+\begin{problem}
+	The functions $s : \N \to \N$ and $t : \N \to \N$ are defined by \[
+	s(x) = x+1, \quad t(x) = 2x \quad (x \in \N).
+	\]
+	Show that $t \circ s$ and $s \circ t$ are different functions. Find explicit formulas for each of $t \circ s$ and $s \circ t$. 
+\end{problem}
+
+\begin{solution*}
+	The functions are:
+	\[
+	(s \circ t)(x) = s(t(x)) = t(x)+1 = 2x+1 \quad \textrm{and} \quad (t \circ s)(x) = t(s(x)) = 2s(x) = 2x + 2
+	\]
+	so these functions are different. For example: 
+	\[
+	(s \circ t)(1) = s(t(1)) = s(2) = 3 \quad \textrm{and} \quad (t \circ s)(1) = t(s(1)) = t(2) = 4.
+	\]
+\end{solution*}
+
+\begin{problem}
+	Prove that if $f$ and $g$ are bijections, and $g \circ f$ is defined, then the inverse of $g \circ f$ is $f^{-1} \circ g^{-1}$. 
+\end{problem}
+
+\begin{solution*}
+	Let $x$ be in the domain of $f$. Then: \begin{align*}
+	\big((f^{-1} \circ g^{-1})\circ (g \circ f)\big)(x) &= \left(f^{-1} \circ g^{-1}\right) \big( (g \circ f)(x)\big) \\
+	&= \left(f^{-1} \circ g^{-1}\right)\big( g(f(x))\big) \\
+	&= f^{-1} \left( g^{-1} \big(g(f(x))\big)\right) \\
+	&= f^{-1} \left( f(x)\right)  &\textrm{because $g^{-1}(g(y)) = y$ for any $y$ in the domain of $g$} \\
+	&= x \quad &\textrm{because $f^{-1}(f(x)) = x$ for any $x$ in the domain of $f$.}
+	\end{align*}
+	Since $x$ was arbitrarily chosen, it follows that $\left(f^{-1} \circ g^{-1}\right) \circ \big(g \circ f\big) = i$, the identity on the domain of $f$. A similar computation shows that $\big(g \circ f\big) \circ \left(f^{-1} \circ g^{-1}\right)$ is the identity on the codomain of $g$.
+	
+	\textbf{Alternative solution.} One can easily show that function composition is associative: if $f : X \to Y$, $g : Y \to Z$, and $h : Z \to W$ are functions, then $h \circ ( g \circ f) = (h \circ g) \circ f$. So, if we let $j$ and $i$ be the identity functions on the codomain of $g$ and the domain of $f$, respectively, we get:
+	\[
+	\left(f^{-1} \circ g^{-1} \right) \circ \big( g \circ f\big) = f^{-1} \circ \left( g^{-1} \circ g \right)\circ f = f^{-1} \circ j \circ f = f^{-1} \circ f = i
+	\] 
+	A similar computation shows that $\big(g \circ f\big) \circ \left(f^{-1} \circ g^{-1}\right) = j$. 
+\end{solution*}
+
+\begin{problem}
+	The function $ f : X \to Y$ is said to have a \emph{left inverse} $l : Y \to X$ if $l \circ f$ is the identity function on $X$. Prove that $f$ has a left inverse if and only if $f$ is an injection. (Remember, this means you need to show both sides of the implication.) 
+\end{problem}
+
+\begin{solution*}
+	($\Longrightarrow$) Suppose $f$ has a left inverse $l$. Then $l \circ f$ is the identity function on $X$. Suppose $f(x_1) = f(x_2)$ for two $x_1, x_2 \in X$. Then, if $i$ is the identity function on $X$:
+	\[
+	x_1 = i(x_1) = (l \circ f)(x_1) = l(f(x_1)) = l(f(x_2)) = (l \circ f)(x_2) = i(x_2) = x_2
+	\]
+	so $x_1 = x_2$. 
+	
+	($\Longleftarrow$) Suppose $f$ is injective. Let $Z \subseteq Y$ be the subset defined by: 
+	\[
+	Z = \{y \in Y : \textrm{there is an } x \in X \textrm{ s.t. } f(x) = y\}
+	\]
+	(The set $Z$ is called the \emph{image} or \emph{range} of $f$, and is sometimes denoted by $f(X)$.) Define $l_0 : Z \to X$ by: 
+	\[
+	l_0(y) = \textrm{the unique $x \in X$ so that $f(x) = y$.}
+	\]
+	Note that $l_0$ is well-defined because $f$ is injective (this would not be possible otherwise). Fix $x_0 \in X$. Let $l : Y \to X$ be defined by: \[
+	l(y) = \begin{cases}
+	l_0(y) & \textrm{if } y \in Z \\
+	x_0 & \textrm{if } y \not\in Z
+	\end{cases}
+	\]
+	Note that for $x \in X$, $f(x) \in Z$, and $l_0(f(x)) = x$ by definition of $l_0$. So: 
+	\[
+	(l \circ f)(x) = l(f(x)) = l_0(f(x)) = x.
+	\]
+	So $l \circ f = i$. \qed
+\end{solution*}
+
+\begin{problem}
+	Let $X = \{1,2,3,4,5\}$ and let $f : X \to X$ be the function defined by 
+	\[
+	f(1) = 2, \quad f(2) = 2, \quad f(3) = 4, \quad f(4) = 4, \quad f(5) = 4.
+	\]
+	\begin{enumerate}[label=(\alph*)]
+		\item Show that $f \circ f = f$. 
+		\item Find a different function $g$ that has the property that $f \circ g = f$ and $g \circ f = f$. (\emph{Remark:} This isn't a hard thing to do mathematically, but there isn't a straightforward procedure. You need to think about it and get your hands messy. Try it with a couple different functions that you cook up. Don't be afraid to play with some different ideas, even if they don't work right away. There are at least two different answers, one of which is very simple.)
+	\end{enumerate}
+\end{problem}
+
+\begin{solution*}
+	(a) $f(f(1)) = f(2) = 2$, $f(f(2)) = f(2) = 2$, $f(f(3)) = f(4) = 4$, $f(f(4)) = f(4) = 4$, and $f(f(5)) = f(4) = 4$. Since $(f \circ f)(x) = f(x)$ for all $x \in X$, $f \circ f = f$. \qed
+	\begin{center}
+		\includegraphics[scale=0.3]{prob8f}
+	\end{center}
+	(b) One option is $g = i$, the identity. Another option is a function $g$ defined as:
+	\[
+	g(1) = 1, \quad g(2) = 2, \quad g(3) = 5, \quad g(4) = 4, \quad g(5) = 3
+	\]
+	and you can check that $g \circ f = f \circ g$. (Note that one way you can arrive at this is by noticing that the only values of $f$ are 2 and 4, so whatever happens, we must have $g(2) = 2$ and $g(4) = 4$ for $g \circ f = f$ to be true. For $f \circ g = f$, it's enough to have $g(1) \in \{1,2\}$, and $g(3) \in \{3,4,5\}$ and $g(5) \in \{3,4,5\}$.)
+	\begin{center}
+		\noindent\includegraphics[scale=0.27]{prob8gf} \hfill
+		\noindent\includegraphics[scale=0.27]{prob8fg}
+	\end{center}
+\end{solution*}
+
+\begin{problem}
+	Construct bijections $s, t : S \to S$, where $S$ is the set $\{1,2,3\}$, having the following properties (where $i : S \to S$ is the identity function): 
+	\begin{enumerate}[label=(\alph*)]
+		\item $s \circ s = i$, $s \neq i$
+		\item $t\circ t \circ t = i$, $t \neq i$
+	\end{enumerate}
+	Describe the inverse functions $s^{-1}$ and $t^{-1}$, in terms of $s$ and $t$. 
+\end{problem}
+
+\begin{solution*}
+	(a) If $s$ swaps the place of any two, then $s \circ s = i$. For example: \[
+	s(1) = 2, \quad s(2) = 1, \quad s(3) = 3.
+	\]
+	Notice that $s^{-1}$ will do exactly the same thing: to undo the swapping of 1 and 2, just swap them back! 
+	(b) Suppose $t$ rearranges all three; for example, 
+	\[
+	s(1) = 2, \quad s(2) = 3, \quad s(3) = 1.
+	\]
+	This is a sort of ``shift'' permutation. Doing it three times, we get the identity: 
+	\[
+	t(t(t(1))) = t(t(2)) = t(3) = 1, \quad t(t(t(2))) = t(t(3)) = t(1) = 2, \quad t(t(t(3))) = t(t(1)) = t(2) = 3
+	\]
+	Its inverse shifts them in the opposite direction:
+	\[
+	t^{-1}(1) = 3, \quad t^{-1}(2) = 1, \quad t^{-1}(3) = 2
+	\]
+	Alternatively, one can observe that $t^{-1} = t \circ t$ since $t \circ t \circ t = i$. 
+\end{solution*}
+
+\begin{problem}
+	Let $S = \{1,2,3\}$ as in the preceding problem. How many different bijections $f$ are there from $S$ to $S$, and how many of them satisfy $f = f^{-1}$? (\emph{Remark:} The set of all bijections from $S$ to $S$ is a very important object in abstract algebra, called a \emph{group}. Groups can be very useful in all areas of science, especially physics and computer science.)
+\end{problem}
+
+\begin{solution*}
+	Let $h : S \to S$ be one of those bijections. One way to think about this is to ask: how many options do we have for $h(1)$, then how many for $h(2)$, and then how many for $h(3)$? For $h(1)$, there are 3 options: either $h(1) = 1$, $h(1) = 2$, or $h(1) = 3$. But once we know $h(1)$, we have only two options for $h(2)$ if $h$ is a bijection. For example, if $h(1) = 1$, then either $h(2) = 2$ or $h(2) = 3$. Once we know $h(2)$, we only have one option for $h(3)$. 
+	
+	So, for each of the three options for $h(1)$, we have two options for $h(2)$, and for each of those, we have only one option for $h(3)$. So, there are $3 \times 2 \times 1 = 3! = 6$ bijections from $S$ to $S$. 
+\end{solution*}
+
+\section*{Cardinality and counting}
+
+\begin{problem}
+	Prove that the cardinality of a finite set is unique (i.e., a finite set cannot have more than one ``size''). Specifically, prove that if $A$ is a finite set, and $f : A \to \{1,\ldots, m\}$ and $g : A \to \{1, \ldots, n\}$ are two bijections, then $m = n$. (\emph{Hint.} Apply the pigeonhole principle to the composed functions $g \circ f^{-1}$ and $f \circ g^{-1}$.)
+\end{problem}
+
+\begin{solution*}
+	Suppose $f : A \to \{1,\ldots, m\}$ and $g : A \to \{1, \ldots, n\}$ are two bijections. Consider the function $g \circ f^{-1} : \{1, \ldots, m\} \to \{1, \ldots, n\}$. Since $g$ and $f^{-1}$ are both bijections, so is $g \circ f^{-1}$. Suppose $m > n$. Then by the pigeonhole principle, there is no injective function from $\{1,\ldots, m\}$ to $\{1,\ldots, n\}$. But $g \circ f^{-1}$ is bijective, hence injective, a contradiction. So $m \leq n$. The same argument about $f \circ g^{-1} : \{1, \ldots, n\} \to \{1, \ldots, m\}$ shows that $n \leq m$. Since $m \leq n$ and $m \geq n$, we conclude that $m=n$. \qed
+\end{solution*}
+
+\begin{problem}
+	Let $X = \{1,2,3\}$ and $Y = \{0,1\}$. 
+	\begin{enumerate}[label=(\alph*)]
+		\item Give an example of a function $f : X \to Y$. 
+		\item Let $F$ denote the set of all functions $f : X \to Y$. Show that $\#F = 8$ by listing out the members of $F$, calling them $f_1, \ldots, f_8$. 
+	\end{enumerate}
+\end{problem}
+
+\begin{solution*}
+	(a) The simplest example would be $f(1) = f(2) = f(3) = 0$, a \emph{constant} function. 
+	
+	(b) There are 8 functions in $F$ because for each of 1, 2, and 3, we have two choices of $f(1)$, $f(2)$, and $f(3)$, or $2 \times 2 \times 2 = 8$ choices. So the functions are: 
+	\begin{enumerate}
+		\item $f_1(1) = 0, f_1(2) = 0, f_1(3) = 0$
+		\item $f_2(1) = 0$, $f_2(2) = 0, f_2(3) = 1$
+		\item $f_3(1) = 0, f_3(2) = 1, f_3(3) = 0$
+		\item $f_4(1) = 0, f_4(2) = 1, f_4(3) = 1$
+		\item $f_5(1) = 1, f_5(2) = 0, f_5(3) = 0$
+		\item $f_6(1) = 1, f_6(2) = 0, f_6(3) = 1$
+		\item $f_7(1) = 1, f_7(2) = 1, f_7(3) = 0$
+		\item $f_8(1) = 1, f_8(2) = 1, f_8(3) = 1$
+	\end{enumerate}
+\end{solution*}
+
+\begin{problem}
+	If $\#X = m$ and $\#Y = 2$, what is the size of the set $F$ of all functions $f : X \to Y$? Make a conjecture, and prove your conjecture with induction. (\emph{Hint:} If you're stuck, try doing it with a few examples, e.g., $m = 3$, $m = 4$, $m=5$...)
+\end{problem}
+
+\begin{solution*}
+	For the reasons above, there are $\boxed{2^m \textrm{ such functions.}}$
+	
+	\begin{proof}
+		If $\#X = 1$, then $X = \{1\}$, or another set with a single element. There are two functions from $\{1\}$ to $\{0,1\}$: one function takes $f(1) = 0$, and the other takes $f(1) = 1$. So there are $2^1 = 2$ such functions. 
+		
+		Now suppose that $k \in \N$ is such that if $\#X = k$, then there are $2^k$ functions $f : X \to \{0,1\}$. Let $X$ be a set with $\#X = k+1$; assume without loss of generality that $X = \{1, \ldots, k+1\}$. Consider $Y := \{1, \ldots, k\} \subset X$. Then $\#Y = k$, so by the induction hypothesis, there are $2^k$ functions from $Y$ to $\{0,1\}$. Suppose $f : X \to \{0,1\}$ is a function. There are $2^k$ possibilities for what $f$ can do to $Y$; and, either $f(k+1) = 0$, or $f(k+1) = 1$. So, there are $2 \times 2^k = 2^{k+1}$ possibilities for $f$. By induction, since when $n=k+1$, there are $2^{k+1}$ functions in $F$ if this holds for $n=k$, we know that there are $2^m$ functions in $F$ for every $m \in \N$.
+	\end{proof}
+\end{solution*}
+
+\begin{problem}
+	Four students have to be assigned to a tutor. There are seven possible tutors, and none of them will accept more than one new student. In how many ways can the assignment be carried out? (\emph{Hint:} If you're stuck, try doing it with 2 students and 2 tutors, then 3 students and 3 tutors, and then 4 students and 4 tutors. Do you see a pattern? What if there are more tutors?)
+\end{problem}
+
+\begin{solution*}
+	The problem asks how many functions there are from the set $S = \{s_1, s_2, s_3, s_4\}$ to the set $T = \{t_1, t_2, t_3, t_4, t_5, t_6, t_7\}$. For $s_1$, there are 7 possible tutors. For $s_2$, there are then 6 possible tutors since one of them is working with $s_1$. That means there are $7 \times 6$ possible assignments just for the first two students. For each of these assignments, $s_3$ can be assigned to $5 = 7-2$ possible tutors, since two are working with $s_1$ and $s_2$, so there are $7 \times 6 \times 5$ possible assignments for the first three students. And finally, for each of these assignments, there are four tutors remaining for $s_4$ to choose from. Multiplying the possibilities, there are $7 \times 6 \times 5 \times 4$ possible assignments, or $\boxed{7!/3!}$. 
+\end{solution*}
+
+\begin{problem}
+	A blindfolded man has a heap of 10 grey socks and 10 brown socks in a drawer. How many must he select in order to guarantee that, among them, there is a matching pair?
+\end{problem}
+
+\begin{solution*}
+	Let $T = \{1, \ldots, m\}$, for some $m \leq 20$. Then $n \in T$ represents the $n$th selection that the man makes. Let $S = \{\textrm{grey, brown}\}$ be the set of possible colors. Let $c : T \to S$ be the function given by $c(n) = $ the color of the $n$th selection. If two selections have the same color---in other words, if $c$ is \emph{not injective}---then the man has chosen a matching pair. Since $\#S = 2$, in order for $c : T \to S$ to not be injective, by the pigeonhole principle, it's enough to have $\#T = 3$. So the man needs to make \underline{three selections to have a matching pair.}
+\end{solution*}
+
+\begin{problem}
+	Let $S$ be any set of 12 natural numbers. Show that $S$ must contain two distinct numbers $s_1, s_2 \in S$ such that $s_1 - s_2$ is a (possibly negative) multiple of 11. (\emph{Hint:} Every $n \in \N$ can be written as $n = 11q + r$ for some $q, r \in \N$. What is the largest that $r$ has to be in order for this to be true?)
+\end{problem}
+
+\begin{solution*}
+	A number $n \in \N$ is a multiple of 11 if and only if $n = 11q$ for some $q \in \N$. The important observation to make is that every number $n \in \N$ can be written as $n = 11q + r$, for some $q \in \N$, and some $r \in \{0, \ldots, 10\}$. Indeed, if $r = 11+s$ for some $s \geq 0$, then $n = 11q + r = 11q + 11 + s = 11(q+1)+s$, so $s$ only needs to be as big as 10 in order for this to be true. 
+	
+	In fact, the choices of $q$ and $r$ are \emph{unique}. So, we can define a function $R : \N\to \{0, \ldots, 10\}$ given by 
+	\[
+	R(n) = R(11q + r) = r,
+	\]
+	in other words, $R(n)$ is the \emph{remainder} of $n$ when $n$ is divided by 11, and $n$ is a multiple of 11 if and only if $R(n) = 0$. 
+	
+	Now, let's say $s_1 = 11q_1 + r_1$ and $s_2 = 11q_2 + r_2$. Then $s_1 - s_2 = 11(q_1 - q_2) + (r_1 - r_2)$. So $s_1 - s_2$ is a multiple of 11 if and only if $r_1 - r_2 = 0$, or $r_1 = r_2$, or $R(s_1) = R(s_2)$. To summarize: 
+	\begin{equation}\label{eq:16}
+	s_1 - s_2  \textrm{ is a multiple of 11} \quad \Leftrightarrow \quad R(s_1) = R(s_2). 
+	\end{equation}
+	Let's say $S \subseteq \N$ has 12 elements. Then since $\#S = 12 < \#\{0, \ldots, 10\} = 11$, $R : S \to \{0, \ldots, 10\}$ is not injective: there are $s_1, s_2 \in S$ so that $R(s_1) = R(s_2)$. But that means $s_1 - s_2$ is a multiple of 11 by equation \eqref{eq:16}. \qed
+\end{solution*}
+
+\begin{problem}
+	Let $X$ be a subset of $\{1, 2, \ldots, 2n\}$, and let $Y$ be a set of odd numbers $\{1, 3, \ldots, 2n-1\}$. Define a function $f : X \to Y$ by the rule 
+	\[
+	f(x) = \textrm{ the greatest member of $Y$ that evenly divides $x$}.
+	\]
+	Show that if $\#X \geq n+1$ then $f$ is not an injection, and deduce that in this case $X$ contains distinct numbers $x_1$ and $x_2$ such that $x_1$ is a multiple of $x_2$. (\emph{Hint:} After showing $f$ is not an injection, assume $f(x_1) = f(x_2)$ with $x_1 > x_2$. If $x_2$ is odd, what is $f(x_2)$? What happens if $x_2$ is even?)
+\end{problem}
+
+\begin{solution*}
+	Notice that $\#Y = n$ via the bijection $b : Y \to \{1, \ldots, n\} : b(y) = (y+1)/2$ (one can show this is both injective and surjective). If $\#X \geq n+1$, then $f : X \to Y$ must be non-injective by the pigeonhole principle. Therefore, there are numbers $x_1$ and $x_2$ in $X$ so that $f(x_1) = f(x_2) = y \in Y$; that is, $y$ is the largest number in $Y$ that evenly divides $x_1$, and $y$ is the largest number in $Y$ that evenly divides $x_2$. 
+	
+	Now, every $x \in \N$ can be written as $x = 2^k y$, for some $k \geq 0$ and some odd number $y$ (note that $n$ is odd if and only if $k=0$ in this formulation, in which case $x=y$). If $x \in X \subseteq \{1, \ldots, 2n\}$ is even, then $x = 2r$; if $r > 2n-1$, then $x = 2r > 2(2n-1) = 4n-2 > 2n$ if $n \geq 1$, a contradiction of the fact that $x \leq 2n$. So, if we write $x = 2^k y$ for some odd number $y$, then $1 \leq y \leq 2n-1$, so $y \in Y$. In summary, 
+	\[
+	x = 2^k y \quad \Rightarrow \quad f(x) = f(2^k y) = y.
+	\]
+	This holds whether $x$ is odd or even. So suppose $x_1, x_2 \in X$ satisfy $x_1 = 2^{k_1} y_1$ and $x_2 = 2^{k_2} y_2$, for some $y_1, y_2$ odd, and $f(x_1) = f(x_2)$. Then $y_1 = y_2$, so $x_1 = 2^{k_1} y$ and $x_2 = 2^{k_2}y$. Assuming without loss of generality that $x_2 > x_1$, this implies $k_2 > k_1$, so: $$x_2 = 2^{k_2} y = 2^{k_2-k_1} \times 2^{k_1} y = 2^{k_2 - k_1}x_1$$ So $x_2$ is a multiple of $x_1$. \qed
+\end{solution*}
+
+\begin{problem}
+	With the notation as in the preceding problem, show that it is possible to find a subset $X$ of $\{1, \ldots, 2n\}$ which has $n$ members and is such that no member of $X$ is a multiple of another. 
+\end{problem}
+
+\begin{solution*}
+	In particular, this works with $X = \{n+1, n+2, \ldots, 2n\}$. Indeed, suppose $k,l \in \{n+1, \ldots, 2n\}$ are such that $k$ is a multiple of $l$. Then $k = ml$ for some $m \in \N$; if $k \neq l$, then $m \geq 2$. So then, since $n+1 \leq l \leq k \leq 2n$,  
+	\[
+	2n \geq k = ml \geq 2l \geq 2(n+1) = 2n + 2 > 2n,
+	\]
+	an absurd contradiction. So no such $k$ and $l$ exist. \qed
+\end{solution*}
+
+\begin{problem}
+	By constructing a bijection from $\N$ to $S$, show that each of the following sets $S$ is countably infinite. 
+	\begin{enumerate}[label=(\alph*)]
+		\item $S = \{n \in \N : n \geq 10^6\}$ 
+		\item $S = \{n \in \N: n \textrm{ is a multiple of 3}\}$. 
+	\end{enumerate}
+\end{problem}
+
+\begin{solution*}
+	(a) $f : S \to \N$ is defined by $f(n) = n - 10^6 + 1$. Then $f$ is injective, and if $m \in \N$, then $m - 1 + 10^6 \geq 10^6$ since $m -1 \geq 0$, so $m-1+10^6 \in S$; in other words, $f$ is surjective. So $f$ is bijective, and so $S$ is countably infinite. 
+	
+	(b) If $n$ is a multiple of 3, then there is a \emph{unique} $m \in \N$ so that $n = 3m$ (uniqueness follows from Axiom 8, the cancellation axiom in our list, since if $3m = 3k$, then $m=k$). Let $g : S \to \N$ be given by $g(n) = m$, or in other words, $g(n) = n/3$ (even though division isn't formally defined for us yet). By uniqueness of $m$ satisfying $n = 3m$, the function $g$ is injective. And if $m \in \N$, then $3m$ is a multiple of 3, so $3m \in S$, and $g(3m) = m$. So $g$ is surjective. It follows that $g$ is bijective, so the set of all multiples of 3 is a countably infinite set. \qed
+\end{solution*}
+
+\begin{problem}\label{prob:18}
+	Prove that if $X$ is a subset of $Y$, and $X$ is infinite, then $Y$ is infinite. (Recall that ``infinite'' means that there is no $m \in \N$ such that $\#X = m$.)
+\end{problem}
+
+\begin{solution*}
+	Suppose that $Y$ is finite. Then there is a bijection $f : Y \to \{1, \ldots, m\}$ for some $m \in \N$. Since $X \subseteq Y$, the function $f|_X : X \to \{1, \ldots, m\}$ (called a ``restricted function'') is injective, and the set $$f(X) = \{k \in \{1, \ldots, m\} : f(x) = k \textrm{ for some } x \in X\}$$ is a subset of $\{1, \ldots, m\}$. Let $g : \{1, \ldots, m\} \to \{1, \ldots, m\}$ be a permutation (i.e., a bijection) that sends all of the elements of $f(X)$ to the first $n$ numbers, for some $n \leq m$. Since $f|_X : X \to \{1, \ldots, m\}$ and $g : \{1, \ldots, m\} \to \{1, \ldots, m\}$ are both injective, the composed function $g \circ f|_X : X \to \{1, \ldots, m\}$ is injective, and by restricting the final codomain, since $g$ sends all of $f(X)$ exactly to the first $n$ numbers, the function $h = g|_{f(X)} \circ f|_X : X \to \{1, \ldots, n\}$ is both injective and surjective, i.e., bijective. So $X$ is finite. It follows that if $X$ is infinite, then $Y$ must be infinite (by contrapositive). \qed
+\end{solution*}
+
+\begin{problem}
+	Let $X$ be a non-empty subset of $\N$ which has no greatest member. 
+	\begin{enumerate}[label=(\alph*)] 
+		\item Using the Axioms of Algebra and the results of Week 2's lectures (such as the well-ordering principle), show that we can choose members $x_1, x_2, \ldots$ of $X$ such that $x_{n+1} > x_n$ for all $n \in \N$. 
+		\item Use the preceding exercise to conclude that $X$ is infinite. 
+		\item Prove the converse: that if $X$ is infinite, then $X$ has no greatest member. 
+	\end{enumerate}
+\end{problem}
+
+\begin{solution*}
+	(a) Since $X \subseteq \N$, by the well-ordering principle, $X$ has a least member; call it $x_1$. Let $X_1 = X \setminus \{x_1\}$, i.e., $X_1$ is all of $X$ without $x_1$. Since $X_1 \subseteq \N$, $X_1$ has a least member; call it $x_2$. Proceeding in this way, we can create a sequence of subsets $X \supseteq X_1 \supseteq X_2 \supseteq \cdots$ for which each $X_n$ has a least member $x_{n+1}$, and $X_{n+1} = X_n \setminus \{x_{n+1}\}$. Since the least member of a set is unique as a consequence of Axiom 10, all of the $x_1, x_2, x_3, \ldots$ are distinct, and $x_1 < x_2 < x_3 < \cdots$. \qed 
+	
+	(b) One of two things can occur: either one of the $X_n$s has only on element, or all of the $X_n$s have at least two elements. If the former is true, then say $X_n$ has only one element, $x_{n+1}$. At each step of creating $X_1, X_2, X_3, \ldots, X_n$, we removed one element, which means that every element that did not get removed from $X$ in creating $X_n$ is an element of $X_n$. Since $X_n = \{x_{n+1}\}$, the only such element is $x_{n+1}$, so in fact, $X = \{x_1, x_2, \ldots, x_{n+1}\}$. Since $x_1 < \cdots < x_{n+1}$, for every other $x = x_i \in X$, $x_i \leq x_{n+1}$, which means that $x_{n+1}$ is a greatest element of $X$, contradiction. 
+	
+	So, that means that every $X_n$ has at least two members. If any $X_n$ has finitely many $n$s, say $\#X_n = k$, then after another $k-1$ elements are removed, we find that $X_{n+k-1}$ has exactly one element, which we saw was impossible. That means that every $X_n$ has infinitely many elements. By Problem \ref{prob:18}, that means that $X$ is infinite. \qed 
+	
+	(c) Suppose conversely that $X$ is infinite, and suppose to the contrary that $m \in X$ is a greatest member of $X$. Then $X \subseteq \{1, \ldots, m\}$. If $X$ is infinite, then there is a subset $Y$ of $X$ of cardinality $m+1$. The inclusion map $j : Y \to \{1, \ldots, m\}$ is injective, but $\#Y = m+1$ and $\#\{1, \ldots, m\} = m$, contradicting the pigeonhole principle. Since this came from assuming that $X$ has a greatest member, it follows that in fact $X$ has no greatest member. \qed
+\end{solution*}
+
+\end{document}

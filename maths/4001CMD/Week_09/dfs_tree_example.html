@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFS Tree Traversal Visualisation</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the Visualisation */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .node {
+            transition: all 0.3s ease-in-out;
+        }
+        .node-circle {
+            stroke-width: 2;
+            stroke: #374151; /* gray-700 */
+            fill: #FFFFFF;
+        }
+        .node-text {
+            font-size: 16px;
+            font-weight: 600;
+            fill: #1F2937; /* gray-800 */
+            pointer-events: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .edge {
+            stroke: #6B7280; /* gray-500 */
+            stroke-width: 2;
+        }
+        
+        /* Node states */
+        .node-inStack .node-circle { /* Changed from node-queued */
+            fill: #FDE047; /* yellow-300 */
+            stroke: #FACC15; /* yellow-400 */
+        }
+        .node-visited .node-circle {
+            fill: #86EFAC; /* green-300 */
+            stroke: #22C55E; /* green-500 */
+        }
+
+        /* Animation for stack items */
+        .stack-item { /* Changed from queue-item */
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 4px;
+            border-radius: 9999px;
+            background-color: #FDE047;
+            font-weight: 600;
+            color: #4B5563;
+            animation: popIn 0.3s ease;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-4xl bg-white rounded-lg p-6">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">
+            DFS Algorithm - Tree Traversal Visualisation
+        </h1>
+        
+        <!-- Main container - Vertical layout -->
+        <div class="flex flex-col gap-6">
+            
+            <!-- Visualisation Area -->
+            <div class="flex-grow border-2 border-gray-200 rounded-lg overflow-hidden">
+                <svg id="dfs-svg" class="w-full h-[450px] lg:h-[500px]"></svg>
+            </div>
+            
+            <!-- Controls and Info Panel -->
+            <div class="w-full flex-shrink-0 space-y-4">
+                
+                <!-- Control Buttons -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Controls</h2>
+                    <div class="flex space-x-2">
+                        <button id="prev-btn" class="w-full bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Previous
+                        </button>
+                        <button id="next-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next
+                        </button>
+                        <button id="reset-btn" class="w-1/2 bg-white text-red-700 border border-red-400 font-semibold py-2 px-4 rounded-lg hover:bg-red-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step Description -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 mb-1">Step Description</h2>
+                    <div class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
+                        <p id="step-description" class="text-lg text-gray-800">Algorithm ready. Click 'Next' to start.</p>
+                    </div>
+                </div>
+
+                <!-- Info Panels (Stack, Visited, Legend) in a grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Stack Visualisation -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-1">Stack</h2>
+                        <div id="stack-container" class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-2 flex flex-wrap items-center">
+                            <span id="stack-placeholder" class="text-gray-400 italic">Stack is empty...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Visited Order -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-1">Visited Order</h2>
+                        <div id="visited-container" class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
+                            <span id="visited-placeholder" class="text-gray-400 italic">No nodes visited...</span>
+                            <p id="visited-output" class="text-lg font-mono text-gray-800 break-words"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Legend -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Legend</h2>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-700 bg-white mr-2"></div>
+                                <span>Unvisited</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full border-2 border-yellow-400 bg-yellow-300 mr-2"></div>
+                                <span>In Stack</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full border-2 border-green-500 bg-green-300 mr-2"></div>
+                                <span>Visited</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- DOM Elements ---
+            const svg = document.getElementById('dfs-svg');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const stackContainer = document.getElementById('stack-container');
+            const stackPlaceholder = document.getElementById('stack-placeholder');
+            const visitedContainer = document.getElementById('visited-container');
+            const visitedPlaceholder = document.getElementById('visited-placeholder');
+            const visitedOutput = document.getElementById('visited-output');
+            const stepDescription = document.getElementById('step-description');
+
+            const svgNS = "http://www.w3.org/2000/svg";
+
+            // --- Tree Data Structure (from image) ---
+            const treeData = {
+                id: 'A', x: 50, y: 10,
+                children: [
+                    {
+                        id: 'B', x: 30, y: 30,
+                        children: [
+                            { 
+                                id: 'D', x: 20, y: 50, 
+                                children: [
+                                    { id: 'H', x: 15, y: 70, children: [] },
+                                    { id: 'I', x: 25, y: 70, children: [] }
+                                ] 
+                            },
+                            { 
+                                id: 'E', x: 40, y: 50, 
+                                children: [
+                                    { id: 'J', x: 40, y: 70, children: [] }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: 'C', x: 70, y: 30,
+                        children: [
+                            { id: 'F', x: 60, y: 50, children: [] },
+                            { 
+                                id: 'G', x: 80, y: 50, 
+                                children: [
+                                    { id: 'K', x: 80, y: 70, children: [] }
+                                ] 
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            // --- State ---
+            let nodeElements = {}; // Stores { id: { group, circle, text } }
+            let edgeElements = [];
+            let steps = []; // Stores the sequence of algorithm steps
+            let currentStep = 0;
+            let initialNodeStates = {};
+            
+            // --- Utility Functions ---
+            const getResponsiveCoords = (x, y) => {
+                const bounds = svg.getBoundingClientRect();
+                return {
+                    cx: (x / 100) * bounds.width,
+                    cy: (y / 100) * bounds.height
+                };
+            };
+            
+            // Get all node IDs for setting initial states
+            function getAllNodeIds(node) {
+                let ids = [node.id];
+                node.children.forEach(child => {
+                    ids = ids.concat(getAllNodeIds(child));
+                });
+                return ids;
+            }
+            const allNodeIds = getAllNodeIds(treeData);
+            initialNodeStates = allNodeIds.reduce((acc, id) => {
+                acc[id] = 'default';
+                return acc;
+            }, {});
+            
+            // --- Drawing Functions ---
+            
+            function drawTree() {
+                svg.innerHTML = '';
+                nodeElements = {};
+                edgeElements = [];
+
+                const bounds = svg.getBoundingClientRect();
+                if (bounds.width === 0 || bounds.height === 0) {
+                    requestAnimationFrame(drawTree);
+                    return;
+                }
+
+                const edgeGroup = document.createElementNS(svgNS, 'g');
+                const nodeGroup = document.createElementNS(svgNS, 'g');
+                svg.appendChild(edgeGroup);
+                svg.appendChild(nodeGroup);
+
+                function drawNode(node, parent) {
+                    const { cx, cy } = getResponsiveCoords(node.x, node.y);
+
+                    if (parent) {
+                        const { cx: parentCX, cy: parentCY } = getResponsiveCoords(parent.x, parent.y);
+                        const edge = document.createElementNS(svgNS, 'line');
+                        edge.setAttribute('x1', parentCX);
+                        edge.setAttribute('y1', parentCY);
+                        edge.setAttribute('x2', cx);
+                        edge.setAttribute('y2', cy);
+                        edge.setAttribute('class', 'edge');
+                        edgeGroup.appendChild(edge);
+                        edgeElements.push(edge);
+                    }
+
+                    const nodeG = document.createElementNS(svgNS, 'g');
+                    nodeG.setAttribute('class', 'node');
+                    nodeG.setAttribute('id', `node-${node.id}`);
+                    nodeG.setAttribute('transform', `translate(${cx}, ${cy})`);
+
+                    const circle = document.createElementNS(svgNS, 'circle');
+                    circle.setAttribute('r', 20);
+                    circle.setAttribute('class', 'node-circle');
+                    
+                    const text = document.createElementNS(svgNS, 'text');
+                    text.setAttribute('class', 'node-text');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('dy', '0.3em');
+                    text.textContent = node.id;
+
+                    nodeG.appendChild(circle);
+                    nodeG.appendChild(text);
+                    nodeGroup.appendChild(nodeG);
+                    
+                    nodeElements[node.id] = { group: nodeG, circle, text };
+
+                    node.children.forEach(child => drawNode(child, node));
+                }
+
+                drawNode(treeData, null);
+            }
+
+            function handleResize() {
+                drawTree();
+                // Re-apply the current step's state after redrawing
+                if (steps.length > 0) {
+                    renderStep(currentStep, false); // false to avoid history push
+                }
+            }
+
+            // --- UI Update Functions ---
+            
+            function setNodeState(id, state) { // state: 'inStack' | 'visited' | 'default'
+                const el = nodeElements[id];
+                if (!el) return;
+                
+                el.group.classList.remove('node-inStack', 'node-visited');
+                if (state === 'inStack') {
+                    el.group.classList.add('node-inStack');
+                } else if (state === 'visited') {
+                    el.group.classList.add('node-visited');
+                }
+            }
+            
+            /**
+             * Updates the Stack UI based on an array of node IDs
+             */
+            function updateStackUI(stackIds) {
+                if (stackIds.length === 0) {
+                    stackContainer.innerHTML = ''; 
+                    stackContainer.appendChild(stackPlaceholder); 
+                } else {
+                    if (stackPlaceholder.parentNode) {
+                        stackPlaceholder.remove(); 
+                    }
+                    stackContainer.innerHTML = ''; 
+                    // Display stack items. In a visual stack, last item in array is "top".
+                    // We can reverse it so "top" appears first, or just list them.
+                    // Sticking to simple list for now.
+                    stackIds.forEach(nodeId => {
+                        const item = document.createElement('div');
+                        item.className = 'stack-item';
+                        item.textContent = nodeId;
+                        stackContainer.appendChild(item);
+                    });
+                }
+            }
+            
+            function updateVisitedUI(visitedOrder) {
+                if (visitedOrder.length === 0) {
+                    visitedOutput.textContent = '';
+                    if (!visitedPlaceholder.parentNode) {
+                        visitedContainer.prepend(visitedPlaceholder);
+                    }
+                } else {
+                    if (visitedPlaceholder.parentNode) {
+                        visitedPlaceholder.remove();
+                    }
+                    visitedOutput.textContent = visitedOrder.join(' → ');
+                }
+            }
+
+            // --- Algorithm Step Generation (DFS Stack-based) ---
+
+            /**
+             * Generates all steps of the DFS algorithm and stores them in the 'steps' array.
+             */
+            function generateDFSSteps() {
+                steps = []; // Clear previous steps
+                let stack = [];
+                let visitedOrder = [];
+                let nodeStates = { ...initialNodeStates };
+
+                const root = treeData;
+
+                // Initial state (Step 0)
+                steps.push({
+                    nodeStates: { ...initialNodeStates },
+                    stack: [],
+                    visitedOrder: [],
+                    message: "Algorithm ready. Click 'Next' to start."
+                });
+
+                // 1. Push root onto stack
+                stack.push(root);
+                nodeStates[root.id] = 'inStack';
+                steps.push({
+                    nodeStates: { ...nodeStates },
+                    stack: stack.map(n => n.id), // Store node IDs
+                    visitedOrder: [...visitedOrder],
+                    message: `Push root node '${root.id}' onto stack.`
+                });
+
+                // 2. Loop while stack is not empty
+                while (stack.length > 0) {
+                    // 3. Pop node from stack
+                    const currentNode = stack.pop();
+                    nodeStates[currentNode.id] = 'visited';
+                    visitedOrder.push(currentNode.id);
+                    steps.push({
+                        nodeStates: { ...nodeStates },
+                        stack: stack.map(n => n.id),
+                        visitedOrder: [...visitedOrder],
+                        message: `Pop and visit node '${currentNode.id}'.`
+                    });
+
+                    // 4. Push children onto stack (in reverse order for L-R traversal)
+                    let childrenPushed = [];
+                    const children = currentNode.children;
+                    for (let i = children.length - 1; i >= 0; i--) {
+                        const child = children[i];
+                        stack.push(child);
+                        nodeStates[child.id] = 'inStack';
+                        childrenPushed.push(child.id);
+                    }
+                    
+                    if (childrenPushed.length > 0) {
+                        steps.push({
+                            nodeStates: { ...nodeStates },
+                            stack: stack.map(n => n.id),
+                            visitedOrder: [...visitedOrder],
+                            message: `Push children of '${currentNode.id}' onto stack: ${childrenPushed.join(', ')}.`
+                        });
+                    } else {
+                         steps.push({
+                            nodeStates: { ...nodeStates },
+                            stack: stack.map(n => n.id),
+                            visitedOrder: [...visitedOrder],
+                            message: `Node '${currentNode.id}' is a leaf node.`
+                        });
+                    }
+                }
+
+                // 5. Finished
+                steps.push({
+                    nodeStates: { ...nodeStates },
+                    stack: [],
+                    visitedOrder: [...visitedOrder],
+                    message: "Traversal complete. Stack is empty."
+                });
+            }
+
+            // --- Step Rendering and Navigation ---
+
+            /**
+             * Renders a specific step from the 'steps' array.
+             * @param {number} index The index of the step to render.
+             */
+            function renderStep(index) {
+                if (index < 0 || index >= steps.length) return;
+
+                currentStep = index;
+                const step = steps[currentStep];
+
+                // Update node visuals
+                Object.keys(step.nodeStates).forEach(nodeId => {
+                    setNodeState(nodeId, step.nodeStates[nodeId]);
+                });
+
+                // Update UI panels
+                updateStackUI(step.stack);
+                updateVisitedUI(step.visitedOrder);
+                stepDescription.textContent = step.message;
+
+                // Update button states
+                prevBtn.disabled = (currentStep === 0);
+                nextBtn.disabled = (currentStep === steps.length - 1);
+                resetBtn.disabled = (currentStep === 0);
+            }
+
+            function handleNext() {
+                if (currentStep < steps.length - 1) {
+                    renderStep(currentStep + 1);
+                }
+            }
+
+            function handlePrev() {
+                if (currentStep > 0) {
+                    renderStep(currentStep - 1);
+                }
+            }
+            
+            function resetVisualisation() {
+                renderStep(0);
+            }
+
+            // --- Event Listeners ---
+            prevBtn.addEventListener('click', handlePrev);
+            nextBtn.addEventListener('click', handleNext);
+            resetBtn.addEventListener('click', resetVisualisation);
+            window.addEventListener('resize', handleResize);
+            
+            // --- Initial Setup ---
+            drawTree();
+            generateDFSSteps(); // Changed from generateBFSSteps
+            renderStep(0); // Render the initial state
+
+        });
+    </script>
+
+</body>
+</html>

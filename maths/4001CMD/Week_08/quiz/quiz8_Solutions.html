@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz 8 Solutions: Algorithms and Graph Theory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .solution-correct {
+            background-color: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+        .solution-incorrect {
+            background-color: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+        .explanation-box {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="max-w-5xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Quiz 8 Solutions: Algorithms and Graph Theory</h1>
+        <p class="text-lg text-gray-600 mb-8">Detailed explanations with comprehensive background for each question</p>
+
+        <div id="solutions-container" class="space-y-10">
+            <!-- Solutions will be rendered here -->
+        </div>
+    </div>
+
+    <script>
+        const allQuizData = [
+            {
+                id: 1,
+                question: 'Which statements correctly characterize what makes something an <strong>algorithm</strong>?<sup>1</sup>',
+                options: [
+                    'It has well-defined input and output',
+                    'The steps are precisely and unambiguously stated',
+                    'It is guaranteed to eventually terminate',
+                    'It must be the fastest possible solution to the problem',
+                    'It allows for creative interpretation at certain steps'
+                ],
+                correct: [0, 1, 2],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Well-defined input and output: An algorithm must clearly specify what inputs it accepts and what outputs it produces. This formal definition ensures the algorithm can be implemented consistently across different programming languages and systems. Without well-defined inputs and outputs, the algorithm cannot be properly tested or verified.
+
+B. CORRECT - Precise and unambiguous steps: Each step in an algorithm must be precisely defined so that it can be executed without human interpretation. This requirement stems from the need for algorithms to be implementable by computers, which follow instructions literally. Ambiguity would lead to different implementations producing different results.
+
+C. CORRECT - Guaranteed termination: Algorithms must eventually halt after a finite number of steps. This distinguishes algorithms from general computational processes that might run indefinitely. The halting problem in computer science demonstrates that not all computational processes can be guaranteed to terminate, but true algorithms must have this property.
+
+D. INCORRECT - Must be fastest solution: While efficiency is desirable, it is not a defining characteristic of an algorithm. An algorithm must be correct and finite, but it doesn't need to be optimal. Many algorithms trade off speed for simplicity, clarity, or other desirable properties.
+
+E. INCORRECT - Creative interpretation allowed: Algorithms require deterministic behavior where each step leads predictably to the next. Creative interpretation would introduce non-determinism, making the algorithm unreliable and unrepeatable.`
+            },
+            {
+                id: 2,
+                question: 'Which statements about <strong>asymptotic complexity (Big O notation)</strong> are correct?<sup>2</sup>',
+                options: [
+                    '\\(f(n) = O(g(n))\\) means \\(f(n) \\leq K \\cdot g(n)\\) for all \\(n \\geq N\\) and some \\(K > 0\\)',
+                    '\\(O(n^2)\\) is considered exponential time',
+                    'When analyzing sums, only the fastest-growing term matters asymptotically',
+                    '\\(O(2^n)\\) grows faster than \\(O(n!)\\) for large \\(n\\)',
+                    'Multiplicative constants are ignored in Big O notation'
+                ],
+                correct: [0, 2, 4],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Formal definition of Big O: This statement precisely defines the mathematical foundation of Big O notation. The notation \\(f(n) = O(g(n))\\) means that \\(f(n)\\) grows no faster than \\(g(n)\\) up to a constant factor for sufficiently large \\(n\\). This formal definition allows rigorous analysis of algorithm scalability.
+
+B. INCORRECT - O(n²) is polynomial, not exponential: \\(O(n^2)\\) represents quadratic time complexity, which is polynomial time. Exponential time would be \\(O(2^n)\\), \\(O(3^n)\\), etc. The distinction is crucial: polynomial-time algorithms are generally considered efficient, while exponential-time algorithms become impractical for large inputs.
+
+C. CORRECT - Dominant term principle: In asymptotic analysis, when summing multiple terms, the term with the highest growth rate dominates the overall complexity. This follows from limit theory in calculus and allows simplification of complex expressions to their most significant component for large input sizes.
+
+D. INCORRECT - Factorial grows faster than exponential: While \\(2^n\\) grows very rapidly, \\(n!\\) grows even faster for large \\(n\\). Using Stirling's approximation, \\(n! \\sim \\sqrt{2\\pi n}(\\frac{n}{e})^n\\), we can see that factorial complexity dominates exponential complexity as \\(n\\) increases.
+
+E. CORRECT - Constants are ignored: Big O notation focuses on growth rates rather than constant factors, as these become negligible for large inputs. This abstraction allows comparison of algorithmic efficiency independent of hardware or implementation details.`
+            },
+            {
+                id: 3,
+                question: 'Which statements correctly describe <strong>graph theory concepts</strong>?<sup>3</sup>',
+                options: [
+                    'A tree is a connected graph without cycles',
+                    'A graph is Eulerian if and only if all vertices have even degree',
+                    'The complete graph \\(K_n\\) has \\(n(n-1)\\) edges',
+                    'A bipartite graph can be colored with 2 colors',
+                    'The handshake lemma states \\(\\sum \\deg(v) = |E|\\)'
+                ],
+                correct: [0, 3],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Tree definition: A tree is defined as a connected acyclic graph. This fundamental concept in graph theory has many equivalent definitions (n vertices with n-1 edges, unique paths between vertices, etc.). Trees are minimally connected - removing any edge disconnects them.
+
+B. INCORRECT - Eulerian graph requires connectivity: Euler's theorem states that a connected graph is Eulerian (has an Eulerian circuit) if and only if all vertices have even degree. The connectivity condition is essential - a disconnected graph with all even-degree vertices would have Eulerian circuits in each component but no single circuit covering all edges.
+
+C. INCORRECT - Complete graph edge count: The complete graph \\(K_n\\) has \\(\\frac{n(n-1)}{2}\\) edges, not \\(n(n-1)\\). This formula comes from combinatorial counting: each of n vertices connects to n-1 others, but each edge is counted twice in this calculation.
+
+D. CORRECT - Bipartite graph coloring: By definition, a bipartite graph has a vertex set that can be partitioned into two disjoint sets such that no two vertices within the same set are adjacent. This partition directly provides a 2-coloring of the graph.
+
+E. INCORRECT - Handshake lemma correction: The handshake lemma states that \\(\\sum \\deg(v) = 2|E|\\), not \\(|E|\\). This is because each edge contributes exactly 2 to the total degree sum (one for each endpoint). This lemma has important applications in proving various graph properties.`
+            },
+            {
+                id: 4,
+                question: 'Which statements about <strong>adjacency matrices</strong> are true?<sup>4</sup>',
+                options: [
+                    'The \\((i,j)\\)-entry of \\(A^n\\) gives the number of paths of length \\(n\\) from \\(i\\) to \\(j\\)',
+                    'For undirected graphs, the adjacency matrix is always asymmetric',
+                    'The sum \\(A + A^2 + \\cdots + A^{n-1}\\) can determine if a graph is connected',
+                    'The trace of \\(A^3\\) divided by 3 gives the number of triangles in the graph',
+                    'The connectivity algorithm using matrix powers is \\(O(n^2)\\)'
+                ],
+                correct: [0, 2],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Path counting property: This is a fundamental theorem in algebraic graph theory. The \\((i,j)\\)-entry of \\(A^n\\) counts walks of length n from vertex i to j. For simple paths, this property forms the basis of many graph algorithms and connectivity analyses.
+
+B. INCORRECT - Undirected graphs have symmetric matrices: For undirected graphs, the adjacency matrix is always symmetric (\\(A = A^T\\)) because if vertex i is adjacent to j, then j is adjacent to i. Asymmetric adjacency matrices characterize directed graphs where relationships may not be reciprocal.
+
+C. CORRECT - Connectivity testing: The non-zero pattern of the matrix sum \\(A + A^2 + \\cdots + A^{n-1}\\) reveals reachability information. If this sum has no zero entries, every vertex is reachable from every other vertex, indicating the graph is connected. This follows from the fact that in a connected graph with n vertices, the maximum distance between any two vertices is at most n-1.
+
+D. INCORRECT - Triangle counting correction: The trace of \\(A^3\\) counts each triangle 6 times (3 vertices × 2 directions), so dividing by 6 gives the correct triangle count. Dividing by 3 would overcount triangles, as each triangle contributes 6 to the trace due to the three vertices and two possible orientations of cycles.
+
+E. INCORRECT - Matrix power complexity: The matrix power approach for connectivity has complexity \\(O(n^4)\\) using naive matrix multiplication, or \\(O(n^3 \\log n)\\) with repeated squaring. This is significantly worse than the \\(O(n^2)\\) BFS/DFS approaches for connectivity testing.`
+            },
+            {
+                id: 5,
+                question: 'Which statements about the <strong>connectivity algorithm</strong> (using matrix marking) are correct?<sup>5</sup>',
+                options: [
+                    'It is less efficient than using matrix powers',
+                    'It works by marking rows and crossing out columns iteratively',
+                    'If all entries become crossed out, the graph is disconnected',
+                    'It only works for undirected graphs',
+                    'The algorithm terminates when no uncrossed nonzero entries remain in marked rows'
+                ],
+                correct: [1, 4],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. INCORRECT - More efficient than matrix powers: The matrix marking algorithm runs in \\(O(n)\\) time for sparse graphs, making it significantly more efficient than the \\(O(n^4)\\) matrix power approach. This efficiency comes from processing only non-zero entries rather than performing full matrix operations.
+
+B. CORRECT - Iterative row/column processing: The algorithm maintains a set of marked rows (vertices known to be connected) and iteratively crosses out columns corresponding to vertices reachable from marked rows. This process continues until no new connections are found, efficiently discovering connected components.
+
+C. INCORRECT - All crossed out means connected: If all entries become crossed out, this means every vertex is reachable from the starting vertex, indicating the graph IS connected. The algorithm starts with one marked row and expands the reachable set until completion.
+
+D. INCORRECT - Works for both directed and undirected: The matrix marking algorithm works for both directed and undirected graphs. For directed graphs, it finds strongly connected components when applied appropriately, though the interpretation of "connectivity" differs between the two graph types.
+
+E. CORRECT - Termination condition: The algorithm terminates when no uncrossed nonzero entries remain in the marked rows, meaning no new vertices can be reached from the current connected component. This indicates that the algorithm has fully explored one connected component and can move to the next unvisited vertex if the graph is disconnected.`
+            },
+            {
+                id: 6,
+                question: 'Which statements about <strong>graph connectivity and robustness</strong> are true?<sup>6</sup>',
+                options: [
+                    'A tree is 2-edge connected',
+                    'The size of the smallest cutset measures vertex connectivity',
+                    'A graph is \\(n\\)-edge connected if its smallest cutset has \\(n\\) edges',
+                    'Complete graphs are minimally robust',
+                    'Removing any single edge from a tree disconnects it'
+                ],
+                correct: [2, 4],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. INCORRECT - Trees are 1-edge connected: A tree is minimally connected, meaning it has exactly one path between any two vertices. Removing any single edge disconnects the tree, giving it edge connectivity of 1. 2-edge connected graphs can survive the removal of any single edge while remaining connected.
+
+B. INCORRECT - Cutset measures edge connectivity: The size of the smallest edge cutset (minimum cut) measures edge connectivity, not vertex connectivity. Vertex connectivity is measured by the minimum number of vertices whose removal disconnects the graph. These two measures can differ significantly in the same graph.
+
+C. CORRECT - Definition of n-edge connectivity: A graph is n-edge connected if the smallest set of edges whose removal disconnects the graph has size n. This means the graph remains connected after the removal of any n-1 edges but becomes disconnected when some set of n edges is removed.
+
+D. INCORRECT - Complete graphs are highly robust: Complete graphs \\(K_n\\) have the maximum possible connectivity - both vertex connectivity and edge connectivity equal to n-1. This makes them extremely robust to both vertex and edge failures, contrary to being "minimally robust."
+
+E. CORRECT - Trees are minimally connected: By definition, trees have exactly n-1 edges for n vertices, which is the minimum number needed for connectivity. Removing any edge breaks the unique path between some pair of vertices, immediately disconnecting the graph.`
+            },
+            {
+                id: 7,
+                question: 'Which statements about <strong>clustering coefficients</strong> are correct?<sup>7</sup>',
+                options: [
+                    'Global clustering coefficient \\(C = \\frac{\\text{tr}(A^3)}{\\sum_{i \\neq j} (A^2)_{ij}}\\)',
+                    'Local clustering measures the degree of each vertex',
+                    'The average local clustering coefficient is \\(\\frac{1}{n} \\sum C_i\\)',
+                    '\\(C_i = 1\\) if vertex \\(i\\) has degree 0',
+                    'Low clustering indicates tightly interconnected communities'
+                ],
+                correct: [0, 2],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Global clustering formula: This formula computes the global clustering coefficient using the adjacency matrix. The numerator \\(\\text{tr}(A^3)\\) counts three times the number of triangles (each triangle is counted 6 times total, but trace counts each 2 times). The denominator counts the number of connected triples (paths of length 2).
+
+B. INCORRECT - Local clustering measures triangle density: Local clustering coefficient \\(C_i\\) measures the proportion of possible edges between neighbors of vertex i that actually exist, not the degree itself. It quantifies how close the neighborhood of a vertex is to being a complete graph (clique).
+
+C. CORRECT - Average local clustering: The average local clustering coefficient is indeed the arithmetic mean of all individual vertex clustering coefficients. This provides a network-level measure of clustering while preserving information about local structure variations.
+
+D. INCORRECT - Zero-degree vertex clustering: For a vertex with degree 0 or 1, the local clustering coefficient is defined as 0, not 1. This is because there are no possible triangles involving such vertices (for degree 0, no neighbors; for degree 1, only one neighbor so no possible connections between neighbors).
+
+E. INCORRECT - High clustering indicates tight communities: High clustering coefficients indicate that nodes tend to form tightly interconnected groups (triangles), which is characteristic of social networks and communities. Low clustering suggests more tree-like or random network structures with fewer local interconnections.`
+            },
+            {
+                id: 8,
+                question: 'Which statements about <strong>graph types and properties</strong> are true?<sup>8</sup>',
+                options: [
+                    'A planar graph cannot contain \\(K_5\\) or \\(K_{3,3}\\) as subgraphs',
+                    'The Four Color Theorem states 3 colors suffice for any planar map',
+                    'A Hamiltonian graph has a cycle visiting every edge once',
+                    'The traveling salesman problem seeks the shortest path visiting all vertices',
+                    'Determining if a graph is Eulerian can be done in polynomial time'
+                ],
+                correct: [0, 3, 4],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Kuratowski\'s theorem: This statement expresses Kuratowski\'s theorem, which characterizes planar graphs. A graph is planar if and only if it does not contain a subdivision of \\(K_5\\) (complete graph on 5 vertices) or \\(K_{3,3}\\) (complete bipartite graph with 3 vertices in each partition).
+
+B. INCORRECT - Four Color Theorem: The Four Color Theorem (proved in 1976) states that any planar map can be colored with at most 4 colors, not 3. While many planar maps can be 3-colored, there exist planar graphs that require 4 colors, such as the complete graph \\(K_4\\).
+
+C. INCORRECT - Hamiltonian vs Eulerian: A Hamiltonian graph has a cycle visiting every VERTEX exactly once. A graph that visits every EDGE exactly once is Eulerian. This distinction is fundamental: Eulerian circuits concern edge traversal, while Hamiltonian cycles concern vertex visitation.
+
+D. CORRECT - Traveling Salesman Problem: The TSP seeks the shortest possible route that visits each vertex exactly once and returns to the origin. This is one of the most famous NP-hard problems in combinatorial optimization with applications in logistics, manufacturing, and DNA sequencing.
+
+E. CORRECT - Eulerian testing is efficient: Checking if a graph is Eulerian can be done in polynomial time (\\(O(|V| + |E|)\\)) by verifying two conditions: (1) the graph is connected, and (2) all vertices have even degree. This efficient verification contrasts with Hamiltonian cycle testing, which is NP-complete.`
+            },
+            {
+                id: 9,
+                question: 'Which <strong>algorithm analysis examples</strong> are correctly matched with their complexities?<sup>9</sup>',
+                options: [
+                    '\\((6n+1)(4+\\log n) = O(n)\\)',
+                    '\\(\\frac{(n+1)(n+3)}{n+2} = O(n^2)\\)',
+                    'Three nested loops from 1 to \\(n\\): \\(O(n^3)\\)',
+                    '\\(\\text{while}(i \\leq n) \\{i = i^2\\}\\): \\(O(\\log n)\\)',
+                    'Sum of first \\(N\\) integers algorithm: \\(O(1)\\)'
+                ],
+                correct: [2],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. INCORRECT - Should be O(n log n): \\((6n+1)(4+\\log n)\\) simplifies to \\(24n + 6n\\log n + 4 + \\log n\\). The dominant term is \\(6n\\log n\\), giving \\(O(n\\log n)\\) complexity. The product of linear and logarithmic factors results in linearithmic complexity, not linear.
+
+B. INCORRECT - Should be O(n): \\(\\frac{(n+1)(n+3)}{n+2} = \\frac{n^2 + 4n + 3}{n+2}\\). Using polynomial division or asymptotic analysis, this simplifies to approximately \\(n + 2 - \\frac{1}{n+2}\\), which is \\(O(n)\\), not \\(O(n^2)\\). The numerator and denominator are both quadratic, but division reduces the order.
+
+C. CORRECT - Cubic complexity: Three nested loops, each running n times, gives \\(n \\times n \\times n = n^3\\) iterations. This is the classic example of cubic time complexity, common in algorithms that process all triple combinations of elements.
+
+D. INCORRECT - Should be O(log log n): In the loop "while(i ≤ n) {i = i²}", i grows doubly exponentially: 2, 4, 16, 256, ... The number of iterations is the number of times we can square starting from 2 before exceeding n, which is \\(O(\\log \\log n)\\), not \\(O(\\log n)\\).
+
+E. INCORRECT - Should be O(N): Computing the sum of first N integers using a loop from 1 to N requires N additions, giving \\(O(N)\\) time. While there is a closed-form formula \\(\\frac{N(N+1)}{2}\\) that runs in O(1), the question implies the iterative algorithm unless specified otherwise.`
+            },
+            {
+                id: 10,
+                question: 'Which statements about <strong>matrix operations in graph theory</strong> are correct?<sup>10</sup>',
+                options: [
+                    'Matrix multiplication: \\((AB)_{ij} = \\sum_k A_{ik}B_{kj}\\)',
+                    'For symmetric matrices, \\(A^T \\neq A\\)',
+                    'The transpose operation swaps rows and columns',
+                    '\\(A^2\\) reveals paths of length 1 between vertices',
+                    'The efficient connectivity algorithm is \\(O(n^4)\\)'
+                ],
+                correct: [0, 2],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Matrix multiplication definition: This is the standard definition of matrix multiplication where each element in the product matrix is the dot product of the corresponding row from the first matrix and column from the second matrix. This definition underlies many graph algorithms based on matrix operations.
+
+B. INCORRECT - Symmetric matrices satisfy A^T = A: By definition, a symmetric matrix satisfies \\(A^T = A\\). In graph theory, adjacency matrices of undirected graphs are always symmetric, reflecting the bidirectional nature of edges in undirected graphs.
+
+C. CORRECT - Transpose operation: The transpose operation indeed swaps rows and columns - row i becomes column i and vice versa. For adjacency matrices, transposing corresponds to reversing the direction of all edges in directed graphs.
+
+D. INCORRECT - A² reveals paths of length 2: The entry \\((A^2)_{ij}\\) counts the number of walks of length 2 from vertex i to j. For paths of length 1, we look at A itself, where \\(A_{ij} = 1\\) indicates a direct edge from i to j.
+
+E. INCORRECT - Efficient connectivity is O(n): The efficient connectivity algorithm using BFS/DFS or the matrix marking method runs in \\(O(|V| + |E|)\\) time, which is \\(O(n^2)\\) for dense graphs but typically much better for sparse graphs. The \\(O(n^4)\\) complexity applies to the naive matrix power approach.`
+            },
+            {
+                id: 11,
+                question: 'Which statements about <strong>time complexity hierarchies</strong> are correct?<sup>11</sup>',
+                options: [
+                    '\\(O(1) < O(\\log n) < O(n) < O(n \\log n)\\)',
+                    '\\(O(n^3) < O(2^n) < O(n!)\\)',
+                    '\\(O(n \\log n)\\) grows faster than \\(O(n^2)\\)',
+                    '\\(O(\\log \\log n)\\) grows faster than \\(O(\\log n)\\)',
+                    '\\(O(2^n)\\) and \\(O(3^n)\\) have the same asymptotic complexity'
+                ],
+                correct: [0, 1],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Standard complexity hierarchy: This represents the standard ordering of common time complexities from fastest to slowest growing. Constant time is fastest, followed by logarithmic, linear, and linearithmic. This hierarchy is fundamental to algorithm analysis and design.
+
+B. CORRECT - Polynomial < Exponential < Factorial: This ordering reflects the relative growth rates of these complexity classes. Polynomial functions (\\(n^3\\)) grow much slower than exponential functions (\\(2^n\\)), which in turn grow slower than factorial functions (\\(n!\\)) for large n.
+
+C. INCORRECT - n² grows faster than n log n: For large n, \\(n^2\\) grows significantly faster than \\(n\\log n\\). We can see this by taking the limit: \\(\\lim_{n\\to\\infty} \\frac{n\\log n}{n^2} = \\lim_{n\\to\\infty} \\frac{\\log n}{n} = 0\\), confirming that \\(n\\log n = o(n^2)\\).
+
+D. INCORRECT - log n grows faster than log log n: The function \\(\\log n\\) grows unbounded as n increases, while \\(\\log \\log n\\) grows extremely slowly. For example, when n = 10¹⁰⁰, \\(\\log n \\approx 230\\) while \\(\\log \\log n \\approx 6\\).
+
+E. INCORRECT - Different exponential complexities: \\(O(2^n)\\) and \\(O(3^n)\\) are different complexity classes. While both are exponential, \\(3^n\\) grows significantly faster than \\(2^n\\) as \\(\\lim_{n\\to\\infty} \\frac{2^n}{3^n} = \\lim_{n\\to\\infty} (\\frac{2}{3})^n = 0\\).`
+            },
+            {
+                id: 12,
+                question: 'Which statements about <strong>graph algorithms and their complexities</strong> are true?<sup>12</sup>',
+                options: [
+                    'The matrix marking connectivity algorithm is \\(O(n)\\)',
+                    'Finding all triangles using \\(A^3\\) is \\(O(n^3)\\)',
+                    'Checking if a graph is Eulerian is \\(O(n^2)\\)',
+                    'The traveling salesman problem has a known polynomial-time solution',
+                    'Determining if a graph is bipartite can be done in linear time'
+                ],
+                correct: [0, 1, 2, 4],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Matrix marking is O(n): The matrix marking algorithm for connectivity processes each vertex and edge a constant number of times, resulting in \\(O(|V| + |E|)\\) complexity, which is \\(O(n)\\) for sparse graphs where \\(|E| = O(|V|)\\).
+
+B. CORRECT - Triangle finding via A³ is O(n³): Using standard matrix multiplication (which is \\(O(n^3)\\)), computing \\(A^3\\) and then extracting triangle information maintains the cubic complexity. More sophisticated algorithms can find triangles faster for sparse graphs.
+
+C. CORRECT - Eulerian testing is O(n²): Checking if a graph is Eulerian involves verifying connectivity (O(|V| + |E|)) and checking that all vertices have even degree (O(|V|)). Since |E| can be O(|V|²) in dense graphs, this gives worst-case O(n²) complexity.
+
+D. INCORRECT - TSP is NP-hard: The Traveling Salesman Problem is one of the most famous NP-hard problems. No polynomial-time solution is known, and it is widely believed that no such solution exists. The best known exact algorithms have exponential time complexity.
+
+E. CORRECT - Bipartiteness testing is linear: A graph is bipartite if and only if it is 2-colorable and contains no odd cycles. This can be checked using BFS or DFS in \\(O(|V| + |E|)\\) time by attempting to 2-color the graph and checking for conflicts.`
+            },
+            {
+                id: 13,
+                question: 'Which statements about <strong>graph representations and properties</strong> are correct?<sup>13</sup>',
+                options: [
+                    'Adjacency matrices use \\(O(V^2)\\) space',
+                    'Adjacency lists use \\(O(V+E)\\) space',
+                    'For sparse graphs, adjacency lists are more space-efficient',
+                    'The degree sequence uniquely determines a graph',
+                    'Isomorphic graphs have identical adjacency matrices'
+                ],
+                correct: [0, 1, 2],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Adjacency matrix space: An adjacency matrix for a graph with V vertices requires a V × V matrix, using \\(O(V^2)\\) space regardless of the number of edges. This makes it efficient for dense graphs but wasteful for sparse graphs.
+
+B. CORRECT - Adjacency list space: Adjacency lists store each vertex and its neighbors, using \\(O(V + E)\\) space total. This representation is compact for sparse graphs where E is much smaller than V².
+
+C. CORRECT - Lists better for sparse graphs: For sparse graphs (where E = O(V)), adjacency lists use O(V) space compared to O(V²) for matrices, making them significantly more space-efficient. This space advantage often translates to time efficiency for graph traversal algorithms.
+
+D. INCORRECT - Degree sequence not unique: The degree sequence alone does not uniquely determine a graph. Different non-isomorphic graphs can have the same degree sequence. For example, there are multiple non-isomorphic graphs with degree sequence (2,2,2,2,2,2).
+
+E. INCORRECT - Isomorphic graphs may have different matrices: Isomorphic graphs have adjacency matrices that are permutation-similar, not necessarily identical. If A and B are adjacency matrices of isomorphic graphs, then B = PAP⁻¹ for some permutation matrix P, but A and B may look quite different.`
+            },
+            {
+                id: 14,
+                question: 'Which statements about <strong>special graph types</strong> are true?<sup>14</sup>',
+                options: [
+                    'A wheel graph \\(W_n\\) has \\(n+1\\) vertices',
+                    'A cycle graph \\(C_n\\) is 2-regular',
+                    'A complete bipartite graph \\(K_{m,n}\\) has \\(m \\times n\\) edges',
+                    'All trees are bipartite graphs',
+                    'Every connected graph has a spanning tree'
+                ],
+                correct: [0, 1, 2, 3, 4],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Wheel graph definition: The wheel graph \\(W_n\\) is formed by taking a cycle graph \\(C_n\\) and adding one central vertex connected to all vertices of the cycle. Thus it has n vertices from the cycle plus one central vertex, totaling n+1 vertices.
+
+B. CORRECT - Cycle graph regularity: A cycle graph \\(C_n\\) is 2-regular, meaning every vertex has degree exactly 2. This property makes cycles the simplest non-tree connected graphs and gives them many interesting mathematical properties.
+
+C. CORRECT - Complete bipartite edge count: In a complete bipartite graph \\(K_{m,n}\\), each of the m vertices in the first partition connects to all n vertices in the second partition, resulting in exactly m × n edges. There are no edges within the same partition.
+
+D. CORRECT - Trees are bipartite: All trees are bipartite because they contain no cycles, and particularly no odd cycles. A tree can always be 2-colored by choosing a root and coloring vertices based on their distance (even/odd) from the root.
+
+E. CORRECT - Spanning trees exist: Every connected graph has at least one spanning tree. This can be found using algorithms like DFS, BFS, or by systematically removing cycles until a tree remains. This property is fundamental to network design and graph connectivity.`
+            },
+            {
+                id: 15,
+                question: 'Which statements about <strong>practical algorithm considerations</strong> are correct?<sup>15</sup>',
+                options: [
+                    'An \\(O(n^4)\\) algorithm becomes impractical for large \\(n\\)',
+                    'Asymptotic analysis always determines real-world performance',
+                    'An \\(O(n \\log n)\\) sorting algorithm exists (e.g., merge sort)',
+                    'Constants matter for small input sizes despite Big O notation',
+                    'Exponential time algorithms are only theoretical and never used'
+                ],
+                correct: [0, 2, 3],
+                explanation: `EXPANDED EXPLANATIONS:
+
+A. CORRECT - Quartic algorithms impractical for large n: \\(O(n^4)\\) algorithms become prohibitively slow for large inputs. For example, with n=1000, an O(n⁴) algorithm might require 10¹² operations, which could take hours or days even on fast computers.
+
+B. INCORRECT - Asymptotic analysis isn\'t everything: While asymptotic complexity is crucial for understanding scalability, real-world performance depends on constant factors, memory hierarchy effects (cache behavior), implementation details, and hardware characteristics. An O(n²) algorithm with small constants may outperform an O(n log n) algorithm with large constants for practical input sizes.
+
+C. CORRECT - O(n log n) sorting exists: Merge sort, heap sort, and quick sort (average case) all achieve O(n log n) time complexity. This complexity represents the theoretical lower bound for comparison-based sorting algorithms, making these algorithms asymptotically optimal.
+
+D. CORRECT - Constants matter for small n: For small input sizes, the constant factors hidden by Big O notation can dominate performance. This is why simple O(n²) algorithms like insertion sort are often faster than more complex O(n log n) algorithms for very small arrays.
+
+E. INCORRECT - Exponential algorithms have practical uses: While exponential algorithms are infeasible for large inputs, they are used in practice for small problem instances, as subroutines in more complex algorithms, or for problems where no polynomial-time solution is known but the input size is constrained by the problem domain.`
+            }
+        ];
+
+        function renderSolutions() {
+            const container = document.getElementById('solutions-container');
+            
+            container.innerHTML = allQuizData.map((q, index) => `
+                <div class="p-6 border border-gray-200 rounded-lg bg-gray-50 shadow-sm">
+                    <p class="text-xl font-semibold mb-4 text-gray-700">Q${index + 1}: ${q.question}</p>
+                    <div class="space-y-3 mb-6">
+                        ${q.options.map((option, optIndex) => {
+                            const isCorrect = q.correct.includes(optIndex);
+                            const className = isCorrect ? 'solution-correct' : 'solution-incorrect';
+                            return `
+                                <div class="${className} p-3 rounded-lg">
+                                    <div class="flex items-center">
+                                        <span class="font-bold mr-2">${String.fromCharCode(65 + optIndex)}.</span>
+                                        <span class="text-base text-gray-800">${option}</span>
+                                        ${isCorrect ? 
+                                            '<span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">Correct</span>' : 
+                                            '<span class="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded">Incorrect</span>'
+                                        }
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="explanation-box p-4 rounded-lg bg-blue-50 border border-blue-200 text-sm text-gray-700 whitespace-pre-line">
+                        <p class="font-bold text-blue-800 mb-2">Detailed Explanation:</p>
+                        ${q.explanation}
+                    </div>
+                </div>
+            `).join('');
+
+            // Process MathJax after rendering
+            if (window.MathJax) {
+                MathJax.typesetPromise([container]).catch(err => console.error("MathJax typesetting failed: ", err));
+            }
+        }
+
+        // Initialize the solutions when the page loads
+        window.onload = renderSolutions;
+    </script>
+</body>
+</html>

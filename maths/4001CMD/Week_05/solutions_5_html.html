@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4001CMD Tutorial 5 Solutions (Static)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.js"></script>
+    <!-- Load Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- MathJax Configuration and Load -->
+    <script>
+        // Explicit configuration for MathJax to ensure correct parsing
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#4f46e5',
+                        'secondary': '#10b981',
+                        'accent': '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .solution-card {
+            border-left: 4px solid var(--tw-s-primary, #4f46e5);
+            transition: all 0.3s ease-in-out;
+        }
+        .solution-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        /* Ensure display math blocks are clearly separated */
+        .math-display {
+            display: block;
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background-color: #eef2ff; /* Light indigo background */
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            border: 1px solid #c7d2fe;
+        }
+
+        /* --- PRINT STYLES FOR PAGE BREAKS --- */
+        @media print {
+            .solution-card {
+                /* Standard property for modern browsers */
+                break-inside: avoid; 
+                /* Legacy property for older browsers */
+                page-break-inside: avoid;
+            }
+            /* Reduce unnecessary padding/margins for printing efficiency */
+            body {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            /* Remove shadows, borders, and hover effects for cleaner printing */
+            .solution-card {
+                box-shadow: none !important;
+                border: 1px solid #ccc; /* Add subtle border for separation */
+                margin-bottom: 1.5rem;
+            }
+            /* Adjust header for print */
+            header {
+                background-color: #ffffff !important;
+                color: #1f2937 !important; /* Dark text for print */
+                box-shadow: none !important;
+                border-bottom: 2px solid #ccc;
+                padding: 1rem 0 !important;
+                margin-bottom: 1rem !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-4 sm:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-12 bg-primary text-white p-8 rounded-xl shadow-2xl">
+            <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight">4001CMD Tutorial 5 Solutions</h1>
+            <p class="mt-2 text-xl font-light opacity-90">Mathematical Skills for Computing Professionals</p>
+        </header>
+
+        <main class="space-y-10">
+
+            <!-- Problem 1 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 1: Proof of the Addition Principle (PIE)</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> Write out a proof (using induction on $n$) of the fact that if $A_{1},A_{2},\dots,A_{n}$ are disjoint finite sets, then $\#(A_{1} \cup A_{2} \cup \dots \cup A_{n}) = \#(A_{1}) + \#(A_{2}) + \dots + \#(A_{n})$.</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Proof by Induction on $n$</h3>
+
+                <h4 class="font-bold mt-3">Base Case ($n=2$):</h4>
+                <p>For two disjoint sets, $A_1$ and $A_2$, the formula is $\#(A_1 \cup A_2) = \#(A_1) + \#(A_2)$. This is the definition of the basic Addition Principle for disjoint sets, so the base case holds.</p>
+
+                <h4 class="font-bold mt-3">Inductive Hypothesis:</h4>
+                <p>Assume the formula holds for some integer $k \ge 2$. That is, for any $k$ disjoint finite sets $A_1, A_2, \dots, A_k$:</p>
+                <div class="math-display">
+                    \[\#(A_{1} \cup A_{2} \cup \dots \cup A_{k}) = \#(A_{1}) + \#(A_{2}) + \dots + \#(A_{k})\]
+                </div>
+
+                <h4 class="font-bold mt-3">Inductive Step ($n=k+1$):</h4>
+                <p>Consider $k+1$ disjoint finite sets $A_1, A_2, \dots, A_{k+1}$. We group the first $k$ sets as a single set $B = A_{1} \cup A_{2} \cup \dots \cup A_{k}$.</p>
+                <p>The union of $k+1$ sets can be written as the union of two disjoint sets, $B$ and $A_{k+1}$:</p>
+                $$\#(A_{1} \cup \dots \cup A_{k+1}) = \#(B \cup A_{k+1})$$
+                <p>Applying the Base Case (or Basic Addition Principle) to the two disjoint sets $B$ and $A_{k+1}$:</p>
+                $$\#(B \cup A_{k+1}) = \#(B) + \#(A_{k+1})$$
+                <p>Now, substitute the Inductive Hypothesis for $\#(B)$:</p>
+                $$\#(B) = \#(A_{1}) + \#(A_{2}) + \dots + \#(A_{k})$$
+                <p>Therefore:</p>
+                <div class="math-display">
+                    \[\#(A_{1} \cup \dots \cup A_{k+1}) = (\#(A_{1}) + \dots + \#(A_{k})) + \#(A_{k+1})\]
+                </div>
+                <p>This is the required formula for $n=k+1$. By the Principle of Mathematical Induction, the formula holds for all finite $n \ge 2$.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 2 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 2: Inclusion-Exclusion Principle (Languages)</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> In a class of 67 mathematics students, 47 can read French (F), 35 can read German (G) and 23 can read both. (a) How many can read neither language? (b) If furthermore 20 can read Russian (R), of whom 12 can also read French, 11 read German also and 5 read all three, how many cannot read any of the three languages?</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Applying PIE</h3>
+
+                <h4 class="font-bold mt-3">Part (a): French and German</h4>
+                <p>Total students $N = 67$. Given: $\#F = 47$, $\#G = 35$, $\#(F \cap G) = 23$.</p>
+                <p>Students reading at least one language ($\#(F \cup G)$) using PIE for two sets:</p>
+                <div class="math-display">
+                    \[\#(F \cup G) = \#F + \#G - \#(F \cap G)\]
+                    \[\#(F \cup G) = 47 + 35 - 23 = 59\]
+                </div>
+                <p>Students reading <strong>neither</strong> language:</p>
+                $$\text{Neither} = N - \#(F \cup G) = 67 - 59 = 8$$
+
+                <h4 class="font-bold mt-3">Part (b): French, German, and Russian</h4>
+                <p>Given: $\#R = 20$, $\#(F \cap R) = 12$, $\#(G \cap R) = 11$, $\#(F \cap G \cap R) = 5$.</p>
+                <p>Students reading at least one language ($\#(F \cup G \cup R)$) using PIE for three sets:</p>
+                <div class="math-display">
+                    \[\#(F \cup G \cup R) = (\#F + \#G + \#R) - (\#(F \cap G) + \#(F \cap R) + \#(G \cap R)) + \#(F \cap G \cap R)\]
+                    \[\#(F \cup G \cup R) = (47 + 35 + 20) - (23 + 12 + 11) + 5\]
+                    \[\#(F \cup G \cup R) = 102 - 46 + 5 = 61\]
+                </div>
+                <p>Students reading <strong>none</strong> of the three languages:</p>
+                $$\text{None} = N - \#(F \cup G \cup R) = 67 - 61 = 6$$
+                <p class="mt-4 font-bold">Answer: (a) 8 students, (b) 6 students.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 3 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 3 (*): Permutations with Restrictions (PIE)</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> Find the number of ways of arranging the letters A, E, M, O, U, Y in a sequence in such a way that neither of the words ME nor YOU occur. (Hint: Apply the sieve principle.)</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: PIE on Permutations</h3>
+
+                <p>Total letters $n=6$. Total arrangements <strong>$\#(S) = 6! = 720$</strong>.</p>
+                <ul>
+                    <li>Let $P_{ME}$ be the set of arrangements containing the block <strong>ME</strong>.</li>
+                    <li>Let $P_{YOU}$ be the set of arrangements containing the block <strong>YOU</strong>.</li>
+                </ul>
+
+                <h4 class="font-bold mt-3">1. Arrangements containing ME ($\#P_{ME}$)</h4>
+                <p>Treat <strong>ME</strong> as one unit. We arrange 5 units: $\mathbf{ME}, A, O, U, Y$.</p>
+                $$\#P_{ME} = 5! = 120$$
+
+                <h4 class="font-bold mt-3">2. Arrangements containing YOU ($\#P_{YOU}$)</h4>
+                <p>Treat <strong>YOU</strong> as one unit. We arrange 4 units: $\mathbf{YOU}, A, E, M$.</p>
+                $$\#P_{YOU} = 4! = 24$$
+
+                <h4 class="font-bold mt-3">3. Arrangements containing ME and YOU ($\#(P_{ME} \cap P_{YOU})$)</h4>
+                <p>We are arranging the 3 units: $\mathbf{ME}, \mathbf{YOU}$, and $A$.</p>
+                $$\#(P_{ME} \cap P_{YOU}) = 3! = 6$$
+
+                <h4 class="font-bold mt-3">4. Final Calculation</h4>
+                <p>Arrangements with at least one bad word using PIE:</p>
+                <div class="math-display">
+                    \[\#(P_{ME} \cup P_{YOU}) = \#P_{ME} + \#P_{YOU} - \#(P_{ME} \cap P_{YOU})\]
+                    \[\#(P_{ME} \cup P_{YOU}) = 120 + 24 - 6 = 138\]
+                </div>
+                <p>The number of ways neither word occurs is the total minus the bad arrangements:</p>
+                $$\text{Result} = 720 - 138 = 582$$
+                <p class="mt-4 font-bold">Answer: 582 ways.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 4 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 4: Ordered Selection with Repetition (Flags)</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> How many national flags can be constructed from three equal vertical strips, using the colours red, white, blue, and green? (Colours can be repeated, and order matters.)</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Permutations with Replacement</h3>
+
+                <p>This is a problem of <strong>ordered selection with repetition</strong> ($n^k$).</p>
+                <ul>
+                    <li>Number of choices (colors) $n=4$.</li>
+                    <li>Number of selections (strips) $k=3$.</li>
+                </ul>
+                <p>The total number of possible flags is:</p>
+                <div class="math-display">
+                    $$\text{Total Flags} = 4^3 = 64$$
+                </div>
+                <p class="mt-4 font-bold">Answer: 64 flags.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 5 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 5: Power Set and Binary Correspondence</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> Write down all of the subsets of the set $X=\{a,b,c\}$. Use the correspondence between $\mathcal{P}(X)$ and $\{0,1\}^{3}$ discussed in lecture to check that your list is complete.</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Power Set and Binary Strings</h3>
+
+                <p>The set $X$ has 3 elements, so the power set $\mathcal{P}(X)$ must have $2^3 = 8$ subsets. The binary string correspondence uses a 1 for inclusion and a 0 for exclusion for the elements $(a, b, c)$.</p>
+
+                <table class="w-full text-left mt-4 border border-gray-300 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="p-3">Subset</th>
+                            <th class="p-3">Binary String (a, b, c)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b">
+                            <td class="p-3">$\emptyset$ (The empty set)</td>
+                            <td class="p-3">000</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3">$\{a\}$</td>
+                            <td class="p-3">100</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3">$\{b\}$</td>
+                            <td class="p-3">010</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3">$\{c\}$</td>
+                            <td class="p-3">001</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3">$\{a, b\}$</td>
+                            <td class="p-3">110</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3">$\{a, c\}$</td>
+                            <td class="p-3">101</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3">$\{b, c\}$</td>
+                            <td class="p-3">011</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">$\{a, b, c\}$ (The set itself)</td>
+                            <td class="p-3">111</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="mt-4">The set of all binary strings of length 3, <strong>$\mathbf{\{0,1\}^{3}}$</strong>, contains $2^3=8$ unique strings, confirming the list of subsets is complete.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 6 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 6: Ordered Selection without Repetition (Batting Order)</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> In how many ways can we select a batting order of 11 from a pool of 14 cricketers?</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Permutations</h3>
+
+                <p>This is a <strong>permutation</strong> problem ($P(n, k)$) because the order of the players in the batting lineup matters, and repetition is not allowed.</p>
+                <ul>
+                    <li>Total players $n=14$.</li>
+                    <li>Players selected $k=11$.</li>
+                </ul>
+                <p>The number of ways is:</p>
+                <div class="math-display">
+                    \[P(14, 11) = \frac{14!}{(14-11)!} = \frac{14!}{3!}\]
+                    \[P(14, 11) = 14 \times 13 \times 12 \times \dots \times 4 = 1,452,972,864,000\]
+                </div>
+                <p class="mt-4 font-bold">Answer: 1,452,972,864,000 ways.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 7 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 7: Binomial Coefficients (Combinations)</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> Evaluate $\binom{16}{4}$ and $\binom{17}{5}$.</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Combination Formula</h3>
+
+                <h4 class="font-bold mt-3">A. Evaluate $\binom{16}{4}$</h4>
+                <div class="math-display">
+                    \[\binom{16}{4} = \frac{16 \times 15 \times 14 \times 13}{4 \times 3 \times 2 \times 1} = 5460\]
+                </div>
+
+                <h4 class="font-bold mt-3">B. Evaluate $\binom{17}{5}$</h4>
+                <div class="math-display">
+                    \[\binom{17}{5} = \frac{17 \times 16 \times 15 \times 14 \times 13}{5 \times 4 \times 3 \times 2 \times 1} = 6188\]
+                </div>
+                <p class="mt-4 font-bold">Answer: $\binom{16}{4} = 5460$ and $\binom{17}{5} = 6188$.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 8 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 8: The Four Selection Types</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> Suppose $X=\{a,b,c\}$. How many selections of 2 elements is are possible from $X$, when those selections are: (a) ordered and repeating? (b) ordered and non-repeating? (c) unordered and repeating? (d) unordered and non-repeating?</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Applying Counting Formulas</h3>
+
+                <p>Set size $n=|X|=3$. Number of selections $k=2$.</p>
+
+                <h4 class="font-bold mt-3"> (a) Ordered and Repeating</h4>
+                $$\text{Formula}: n^k$$
+                $$\text{Number} = 3^2 = 9$$
+
+                <h4 class="font-bold mt-3"> (b) Ordered and Non-Repeating (Permutations)</h4>
+                $$\text{Formula}: P(n, k)$$
+                $$\text{Number} = P(3, 2) = 3 \times 2 = 6$$
+
+                <h4 class="font-bold mt-3"> (c) Unordered and Repeating (Stars and Bars)</h4>
+                $$\text{Formula}: \binom{n+k-1}{k}$$
+                $$\text{Number} = \binom{3+2-1}{2} = \binom{4}{2} = 6$$
+
+                <h4 class="font-bold mt-3"> (d) Unordered and Non-Repeating (Combinations)</h4>
+                $$\text{Formula}: \binom{n}{k}$$
+                $$\text{Number} = \binom{3}{2} = 3$$
+                <p class="mt-4 font-bold">Answer: (a) 9, (b) 6, (c) 6, (d) 3.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 9 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 9: Exponential Growth (Key Depths)</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> If there are eight possible depths, how many positions are required to make one million different keys? (Hint: To facilitate the calculation, use the fact that $2^{10}$ is slightly greater than 1000.)</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Using Powers of Two</h3>
+
+                <p>Let $n=8$ be the number of possible depths, and $k$ be the number of positions. Total unique keys $= 8^k$. We require $8^k \ge 1,000,000$.</p>
+                <p>Since $8 = 2^3$, we can rewrite the equation as $(2^3)^k = 2^{3k}$. We need $2^{3k} \ge 10^6$.</p>
+                <p>Using the hint, $10^6 = (10^3)^2 \approx (2^{10})^2 = 2^{20}$.</p>
+                <p>We need the exponent $3k$ to be at least 20:</p>
+                <div class="math-display">
+                    \[3k \ge 20 \implies k \ge \frac{20}{3} \approx 6.67\]
+                </div>
+                <p>Since $k$ must be an integer, the smallest number of positions required is <strong>7</strong>.</p>
+                <p class="mt-4 font-bold">Answer: 7 positions are required ($8^7 = 2,097,152$).</p>
+            </div>
+
+            ---
+
+            <!-- Problem 10 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 10: Permutations of Symbols</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> How many four-letter words can be made from an alphabet of 10 symbols if there are no restrictions on spelling except that no letter can be used more than once?</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Permutations without Replacement</h3>
+
+                <p>This is an <strong>ordered selection without repetition</strong> problem. The word length $k=4$ and total symbols $n=10$.</p>
+                <div class="math-display">
+                    \[P(10, 4) = \frac{10!}{(10-4)!} = 10 \times 9 \times 8 \times 7 = 5040\]
+                </div>
+                <p class="mt-4 font-bold">Answer: 5040 four-letter words.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 11 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 11: Unordered Selection with Repetition (Indistinguishable Dice)</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> Show that when three indistinguishable dice are thrown, there are 56 possible outcomes. What is the number of outcomes when $n$ indistinguishable dice are thrown?</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Stars and Bars</h3>
+
+                <h4 class="font-bold mt-3">Part 1: Three Indistinguishable Dice</h4>
+                <p>We are selecting $k=3$ results from $n=6$ possible faces, with repetition and order not mattering. We use $\binom{n+k-1}{k}$:</p>
+                <div class="math-display">
+                    \[\text{Outcomes} = \binom{6+3-1}{3} = \binom{8}{3} = \frac{8 \times 7 \times 6}{3 \times 2 \times 1} = 56\]
+                </div>
+
+                <h4 class="font-bold mt-3">Part 2: $n$ Indistinguishable Dice</h4>
+                <p>The number of items to choose is $k=n$ (the dice), and the number of types is $n=6$ (the faces).</p>
+                <div class="math-display">
+                    \[\text{Outcomes} = \binom{6+n-1}{n} = \binom{n+5}{n} \quad \text{or equivalently, } \binom{n+5}{5}\]
+                </div>
+                <p class="mt-4 font-bold">Answer: 56 outcomes for 3 dice; $\binom{n+5}{5}$ for $n$ dice.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 12 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 12 (*): Stars and Bars Proof</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> Show that the number of $n$-tuples $(x_{1},\dots,x_{n})$ of non-negative integers which satisfy the equation $x_{1}+x_{2}+\dots+x_{n}=r$ is $\binom{n+r-1}{r}$.</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Combinatorial Proof (Stars and Bars)</h3>
+
+                <p>This equation represents the number of ways to distribute $r$ identical objects (stars, $\star$) into $n$ distinct bins ($x_1$ through $x_n$). To separate the $n$ bins, we need $n-1$ indistinguishable separators (bars, $|$).</p>
+                <p>The total number of objects we are arranging is the sum of the stars and the bars:</p>
+                $$\text{Total Objects} = r + (n-1) = n+r-1$$
+                <p>Any arrangement of these $n+r-1$ objects corresponds to a unique solution. The problem reduces to finding the number of ways to choose the $r$ positions for the stars (or $n-1$ positions for the bars) from the total $n+r-1$ positions.</p>
+                <div class="math-display">
+                    \[\text{Number of solutions} = \binom{n+r-1}{r}\]
+                </div>
+                <p>This proves the formula for the number of non-negative integer solutions.</p>
+            </div>
+
+            ---
+
+            <!-- Problem 13 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 13: Binomial Theorem Formulas</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> Write out the formulas for $(1+x)^{8}$ and $(1-x)^{8}$.</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Binomial Expansion</h3>
+
+                <p>The general Binomial Theorem states: $$(a+b)^n = \sum_{k=0}^{n} \binom{n}{k} a^{n-k} b^k$$</p>
+
+                <h4 class="font-bold mt-3">A. Formula for $(1+x)^{8}$</h4>
+                <p>With $a=1$ and $b=x$, the expansion is:</p>
+                <div class="math-display">
+                    \[(1+x)^8 = \sum_{k=0}^{8} \binom{8}{k} x^k\]
+                    \[(1+x)^8 = 1 + 8x + 28x^2 + 56x^3 + 70x^4 + 56x^5 + 28x^6 + 8x^7 + x^8\]
+                </div>
+
+                <h4 class="font-bold mt-3">B. Formula for $(1-x)^{8}$</h4>
+                <p>With $a=1$ and $b=-x$, the signs of the odd powers of $x$ alternate:</p>
+                <div class="math-display">
+                    \[(1-x)^8 = \sum_{k=0}^{8} \binom{8}{k} (-1)^k x^k\]
+                    \[(1-x)^8 = 1 - 8x + 28x^2 - 56x^3 + 70x^4 - 56x^5 + 28x^6 - 8x^7 + x^8\]
+                </div>
+            </div>
+
+            ---
+
+            <!-- Problem 14 -->
+            <div class="solution-card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary mb-3">Problem 14: Finding Specific Coefficients</h2>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4 italic">
+                    <p><strong>Question:</strong> Calculate the coefficients of: (a) $x^{5}$ in $(1+x)^{11}$ (b) $a^{2}b^{8}$ in $(a+b)^{10}$ (c) $a^{6}b^{6}$ in $(a^{2}+b^{3})^{5}$ (d) $x^{3}$ in $(3+4x)^{6}$</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 text-gray-700">Solution: Coefficient Calculation</h3>
+
+                <h4 class="font-bold mt-3"> (a) Coefficient of $x^{5}$ in $(1+x)^{11}$</h4>
+                <p>Using $\binom{n}{k}$, where $n=11$ and $k=5$:</p>
+                $$\text{Coefficient} = \binom{11}{5} = \frac{11 \times 10 \times 9 \times 8 \times 7}{5 \times 4 \times 3 \times 2 \times 1} = 462$$
+
+                <h4 class="font-bold mt-3"> (b) Coefficient of $a^{2}b^{8}$ in $(a+b)^{10}$</h4>
+                <p>Using $\binom{n}{k}$, where $n=10$ and $k=8$ (for $b^8$):</p>
+                $$\text{Coefficient} = \binom{10}{8} = \binom{10}{2} = 45$$
+
+                <h4 class="font-bold mt-3"> (c) Coefficient of $a^{6}b^{6}$ in $(a^{2}+b^{3})^{5}$</h4>
+                <p>General term: $\binom{5}{k} (a^2)^{5-k} (b^3)^k = \binom{5}{k} a^{10-2k} b^{3k}$.</p>
+                <p>Set $3k=6 \implies k=2$. The coefficient is $\binom{5}{2}$.</p>
+                $$\text{Coefficient} = \binom{5}{2} = 10$$
+
+                <h4 class="font-bold mt-3"> (d) Coefficient of $x^{3}$ in $(3+4x)^{6}$</h4>
+                <p>Set $k=3$. The term is $\binom{6}{3} (3)^{6-3} (4x)^3 = \binom{6}{3} 3^3 4^3 x^3$.</p>
+                <div class="math-display">
+                    \[\text{Coefficient} = \binom{6}{3} \cdot 3^3 \cdot 4^3 = 20 \cdot 27 \cdot 64 = 34,560\]
+                </div>
+                <p class="mt-4 font-bold">Answer: (a) 462, (b) 45, (c) 10, (d) 34,560.</p>
+            </div>
+        </main>
+
+        <footer class="text-center mt-12 py-4 text-gray-500 text-sm border-t border-gray-300">
+            <p>Static Solutions Generated with MathJax and Tailwind CSS</p>
+        </footer>
+    </div>
+</body>
+</html>

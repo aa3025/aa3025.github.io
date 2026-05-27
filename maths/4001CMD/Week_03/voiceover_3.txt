@@ -1,0 +1,106 @@
+Slide 0: Week 2 Recap and Week 3 Roadmap
+Amanda: Welcome to Week three. Quick recap from Week two: we built the language of symbolic logic, translated statements into formal notation, and practiced truth tables to test whether arguments are valid. Those tools now become our proof engine.
+Jack: So now we move from checking whether statements are logically valid to proving mathematical claims in a structured way.
+Amanda: Exactly. In Week three, we will study the axioms of number theory, use precise definitions, and build rigorous proofs. Then we will focus on mathematical induction, including standard induction, flexible starting points, and strong induction.
+Jack: And we also revisit the Sum-to-N formula, summation notation, recursion, and the well-ordering principle.
+Amanda: Perfect. This week connects logic to efficient computation: discovering patterns and then proving they always hold. Let's begin with a classic challenge.
+
+Slide 1: Proofs: The Challenge
+Amanda: Let's start with a classic computer science challenge.
+Jack: The 'Sum-to-N' problem on the slide. So we need to write an algorithm that calculates the sum of the first N integers. If N is five, it should return one plus two plus three plus four plus five... which equals fifteen. 
+Amanda: Exactly. Look at Strategy One on the slide. This is how most beginners would code it. It's a standard 'While' loop. You initialize a variable 's' to zero, a counter 'i' to zero, and just loop, adding 'i' to 's' until you hit N. What is the fundamental, real-world limitation of this strategy?
+Jack: Well, it scales disastrously! If N is five, the loop runs five times, totally fine. But if N is three trillion, the processor has to manually run three trillion sequential addition operations. It would take forever. 
+Amanda: Exactly! Which leads us to Strategy Two. Instead of looping, what if we just plug N into this specific direct formula: p equals N times N plus one, and then s equals p divided by two? 
+Jack: Wait... so if N is a hundred... a hundred times one hundred and one is ten thousand, one hundred. Divided by two is five thousand and fifty! That's exactly right, without running a single loop! It executes instantly!
+Amanda: Correct! But here is the critical computer science question: you can see it works for five, and it works for a hundred... but how do you actually guarantee to a software client that this direct algebraic formula isn't going to fail completely when N is fifty billion? 
+Jack: You'd have to prove that the equation itself is universally True. 
+
+Slide 2: Why Study Proofs?
+Amanda: That exact scenario is why we study formal Proofs. As computer scientists, we are constantly trying to optimize code, ripping out slow, heavy loops and replacing them with fast, light mathematical formulas. 
+Jack: But if we replace a loop with a formula, we have to formally prove that the new code does absolutely, identically the same thing perfectly in every single scenario.
+Amanda: Spot on! Proofs rigorously verify that two entirely differently programs will always produce the identical output. To prove anything, we have to start from a foundation we can rigidly agree on. Those undeniable starting premises are called 'Axioms'. 
+
+Slide 3: Axioms of Algebra (First Nine)
+Amanda: In this module, we assume eleven foundational axioms of number theory. An axiom is basically a self-evident truth that we just accept without demanding proof. Let's look at the first nine.
+Jack: Okay, looking at the table. Additive closure... for all elements a and b in the Natural numbers, 'a' plus 'b' is also in the Natural numbers. That just means if I add two positive integers, I'm guaranteed to get another positive integer out. It won't spontaneously turn into a negative decimal.
+Amanda: Precisely. They act as the absolute lowest-level physics of arithmetic. We have commutativity, meaning a plus b acts identically to b plus a. We have associativity, representing the freedom to shift parentheses without altering the outcome. Then we have properties like the Multiplicative Identity: a times one fundamentally equals a. 
+Jack: These seem extremely basic. Do we really need to formally declare that a times one equals a?
+Amanda: We absolutely do. Because if we don't declare it as an untouchable axiom at the bottom of the system, a computer wouldn't intrinsically 'know' it! We only build the complex math by rigorously stacking these basic axioms. 
+
+Slide 4: Definitions
+Amanda: While Axioms are universally accepted truths, a 'Definition' is simply us declaring a label for a specific pattern so we don't have to keep writing out the whole pattern. 
+Jack: What do you mean by that?
+Amanda: Look at the slide for the definition of "Multiple". If we want to declare that "m is a multiple of n", we rigorously define that string of English as meaning: "there exists an integer r such that m tightly equals r times n".
+Jack: Ah, like if 15 is a multiple of 3... it specifically means there exists a 5, such that 15 equals 5 times 3!
+Amanda: You got it! Definitions just map English concepts cleanly onto algebraic structures so we can manipulate them. You can declare literally any definition you want, even silly ones, as long as you're mathematically consistent. 
+
+Slide 5: Proving Theorems
+Amanda: Let's use our axioms and definitions to actually prove a theorem. The claim: If 'a' and 'b' are both multiples of 'n', then basically any combination 'xa + yb' is mysteriously also guaranteed to be a multiple of 'n'.
+Jack: Wow, the proof derivation here is intense. First, we unpack the definition. We rewrite 'a' as 'rn' and 'b' as 'sn' for some unknown constants. So 'xa + yb' transforms into 'x(rn)' plus 'y(sn)'.
+Amanda: Perfect. Now watch the axioms go to work! Step two, we use Axiom six—associativity—to slide the parentheses, giving us '(xr)n' plus '(ys)n'. Next, we use Axiom five—commutativity—to gently flip the 'n' to the front on both terms. 
+Jack: Oh! Then we use Axiom nine, Left Distributivity, to pull the 'n' completely out to the front, factoring it out to leave 'n' times the grouped quantity '(xr + ys)'! Then one more commutative flip... and we're left with some giant chunk of integers times 'n'! 
+Amanda: Brilliant! Because that giant chunk is entirely composed of Natural numbers added and multiplied, Axioms one and two guarantee it evaluates cleanly to another valid Natural number. Therefore, by our strict definition, the whole expression is undeniably just a massive multiple of 'n'! We didn't guess. We just let the axioms push the symbols perfectly into place.
+
+Slide 6: The Relation <
+Amanda: We can also formally define inequalities using just addition! Think about what saying "m is less than n" truly means physically. 
+Jack: Well, if five is less than eight... it means I'm missing three to get to eight. 
+Amanda: Exactly! The rigorous mathematical definition is: "m is less than n", if and only if, there exists a positive integer 'x' such that 'm' plus 'x' tightly equals 'n'. The addition acts as the physical bridge to prove the gap!
+Jack: And then we can use that definition to prove Transitivity! If a is less than b, and b is less than c, then a MUST be less than c. The algebra proves it by showing the gap between a and c is exactly the two previous gaps added together!
+Amanda: Spot on! And we finalize this with Axiom ten, Trichotomy. Given any two natural numbers, exactly ONE of three things is universally true: they are equal, the first is less, or the second is less. There are absolutely no mysterious fourth alternatives.
+
+Slide 7: Proving Universal Statements
+Amanda: We've arrived at the grand finale, Axiom eleven: The Principle of Mathematical Induction. This is how we formally prove those massive Universal Statements we discussed last week—like guaranteeing our fast sum formula works for billions of data points.
+Jack: The slide uses a domino analogy. 
+Amanda: It's the best way to visualize it mentally. Imagine an infinitely long line of dominoes extending over the horizon. How do you mathematically guarantee that every single domino will eventually fall? It's impossible to check them all individually.
+Jack: Well... first, you have to prove that knocking over ANY random domino, which we'll call 'k', is physically close enough to mathematically guarantee its immediate neighbor, 'k plus one', falls over. 
+Amanda: Correct! That is the rigorous 'Inductive Step'. You assume domino 'k' falls, and you algebraically use that force to prove that 'k plus one' gets knocked down. But wait! Even if the spacing is completely perfect, they won't magically fall on their own. What's the critical missing ingredient? 
+Jack: You have to actually push the very first one over! The 'Base Case'!
+Amanda: Exactly! If you prove domino one falls—the Base Case—AND you mathematically prove that any falling domino knocks over the next—the Inductive Step—then logic dictates the entire infinite line will collapse flawlessly. Every induction proof follows this beautiful structure. 
+
+Slide 8: Gauss's Formula (Sum of First N Integers)
+Amanda: Let's apply Induction right back to our original fast formula from slide one! Did you know, historically, this formula was actually discovered by Carl Friedrich Gauss when he was just a little boy in grade school?
+Jack: Wait, seriously? Does the slide show his child logic? Oh wow! Instead of adding one, plus two, plus three in a row like a computer loop, he just wrote the sequence out backwards right beneath it! Then he aggressively added the numbers vertically!
+Amanda: Correct! One plus a hundred vertically makes 101. Two plus ninety-nine vertically makes 101. It creates exactly one hundred vertical pairs that all perfectly sum to 101! That means twice the total sum equals 100 times 101. Divide by two, and you have Gauss's legendary fast formula natively. 
+Jack: And then the slide formally proves Gauss's child formula using mathematical Induction! Base case for N equals 1 evaluates perfectly to 1! Then the Inductive Step assumes it works for 'k', and pushes it to successfully evaluate to the exact shape for 'k plus one'! Brilliant. 
+
+Slide 9: Summation Notation
+Amanda: Instead of writing out "one plus two plus three plus dot dot dot"... mathematicians use Sigma Notation. It's the giant, jagged uppercase Greek letter Sigma.
+Jack: Okay, this is literally just a 'For' loop translated into math symbols. The 'r equals 1' at the bottom is the initialized counter. The 'N' at the top is the terminating condition. And the expression to the right is the block of code we run and sum up every iteration! 
+Amanda: That is precisely how you should natively read it! And just like Gauss's formula, we can use induction to formally prove crazy summation claims. Like the slide's claim that summing the expression '4r plus 3' natively equals the direct formula '2n squared plus 5n'. You prove the base case loop of one, assume it works for 'k', and then algebraically push the sum to encompass the 'k plus one' iteration. Once the algebra neatly matches... the direct formula is verified forever. 
+
+Slide 10: Sum of Cubes
+Amanda: Often, discovering the actual formula yourself is far harder than just proving it once someone hands it to you. Look at the Sum of Cubes problem. Adding one cubed, plus two cubed, plus three cubed.
+Jack: The slide shows a pattern discovery! If you sum the first two cubes, you get nine. Which is three squared! If you sum the first three cubes, you get 36, which is six squared! Oh... and those bases are literally the sums we just did with Gauss! The base 6 is one plus two plus three!
+Amanda: Yes! This massive pattern hints that summing the cubes is mysteriously mathematically equivalent to simply taking Gauss's basic sum formula... and squaring the entire thing! It's a gorgeous geometric discovery. And once you guess that structure, Induction comes in as the strict enforcer, hammering out the base case and the inductive step to officially cement your wild guess universally.
+
+Slide 11: Recursion
+Amanda: Now let's formally tackle 'Recursion'. A recursive sequence is one where the next term heavily inherently relies on the value of the previous terms.
+Jack: Oh, I know recursion from programming! Like writing a function that literally calls itself from inside its own code block until it hits a base case that stops it.
+Amanda: Yes! Look at the Factorial slide comparison. A 'while' loop sequentially multiplies the numbers counting up to N. But the Recursive version simply asks the computer to return "N times the factorial of N minus one". It fundamentally hands the work down the chain until it crashes into zero, returning a rigid '1'. This creates a massive compounding chain. Wait until you see how Fibonacci scales!
+Jack: Let's see... the Fibonacci sequence. The current number is simply the sum of the two previous numbers. But wait, how do you find the hundredth Fibonacci number without manually calculating all ninety-nine before it? That takes ages! 
+Amanda: You use the Closed Form! Look at Binet's formula on the slide. It totally reconstructs the sequence using the Golden Ratio, letting you instantly jump right to the hundredth index, resulting in that massive multidigit 354 quintillion number instantly! Fast direct formulas are everything!
+
+Slide 12: Induction with a New Starting Point
+Amanda: But sometimes, a rule doesn't kick in right away. Take the claim on this slide: "For all 'n', 'n' squared is strictly greater than 7n plus 1". 
+Jack: Wait... if I test that with n equals 2, four is definitely not greater than fifteen! The formula fails! 
+Amanda: Correct! That's why the theorem specifically limits itself to "For all n greater than or equal to 8". 
+Jack: Oh, so the domino line doesn't start at domino number one! We just physically walk down the line, ignore the first seven dominoes entirely, and flick over domino number eight! 
+Amanda: Precisely, Jack. The Induction 'Base Case' simply starts at n equals 8! You prove 8 works natively, then run the exact same standard inductive step moving forward. Mathematical induction is incredibly flexible regarding where you choose to establish your starting beachhead. 
+
+Slide 13: Strong Induction
+Amanda: Sometimes, our standard domino falling analogy isn't quite powerful enough. Regular induction only relies on the single previous integer, 'k', to push 'k plus one' over. But what about wild recursive sequences like the one on the slide, where the next term requires the algebraic force of the LAST TWO previous terms combined? 
+Jack: Right, 'k' alone wouldn't have enough data to solve for 'k plus one'. We need 'k' AND 'k minus one'!
+Amanda: This requires a structural upgrade known as 'Strong Induction'. In Strong Induction, during the Inductive Hypothesis, you maliciously assume that your property holds true not just for 'k'... but for literally every single value that came BEFORE it as well! All of them! 
+Jack: Wow, so you don't just use one domino. You grab the entire heavy stack of fallen dominoes behind 'k' and physically smash them forward into 'k plus one' to force it over mathematically! That gives you intensely more algebraic leverage in the proof gap!
+
+Slide 14: The Well-Ordering Principle
+Amanda: This robust idea of structure leads directly to our final formal concept: The Well-Ordering Principle. Notice on the slide, if you define any non-empty subset of Natural numbers... we know mathematically we can always easily locate a 'Least Member'. A definitive, concrete minimum value.
+Jack: Okay, this sounds like common sense. If I have a bag of positive integers, there has to be a smallest one mechanically. But look at the slide's example subset... the restriction is numbers where 'n' squared plus two 'n' is strictly less than 60. By manually checking the bounds, we find the highest number that works is 6! 
+Amanda: Exactly, because 7 throws the result to 63, breaking the ceiling! So the subset is cleanly just the integers 1 through 6. 1 is the least member, acting as our lowest floor. 6 is the greatest member. But the Well-Ordering concept—that any subset of Natural numbers MUST have an irrefutable bottom floor—is mathematically profound, because it is the structural anchor that prevents an induction sequence from collapsing disastrously into negative infinity!
+
+Slide 15: Summary
+Amanda: So let's review the massive conceptual toolkit you just gained in Week three.
+Jack: Number theory is absolutely built on eleven rigid, untouchable axioms. Sigma notation is a native visual 'For' loop for generating sums. And while guessing direct sequential formulas is ridiculously hard, proving they work permanently with Induction is very structural.
+Amanda: Spot on! And we have three flavors of pushing that structure. Standard induction starts at one. Flexible induction can aggressively start anywhere you drop your base case. And Strong induction recruits every previous variable to bludgeon through complex recursive logic. 
+Jack: I've honestly never felt more structurally confident in understanding why algebraic loops mechanically work.
+Amanda: Excellent. Take that confidence, hit the Quiz, and I'll catch you both in Week four!

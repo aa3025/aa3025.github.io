@@ -1,0 +1,483 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[normalem]{ulem}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{mathdots}
+\usepackage{arydshln}
+\usepackage{textcomp}
+\usepackage{mathpazo}
+%\usepackage{bbold}
+\usepackage[margin=1in]{geometry}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,      
+	urlcolor=cyan,
+}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand\blank{\hphantom{==}}
+
+\DeclareFontFamily{U}{MnSymbolC}{}
+\DeclareSymbolFont{MnSyC}{U}{MnSymbolC}{m}{n}
+\DeclareFontShape{U}{MnSymbolC}{m}{n}{
+	<-6>  MnSymbolC5
+	<6-7>  MnSymbolC6
+	<7-8>  MnSymbolC7
+	<8-9>  MnSymbolC8
+	<9-10> MnSymbolC9
+	<10-12> MnSymbolC10
+	<12->   MnSymbolC12}{}
+\DeclareMathSymbol{\intprod}{\mathbin}{MnSyC}{'270}
+
+\numberwithin{equation}{section}
+%\numberwithin{theorem}{section}
+
+%%% THEOREM STYLES %%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem*{lemma*}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{conjecture}{Conjecture}
+
+%%% DEFINITION STYLES %%%
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem*{definition*}{Definition}
+\newtheorem{example}{Example}
+\newtheorem*{example*}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{remark*}{Remark}
+\newtheorem{fact}{Fact}
+\newtheorem{problem}{Problem}
+\newtheorem*{problem*}{Problem}
+
+% --- Custom style for solutions to make the body text blue ---
+\newtheoremstyle{solutionstyle}% name
+{\topsep}%      Space above
+{\topsep}%      Space below
+{\small\color{blue}}% Body font: Upright and Blue
+{}%             Indent amount (empty = no indent)
+{\bfseries}%    Head font: Bold
+{.}%            Punctuation after head
+{.5em}%         Space after head
+{}%             Head spec
+
+\theoremstyle{solutionstyle}
+\newtheorem*{solution*}{Solution} % Define solution* with the blue style
+
+\theoremstyle{definition} % Revert to the default definition style for subsequent environments
+\newtheorem*{claim*}{Claim}
+\newtheorem{exercise}{Exercise}
+
+%%% FUNCTIONS %%%
+\newcommand{\Aut}{\mathrm{Aut}}
+\newcommand{\Sym}{\mathrm{Sym}}
+\newcommand{\Syl}{\mathrm{Syl}}
+\newcommand{\intersection}{\mathop{\bigcap}}
+\newcommand{\union}{\mathop{\bigcup}}
+\newcommand{\disjointunion}{\mathop{\bigsqcup}}
+\newcommand{\evaluated}{\Big|}
+\newcommand{\re}{\mathrm{Re}}
+\newcommand{\im}{\mathrm{Im}}
+\newcommand{\Log}{\mathrm{Log}}
+\newcommand{\Res}{\mathrm{Res}}
+\newcommand{\Sk}{\mathrm{Sk}}
+\newcommand{\disc}{\mathrm{disc}}
+\newcommand{\then}{\Longrightarrow}
+\newcommand{\Int}{\mathrm{int}}
+\newcommand{\bd}{\mathrm{bd}}
+\newcommand{\diam}{\mathrm{diam}}
+\newcommand{\lcm}{\mathrm{lcm}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\del}{\partial}
+\newcommand{\len}{\mathrm{len}}
+\newcommand{\res}{\mathrm{res}}
+\newcommand{\esssup}{\mathrm{ess} \, \mathrm{sup}}
+\newcommand{\wlim}{\displaystyle\mathop{\mathrm{w}\textrm{-}\mathrm{lim}}}
+\newcommand{\vlim}{\displaystyle \mathop{\mathrm{v}\textrm{-}\mathrm{lim}}}
+\newcommand{\condE}[2]{\mathbb E\left[ #1 \,\middle|\, #2\right]}
+\newcommand{\condP}[2]{\mathbb P\left[ #1 \, \middle| \, #2\right]}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\Poi}{\mathrm{Poi}}
+
+%%% FONTS %%%
+\newcommand{\boldZ}{\boldsymbol{\mathrm{Z}}}
+\newcommand{\boldC}{\boldsymbol{\mathrm{C}}}
+\newcommand{\boldN}{\boldsymbol{\mathrm{N}}}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\U}{\mathbb U}
+\newcommand{\D}{\mathbb D}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Sbb}{\mathbb S}
+\newcommand{\Kbb}{\mathbb K}
+\newcommand{\F}{\mathbb F}
+\newcommand{\Pbb}{\mathbb P}
+\newcommand{\Ts}{\mathcal T}
+\newcommand{\Cs}{\mathcal C}
+\newcommand{\As}{\mathcal A}
+\newcommand{\Ss}{\mathcal S}
+\newcommand{\Ms}{\mathcal M}
+\newcommand{\Bs}{\mathcal B}
+\newcommand{\Ps}{\mathcal P}
+\newcommand{\Ds}{\mathcal D}
+\newcommand{\Ls}{\mathcal L}
+\newcommand{\Ns}{\mathcal N}
+\newcommand{\Rs}{\mathcal R}
+\newcommand{\Fs}{\mathcal F}
+\newcommand{\Os}{\mathcal O}
+\newcommand{\Ks}{\mathcal K}
+\newcommand{\Es}{\mathcal E}
+\newcommand{\Gs}{\mathcal G}
+\newcommand{\Us}{\mathcal U}
+\newcommand{\Zs}{\mathcal Z}
+\newcommand{\fp}{\mathfrak p}
+\newcommand{\fm}{\mathfrak m}
+\newcommand{\diff}{\,d}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\Span}{\mathrm{span}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand*{\charone}{\text{\usefont{U}{bbold}{m}{n}1}}
+\newcommand{\dlim}{\displaystyle\lim}
+\newcommand{\dsum}{\displaystyle\sum}
+\newcommand{\dint}{\displaystyle\int}
+\newcommand{\Var}{\mathbf{Var}}
+\newcommand{\Cov}{\mathbf{Cov}}
+\newcommand{\Lip}{\mathrm{Lip}}
+\newcommand{\sgn}{\mathrm{sgn}}
+
+\newcommand{\done}{\flushright$\diamondsuit$}
+
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+\let\oldphi\phi
+\let\phi\varphi
+\let\oldepsilon\epsilon
+\let\epsilon\varepsilon
+\let\oldIm\Im
+\let\oldRe\Re
+\renewcommand{\Im}{\mathrm{Im}\,}
+\renewcommand{\Re}{\mathrm{Re}\,}
+\let\oldtilde\tilde
+\let\tilde\widetilde
+\let\oldhat\hat
+\let\hat\widehat
+
+\begin{document}
+	
+	\begin{center}
+		\Large{Tutorial Exercises Solutions - Week 5} \\
+		\vspace{3mm}
+		\large{4001CMD - Mathematical Skills for Computing Professionals} \\
+		\vspace{5mm}
+	\end{center}
+	
+	
+Problems with an asterisk (\textbf{*}) are more challenging than others.
+	
+	\section*{Addition and Sieve Principles}
+	
+	\begin{problem}
+		Write out a proof (using induction on $n$) of the fact that if $A_1, A_2, \ldots, A_n$ are disjoint finite sets, then \[
+		\#\left(A_1 \cup A_2 \cup \cdots \cup A_n\right) = (\#A_1) + (\#A_2) + \cdots + (\#A_n).
+		\]
+	\end{problem}
+	
+	\begin{solution*}
+		\begin{proof}
+			For $n=1$, this is just saying $\#A_1 = \#A_1$. For $n=2$, this is the addition principle: $\#(A_1 \cup A_2) = \#A_1 + \#A_2$ if $A_1$ and $A_2$ are disjoint. 
+			
+			Suppose that for $n=k$, we have: 
+			\[
+			\#(A_1 \cup \cdots \cup A_k) = \#A_1 + \cdots + \#A_k.
+			\]
+			Let $A_{k+1}$ be another set, disjoint from the $A_1, \ldots, A_k$. By the $n=2$ case, 
+			\begin{align*}
+				\#\left(A_1 \cup \cdots \cup A_k \cup A_{k+1}\right) &= \#\left(A_1 \cup \cdots \cup A_k\right)+ \#A_{k+1} \\
+				&= \#A_1 + \cdots + \#A_k + \#A_{k+1}. 
+			\end{align*}
+			So if the addition principle holds for $n=k$, it holds for $n=k+1$. By induction, the claim holds for all $n \geq 2$. 
+		\end{proof}
+	\end{solution*}
+	
+	\begin{problem}
+		In a class of 67 mathematics students, 47 can read French, 35 can read German and 23 can read both languages.
+		\begin{enumerate}[label=(\alph*)]
+			\item How many can read neither language? 
+			\item If furthermore 20 can read Russian, of whom 12 can also read French, 11 read German also and 5 read all three languages, how many cannot read any of the three languages? 
+		\end{enumerate}
+	\end{problem}
+	
+	\begin{solution*}
+		(a) Let $F$ be those students who can read French and $G$ those students who can read German. Also let $X$ be the set of all students in the class. We are told: \[
+		\#X = 67, \quad \#F = 47, \#G = 35, \quad \#(F \cap G) = 23
+		\]
+		By the sieve principle, the number of students who cannot read French or German is:
+		\[
+		\#(X \setminus(F \cup G)) = \#X - \#F - \#G + \#(F \cap G) = 67 - 47 - 35 + 23 = \boxed{8}.
+		\]
+		(b) If $R$ is the set of students who can read Russian, we are additionally told: 
+		\[
+		\#R = 20, \quad \#(F \cap R) = 12, \quad \#(G \cap R) = 11, \quad \#(F \cap G \cap R) = 5.
+		\]
+		So the number of students who cannot read German, French, or Russian is:
+		\begin{align*}
+			\#(X \setminus(F \cup G \cup R)) &= \#X - \#F - \#G - \#R + \#(F \cap G) + \#(F \cap R) + \#(G \cap R) - \#(F \cap G \cap R) \\
+			&= 67 - 47 - 35 - 20 + 23 + 12 + 11 - 5 = \boxed{6}
+		\end{align*}
+	\end{solution*}
+	
+	\begin{problem}[\textbf{*}]
+		Find the number of ways of arranging the letters A, E, M, O, U, Y in a sequence in such a way that neither of the words ME nor YOU occur. (\emph{Hint:} Apply the sieve principle to the set of all rearrangements of the letters A, E, M, O, U, Y.)
+	\end{problem}
+	
+	\begin{solution*}
+		Let's say $P$ is the set of all permutations of the letters A, E, M, O, U, and Y. Then $\#P = 6!$. Let $Q \subseteq P$ be the set of permutations for which the word ME appears, and let $R \subseteq P$ be the set of permutations for which the word YOU appears. We want to know the size of $P \setminus(Q \cup R)$. By the sieve principle, $$\#(Q \cup R) = \#Q + \#R - \#(Q \cap R).$$ So we need to find $\#Q$, $\#R$, and $\#(Q \cap R)$. 
+		
+		For $\#Q$, there are 5 different positions in a 6-letter permutation that the word ME could appear: MEXXXX, XMEXXX, XXMEXX, XXXMEX, and XXXXME. In each of these permutations, the remaining four letters can themselves be rearranged in 4! ways. So, $\#Q = 5 \times 4! = 5!$. 
+		
+		For $\#R$, there are 4 different positions in a 6-letter permutation that YOU can appear in: YOUXXX, XYOUXX, XXYOUX, and XXXYOU. The remaining three letters can be rearranged in 3! ways. So $\#R = 4 \times 3! = 4!$. 
+		
+		For $\#(Q \cap R)$, we can list out the permutations that contain both ME and YOU. A permutation of A, E, M, O, U, Y that must contain the words ME and YOU is effectively a permutation of the words A, ME, and YOU. There are $3! = 6$ such permutations: 
+		\begin{enumerate}
+			\item MEYOUA
+			\item MEAYOU
+			\item AMEYOU
+			\item YOUMEA
+			\item YOUAME
+			\item AYOUME
+		\end{enumerate}
+		So $\#(Q \cap R) = 3!$. All of this lets us conclude: 
+		\[
+		\#(Q \cup R) = \#Q + \#R - \#(Q \cap R) = 5! + 4! - 3! = 120 + 24 - 6 = 138
+		\]
+		so there are $6! - 138 = 720 - 138 = \boxed{582}$ ordered sequences of A, E, M, O, U, Y that do not contain the words ME and YOU. 
+	\end{solution*}
+	
+	\section*{Ordered and Unordered Selection}
+	
+	\begin{problem}
+		How many national flags can be constructed from three equal vertical strips, using the colours red, white, blue, and green? (It is assumed that colours can be repeated, and that one vertical edge of the flag is distinguished as the ``flagpole side'', so that flipping the flag around results in a different flag.)
+	\end{problem}
+	
+	\begin{solution*}
+		The problem is basically asking how many ordered selections of three colors can be made out of four, allowing repetition. There are $\boxed{4^3 = 64 \textrm{ possible flags.}}$
+	\end{solution*}
+	
+	\begin{problem}
+		Write down all of the subsets of the set $X = \{a,b,c\}$. Use the correspondence between $\Ps(X)$ and $\{0,1\}^3$ discussed in lecture to check that your list is complete. 
+	\end{problem}
+	
+	\begin{solution*}
+		The correspondence is that the $k$th letter in a word is 0 if the $k$th symbol in $\{a,b,c\}$ is not in the set, and 1 otherwise. So the sets and the corresponding words are: 
+		\[
+		\boxed{\begin{aligned}
+				\emptyset \quad &\longleftrightarrow \quad 000 \\
+				\{c\} \quad &\longleftrightarrow \quad 001 \\
+				\{b\} \quad &\longleftrightarrow \quad 010 \\
+				\{b,c\} \quad &\longleftrightarrow \quad 011 \\
+				\{a\} \quad &\longleftrightarrow \quad 100 \\
+				\{a,c\} \quad &\longleftrightarrow \quad 101 \\
+				\{a,b\} \quad &\longleftrightarrow \quad 110 \\
+				\{a,b,c\} \quad &\longleftrightarrow \quad 111
+		\end{aligned}}
+		\]
+		Since this systematically counts up all words of length 3 in the alphabet $\{0,1\}$, this list is complete. 
+	\end{solution*}
+	
+	\begin{problem}
+		In how many ways can we select a batting order of 11 from a pool of 14 cricketers? 
+	\end{problem}
+	
+	\begin{solution*}
+		The selection is ordered and non-repeating. The number of ways is given by the permutation formula $P(14, 11)$: 
+		\[
+		P(14, 11) = \frac{14!}{(14-11)!} = \boxed{\frac{14!}{3!} = 14,529,715,200 \textrm{ different batting orders.}}
+		\]
+	\end{solution*}
+	
+	\begin{problem}
+		Evaluate $\binom{16}4$ and $\binom{17}5$. 
+	\end{problem}
+	
+	\begin{solution*}
+		Using the binomial coefficient formula $\binom{n}{k} = \frac{n!}{k!(n-k)!}$:
+		\[
+		\binom{16}4 = \frac{16 \times 15 \times 14 \times 13}{4 \times 3 \times 2 \times 1} = 4 \times 5 \times 7 \times 13 = \boxed{1820},
+		\]
+		and 
+		\[
+		\binom{17}5 = \frac{17 \times 16 \times 15 \times 14 \times 13}{5 \times 4 \times 3 \times 2 \times 1} = 17 \times 4 \times 7 \times 13 = \boxed{6188.}
+		\]
+	\end{solution*}
+	
+	\begin{problem}
+		Suppose $X = \{a,b,c\}$. How many selections of 2 elements is are possible from $X$, when those selections are
+		\begin{enumerate}[label=(\alph*)]
+			\item ordered and repeating? 
+			\item ordered and non-repeating?
+			\item unordered and repeating? 
+			\item unordered and non-repeating? 
+		\end{enumerate}
+	\end{problem}
+	
+	\begin{solution*}
+		Let $n=3$ (size of $X$) and $r=2$ (number of elements selected).
+		\begin{enumerate}[label=(\alph*)]
+			\item \textbf{Ordered and repeating:} $n^r = 3^2 = \boxed 9$. 
+			\item \textbf{Ordered and non-repeating (Permutations):} $\frac{n!}{(n-r)!} = \frac{3!}{(3-2)!} = 6$.
+			\item \textbf{Unordered and repeating (Multisets):} $\binom{n+r-1}{r} = \binom{3+2-1}{2} = \binom 4 2 = \boxed{6}$. 
+			\item \textbf{Unordered and non-repeating (Combinations):} $\binom{n}{r} = \binom{3}{2} = \boxed 3$. 
+		\end{enumerate}
+	\end{solution*}
+	
+	\begin{problem}
+		Keys are made by cutting incisions of various depths in a number of positions on a blank key. If there are eight possible depths, how many positions are required to make one million different keys? (\emph{Hint:} To facilitate the calculation, use the fact that $2^{10}$ is slightly greater than 1000.) 
+	\end{problem}
+	
+	\begin{solution*}
+		Let $p$ be the number of positions. Since there are 8 possible depths for each position and the order matters, the number of unique keys is $8^p$. We need $8^p \geq 1,000,000$.
+		
+		Since $8 = 2^3$, we have $8^p = (2^3)^p = 2^{3p}$.
+		We use the hint $2^{10} \approx 1000$:
+		\[
+		1,000,000 = 1000 \times 1000 \approx 2^{10} \times 2^{10} = 2^{20}.
+		\]
+		We need $2^{3p} \geq 2^{20}$, which means $3p \geq 20$.
+		The smallest integer $p$ satisfying this is $p = 7$.
+		
+		Check: $8^6 = 262,144$ (not enough), $8^7 = 2,097,152$ (enough).
+		The required number of positions is $\boxed{7}$.
+	\end{solution*}
+	
+	\begin{problem}
+		How many four-letter words can be made from an alphabet of 10 symbols if there are no restrictions on spelling except that no letter can be used more than once? 
+	\end{problem}
+	
+	\begin{solution*}
+		This is ordered selection without repetition, choosing $r=4$ letters from $n=10$ symbols.
+		\[
+		P(10, 4) = 10 \times 9 \times 8 \times 7 = \boxed{5040} \textrm{ different words.}
+		\]
+	\end{solution*}
+	
+	\begin{problem}
+		Show that when three indistinguishable dice are thrown, there are 56 possible outcomes. What is the number of outcomes when $n$ indistinguishable dice are thrown?
+	\end{problem}
+	
+	\begin{solution*}
+		Throwing three indistinguishable dice is equivalent to \textbf{unordered selection with replacement} of $r=3$ items from a set of $n=6$ possible values (1 through 6).
+		
+		The number of outcomes is given by the multiset formula:
+		\[
+		\binom{n+r-1}{r} = \binom{6+3-1}{3} = \binom{8}{3} = \frac{8 \times 7 \times 6}{3 \times 2 \times 1} = \boxed{56} \textrm{ possible outcomes.}
+		\]
+		When $n$ indistinguishable dice are thrown (i.e., selecting $r=n$ times from $k=6$ values), the number of outcomes is:
+		\[
+		\binom{6+n-1}{n} = \boxed{\binom{n+5}{n} \quad \text{or} \quad \binom{n+5}{5}.}
+		\]
+	\end{solution*}
+	
+	\begin{problem}[\textbf{*}]
+		Show that the number of $n$-tuples $(x_1, \ldots, x_n)$ of non-negative integers which satisfy the equation 
+		\[
+		x_1 + x_2 + \cdots + x_n = r
+		\]
+		is $\binom{n+r-1}{r}$. (\emph{Hint:} Suppose that an unordered selection, with repetition, of $r$ objects from a set of $n$ objects contains $x_i$ copies of the $i$th object ($1 \leq i \leq n$).)\\
+		
+		
+		{\small \textbf{Note}: A \textbf{tuple} is an ordered, immutable, fixed-size collection of items. It is one of the most basic and important data structures, both in theoretical mathematics and in practical computer programming.}	\end{problem}
+	
+	\begin{solution*}
+		The hint suggests establishing a bijection between the set of solutions to $x_1 + \cdots + x_n = r$ (where $x_i \geq 0$) and the number of ways to make an \textbf{unordered selection with repetition} of $r$ items from a set of $n$ distinct objects.
+		
+		Consider $n$ distinct objects, say $O = \{o_1, o_2, \ldots, o_n\}$. We want to choose $r$ objects from $O$ with repetition allowed, and the order of selection doesn't matter.
+		
+		Let $x_i$ be the number of times object $o_i$ is selected in the $r$-item collection.
+		
+		\begin{enumerate}
+			\item Since we select a total of $r$ items, we must have $x_1 + x_2 + \cdots + x_n = r$.
+			\item Since $x_i$ is a count of selections, $x_i$ must be a non-negative integer ($x_i \geq 0$).
+		\end{enumerate}
+		
+		Thus, every unique unordered selection of $r$ items with repetition corresponds to a unique solution $(x_1, \ldots, x_n)$ to the equation, and vice versa.
+		
+		Since the number of ways to make an unordered selection of $r$ items from $n$ distinct objects with replacement is given by the multiset formula:
+		\[
+		\binom{n+r-1}{r}
+		\]
+		the number of non-negative integer solutions to $x_1 + \cdots + x_n = r$ must also be $\boxed{\binom{n+r-1}{r}}$.
+		
+		(This is sometimes known as the \textbf{Stars and Bars} problem, where $r$ stars (the total sum) are separated by $n-1$ bars (to partition the stars into $n$ groups).)
+	\end{solution*}
+	
+	\section*{Binomial Theorem}
+	
+	\begin{problem}
+		Write out the formulas for $(1+x)^8$ and $(1-x)^8$. 
+	\end{problem}
+	
+	\begin{solution*}
+		The coefficients are found in the 8th row of Pascal's triangle: $1, 8, 28, 56, 70, 56, 28, 8, 1$.
+		
+		For $(1+x)^8$:
+		\[
+		\boxed{(1+x)^8 = x^8 + 8x^7 + 28x^6 + 56x^5 + 70x^4 + 56x^3 + 28x^2 + 8x + 1}.
+		\]
+		For $(1-x)^8$, the terms are $\binom{8}{k} (1)^{8-k} (-x)^k = (-1)^k \binom{8}{k} x^k$, so the signs alternate: 
+		\[
+		\boxed{(1-x)^8 = x^8 - 8x^7 + 28x^6 - 56x^5 + 70x^4 - 56x^3 + 28x^2 - 8x + 1}.
+		\]
+	\end{solution*}
+	
+	\begin{problem}
+		Calculate the coefficients of: 
+		\begin{enumerate}[label=(\alph*)]
+			\item $x^5$ in $(1+x)^{11}$
+			\item $a^2b^8$ in $(a+b)^{10}$
+			\item $a^6 b^6$ in $(a^2 + b^3)^5$
+			\item $x^3$ in $(3+4x)^6$
+		\end{enumerate}
+	\end{problem}
+	
+	\begin{solution*}
+		(a) The term is $\displaystyle \binom{11}{5} (1)^{11-5} x^5 = \frac{11 \times 10 \times 9 \times 8 \times 7}{5 \times 4 \times 3 \times 2 \times 1} x^5 = 462 x^5$, so the coefficient is $\boxed{462}$. 
+		
+		(b) The general term in the expansion of $(a+b)^{10}$ is $\binom{10}{k} a^k b^{10-k}$. For the $a^2b^8$ term, we need $k=2$:
+		\[
+		\binom{10}{2} a^2 b^8 = \frac{10 \times 9}{2 \times 1} a^2 b^8 = 45 a^2 b^8.
+		\]
+		The coefficient is $\boxed{45}$. 
+		
+		(c) The general term in the expansion of $(a^2 + b^3)^5$ is $\binom{5}{k} (a^2)^k (b^3)^{5-k}$. We need the powers of $a$ and $b$ to match $a^6 b^6$, so we require:
+		\[
+		2k = 6 \implies k=3 \quad \text{and} \quad 3(5-k) = 6 \implies 15 - 3k = 6 \implies 3k = 9 \implies k=3.
+		\]
+		With $k=3$, the term is $\displaystyle \binom{5}{3} (a^2)^3 (b^3)^2 = 10 a^6 b^6$. The coefficient is $\boxed{10}$. 
+		
+		(d) The general term in the expansion of $(3+4x)^6$ is $\binom{6}{k} (3)^{6-k} (4x)^k$. For the $x^3$ term, we need $k=3$:
+		\[
+		\binom{6}{3} (3)^{6-3} (4x)^3 = 20 \cdot 3^3 \cdot (4^3 x^3) = 20 \cdot 27 \cdot 64 x^3 = 34560 x^3.
+		\]
+		The coefficient is $\boxed{34560}$. 
+	\end{solution*}
+	
+\end{document} 

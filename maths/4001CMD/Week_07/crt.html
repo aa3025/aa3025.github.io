@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Remainder Theorem</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        
+        h3 {
+            color: #3498db;
+            margin-top: 20px;
+        }
+        
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .example {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .important {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .math {
+            font-size: 1.1em;
+            padding: 10px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .step {
+            margin: 10px 0;
+            padding-left: 15px;
+        }
+        
+        .conclusion {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .solution-step {
+            background-color: #e8f5e8;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 3px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Chinese Remainder Theorem</h1>
+        
+        <div class="section">
+            <h2>Core Idea in Simple Terms</h2>
+            <p>Imagine this scenario:</p>
+            <ul>
+                <li>You have a number. When you divide it by 3, the remainder is 2.</li>
+                <li>When you divide it by 5, the remainder is 3.</li>
+                <li>You are told the number is between 0 and 15.</li>
+            </ul>
+            <p>What is the number?</p>
+            <p>You could try guessing: a number that fits is 8 (8 ÷ 3 = 2 remainder 2, and 8 ÷ 5 = 1 remainder 3). The Chinese Remainder Theorem is the formal, general rule that guarantees problems like this have a solution, and tells us how to find it.</p>
+            <p>In essence, the CRT says:</p>
+            <div class="important">
+                <p><strong>If you know the remainders of a number when divided by several pairwise coprime integers, you can uniquely determine that number modulo their product.</strong></p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Formal Statement</h2>
+            <p>Let \( n_1, n_2, ..., n_k \) be positive integers that are <strong>pairwise coprime</strong> (this means the greatest common divisor of any two of them is 1).</p>
+            <p>Let \( a_1, a_2, ..., a_k \) be any integers.</p>
+            <p>Then the system of simultaneous congruences:</p>
+            <div class="math">
+                \[
+                \begin{cases}
+                x \equiv a_1 \pmod{n_1} \\
+                x \equiv a_2 \pmod{n_2} \\
+                \vdots \\
+                x \equiv a_k \pmod{n_k}
+                \end{cases}
+                \]
+            </div>
+            <p>has a solution, and this solution is <strong>unique modulo \( N \)</strong>, where \( N = n_1 \cdot n_2 \cdot ... \cdot n_k \).</p>
+            <p>In other words:</p>
+            <ol>
+                <li><strong>Existence:</strong> There exists an integer \( x \) that satisfies all the congruences at once.</li>
+                <li><strong>Uniqueness:</strong> All solutions are congruent modulo \( N \), meaning if \( x \) and \( y \) are both solutions, then \( x \equiv y \pmod{N} \). So, there is essentially one solution between \( 0 \) and \( N-1 \).</li>
+            </ol>
+        </div>
+        
+        <div class="section">
+            <h2>How to Find the Solution (The Construction Method)</h2>
+            <p>The theorem doesn't just say a solution exists; it gives us a recipe to find it. Here are the steps:</p>
+            
+            <div class="step">
+                <p><strong>1. Compute the product:</strong> \( N = n_1 \cdot n_2 \cdot ... \cdot n_k \).</p>
+            </div>
+            
+            <div class="step">
+                <p><strong>2. For each modulus \( n_i \), compute:</strong></p>
+                <p>\( N_i = \frac{N}{n_i} \). (This is the product of <em>all the other moduli</em>)</p>
+            </div>
+            
+            <div class="step">
+                <p><strong>3. Find the modular inverse:</strong> For each \( N_i \), find a number \( M_i \) such that \( N_i \cdot M_i \equiv 1 \pmod{n_i} \).</p>
+                <p>This \( M_i \) is the modular inverse of \( N_i \) modulo \( n_i \). We know it exists because \( \gcd(N_i, n_i) = 1 \) (since all \( n_i \) are coprime).</p>
+            </div>
+            
+            <div class="step">
+                <p><strong>4. Combine the pieces:</strong> The solution \( x \) is given by:</p>
+                <div class="math">
+                    \[
+                    x = (a_1 \cdot N_1 \cdot M_1 + a_2 \cdot N_2 \cdot M_2 + ... + a_k \cdot N_k \cdot M_k) \mod N
+                    \]
+                </div>
+            </div>
+            
+            <p>Let's see this in action with our initial example.</p>
+        </div>
+        
+        <div class="section">
+            <h2>Worked Example 1: Two Congruences</h2>
+            <p>Find \( x \) such that:</p>
+            <div class="math">
+                \[
+                \begin{cases}
+                x \equiv 2 \pmod{3} \\
+                x \equiv 3 \pmod{5}
+                \end{cases}
+                \]
+            </div>
+            
+            <div class="solution-step">
+                <p><strong>1. Compute \( N \):</strong> \( N = 3 \cdot 5 = 15 \)</p>
+            </div>
+            
+            <div class="solution-step">
+                <p><strong>2. For each modulus:</strong></p>
+                <ul>
+                    <li>For \( n_1 = 3 \): \( N_1 = N / n_1 = 15 / 3 = 5 \)</li>
+                    <li>For \( n_2 = 5 \): \( N_2 = N / n_2 = 15 / 5 = 3 \)</li>
+                </ul>
+            </div>
+            
+            <div class="solution-step">
+                <p><strong>3. Find the modular inverses:</strong></p>
+                <ul>
+                    <li>Find \( M_1 \) such that \( 5 \cdot M_1 \equiv 1 \pmod{3} \).</li>
+                    <li>\( 5 \equiv 2 \pmod{3} \), so we need \( 2 \cdot M_1 \equiv 1 \pmod{3} \).</li>
+                    <li>Trying values: \( M_1 = 2 \) works because \( 2 \cdot 2 = 4 \equiv 1 \pmod{3} \).</li>
+                    <li>Find \( M_2 \) such that \( 3 \cdot M_2 \equiv 1 \pmod{5} \).</li>
+                    <li>\( M_2 = 2 \) works because \( 3 \cdot 2 = 6 \equiv 1 \pmod{5} \).</li>
+                </ul>
+            </div>
+            
+            <div class="solution-step">
+                <p><strong>4. Combine the pieces:</strong></p>
+                <div class="math">
+                    \[
+                    x = (a_1 N_1 M_1 + a_2 N_2 M_2) \mod N
+                    \]
+                    \[
+                    x = (2 \cdot 5 \cdot 2 + 3 \cdot 3 \cdot 2) \mod 15
+                    \]
+                    \[
+                    x = (20 + 18) \mod 15
+                    \]
+                    \[
+                    x = 38 \mod 15
+                    \]
+                    \[
+                    x = 8
+                    \]
+                </div>
+            </div>
+            
+            <p><strong>Answer:</strong> The unique solution modulo 15 is \( x = 8 \). This matches our initial guess!</p>
+        </div>
+
+        <div class="section">
+            <h2>Worked Example 2: Three Congruences</h2>
+            <p>Find the smallest positive integer \( x \) that satisfies:</p>
+            <div class="math">
+                \[
+                \begin{cases}
+                x \equiv 2 \pmod{3} \\
+                x \equiv 3 \pmod{5} \\
+                x \equiv 2 \pmod{7}
+                \end{cases}
+                \]
+            </div>
+            
+            <div class="solution-step">
+                <p><strong>1. Compute \( N \):</strong> \( N = 3 \cdot 5 \cdot 7 = 105 \)</p>
+            </div>
+            
+            <div class="solution-step">
+                <p><strong>2. For each modulus:</strong></p>
+                <ul>
+                    <li>For \( n_1 = 3 \): \( N_1 = N / n_1 = 105 / 3 = 35 \)</li>
+                    <li>For \( n_2 = 5 \): \( N_2 = N / n_2 = 105 / 5 = 21 \)</li>
+                    <li>For \( n_3 = 7 \): \( N_3 = N / n_3 = 105 / 7 = 15 \)</li>
+                </ul>
+            </div>
+            
+            <div class="solution-step">
+                <p><strong>3. Find the modular inverses:</strong></p>
+                <ul>
+                    <li>Find \( M_1 \) such that \( 35 \cdot M_1 \equiv 1 \pmod{3} \).</li>
+                    <li>\( 35 \equiv 2 \pmod{3} \), so we need \( 2 \cdot M_1 \equiv 1 \pmod{3} \).</li>
+                    <li>\( M_1 = 2 \) works because \( 2 \cdot 2 = 4 \equiv 1 \pmod{3} \).</li>
+                    
+                    <li>Find \( M_2 \) such that \( 21 \cdot M_2 \equiv 1 \pmod{5} \).</li>
+                    <li>\( 21 \equiv 1 \pmod{5} \), so we need \( 1 \cdot M_2 \equiv 1 \pmod{5} \).</li>
+                    <li>\( M_2 = 1 \) works because \( 21 \cdot 1 = 21 \equiv 1 \pmod{5} \).</li>
+                    
+                    <li>Find \( M_3 \) such that \( 15 \cdot M_3 \equiv 1 \pmod{7} \).</li>
+                    <li>\( 15 \equiv 1 \pmod{7} \), so we need \( 1 \cdot M_3 \equiv 1 \pmod{7} \).</li>
+                    <li>\( M_3 = 1 \) works because \( 15 \cdot 1 = 15 \equiv 1 \pmod{7} \).</li>
+                </ul>
+            </div>
+            
+            <div class="solution-step">
+                <p><strong>4. Combine the pieces:</strong></p>
+                <div class="math">
+                    \[
+                    x = (a_1 N_1 M_1 + a_2 N_2 M_2 + a_3 N_3 M_3) \mod N
+                    \]
+                    \[
+                    x = (2 \cdot 35 \cdot 2 + 3 \cdot 21 \cdot 1 + 2 \cdot 15 \cdot 1) \mod 105
+                    \]
+                    \[
+                    x = (140 + 63 + 30) \mod 105
+                    \]
+                    \[
+                    x = 233 \mod 105
+                    \]
+                    \[
+                    x = 233 - 2 \cdot 105 = 233 - 210 = 23
+                    \]
+                </div>
+            </div>
+            
+            <div class="solution-step">
+                <p><strong>Verification:</strong></p>
+                <ul>
+                    <li>\( 23 \div 3 = 7 \) remainder \( 2 \) ✓</li>
+                    <li>\( 23 \div 5 = 4 \) remainder \( 3 \) ✓</li>
+                    <li>\( 23 \div 7 = 3 \) remainder \( 2 \) ✓</li>
+                </ul>
+            </div>
+            
+            <p><strong>Answer:</strong> The smallest positive solution is \( x = 23 \). All other solutions are of the form \( x = 23 + 105k \) for integer \( k \).</p>
+        </div>
+        
+        <div class="section">
+            <h2>Why is it so Important and Useful?</h2>
+            <p>The CRT is not just a mathematical curiosity; it's a powerful tool.</p>
+            
+            <div class="example">
+                <p><strong>1. Efficiency in Computations:</strong> Instead of working with one very large number (e.g., \( N = 1000 \)), you can break the problem down and work with several smaller, coprime numbers (e.g., \( 8, 125, \) and \( 1 \), since \( 8 \cdot 125 \cdot 1 = 1000 \)). This is much faster for computers. This is its primary use in <strong>RSA cryptography</strong> and computer algebra systems.</p>
+            </div>
+            
+            <div class="example">
+                <p><strong>2. A Foundational Concept in Number Theory:</strong> The CRT proves that if you have pairwise coprime moduli \( n_1, n_2, ..., n_k \), then the ring of integers modulo \( N \) (denoted \( \mathbb{Z}/N\mathbb{Z} \)) is structurally identical to the product of the rings \( \mathbb{Z}/n_1\mathbb{Z} \times \mathbb{Z}/n_2\mathbb{Z} \times ... \times \mathbb{Z}/n_k\mathbb{Z} \). This is a profound result that connects different areas of mathematics.</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>A Crucial Caveat: The "Pairwise Coprime" Condition</h2>
+            <p>The theorem <strong>requires</strong> the moduli \( n_1, n_2, ..., n_k \) to be <strong>pairwise coprime</strong>. If they are not, a solution might not exist.</p>
+            
+            <div class="important">
+                <p><strong>Example of Failure:</strong></p>
+                <p>Consider:</p>
+                <div class="math">
+                    \[
+                    \begin{cases}
+                    x \equiv 1 \pmod{2} \\
+                    x \equiv 2 \pmod{4}
+                    \end{cases}
+                    \]
+                </div>
+                <p>The moduli 2 and 4 are not coprime.</p>
+                <ul>
+                    <li>The first equation says \( x \) is odd.</li>
+                    <li>The second equation says \( x \) is even (since \( x \equiv 2 \pmod{4} \) means \( x = 4k + 2 \), which is even).</li>
+                    <li>A number cannot be both odd and even. Therefore, <strong>no solution exists</strong>.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="conclusion">
+            <h2>Summary</h2>
+            <p>The <strong>Chinese Remainder Theorem</strong> is a cornerstone of number theory that allows us to reconstruct an integer from its remainders modulo a set of coprime integers. It guarantees a unique solution and provides a clear, constructive method to find it, with far-reaching applications in computer science, cryptography, and abstract algebra.</p>
+        </div>
+    </div>
+</body>
+</html>

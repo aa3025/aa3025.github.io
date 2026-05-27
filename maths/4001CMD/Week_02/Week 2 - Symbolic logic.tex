@@ -1,0 +1,1184 @@
+\documentclass[12pt,aspectratio=1610, handout]{beamer}
+%\documentclass[12pt,aspectratio=1610]{beamer}
+\input{../../preamble12}
+
+\title[Week 2: Logic 2]{Week 2: Symbolic Logic 2, Rules of Inference}
+
+\section*{Week 2}
+
+
+\begin{document}
+	\section*{~}	
+	\begin{frame}{4001CMD -- Mathematics for Computer Science}		
+		\vspace{0cm}
+		\begin{center}
+			\shadowtext{\huge Week 2: Symbolic Logic cont'd.}	
+		\end{center}
+	\end{frame}
+	
+\hypersetup{linkcolor=blue}
+\begin{frame}{Outline}
+	
+	    \begin{columns}[t]
+	    	\begin{column}{15mm}
+	    		~
+	    	\end{column}
+		\begin{column}{.5\textwidth}
+			Part I:
+			
+			\vspace{3mm}
+			
+			\tableofcontents[sections={1-10}]
+		\end{column}
+		\begin{column}{.5\textwidth}
+			Part II:
+			\vspace{3mm}
+			
+			\tableofcontents[sections={11-20}]
+		\end{column}
+	\end{columns}
+	
+\end{frame}
+\hypersetup{linkcolor=mygray}	
+
+\section{Truth Values}
+
+\begin{frame}{Truth Values} \p
+	\begin{block}{In mathematics, statements can be True or False.}
+		\begin{center}{\small
+			\begin{tabular}{|c|c|c|}
+				\hline
+				\textbf{Statement} & 20 is a & 20 is not a \\
+				& multiple of 3 & multiple of 3 \\
+				\hline
+				\textbf{Truth value} & False & True \\
+				\hline
+			\end{tabular}}
+		\end{center}
+	\end{block}\p
+	
+	\begin{blockz}{0.45}{Truth Value} 
+	A \textbf{truth value} an object in mathematics---like a set, or a number. It can either be \textbf{T} or \textbf{F}. 
+	\end{blockz}
+	\p
+	\begin{blockz}{0.5}{Symbolic logic}
+		\emph{Symbolic logic} is the area of mathematics that \emph{computes the truth values of abstract statements} --- not just mathematical ones!
+	\end{blockz}\p
+	
+	\begin{example}
+		If I am a vegetarian, I will not eat chicken tonight. \p But I will eat chicken tonight. Therefore I am not a vegetarian.  
+	\end{example}
+	
+	
+	
+\end{frame}
+
+\section{Logical Operations}
+
+\begin{frame}{Logical operations \textbf{and $\land$}, \textbf{or $\lor$}, and \textbf{not $\neg$}}
+	\begin{itemize}
+	\item There are three basic operations: \textbf{not} ($\neg$), \textbf{and} ($\wedge$), and \textbf{or} ($\vee$). \p
+	\end{itemize}
+	
+	\begin{blockz}{0.28}{$\neg p$ \hfill ~~~(\textbf{not})}
+		\textbf{The statement $p$ is not true. }
+	\end{blockz}	
+	\p	
+	\begin{blockz}{0.3}{$p \land q$ \hfill ~~~(\textbf{and})}
+	\textbf{Both statements $p$ and $q$ are true. }
+	\end{blockz}
+	\p
+	\begin{blockz}{0.3}{$p \lor q$ \hfill~~~ (\textbf{or})}
+		\textbf{At least one of $p$ or $q$ is true, or both are true}.
+	\end{blockz}\p
+		
+	\begin{example}
+	$p$ is ``I have a cat'' and $q$ is ``I have houseplants''. It may be the case that $p \vee q$ is true, and also that both $p$ and $q$ are true. (...they won't both be true for long...)
+	
+\end{example}
+
+\end{frame}
+
+
+\section{Truth Tables}
+\begin{frame}{Truth tables}
+	\begin{itemize}
+		\item With sets, we used Venn diagrams to see if a statement is true or false. \p
+		\item In symbolic logic, we use \textbf{truth tables.}\p
+	\end{itemize}
+		
+	\begin{center}
+	\begin{blockz}{0.25}{Truth table for $\neg$}
+				\begin{tabular}{|c|c|}
+					\hline
+					$p$ & $\neg p$ \\
+					\hline
+					$T$ & $F$ \\
+					\hline
+					$F$ & $T$ \\
+					\hline
+				\end{tabular}
+		\end{blockz}\hspace{2mm}	\p
+	\begin{blockz}{0.3}{Truth table for $\land$}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		$p$ & $q$ & $p \wedge q$ \\
+		\hline
+		F & F & F\\
+		\hline
+		F & T & F\\
+		\hline
+		T&F &F \\ 
+		\hline 
+		T&T &T \\
+		\hline
+	\end{tabular}
+	\end{blockz}	\hspace{2mm}\p
+	\begin{blockz}{0.3}{Truth table for $\lor$}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		$p$ & $q$ & $p \vee q$ \\
+		\hline
+		F&F &F \\
+		\hline
+		F&T &T \\
+		\hline 
+		T&F &T \\
+		\hline 
+		T& T& T\\ 
+		\hline 
+	\end{tabular}
+	\end{blockz}
+\end{center}
+
+
+\begin{itemize}
+	\item These tables tell us the truth value of the statement (last column) for different combinations of inputs $p$ and $q$.
+\end{itemize}
+\end{frame}
+	
+
+\section{Implication}
+\begin{frame}{The implication $\then$ (a.k.a. conditional statement)}
+	\begin{itemize}
+		\item \textbf{Exercise:} Construct a truth table for the statement $(\neg p) \vee q$. \p
+\vspace{-3mm}	\begin{center}\begin{blockz}{0.45}{Solution:}
+			\begin{tabular}{|c|c|c|c|}
+					\hline
+					$p$ & $q$ & $\neg p$ & $(\neg p) \vee q$ \\
+					\hline
+					$T$ & $T$ &$F$ & $T$ \\
+					\hline
+					$T$ & $F$ &$F$ & $F$ \\
+					\hline
+					$F$ & $T$ & $T$ & $T$ \\ 
+					\hline
+					$F$ & $F$ & $T$ & $T$ \\
+					\hline
+				\end{tabular}
+				\end{blockz}\p\hspace{5mm}
+				\begin{blockz}{0.45}{Truth table for $\then$:} 			
+					\begin{tabular}{|c|c|c|}
+						\hline
+						$p$ & $q$ & $p \then q$ \\
+						\hline
+						$T$ & $T$ & $T$ \\
+						\hline
+						$T$ & $F$ & $F$ \\
+						\hline
+						$F$ & $T$ & $T$ \\ 
+						\hline
+						$F$ & $F$ & $T$ \\
+						\hline
+					\end{tabular}
+					\end{blockz}\p\vspace{2mm}
+		\end{center}
+		\item The operator $\then$ (also $\rightarrow$) represents implication: the statement $p \then q$ means ``if $p$, then $q$''. \p
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Another way to think of $\then$}
+	\begin{itemize}
+		\item Consider the following sentence: 
+		\begin{center}
+			``I'm not vegetarian, or I'll order from the vegetarian menu.''
+		\end{center}
+		\item Note that both of these statements might be true at the same time. 
+		\item Say $p$ is the statement ``I'm a vegetarian'', and $q$ is the statement ``I'll order from the vegetarian menu''. Then the above sentence can be expressed as 
+		\[
+		(\neg p) \vee q.
+		\]
+		\item If you know that $p$ is true, and that $(\neg p) \vee q$ is true (i.e., either $p$ is false, or $q$ is true), then $q$ must necessarily be true---in other words, $p$ implies $q$. 
+		\item So if $p$ is true, then \textbf{both $p \then q$ and $(\neg p) \vee q$ have the same truth value. }
+		\item What if $p$ is false? Well, \textbf{then $(\neg p) \vee q$ is true---\emph{regardless of the truth value of $q$}. }
+	\end{itemize}
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Truth table of $\then$}
+	\begin{itemize}
+	\item[\finger] For this reason, we declare that \fbox{$p\then q$ and $(\neg p) \vee q$ are \emph{logically equivalent}}.
+%	\item  
+	\begin{center}\begin{blockz}{0.5}{Truth tables for $\then$ and $(\neg p) \vee q$:}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			$p$ & $q$ & $p \then q$ & $(\neg p) \vee q$\\
+			\hline
+			$T$ & $T$ & $T$ & $T$ \\
+			\hline
+			$T$ & $F$ & $F$ & $F$ \\
+			\hline
+			$F$ & $T$ & $T$ & $T$ \\ 
+			\hline
+			$F$ & $F$ & $T$ & $T$ \\
+			\hline
+		\end{tabular}\end{blockz}\p \vspace{2mm}
+	\end{center}
+	\item Another argument (though perhaps less convincing) is that if $p$ is false, then we cannot disprove that $p \then q$ is true. 
+	\end{itemize} 
+\end{frame}
+
+%\section{Symbolic logic and set theory}
+%
+%\begin{frame}{Symbolic logic and set theory}
+%	\begin{itemize}
+%		\item Symbolic logic and set theory are two languages describing the same thing: replace ``statements'' with ``sets'', and the operations $\neg$, $\wedge$, $\vee$, and $\then$ with $^c$, $\cap$, $\cup$, and $\subseteq$ and you have the same statements.
+%		(Recall that $x \in A^c$ means $x \not\in A$.)\p
+%		\item Indeed, say $A$ and $B$ are sets, $p$ is the statement $x \in A$, and $q$ is the statement $x \in B$. \p
+%		\begin{blockz}{0.5}{Symbolic logic and sets}\vspace{-5mm}\begin{align*}
+%			x \in A^c \quad &\iff \quad \neg p\\ 
+%			x \in A \cap B \quad &\iff \quad p \wedge q\\
+%			x \in A \cup B \quad &\iff \quad p \vee q\\
+%			A \subseteq B \quad & \iff \quad p \then q
+%			\end{align*}\end{blockz}\p
+%				\item Indeed, $A \subseteq B$ means if $x \in A$, then $x \in B$, or $p \then q$.
+%	\end{itemize}
+%\end{frame}
+
+%\begin{frame}{``Then'' in the art of set theory}
+%	\begin{itemize}
+%		\item Consider again the statement $(\neg p) \vee q$, where $p$ means ``$x \in A$'' and $q$ means ``$x \in B$'':
+%		\[
+%		x \in A^c \cup B \quad \iff \quad (\neg p) \vee q
+%		\]
+%		\item \textbf{Question.} If we know $x \in A^c \cup B$, what happens if $x \in A$? 
+%		\begin{itemize}
+%			\item \textbf{Answer.} $x$ must then be a member of $B$! In other words, $x \in A \then x \in B$, or $A \subseteq B$. 
+%			\item \textbf{Exercise.} Show that if $A \subseteq B$, then for any $x$, we have $x \in A^c \cup B$. 
+%			\item \textbf{Solution.} If $x \in A$, then $x \in B \subseteq A^c \cup B$. But if $x \not\in A$, then $x \in A^c \subseteq A^c \cup B$. Either way, $x \in A^c \cup B$. 
+%		\end{itemize}
+%		\item Summary:
+%		%\vspace{1in}
+%		\[
+%		(\neg p) \vee q \quad \iff \quad x \in A^c \cup B \quad \iff \quad A \subseteq B \quad \iff \quad p \then q
+%		\]
+%	\end{itemize}
+%\end{frame}
+
+
+\section{Converse statements}
+\begin{frame}{Converse statements}
+	\begin{definition}[Converse]
+		A converse statement is a proposition formed by \textbf{interchanging the hypothesis and conclusion} of a conditional statement.
+	\end{definition}
+	\p
+	
+%	\begin{itemize}
+%		\item On the previous slide, we showed two things: 
+%		\begin{itemize}
+%			\item If $x \in A^c \cup B$ for every $x$, then $A \subseteq B$ (the Question/Answer).
+%			\item If $A \subseteq B$, then $x \in A^c \cup B$ for every $x$ (the Exercise). 
+%		\end{itemize}
+%		\item Why did we do that exercise? Did we already know that from the question/answer? 
+		\begin{example}[Conditional statement]
+			``If it is raining (hypothesis $P$), then the ground is wet (conclusion $Q$)'', i.e. $$P \then Q$$
+		\end{example}\p
+		
+		\begin{example}[Converse]
+			``If the ground is wet, then it is raining'', i.e. $$Q \then P$$ 
+		\end{example}\p
+		Is this always true? \p Of course not!
+\end{frame}
+
+\begin{frame}{Converse statements}
+	\begin{itemize}\itemsep2mm
+		\item In general, \fbox{\emph{the statement $p \then q$ does not imply the converse $q \then p$}}. \\\vspace{1mm}This is a VERY FAMOUS AND COMMON MISTAKE (called fallacy of "affirming the consequent"). \p
+		\item \textbf{Example.} Consider the following statement: 
+		\begin{center}
+			If $n$ is a multiple of 12, then $n$ is a multiple of 4.
+		\end{center}\p
+		\item Is the statement true or false? What about its converse? 
+		\begin{solution}The converse is: \p	
+			\begin{itemize}
+				\item  If $n $ is a multiple of 4, then $n$ is a multiple of 12. \p
+				\item The original statement is true, since 12 itself is a multiple of 4. But the converse is false: $n=8$ is a counterexample. 
+			\end{itemize}
+		\end{solution}
+		 
+	\end{itemize}
+\end{frame}
+
+\section{If and only if}
+
+\begin{frame}{The operation $\iff$  ~~ (iff -- "if and only if")}
+	\begin{itemize}
+%		\item But earlier, we saw that two statements in set theory each implied the other: 
+%		\begin{align*}
+%		A \subseteq B \quad &\then \quad x \in A^c \cup B \textrm{ for all } x \\
+%		x \in A^c \cup B \textrm{ for all } x \quad &\then \quad A \subseteq B
+%		\end{align*}
+%		\item So $A \subseteq B$ \emph{if and only if} $x \in A^c \cup B$ for all $x$. These statements are \emph{logically equivalent.}
+		\item The operation $\iff$ means that \emph{either both statements are true, or both statements are false.} 
+		
+		a.k.a. "biconditional", or "necessary and sufficient" condition.
+		
+		\p
+		\begin{center}
+		\begin{blockz}{0.4}{Truth table of $\iff$:}
+			\begin{tabular}{|c|c|c|}
+				\hline
+				$p$ & $q$ & $p \iff q$ \\
+				\hline
+				$T$ & $T$ & $T$ \\
+				\hline
+				$T$ & $F$ & $F$ \\
+				\hline
+				$F$ & $T$ & $F$ \\ 
+				\hline
+				$F$ & $F$ & $T$ \\
+				\hline
+			\end{tabular}
+		\end{blockz}
+		\end{center}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Proving statements with $\iff$  ~~ (iff)}\vspace{-3mm}
+	\begin{center}
+		\begin{blockz}{0.9}{\textbf{Example.} Consider the following truth table:} 
+			\begin{tabular}{|c|c|c|c|c|c|}
+				\hline
+				$p$ & $q$ & $p \then q$ & $q \then p$ & $p \iff q$ & $(p \then q) \wedge (q \then p)$\\
+				\hline
+				$T$ & $T$ & $T$ & $T$ & $T$ & $T$ \\
+				\hline
+				$T$ & $F$ & $F$ & $T$ &$F$& $F$\\
+				\hline
+				$F$ & $T$ & $T$& $F$ & $F$& $F$\\ 
+				\hline
+				$F$ & $F$ & $T$ & $T$ & $T$ & $T$\\
+				\hline
+			\end{tabular}
+		\end{blockz}
+		\end{center}\p
+			\vspace{2mm}
+	\begin{itemize}
+		\item[\finger] Notice: \fbox{$p \iff q$ is logically equivalent to $(p \then q) \wedge (q \then p)$.}\p
+		\vspace{3mm}
+		\item[\finger] This means, \emph{\textbf{to prove $p \iff q$, you need to prove both $p \then q$ and $q \then p$}}. \p
+		\item[\finger] In other words: for $p \iff q$ be TRUE, both implication $p\then q$ AND its converse $q\then p$ must be TRUE.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Example: A theorem with $\iff$  ~~ (iff)}
+	\begin{theorem} A natural number $n$ is a multiple of 12 $\underbrace{\text{\textbf{if and only if}}}_{\text{iff,} \iff}$ $n$ is a multiple of both 3 and 4. 
+	\end{theorem}
+	\vspace{4mm}
+	
+	\begin{proof}
+		\begin{itemize} 
+		\item $(\Rightarrow)$ If $n$ is a multiple of 12, then $n = 12k$ for some $k \in \N$.\p
+		\item This means $n = 3(4k)$ and $n = 4(3k)$. So $n$ is a multiple of both 3 and 4. \p
+		\item $(\Leftarrow)$ If $n$ is a multiple of both 3 and 4, then $n = 3k$ and $n = 4\ell$ for $k,\ell \in \N$. \p So $3k = 4\ell$, so $k$ is a multiple of 4. \p
+		\item This means $k = 4p$, so $n = 3k = 3(4p) = 12p$, \p so $n$ is a multiple of 12. 
+	\end{itemize}
+	\end{proof}
+\end{frame}
+
+\section{Contrapositive}
+
+\begin{frame}{The Contrapositive}
+	\begin{definition}[Contrapositive]
+		The \textbf{statement $\neg q \then \neg p$ is the \emph{contrapositive} of $p \then q$}. 
+	\end{definition} \p
+	
+		\begin{colorblock}{Statement 1:}{darkgreen}
+			``If I'm vegetarian, I'll order from the vegetarian menu.'' $p \then q$ \p
+		\end{colorblock}
+		
+		\begin{itemize}
+		\item But say \textbf{I \emph{don't} order from the vegetarian menu}. What can you conclude? \p --- \textbf{I'm not vegetarian!}\p
+		\end{itemize}
+		
+		
+		\begin{colorblock}{Statement 2:}{darkgreen}
+			``If I don't order from the vegetarian menu, I'm not vegetarian.'' $\neg q \then \neg p$\p
+		\end{colorblock}
+		
+		\begin{itemize}
+			\item These two statements say the exact same thing! \p
+	    				
+		\item[\finger] Unlike the converse ($q \then p$, which is usually false), \textbf{the contrapositive $\neg q \then \neg p$ is \emph{always true} if $p \then q$ is true. }
+		\end{itemize}
+%	
+\end{frame}
+
+\begin{frame}{The Contrapositive}
+\begin{center}
+\begin{blockz}{0.7}{Contrapositive truth table}	
+			\begin{tabular}{|c|c|c|c|c|c|}
+				\hline
+				$p$ & $q$ & $\neg p$ & $\neg q$ & $p \then q$ & $\neg q \then \neg p$\\ 
+				\hline
+				$T$ & $T$ & $F$ & $F$ & $T$ & $T$ \\
+				\hline
+				$T$ & $F$ & $F$ &$T$ &$F$ &$F$\\
+				\hline
+				$F$ & $T$ & $T$& $F$ &$T$ &$T$\\
+				\hline
+				$F$ & $F$ & $T$&$T$ &$T$ &$T$\\
+				\hline
+			\end{tabular}
+		\end{blockz}
+\end{center}\p
+	\begin{itemize}
+		\item[\finger] It follows that: \\
+%		\[
+		\begin{center}
+			\boxed{(p \then q) \quad \iff \quad (\neg q \then \neg p)}
+		\end{center}
+%		\]
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Example: Contrapositive proof}
+	\begin{examplen}
+		The number 3 is prime, and $3+1 = 4$ is a perfect square. Show that there are no other prime numbers $n$ such that $n+1$ is a perfect square. \p
+	\end{examplen}
+	\vspace{0mm}
+	\textbf{Proof.}
+	\begin{itemize}
+		\item Another way to phrase this is, ``\textbf{if $n$ is a prime number other than 3, then $n+1$ is not a perfect square}.''\p
+		\item Suppose that $n+1$ \emph{is} a perfect square and $n \neq 3$. Then, $n+1= k^2$ for some $k \in \N$. \p
+		\item Then $n = k^2 - 1 = (k+1)(k-1)$. \p
+		\item We know $k \neq 0$, since then $n = -1$, and we know $k \neq 2$, since then $n+1 = 4$, or $n=3$, and we are excluding that (we already know it works for $n=3$). \p
+		\item It follows that $(k+1)$ and $(k-1)$ are \textbf{\href{https://math.answers.com/natural-sciences/What_are_non-trivial_factors}{nontrivial factors}} of $n$ (meaning neither are equal to 1 and neither are equal to $n$). So $n$ is not prime.\p
+		\item By the contrapositive, if $n$ is a prime number other than $3$, then $n+1$ is not a perfect square. \p \qed
+	\end{itemize}
+\end{frame}
+
+%\begin{frame}{Summary: Symbolic logic}
+%	\begin{itemize} 
+%	\item The basic operations of set theory are $\neg$, $\wedge$, and $\vee$. 
+%	\item The operations $\then$ and $\iff$ show relationships between statements. 
+%	\item The truth value of logical statements can be examined using a truth table. 
+%	\item The statement $p \iff q$ means that $p$ and $q$ are logically equivalent. To prove this, one needs to prove both $p \then q$ and $q \then p$ separately. 
+%	\item The \emph{converse} of $p \then q$ is $q \then p$. The truth value of $q \then p$ is usually not related to the truth value of $p \then q$. 
+%	\item The \emph{contrapositive} of $p \then q$ is $\neg q \then \neg p$. The truth value of the contrapositive is \emph{the same} as the truth value of $p \then q$. 
+%	\end{itemize}
+%\end{frame}
+
+\section{Contradiction}
+
+\begin{frame}{Contradiction}
+	\begin{definition}[Contradiction]
+		A \textbf{Contradiction} occurs when we get a statement $r$, such that \textbf{$r$ is true} and \textbf{its negation $\neg r$ is also true}.
+	\end{definition}
+	\p
+	
+	\begin{itemize}
+		\item Earlier, we proved the following: \p \textbf{Theorem:} 20 is not a multiple of 3. \p
+		
+	\end{itemize}
+	
+	\begin{itemize}
+		\item The way we proved this was: 
+		\begin{itemize}
+			\item Assume 20 \emph{is} a multiple of 3. Then $20 = 3n$ for some natural number $n$. \p
+			\item Since $3 \times 7 = 21$, this number $n$ must be between 1 and 6. \p
+			\item No number $n$ between 1 and 6 gives 20. \p
+		\end{itemize}
+		\item The first and second statements imply the following statement: 
+		\begin{center}
+			There is an $n \in \{1,2,3,4,5,6\}$ such that $3n = 20$.
+		\end{center}\p
+		
+		\item Let's call this statement $r$. \p
+		\item The second and third statements, however, imply: \p
+		\begin{center}
+			There is no $n \in \{1,2,3,4,5,6\}$ such that $3n = 20$.
+		\end{center}\p
+		\item This is $\neg r$. \p
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Contradiction}	
+	\begin{itemize}
+		\item So, if $p$ is the statement ``20 is not a multiple of 3'', let $q$ be statement "an integer $n$ such that $20=3n$" does not exist. \p
+		
+		\item We assumed $\neg p$ (i.e. ``20 \emph{\textbf{is}} a multiple of 3''). We concluded $r \wedge \neg r$. \p
+		\item But $r \wedge \neg r$ is clearly false, no matter what $r$ is! This is a \emph{\textbf{contradiction}.} \p
+		\item So we showed that $(p \wedge \neg q) \then (r \wedge \neg r)$. \p Since $r \wedge \neg r$ is false, $p \wedge \neg q$ is false, or $(\neg p) \vee q$ is true, or $p \then q$. \p
+		\item We might formalize this in the following way: 
+		\begin{center}
+			\begin{tabular}{r}
+				$(p \wedge \neg q) \then (r \wedge \neg r)$ \\
+				$\neg(r \wedge \neg r)$ \\ 
+				\hline  
+				$\therefore\neg(p \wedge \neg q) $\\  
+				$\therefore (\neg p) \vee q$ \\ 
+				\hline  
+				$\therefore p \then q$ \\
+			\end{tabular}
+		\end{center}
+		\item The symbol $\therefore$ means ``therefore'', and signals that the statement follows from the preceding statement and possibly statements before it.  \p
+		%\item This is a formal logical deduction to show that $p \then q$ follows from the contradictory statement $(p \wedge \neg q) \then (r \wedge \neg r)$. 
+	\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{}
+
+{\Huge Part II: Inference, Proofs, Symbolic Logic}
+
+\end{frame}
+
+
+
+\section{Rules of Inference}
+
+\begin{frame}{Rules of Inference}
+	
+	Simple arguments can be used as building blocks to construct more complicated valid arguments. Certain simple arguments that have been established as valid are very important in terms of their usage. These arguments are called \textbf{Rules of Inference}.
+	
+\end{frame}
+
+% examples and problems: https://www.geeksforgeeks.org/rules-of-inference/#table-of-rule-of-inference
+
+\section{Modus tollens}
+\begin{frame}{Rule of inference: \emph{Modus tollens}}
+	\begin{itemize}
+		\item Breaking down the previous argument, let's look at how each line of reasoning went: 
+		\begin{center}
+			\begin{tabular}{r}
+				$(p \wedge \neg q) \then (r \wedge \neg r)$ \\
+				$\neg(r \wedge \neg r)$ \\
+				\hline
+				$\therefore\neg(p \wedge \neg q) $
+			\end{tabular}
+		\end{center} \p
+		\item Let's say that $P$ is the statement $p \wedge \neg q$, and $Q$ is the statement $r \wedge \neg r$. Then the above deduction becomes: 
+		\begin{center}
+			\begin{tabular}{r}
+				$P \then Q$ \\
+				$\neg Q$ \\
+				\hline
+				$\therefore\neg P$
+			\end{tabular}
+		\end{center}
+		
+%		\begin{definition}[\textbf{modus tollens }]
+%			This is a \emph{\textbf{rule of inference}:} a rule by which if you know certain statements have truth values of $T$, you can form other statements with truth values of $T$. 
+%		\end{definition}
+%		 
+		 \p
+%		
+	\item[\finger] This rule of inference is known as \emph{\textbf{modus tollens}}.  \p
+		\item[\finger] Note the similarity between this rule of inference and the contrapositive: 
+		\[
+		(P \then Q) \iff (\neg Q \then \neg P)
+		\]
+	\end{itemize}
+\end{frame}
+
+\section{Modus ponens}
+\begin{frame}{Rule of inference: \emph{Modus ponens}}
+	\begin{itemize}
+		\item Closely related is the rule of inference known as \textbf{modus ponens}:
+		\begin{center}
+			\begin{tabular}{r}
+				$P \then Q$ \\
+				$P$ \\
+				\hline
+				$\therefore Q$
+			\end{tabular}
+		\end{center}
+		\item Both \emph{modus ponens} and \emph{modus tollens} can be applied to \emph{any statements}. Not just statements involving numbers and sets! 
+		\begin{itemize}
+			\item If I were vegetarian, I'd order from the vegetarian menu. I'm vegetarian, so I'll order from the vegetarian menu. (\emph{Modus ponens})
+			\item If I were vegetarian, I'd order from the vegetarian menu. I'm not ordering from the vegetarian menu, so I'm not vegetarian. (\emph{Modus tollens})
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Ponens vs. Tollens}	
+	
+	\begin{blockz}{0.45}{Modus \textbf{Ponens}: }
+
+		\begin{tabular}{r}
+			$P \then Q$ \\
+			$P$ \\
+			\hline
+			$\therefore Q$
+		\end{tabular}		
+		\vspace{2mm} 
+		
+		result is \textbf{affirmation of conclusion}
+	\end{blockz} \p 
+	\begin{blockz}{0.45}{Modus \textbf{Tollens}: }
+
+	\begin{tabular}{r}
+		$P \then Q$ \\
+		$\neg Q$ \\
+		\hline
+		$\therefore\neg P$
+	\end{tabular}
+	
+	
+	\vspace{2mm}  result is \textbf{denial of hypothesis}
+
+	\end{blockz}
+	
+\end{frame}
+
+
+%\section{De Morgan's Laws}
+%\begin{frame}{De Morgan's Laws}
+%	\begin{itemize}
+%		\item Let's look at the second inference in our contradiction argument: 
+%		\begin{center}
+%			\begin{tabular}{r}
+%				$\neg(p  \wedge \neg q)$ \\
+%				$\therefore (\neg p) \vee q$
+%			\end{tabular}
+%		\end{center}
+%		\item Giving these statements some new names, let's call $P$ the statement $p$ and $Q$ the statement $\neg q$, so we get: 
+%		\begin{center}
+%			\begin{tabular}{r}
+%				$\neg(P  \wedge Q)$ \\
+%				$\therefore (\neg P) \vee (\neg Q)$
+%			\end{tabular}
+%		\end{center}
+%		(note $\neg Q$ means $\neg \neg q$, or ``not not $q$'', which is $q$). 
+%		\item This is one of \emph{de Morgan's laws}. The other one is: 
+%		\begin{center}
+%			\begin{tabular}{r}
+%				$\neg(P  \vee Q)$ \\
+%				$\therefore (\neg P) \wedge (\neg Q)$
+%			\end{tabular}
+%		\end{center}
+%		
+%		\setlength{\abovedisplayskip}{0pt}
+%		\item[\finger] These can also be written as logical equivalences:
+%\begin{center}		
+%		 \fbox{\begin{minipage}{0.5\linewidth}\begin{align*}\vspace{-2mm}			\neg(P \wedge Q) &\iff (\neg P) \vee (\neg Q) \\ \neg(P \vee Q) &\iff (\neg P) \wedge (\neg Q)
+%		\end{align*}
+%	\end{minipage}
+%}\end{center}
+%
+%	\end{itemize}
+%\end{frame}
+
+
+\section{Other rules of inference}
+\begin{frame}{Other rules of inference}
+	
+	\hspace{-5mm}\begin{tabular}{l|c|c}
+	Addition	&  \BOX{20mm}{\begin{tabular}{r}$P$ \\ \hline	$\therefore P \vee Q$	\end{tabular}}&  \BOX{6cm}{\scriptsize if P is true, then P or Q must be true.}\\
+		\hline
+\p	Conjunction	& \begin{tabular}{r}
+		$P$ \\
+		$Q$ \\
+		\hline
+		$\therefore P \wedge Q$
+	\end{tabular} &  \BOX{6cm}{\scriptsize if P is true, and Q is true, then the logical conjunction of the two propositions $P\land Q$ is true.}\\
+		\hline
+\p	Simplification	& {\small\BOX{10mm}{\begin{tabular}{r}$P \wedge Q$ \\	\hline	$\therefore P$ \end{tabular}}~~~\BOX{10mm}{\begin{tabular}{r}$P \wedge Q$ \\	\hline	$\therefore Q$ \end{tabular}}} &  \BOX{6cm}{\scriptsize if the conjunction P and Q is true, then P is true, and Q is true.}\\
+		\hline
+\p	\BOX{4cm}{Disjunctive syllogism:\\ {\scriptsize a.k.a. modus tollendo ponens \\ a.k.a. "affirmation by denying"}}	& \begin{tabular}{r}
+		$P \vee Q$ \\
+		$\neg P$ \\
+		\hline
+		$\therefore Q$
+	\end{tabular} &  \BOX{6cm}{\scriptsize I will choose soup or I will choose salad.\\
+	I will not choose soup.\\
+	Therefore, I will choose salad.} \\
+		\hline
+\p	Hypothetical syllogism:	& \begin{tabular}{r}
+		$P \then Q$ \\
+		$Q \then R$ \\
+		\hline
+		$\therefore P \then R$
+	\end{tabular} &  \BOX{6cm}{\scriptsize If I do not wake up, then I cannot go to work.\\
+	If I cannot go to work, then I will not get paid.\\
+	Therefore, if I do not wake up, then I will not get paid.}\\
+	\end{tabular}
+
+\vspace{5mm}
+
+\p	{\scriptsize and there are more of those...	See e.g. \href{https://en.wikipedia.org/wiki/List_of_rules_of_inference}{Wikipedia $\rightarrow$ List of rules of inference}}
+
+
+		
+
+	
+	
+
+\end{frame}
+
+
+
+
+\section{De Morgan's Laws}
+\begin{frame}{De Morgan's Laws}
+	\begin{itemize}
+		\item Let's look at the second inference in our contradiction argument: 
+		\begin{center}
+			\begin{tabular}{r}
+				$\neg(p  \wedge \neg q)$ \\
+				$\therefore (\neg p) \vee q$
+			\end{tabular}
+		\end{center}
+		\item Giving these statements some new names, let's call $P$ the statement $p$ and $Q$ the statement $\neg q$, so we get: 
+		\begin{center}
+			\begin{tabular}{r}
+				$\neg(P  \wedge Q)$ \\
+				$\therefore (\neg P) \vee (\neg Q)$
+			\end{tabular}
+		\end{center}
+		(note $\neg Q$ means $\neg \neg q$, or ``not not $q$'', which is $q$). 
+		\item This is one of \emph{de Morgan's laws}. The other one is: 
+		\begin{center}
+			\begin{tabular}{r}
+				$\neg(P  \vee Q)$ \\
+				$\therefore (\neg P) \wedge (\neg Q)$
+			\end{tabular}
+		\end{center}
+		
+		\setlength{\abovedisplayskip}{0pt}
+		\item[\finger] These can also be written as logical equivalences:
+		\begin{center}		
+			\fbox{\begin{minipage}{0.5\linewidth}\begin{align*}\vspace{-2mm}			\neg(P \wedge Q) &\iff (\neg P) \vee (\neg Q) \\ \neg(P \vee Q) &\iff (\neg P) \wedge (\neg Q)
+					\end{align*}
+				\end{minipage}
+		}\end{center}
+		
+	\end{itemize}
+\end{frame}
+
+
+
+\section{Algebraic properties}
+\begin{frame}{Algebraic properties of logic}
+	\begin{itemize}
+		\item Commutativity: 
+		\[
+		P \vee Q \iff Q \vee P \qquad P \wedge Q \iff Q \wedge P
+		\]
+		\item Associativity: 
+		\[
+		P \vee (Q \vee R) \iff (P \vee Q) \vee R \qquad P \wedge (Q \wedge R) \iff (P \wedge Q) \wedge R
+		\]
+		\item de Morgan's Laws:
+		\[
+		\neg (P \vee Q) \iff (\neg P) \wedge (\neg Q) \qquad \neg(P \wedge Q) \iff (\neg P) \vee(\neg Q)
+		\]
+		\item Negation: 
+		\[
+		P \iff \neg\neg P \qquad P \vee \neg P \textrm{ is TRUE} \qquad P \wedge \neg P \textrm{ is FALSE}
+		\]
+	\end{itemize}
+\end{frame}
+
+\section{Examples}
+\begin{frame}{Example: Proof Based on Inference}
+	Construct a proof to show that the following argument is valid: 
+	\newline
+	If the programming team is happy, or the specification is clear, then the program will be written under budget. If the program is written under budget, the boss will rejoice. The boss will not rejoice. Therefore, the specification is not clear.\\
+	\vspace{3mm}
+	
+	\begin{itemize}\itemsep2mm
+		\item \textbf{Solution.} Let $P$ be the statement ``The programming team is happy'', $S$ be the statement ``The specification is clear'', $B$ be the statement ``The program will be written under budget'', and $R$ be the statement ``The boss will rejoice.'' 
+		\item We are told: 
+		\begin{enumerate}
+			\item $(P \vee S) \then B$
+			\item $B \then R$
+			\item $\neg R$
+		\end{enumerate}
+	\end{itemize}
+	\vspace{3in}
+\end{frame}
+
+\begin{frame}{Example: Proof Based on Inference}
+	\begin{itemize}
+		\item \textbf{Solution.} Let $P$ be the statement ``The programming team is happy'', $S$ be the statement ``The specification is clear'', $B$ be the statement ``The program will be written under budget'', and $R$ be the statement ``The boss will rejoice.'' 
+		\item A syllogistic argument based on inference could look like this: 
+	\end{itemize}
+	\begin{center}
+		\begin{tabular}{lr}
+			1. $(P \vee S) \then B$ & (Assumption 1) \\
+			2. $B \then R$ & (Assumption 2) \\
+			3. $\neg R$ & (Assumption 3) \\
+			4. $\neg B$ & (Modus tollens, steps 2 and 3) \\
+			5. $\neg(P \vee S)$ & (Modus tollens, steps 1 and 4) \\
+			6. $(\neg P) \wedge (\neg S)$ & (de Morgan's Laws, step 5) \\
+			7. $(\neg S) \wedge (\neg P)$ & (Commutativity, step 6) \\
+			8. $\neg S$ & (Simplification, step 7)
+		\end{tabular}
+	\end{center}
+	\qed
+	%\end{itemize}
+\end{frame}
+
+%\begin{frame}{The existential quantifier}
+%	\begin{itemize}
+%		\item The very first statement we looked at was ``15 is a multiple of 3''. We observed that what this really was saying was: 
+%		\begin{center}
+%			There exists an $n \in \N$ such that $3n = 15$.
+%		\end{center}
+%		\item In set theory and in symbolic logic, the phrase ``There exists'' is used so often that it has a special symbol: $\exists$. The above sentence can be written purely symbolically as: 
+%		\[
+%		\exists n \in \N \textrm{ s.t. } 3n = 15
+%		\]
+%		The letters $\textrm{s.t.}$ means ``such that''. Some authors put a ``:'' here instead. Others use the symbol $\ni$. 
+%		\item The symbol $\exists$ is the \emph{existential quantifier}. 
+%	\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{The universal quantifier}
+%	\begin{itemize}
+%		\item What if we instead wanted to make a statement about \emph{all} numbers? Something like:  
+%		\begin{center}
+%			For all $n \in \N$, $n^2 + n$ is even. 
+%		\end{center}
+%		We use the symbol $\forall$ to mean ``For all'', so the above sentence could be written symbolically as: 
+%		\begin{center}
+%			$\forall n \in \N, n^2 + n$ is even.
+%		\end{center}
+%		\item The symbol $\forall$ is the \emph{universal} quantifier. 
+%		\item The above sentence could actually be written so as to \emph{combine} the quantifiers: 
+%		\[
+%		\forall n \in \N, \exists m \in \N \textrm{ s.t. } n^2 + n = 2m. 
+%		\]
+%		\item Recall that to prove an existential claim, we need to produce an example; to disprove a universal claim, we need to produce a counterexample. 
+%	\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{Example: Disproving a universal claim}
+%	Let $X = \{n \in \N : 1 \leq n \leq 100\}$. Show that the statement \[
+%	\forall x \in X , x^2 + x + 41 \textrm{ is prime}
+%	\]
+%	is false. 
+%	\newline\newline
+%	\textbf{Solution.} \emph{Proof.}
+%	\begin{itemize}
+%		\item We can try looking for counterexamples by hand, but we might be looking for a while. 
+%		\item A better observation: if $x^2$ and $x$ are both divisible by 41, this would mean we could factor out a 41 from $x^2 + x + 41$, so it could not be prime. 
+%		\item One way to do this: let $x=41$:
+%		\[
+%		x^2 + x + 41 = (41)^2 + 41 + 41 = 41(41 + 1 + 1) = 41(43),
+%		\]
+%		which is not prime. \qed
+%	\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{Negation of the quantifiers}
+%	\begin{itemize}
+%		\item So we have shown that the following statement is true: 
+%		\[
+%		\neg \left( \forall x \in X , x^2 + x + 41 \textrm{ is prime.}\right) 
+%		\]
+%		\item Notice that we proved a seemingly similar statement: 
+%		\[
+%		\exists x \in X \textrm{ s.t. } x^2 + x + 41 \textrm{ is not prime.}
+%		\]
+%		\item Let's say that $P(x)$ is a statement about the number $x$, e.g., the statement ``$x^2 + x + 41$ is prime''. Then $P(x)$ is either True or False, depending on the value of $x$. 
+%		\item In symbolic logic, we have: 
+%		\[
+%		\neg\big(\forall x, P(x)\big) \iff \exists x \textrm{ s.t. } \neg P(x).
+%		\]
+%		\item This says, ``If it's not true that for all $x$, $P(x)$ is true, then that means there exists an $x$ for which $P(x)$ is false.
+%		\item Similarly, we have: 
+%		\[
+%		\neg\big(\exists x \textrm{ s.t. } P(x)\big) \iff \forall x, \neg P(x).
+%		\] 
+%	\end{itemize}
+%\end{frame}
+
+%\begin{frame}{Looking back at truth tables}
+%	\begin{itemize}
+%		\item Earlier we discussed \emph{truth tables:} a tool that can help us determine if a compound statement is true based on whether other statements are true. 
+%	\end{itemize}
+%	\begin{center}
+%		\begin{tabular}{|c|c|c|}
+%			\hline
+%			$p$ & $q$ & $(\neg p) \vee q$ \\
+%			\hline
+%			$T$ & $T$ & $T$ \\
+%			\hline
+%			$T$ & $F$ & $F$ \\
+%			\hline
+%			$F$ & $T$ & $T$ \\
+%			\hline
+%			$F$ & $F$ & $T$\\
+%			\hline
+%		\end{tabular}
+%	\end{center}
+%\end{frame}
+
+%\section{Symbolic logic and set theory}
+
+\begin{frame}{Symbolic logic and set theory}
+	\begin{itemize}
+		\item Symbolic logic and set theory are two languages describing the same thing: replace ``statements'' with ``sets'', and the operations $\neg$, $\wedge$, $\vee$, and $\then$ with $^c$, $\cap$, $\cup$, and $\subseteq$ and you have the same statements.
+		(Recall that $x \in A^c$ means $x \not\in A$.)\p
+		\item Indeed, say $A$ and $B$ are sets, $p$ is the statement $x \in A$, and $q$ is the statement $x \in B$. \p
+		\begin{blockz}{0.5}{Symbolic logic and sets}\vspace{-5mm}\begin{align*}
+				x \in A^c \quad &\iff \quad \neg p\\ 
+				x \in A \cap B \quad &\iff \quad p \wedge q\\
+				x \in A \cup B \quad &\iff \quad p \vee q\\
+				A \subseteq B \quad & \iff \quad p \then q
+		\end{align*}\end{blockz}\p
+		\item Indeed, $A \subseteq B$ means if $x \in A$, then $x \in B$, or $p \then q$.
+	\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Computer circuitry}
+	\begin{itemize}
+		\item The data in a computer is stored in ``bits'', or 0s and 1s. 
+		\item A ``bit'' is actually a \emph{voltage:} an electrical signal, or a lack of an electrical signal. 
+		\begin{itemize}
+			\item 0: No signal. The voltage is ``off'' (usually between 0 and 0.8 V in computers).
+			\item 1: Signal. The voltage is ``on'' (usually between 3 and 5 V in computers). 
+		\end{itemize}
+		\item Computer circuitry is built up of components that receive information input in the form of voltage---its presence (1), or its absence (0)---and process that input into information output (again a voltage, either 1 or 0). 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{The AND gate}
+	\begin{tabular}{cc}
+		\includegraphics[scale=0.4]{andcirc} &\includegraphics[scale=0.45]{andgate}
+	\end{tabular}
+\end{frame}
+
+\begin{frame}{The truth table of the AND gate}
+	\begin{itemize}
+		\item The AND gate's truth table tells us the \emph{output of the gate given its input.}
+		\item In other words, the truth table gives us \emph{all possible outputs given all possible inputs.} 
+	\end{itemize}
+	\begin{center}
+		\includegraphics[scale=0.44]{andgate1} \newline\newline
+		\begin{tabular}{|c|c|c|}
+			\hline
+			A & B & A AND B \\
+			\hline
+			1 & 1 & 1 \\
+			\hline 
+			1 & 0 & 0 \\
+			\hline
+			0 & 1 & 0 \\
+			\hline
+			0 & 0 & 0 \\
+			\hline
+		\end{tabular}
+		\quad
+		\begin{tabular}{|c|c|c|}
+			\hline
+			$p$ & $q$ & $p \wedge q$ \\
+			\hline
+			$T$ & $T$ & $T$ \\
+			\hline 
+			$T$ & $F$ & $F$ \\
+			\hline
+			$F$ & $T$ & $F$ \\
+			\hline
+			$F$ & $F$ & $F$ \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\begin{itemize}
+		\item Notice that in a certain sense, the truth tables for the AND gate and for the logical operator $\wedge$ are \emph{equivalent}. 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{The NOT gate}
+	\includegraphics[scale=0.45]{notcirc}\qquad
+	\includegraphics[scale=0.6]{notgate}
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$p$ & $\neg p$ \\
+			\hline 
+			$F$ & $T$ \\
+			\hline
+			$T$  & $F$ \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\begin{frame}{The OR gate}
+	\begin{tabular}{cc}
+		\includegraphics[scale=0.4]{orcirc} &\includegraphics[scale=0.45]{orgate}
+	\end{tabular}
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			$q$ & $p$ & $p \vee q$ \\
+			\hline
+			$F$ & $F$ & $F$ \\
+			\hline
+			$F$ & $T$ & $T$ \\
+			\hline
+			$T$ & $F$ & $T$ \\
+			\hline
+			$T$ & $T$ & $T$ \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\begin{frame}{Logic circuits}
+	\begin{itemize}
+		\item Combinations of these logic gates can be linked together to form \emph{logic circuits}, which allow for the processing of more sophisticated logical deductions. 
+		\item \textbf{Example}: What is the output of this logic circuit, and what is its truth table? 
+	\end{itemize}
+	\begin{center}
+		\includegraphics[scale=0.5]{athenbcirc}
+	\end{center}
+	\begin{itemize}
+		\item The output is $(\neg A) \vee B$.
+	\end{itemize}
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			$A$ & $B$ & $\neg A$ & $(\neg A) \vee B$ & $A \Rightarrow B$ \\
+			\hline
+			0 & 0 & 1 &1 & 1 \\
+			\hline
+			0 & 1 & 1 & 1 & 1 \\
+			\hline
+			1 & 0 & 0 & 0 & 0 \\
+			\hline
+			1 & 1 & 0 & 1 & 1\\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\begin{frame}{XOR ~~~ $A\oplus B$   ("but not both")}
+	\textbf{Problem.} Create a logical statement that agrees with the following truth table, and a logic circuit that will produce this output: 
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			A & B & OUT \\
+			\hline 
+			0 & 0 & 0 \\
+			\hline
+			0 & 1 & 1 \\
+			\hline
+			1 & 0 & 1 \\
+			\hline
+			1 & 1 & 0 \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\textbf{Statement:}
+	\[
+	(A \vee B) \wedge \neg(A \wedge B)
+	\]
+	\textbf{Logic gate:}
+	\begin{center}
+		\includegraphics[scale=0.5]{xorcirc}
+	\end{center}
+\end{frame}
+
+\begin{frame}{XNOR ~~~~$\neg(A\oplus B)$}
+	What do we get when we put a NOT gate at the output of the previous circuit?
+	\begin{center}
+		\includegraphics[scale=0.5]{xnorcirc}
+		\newline \newline
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			A & B & OUT & A $\Leftrightarrow$ B\\
+			\hline 0 & 0 & 1 & 1\\
+			\hline
+			0 & 1 & 0 & 0\\
+			\hline
+			1 & 0 & 0 & 0\\
+			\hline
+			1 & 1 & 1 & 1\\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	The circuit is called XNOR. It gives the truth value of $\iff$:
+	\[
+	(A \iff B) \quad \textrm{is equivalent to} \quad \neg((A \vee B) \wedge \neg(A \wedge B))
+	\]
+\end{frame}
+
+\begin{frame}{One more example}
+	Can the following logic gate be simplified? 
+	\begin{tabular}{l}  
+		\begin{tabular}{l}
+			\includegraphics[scale=0.5]{demorgancirc1}
+			
+		\end{tabular} 
+		\begin{tabular}{r}
+			\parbox{0.4\linewidth}{
+				$$
+				(\neg A) \vee (\neg B)
+				$$}
+		\end{tabular}
+	\end{tabular}
+	\newline 
+	\emph{Yes!!} We can simplify it with de Morgan's laws! 
+	\begin{tabular}{l}  
+		\begin{tabular}{l}
+			\includegraphics[scale=0.5]{demorgancirc2}
+			
+		\end{tabular} 
+		\begin{tabular}{r}
+			\parbox{0.4\linewidth}{
+				$$
+				\neg(A \wedge B)
+				$$}
+		\end{tabular}
+	\end{tabular}
+	\begin{center} 
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			$A$ & $B$ & $(\neg A) \vee (\neg B)$ & $\neg(A \wedge B)$ \\
+			\hline
+			0 & 0 & 1 & 1 \\
+			\hline
+			0 & 1 & 1 & 1 \\
+			\hline
+			1 & 0 & 1 & 1 \\
+			\hline
+			1 & 1 & 0 & 0 \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\section{Summary}
+\begin{frame}{So why do symbolic logic?}
+	\begin{itemize}
+		\item Symbolic logic helps us analyze logic circuits. 
+		\item Equivalent statements in symbolic logic correspond to logic circuits with identical outputs. 
+		\item Can use symbolic logic to \emph{simplify} logic circuits, or tell if two logic circuits are \emph{equivalent}. 
+		\item Can also use symbolic logic to \emph{build logic circuits}, especially if you have multiple lines of input. (Once you get good at it, symbolic logic is fantastic for handling several logical inputs systematically.)
+	\end{itemize}
+\end{frame}
+
+\end{document}

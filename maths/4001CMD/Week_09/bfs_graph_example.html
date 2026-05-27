@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFS Graph Traversal Visualization (Demo 2)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the visualization */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .node {
+            transition: all 0.3s ease-in-out;
+        }
+        .node-circle {
+            stroke-width: 2;
+            stroke: #374151; /* gray-700 */
+            fill: #FFFFFF;
+        }
+        .node-text {
+            font-size: 16px;
+            font-weight: 600;
+            fill: #1F2937; /* gray-800 */
+            pointer-events: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .edge {
+            stroke: #6B7280; /* gray-500 */
+            stroke-width: 2;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Node states */
+        .node-queued .node-circle {
+            fill: #FDE047; /* yellow-300 */
+            stroke: #FACC15; /* yellow-400 */
+        }
+        .node-visited .node-circle {
+            fill: #86EFAC; /* green-300 */
+            stroke: #22C55E; /* green-500 */
+        }
+
+        /* Animation for queue items */
+        .queue-item {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 4px;
+            border-radius: 9999px;
+            background-color: #FDE047;
+            font-weight: 600;
+            color: #4B5563;
+            animation: popIn 0.3s ease;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-4xl bg-white rounded-lg p-6">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">
+            BFS Algorithm - Graph Traversal (Demo 2)
+        </h1>
+        
+        <!-- Main container - Vertical layout -->
+        <div class="flex flex-col gap-6">
+            
+            <!-- Visualization Area -->
+            <div class="flex-grow border-2 border-gray-200 rounded-lg overflow-hidden">
+                <svg id="bfs-svg" class="w-full h-[450px] lg:h-[500px]"></svg>
+            </div>
+            
+            <!-- Controls and Info Panel -->
+            <div class="w-full flex-shrink-0 space-y-4">
+                
+                <!-- Control Buttons -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 mb-2">Controls</h2>
+                    <div class="flex space-x-2">
+                        <button id="prev-btn" class="w-full bg-white text-gray-700 border border-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Previous
+                        </button>
+                        <button id="next-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next
+                        </button>
+                        <button id="reset-btn" class="w-1/2 bg-white text-red-700 border border-red-400 font-semibold py-2 px-4 rounded-lg hover:bg-red-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step Description -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 mb-1">Step Description</h2>
+                    <div class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
+                        <p id="step-description" class="text-lg text-gray-800">Algorithm ready. Click 'Next' to start.</p>
+                    </div>
+                </div>
+
+                <!-- Info Panels (Queue, Visited, Legend) in a grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Queue Visualization -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-1">Queue</h2>
+                        <div id="queue-container" class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-2 flex flex-wrap items-center">
+                            <span id="queue-placeholder" class="text-gray-400 italic">Queue is empty...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Visited Order -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-1">Visited Order</h2>
+                        <div id="visited-container" class="min-h-[50px] bg-white border border-gray-300 rounded-lg p-3">
+                            <span id="visited-placeholder" class="text-gray-400 italic">No nodes visited...</span>
+                            <p id="visited-output" class="text-lg font-mono text-gray-800 break-words"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Legend -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Legend</h2>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-700 bg-white mr-2"></div>
+                                <span>Unvisited</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full border-2 border-yellow-400 bg-yellow-300 mr-2"></div>
+                                <span>In Queue</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full border-2 border-green-500 bg-green-300 mr-2"></div>
+                                <span>Visited</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- DOM Elements ---
+            const svg = document.getElementById('bfs-svg');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const queueContainer = document.getElementById('queue-container');
+            const queuePlaceholder = document.getElementById('queue-placeholder');
+            const visitedContainer = document.getElementById('visited-container');
+            const visitedPlaceholder = document.getElementById('visited-placeholder');
+            const visitedOutput = document.getElementById('visited-output');
+            const stepDescription = document.getElementById('step-description');
+
+            const svgNS = "http://www.w3.org/2000/svg";
+
+            // --- Graph Data Structure (from image) ---
+            // 1. Node positions based on image layout
+            const graphNodes = {
+                'A': { x: 20, y: 30 }, 'B': { x: 40, y: 30 }, 'C': { x: 60, y: 30 }, 'D': { x: 80, y: 30 },
+                'E': { x: 20, y: 70 }, 'F': { x: 40, y: 70 }, 'G': { x: 60, y: 70 }, 'H': { x: 80, y: 70 }
+            };
+
+            // 2. Adjacency list for undirected edges from image
+            const adjList = {
+                'A': ['B', 'E'],
+                'B': ['A', 'F'],
+                'C': ['D', 'F', 'G'],
+                'D': ['C', 'G', 'H'],
+                'E': ['A'],
+                'F': ['B', 'C', 'G'],
+                'G': ['C', 'D', 'F', 'H'],
+                'H': ['D', 'G']
+            };
+
+            // --- State ---
+            let nodeElements = {}; // Stores { id: { group, circle, text } }
+            let edgeElements = [];
+            let steps = []; // Stores the sequence of algorithm steps
+            let currentStep = 0;
+            
+            // Get all node IDs for setting initial states
+            const allNodeIds = Object.keys(graphNodes);
+            const initialNodeStates = allNodeIds.reduce((acc, id) => {
+                acc[id] = 'default';
+                return acc;
+            }, {});
+            
+            // --- Utility Functions ---
+            const getResponsiveCoords = (x, y) => {
+                const bounds = svg.getBoundingClientRect();
+                return {
+                    cx: (x / 100) * bounds.width,
+                    cy: (y / 100) * bounds.height
+                };
+            };
+            
+            // --- Drawing Functions ---
+            
+            function drawGraph() {
+                svg.innerHTML = '';
+                nodeElements = {};
+                edgeElements = [];
+
+                const bounds = svg.getBoundingClientRect();
+                if (bounds.width === 0 || bounds.height === 0) {
+                    requestAnimationFrame(drawGraph);
+                    return;
+                }
+
+                const edgeGroup = document.createElementNS(svgNS, 'g');
+                const nodeGroup = document.createElementNS(svgNS, 'g');
+                svg.appendChild(edgeGroup);
+                svg.appendChild(nodeGroup);
+
+                const drawnEdges = new Set();
+
+                // 1. Draw edges
+                for (const u in adjList) {
+                    const { cx: x1, cy: y1 } = getResponsiveCoords(graphNodes[u].x, graphNodes[u].y);
+                    for (const v of adjList[u]) {
+                        const edgeId1 = `${u}-${v}`;
+                        const edgeId2 = `${v}-${u}`;
+                        
+                        // Draw each edge only once for an undirected graph
+                        if (!drawnEdges.has(edgeId1) && !drawnEdges.has(edgeId2)) {
+                            const { cx: x2, cy: y2 } = getResponsiveCoords(graphNodes[v].x, graphNodes[v].y);
+                            const edge = document.createElementNS(svgNS, 'line');
+                            edge.setAttribute('x1', x1);
+                            edge.setAttribute('y1', y1);
+                            edge.setAttribute('x2', x2);
+                            edge.setAttribute('y2', y2);
+                            edge.setAttribute('class', 'edge');
+                            edge.setAttribute('id', `edge-${edgeId1}`);
+                            edgeGroup.appendChild(edge);
+                            edgeElements.push(edge);
+                            drawnEdges.add(edgeId1);
+                        }
+                    }
+                }
+
+                // 2. Draw nodes
+                for (const nodeId in graphNodes) {
+                    const node = graphNodes[nodeId];
+                    const { cx, cy } = getResponsiveCoords(node.x, node.y);
+
+                    const nodeG = document.createElementNS(svgNS, 'g');
+                    nodeG.setAttribute('class', 'node');
+                    nodeG.setAttribute('id', `node-${nodeId}`);
+                    nodeG.setAttribute('transform', `translate(${cx}, ${cy})`);
+
+                    const circle = document.createElementNS(svgNS, 'circle');
+                    circle.setAttribute('r', 20);
+                    circle.setAttribute('class', 'node-circle');
+                    
+                    const text = document.createElementNS(svgNS, 'text');
+                    text.setAttribute('class', 'node-text');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('dy', '0.3em');
+                    text.textContent = nodeId;
+
+                    nodeG.appendChild(circle);
+                    nodeG.appendChild(text);
+                    nodeGroup.appendChild(nodeG);
+                    
+                    nodeElements[nodeId] = { group: nodeG, circle, text };
+                }
+            }
+
+            function handleResize() {
+                drawGraph();
+                // Re-apply the current step's state after redrawing
+                if (steps.length > 0) {
+                    renderStep(currentStep, false); // false to avoid history push
+                }
+            }
+
+            // --- UI Update Functions ---
+            
+            function setNodeState(id, state) { // state: 'queued' | 'visited' | 'default'
+                const el = nodeElements[id];
+                if (!el) return;
+                
+                el.group.classList.remove('node-queued', 'node-visited');
+                if (state === 'queued') {
+                    el.group.classList.add('node-queued');
+                } else if (state === 'visited') {
+                    el.group.classList.add('node-visited');
+                }
+            }
+            
+            /**
+             * Updates the Queue UI based on an array of node IDs
+             */
+            function updateQueueUI(queueIds) {
+                if (queueIds.length === 0) {
+                    queueContainer.innerHTML = ''; 
+                    queueContainer.appendChild(queuePlaceholder); 
+                } else {
+                    if (queuePlaceholder.parentNode) {
+                        queuePlaceholder.remove(); 
+                    }
+                    queueContainer.innerHTML = ''; 
+                    queueIds.forEach(nodeId => {
+                        const item = document.createElement('div');
+                        item.className = 'queue-item';
+                        item.textContent = nodeId;
+                        queueContainer.appendChild(item);
+                    });
+                }
+            }
+            
+            function updateVisitedUI(visitedOrder) {
+                if (visitedOrder.length === 0) {
+                    visitedOutput.textContent = '';
+                    if (!visitedPlaceholder.parentNode) {
+                        visitedContainer.prepend(visitedPlaceholder);
+                    }
+                } else {
+                    if (visitedPlaceholder.parentNode) {
+                        visitedPlaceholder.remove();
+                    }
+                    visitedOutput.textContent = visitedOrder.join(' → ');
+                }
+            }
+
+            // --- Algorithm Step Generation ---
+
+            /**
+             * Generates all steps of the BFS algorithm and stores them in the 'steps' array.
+             */
+            function generateBFSSteps() {
+                steps = []; // Clear previous steps
+                let queue = [];
+                let visited = new Set();
+                let visitedOrder = [];
+                let nodeStates = { ...initialNodeStates };
+                
+                const startNodeId = 'B'; // Start at 'B'
+
+                // Initial state (Step 0)
+                steps.push({
+                    nodeStates: { ...initialNodeStates },
+                    queue: [],
+                    visitedOrder: [],
+                    message: `Algorithm ready. Start node is '${startNodeId}'. Click 'Next'.`
+                });
+
+                // 1. Enqueue start node
+                queue.push(startNodeId);
+                visited.add(startNodeId);
+                nodeStates[startNodeId] = 'queued';
+                steps.push({
+                    nodeStates: { ...nodeStates },
+                    queue: [...queue],
+                    visitedOrder: [...visitedOrder],
+                    message: `Enqueue start node '${startNodeId}'.`
+                });
+
+                // 2. Loop while queue is not empty
+                while (queue.length > 0) {
+                    // 3. Dequeue node
+                    const currentNodeId = queue.shift();
+                    nodeStates[currentNodeId] = 'visited';
+                    visitedOrder.push(currentNodeId);
+                    steps.push({
+                        nodeStates: { ...nodeStates },
+                        queue: [...queue],
+                        visitedOrder: [...visitedOrder],
+                        message: `Dequeue and visit node '${currentNodeId}'.`
+                    });
+
+                    // 5. Enqueue neighbors
+                    // Sort neighbors alphabetically for deterministic order
+                    const neighbors = (adjList[currentNodeId] || []).slice().sort();
+                    let childrenEnqueued = [];
+                    for (const neighborId of neighbors) {
+                        if (!visited.has(neighborId)) {
+                            visited.add(neighborId);
+                            queue.push(neighborId);
+                            nodeStates[neighborId] = 'queued';
+                            childrenEnqueued.push(neighborId);
+                        }
+                    }
+                    
+                    if (childrenEnqueued.length > 0) {
+                        steps.push({
+                            nodeStates: { ...nodeStates },
+                            queue: [...queue],
+                            visitedOrder: [...visitedOrder],
+                            message: `Enqueue unvisited neighbors of '${currentNodeId}': ${childrenEnqueued.join(', ')}.`
+                        });
+                    } else if (neighbors.length > 0) {
+                         steps.push({
+                            nodeStates: { ...nodeStates },
+                            queue: [...queue],
+                            visitedOrder: [...visitedOrder],
+                            message: `Node '${currentNodeId}' has no unvisited neighbors.`
+                        });
+                    } else {
+                         steps.push({
+                            nodeStates: { ...nodeStates },
+                            queue: [...queue],
+                            visitedOrder: [...visitedOrder],
+                            message: `Node '${currentNodeId}' has no neighbors.`
+                        });
+                    }
+                }
+
+                // 6. Finished
+                steps.push({
+                    nodeStates: { ...nodeStates },
+                    queue: [],
+                    visitedOrder: [...visitedOrder],
+                    message: "Traversal complete. Queue is empty."
+                });
+            }
+
+            // --- Step Rendering and Navigation ---
+
+            /**
+             * Renders a specific step from the 'steps' array.
+             * @param {number} index The index of the step to render.
+             */
+            function renderStep(index) {
+                if (index < 0 || index >= steps.length) return;
+
+                currentStep = index;
+                const step = steps[currentStep];
+
+                // Update node visuals
+                Object.keys(step.nodeStates).forEach(nodeId => {
+                    setNodeState(nodeId, step.nodeStates[nodeId]);
+                });
+
+                // Update UI panels
+                updateQueueUI(step.queue);
+                updateVisitedUI(step.visitedOrder);
+                stepDescription.textContent = step.message;
+
+                // Update button states
+                prevBtn.disabled = (currentStep === 0);
+                nextBtn.disabled = (currentStep === steps.length - 1);
+                resetBtn.disabled = (currentStep === 0);
+            }
+
+            function handleNext() {
+                if (currentStep < steps.length - 1) {
+                    renderStep(currentStep + 1);
+                }
+            }
+
+            function handlePrev() {
+                if (currentStep > 0) {
+                    renderStep(currentStep - 1);
+                }
+            }
+            
+            function resetVisualization() {
+                renderStep(0);
+            }
+
+            // --- Event Listeners ---
+            prevBtn.addEventListener('click', handlePrev);
+            nextBtn.addEventListener('click', handleNext);
+            resetBtn.addEventListener('click', resetVisualization);
+            window.addEventListener('resize', handleResize);
+            
+            // --- Initial Setup ---
+            drawGraph();
+            generateBFSSteps();
+            renderStep(0); // Render the initial state
+
+        });
+    </script>
+
+</body>
+</html>

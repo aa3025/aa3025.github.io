@@ -1,0 +1,354 @@
+Slide 0: Table of Contents and Orientation
+Amanda: Welcome back. Last week we focused on logic and proof structure; this week we shift to combinatorics, where we count possibilities systematically.
+Jack: So we are moving from proving statements to counting structured choices.
+Amanda: Exactly. We begin with what combinatorics is, then a famously hard counting problem: the partition number p of n.
+Amanda: After that, we cover the addition principle and extensions of it through the multiplication principle and Cartesian product.
+Amanda: Then we address double- and triple-counting, followed by the sieve principle, with examples for two sets and three sets.
+Amanda: Next we connect functions, words and selections, the power set, and encoding information using ordered selection with replacement.
+Amanda: Then we compare permutations and combinations, calculate binomial coefficients recursively and non-recursively, and use stars and bars for selection with replacement.
+Amanda: We finish with binomials: a look at binomials, binomials and selections, binomials in general, the binomial theorem, and further examples.
+Jack: Perfect. Now the whole roadmap is clear.
+Amanda: Great, now that we have the roadmap, let's jump in.
+
+Slide 1: What is Combinatorics?
+Jack: So, what is combinatorics?
+Amanda: Combinatorics studies counting, arranging, and selecting discrete objects.
+Jack: "Discrete" meaning separate objects, not continuous values like real-number intervals.
+Amanda: Right. Distinct objects, finite choices, and explicit configurations.
+Jack: Where does this show up in computing day to day?
+Amanda: Everywhere. Test-case generation, key-space size in security, possible schedules in operating systems, graph traversals, feature selection in machine learning, and protocol state counts.
+Jack: So this is not just abstract math. It tells us what is feasible.
+Amanda: That is right. If a search space is 10 million, brute force might still be practical. If it is 10 to the 40, we need heuristics, structure, or approximations.
+Jack: What are the main branches inside combinatorics?
+Amanda: Enumeration asks "how many?" Combinatorial design asks "how do we arrange with constraints?" Combinatorial optimization asks "what is the best arrangement?"
+Jack: Could one problem involve all three?
+Amanda: Very often. You count possibilities, restrict by rules, and then optimize among valid outcomes.
+Jack: Can we quickly connect that to concrete examples from computing?
+Amanda: Sure. For example, we can count functions from set one, two, three into set zero, one; choose five students from a class of thirty; or count the execution orders of seven CPU processes.
+Jack: And the partition number p of ten is another example of a counting problem that is easy to ask but hard to solve neatly.
+Amanda: Exactly. Combinatorics is deeply connected to functions, sets, cardinality, number theory, and logic.
+Amanda: In practice, we rely on the addition and multiplication principles as our core counting tools.
+
+Slide 2: A Famously Hard Problem, the Partition Number p of n
+Amanda: Next up, a famously hard problem: the partition number p of n.
+Amanda: The partition number p of n counts the number of ways to write n as a sum of positive integers, ignoring order.
+Jack: So 4 can be written as 3 plus 1, but 1 plus 3 is not new.
+Amanda: Yes, that checks out. For n equals 4, p of 4 equals 5.
+The partitions are 4, 3 plus 1, 2 plus 2, 2 plus 1 plus 1, and 1 plus 1 plus 1 plus 1.
+For n equals 5, p of 5 equals 7.
+Jack: For small n, we can list by hand. Why is this considered hard?
+Amanda: Because the count grows quickly and there is no elementary closed formula like n factorial. You can compute values, but not with one neat expression that behaves like the permutation formula.
+Jack: Is there at least a good approximation?
+Amanda: There is a famous one from Hardy and Ramanujan.
+p of n is asymptotically one over four n root three, times e to the power pi root of two n over three.
+Jack: So the exponential term explains why values blow up.
+Amanda: Yes. Partition numbers are a perfect reminder that "simple question" does not imply "simple formula."
+
+Slide 3: The Addition Principle
+Jack: All right, the addition principle, what exactly is it?
+Amanda: The addition principle handles disjoint alternatives.
+If option A has n1 outcomes and option B has n2 outcomes, and no outcome belongs to both, total outcomes are n1 plus n2.
+Jack: The keyword is disjoint.
+Amanda: Precisely. If overlap exists and we still add directly, we overcount.
+Jack: Give me a quick concrete case.
+Amanda: Choose one faculty member from either 17 computer science staff or 8 mathematics staff, with no overlap between groups.
+Total is 17 plus 8 equals 25.
+Jack: This is the "either-or" counting rule.
+Amanda: Yes, and it is easy to misuse when sets overlap, which is why we discuss inclusion-exclusion shortly.
+
+Slide 4: Multiplication Principle and Cartesian Product
+Amanda: Now we move to extensions of the addition principle, starting with the multiplication principle and the Cartesian product.
+Amanda: The multiplication principle handles sequential independent choices.
+If stage one has n1 options and stage two has n2 options, total ordered pairs are n1 times n2.
+Jack: This sounds like menu counting: choose a starter, then a main.
+Amanda: Good analogy. In set language, this is a Cartesian product.
+If A has size m and B has size n, then A cross B has size m times n.
+Jack: Any hidden caveat here?
+Amanda: Independence matters in the counting argument. If stage two options depend on stage one, we still multiply, but by varying counts per branch, not one constant n2.
+Jack: So we might need a sum of products in constrained pipelines.
+Amanda: That is right. Real problems often mix both principles.
+
+Slide 5: Double-Counting and Triple-Counting
+Jack: Before more formulas, can we talk about double- and triple-counting mistakes?
+Amanda: Trouble starts when categories overlap.
+If we count category A and category B separately and then add, shared elements are counted twice.
+Jack: And with three sets, an element in all three can be counted three times.
+Amanda: Right. This is not a tiny bookkeeping issue. It changes final answers significantly.
+Jack: Is this why people get probability questions wrong?
+Amanda: Very often, yes. Many errors come from forgetting intersections.
+Jack: So our fix is inclusion-exclusion.
+Amanda: That is right. Think of it as an accounting correction system.
+
+Slide 6: The Sieve Principle, Inclusion-Exclusion
+Amanda: Great, so now we fix that with the sieve principle, inclusion-exclusion. The Principle of Inclusion-Exclusion (PIE), sometimes called the Sieve Principle, is the formal method used to correctly calculate the size of the union of non-disjoint sets. When we simply add the cardinalities of overlapping sets, we are counting the shared elements multiple times. PIE provides a systematic way to include all elements, then exclude the overlaps, and repeat as necessary to correct for over- and under-counting.
+Jack: OK, how does it work in a simplest case? Say, for two sets, which partially overlap each other?
+Amanda: For two sets A and B:
+size of A union B equals size A plus size B minus size of A intersect B.
+Jack: We add both totals, then remove overlap once.
+Amanda: For three sets A, B, C:
+size of A union B union C equals size A plus size B plus size C,
+minus size of A intersect B,
+minus size of A intersect C,
+minus size of B intersect C,
+plus size of A intersect B intersect C.
+Jack: Why does the triple intersection come back with a plus?
+Amanda: Because after subtracting all pairwise intersections, elements in all three sets were removed one time too many.
+Jack: So signs alternate as overlap depth increases.
+Amanda: That is right. That alternating pattern is the core idea.
+
+Slide 7: Inclusion-Exclusion Example with Two Sets
+Jack: Can we do an example of the sieve principle with two sets first?
+Amanda: Count positive integers up to 1000 that are divisible by 3 or 5.
+Let A be multiples of 3. Size A is floor of 1000 over 3, which is 333.
+Let B be multiples of 5. Size B is floor of 1000 over 5, which is 200.
+Intersection means divisible by 15. Size of A intersect B is floor of 1000 over 15, which is 66.
+Apply inclusion-exclusion:
+size of A union B equals 333 plus 200 minus 66 equals 467.
+Jack: So 467 numbers are divisible by at least one of 3 and 5.
+Amanda: Yes, that checks out.
+Jack: If the question said "divisible by exactly one of 3 or 5," what changes?
+Amanda: Then we would subtract the intersection twice from the sum:
+333 plus 200 minus 2 times 66, which gives 401.
+Jack: Nice. Same ingredients, slightly different target.
+
+Slide 8: Inclusion-Exclusion Example with Three Sets
+Amanda: Next is an example of the sieve principle with three sets.
+Amanda: In a class of 73 students:
+52 play piano, 25 violin, 20 flute.
+Pair intersections are 17, 12, and 7.
+Triple intersection is 1.
+Jack: So we compute those who play at least one instrument first.
+Amanda: That is right.
+size of P union V union F equals 52 plus 25 plus 20 minus 17 minus 12 minus 7 plus 1.
+That is 62.
+Students who play none are 73 minus 62, so 11.
+Jack: Can we sanity-check quickly?
+Amanda: Yes. If union were larger than 73, we would know a data inconsistency exists. Here 62 is plausible, so the final 11 is consistent.
+
+Slide 9: Functions, Words, and Selections
+Jack: For functions, words and selections, how do those ideas connect in counting?
+Amanda: Number of functions from one to n into one to k equals the number of length-n words over an alphabet of size k.
+Jack: Because each input position chooses one of k outputs.
+Amanda: That is right. Independent choice repeated n times gives k power n.
+Jack: This is ordered selection with replacement.
+Amanda: Yes, that checks out. Order matters because input positions are distinct. Replacement is allowed because multiple inputs may map to the same output.
+
+Slide 10: Example, the Power Set
+Amanda: Let us ground that idea with example: the power set.
+Amanda: For each element of a set A, a subset either includes it or excludes it.
+Jack: Two choices per element.
+Amanda: So if size A is n, number of subsets is two power n.
+In symbols, size of power set of A equals 2 power size A.
+Jack: This is the same binary-choice structure used in feature flags and bitmasks.
+Amanda: That is right. One bit per element, include-or-not include.
+Jack: So subset enumeration and binary numbers are tightly linked.
+Amanda: Yes, and that connection appears constantly in algorithms.
+
+Slide 11: Encoding Information
+Jack: For encoding information, how does ordered selection with replacement help?
+Amanda: Ordered selection with replacement drives encoding.
+Alphabet size k, message length n, total strings k power n.
+Jack: Example with bytes gives 2 power 8 equals 256.
+Amanda: Right. More generally, if a code alphabet has 32 symbols and codewords of length 6, total codes are 32 power 6.
+Jack: That explodes quickly.
+Amanda: Which is good for key space, but can be bad for brute-force search costs.
+
+Slide 12: Ordered Selections without Repetition, Permutations
+Amanda: Next topic: ordered selections without repetition, permutations.
+Amanda: A permutation is an arrangement where order matters and no item repeats.
+Number of k-permutations from n elements is
+P of n k equals n times n minus 1 times down to n minus k plus 1.
+Equivalent form is n factorial over n minus k factorial.
+Jack: Intuition: each slot has fewer choices than the previous slot.
+Amanda: That is right. Example: schedule first 3 out of 5 processes.
+P of 5 3 equals 5 times 4 times 3 equals 60.
+Jack: If all 5 had to be scheduled, that would be 5 factorial, 120.
+Amanda: Yes, that checks out.
+
+Slide 13: Unordered Selections without Repetition, Combinations
+Jack: What changes for unordered selections without repetition, combinations?
+Amanda: Combinations ignore order.
+Number of ways to choose k from n is n choose k.
+Formula:
+n choose k equals n factorial over k factorial times n minus k factorial.
+Jack: Why divide by k factorial?
+Amanda: Because each selected k-set appears in k factorial different orders in permutation counting.
+Jack: So combination equals permutation divided by reorderings.
+Amanda: That is right.
+Example: choose 4 features from 10.
+10 choose 4 equals 210.
+
+Slide 14: Calculating Binomial Coefficients
+Amanda: Now we focus on calculating binomial coefficients in a clear, step-by-step way.
+Jack: Before we calculate, can we define the term clearly?
+Amanda: Absolutely. A binomial coefficient is the number n choose k, and it counts how many ways to choose k objects from n when order does not matter.
+Amanda: So binomial coefficients and combinations are the same counting object.
+Amanda: Quick example: form a committee of 3 from 8 candidates.
+Amanda: We write that as 8 choose 3.
+Amanda: Using the formula, 8 choose 3 equals 8 factorial over 3 factorial times 5 factorial, which simplifies to 8 times 7 times 6 over 3 times 2 times 1, giving 56.
+Jack: Useful symmetry says 8 choose 3 equals 8 choose 5.
+Amanda: Yes. Choosing 3 to include is equivalent to choosing 5 to exclude.
+Jack: In practice, that symmetry can reduce arithmetic when one side is smaller.
+Amanda: Good habit. Compute with the smaller k when possible.
+
+Slide 15: Recursive Binomial Formula, Pascal Identity
+Jack: Is this where the recursive formula for binomial coefficients, Pascal identity, comes in?
+Amanda: Pascal identity says
+n choose k equals n minus 1 choose k plus n minus 1 choose k minus 1.
+Base edges are n choose 0 equals 1 and n choose n equals 1.
+Jack: So each interior value is built from two above it.
+Amanda: Exactly. There is a counting proof too.
+Amanda: Imagine one distinguished element. Any valid k-subset either excludes it, giving n minus 1 choose k, or includes it, giving n minus 1 choose k minus 1.
+Amanda: Yes. For 5 choose 3:
+5 choose 3 equals 4 choose 3 plus 4 choose 2.
+From earlier rows, 4 choose 3 is 4 and 4 choose 2 is 6.
+So 5 choose 3 equals 10.
+Jack: Recurrence is great when generating a full table.
+Amanda: True, especially for dynamic programming.
+
+Slide 16: Pascal Triangle
+Amanda: Next we introduce Pascal's triangle, a triangular table of binomial coefficients built row by row.
+Amanda: Pascal triangle organizes binomial coefficients row by row.
+Each entry is the sum of the two directly above.
+Amanda: On this slide, try hovering, tapping, or focusing an interior number to highlight its two parent numbers.
+Amanda: Use that interaction to trace how each value is constructed from the row above.
+Amanda: We need it because it gives a fast way to compute many coefficients without repeated factorial calculations.
+Jack: So row n contains n choose 0, n choose 1, all the way to n choose n.
+Amanda: Right. That is why row 0 is 1, row 1 is 1 and 1, row 2 is 1, 2, 1, and so on.
+Jack: Row 6 gives 1, 6, 15, 20, 15, 6, 1.
+Amanda: Yes, that checks out. The triangle encodes symmetry, recursion, and coefficients of binomial expansion at once.
+Jack: It is like a compressed data structure for combinations.
+Amanda: Nicely put.
+
+Slide 17: Non-Recursive Binomial Formula
+Jack: And if we want a value if one binomial coefficient directly, e.g. in row 75, we can do it without constructing the whole 75 rows of Pascal's triangle by using a non-recursive formula for binomial coefficients, right?
+Amanda: Yes! The direct computation formula is
+n choose k equals n factorial over k factorial times n minus k factorial.
+Jack: So recurrence and closed formula are two complementary tools.
+Amanda: That is right. Use recurrence for table generation and dependencies, closed form for direct single values.
+Jack: Is there a practical trick to avoid huge factorial arithmetic errors?
+Amanda: Yes. Cancel factors early before multiplying.
+Amanda: For example, 20 choose 3 is 20 times 19 times 18 over 3 times 2 times 1.
+Amanda: Cancel 3 with 18 and 2 with 20 first, then multiply what remains.
+Amanda: Then the computation is 10 times 19 times 6, which is 1140.
+Amanda: You keep numbers small and reduce overflow risk in code and in hand calculations.
+Jack: So simplification is not just neat, it is computationally safer.
+Amanda: True, especially in programming tasks where intermediate values can explode.
+
+Slide 18: Stars and Bars Example
+Amanda: Next, an example of binomial calculation: stars and bars.
+Amanda: Distribute 6 indistinguishable balls into 4 distinguishable bins.
+This is unordered selection with replacement.
+Jack: Indistinguishable balls means we only care how many land in each bin, not which specific ball is which.
+Amanda: Exactly. Draw 6 stars for balls and 3 bars to split into 4 bins.
+Amanda: Every arrangement of those 9 symbols corresponds to one distribution, and every distribution corresponds to one arrangement.
+Formula is k plus n minus 1 choose k.
+So 6 plus 4 minus 1 choose 6 equals 9 choose 6 equals 84.
+Jack: Why "stars and bars" as a name?
+Amanda: Stars represent balls, bars separate bins. Arrangements of stars and separators encode distributions.
+Jack: So a counting picture becomes a binomial count.
+Amanda: That is right.
+
+Slide 19: Unordered Selection with Replacement
+Jack: So this is the general case of unordered selection with replacement?
+Amanda: General formula:
+k plus n minus 1 choose k,
+or equivalently n plus k minus 1 choose n minus 1.
+Jack: Same number either way, because we can choose star positions or bar positions.
+Jack: Example with ice cream, 3 scoops from 4 flavors, gives 6 choose 3 equals 20.
+Amanda: Right.
+Jack: If flavor order mattered, we would model a different problem.
+Amanda: Yes. With order ignored, we have 20 combinations.
+Amanda: If order matters, each of the 3 scoop positions has 4 choices, so the count is 4 power 3, which is 64.
+Jack: So same ingredients, two models: 20 unordered versus 64 ordered.
+Amanda: Exactly. The gap shows how much order can increase the search space.
+
+Slide 20: A Look at Binomials
+Amanda: Great. Next, a look at binomials from a counting perspective.
+Amanda: Expand a plus b to the n.
+Amanda: Think of that as multiplying n copies of a plus b.
+Amanda: In each copy, you choose either a or b, and those local choices determine the final term.
+Term a power n minus k b power k appears when b is chosen from exactly k factors.
+Jack: So coefficient counts slot choices.
+Amanda: That is right. It is a combinatorics statement disguised as algebra.
+Jack: That viewpoint makes coefficients feel less magical.
+Amanda: And much easier to remember.
+
+Slide 21: Binomials and Selections
+Jack: For binomials and selections, can we make that link explicit?
+Amanda: Number of appearances of a power n minus k b power k is n choose k.
+Jack: Because we choose which k of n positions contribute b.
+Amanda: Right.
+Amanda: For example, in a plus b to the 5, the coefficient of a cubed b squared is 5 choose 2, so it is 10.
+Jack: So if someone forgets a coefficient, they can reconstruct it by counting placements.
+Amanda: Great strategy during exams.
+
+Slide 22: Binomials in General
+Amanda: Perfect. Now let us discuss binomials in general, especially symmetry.
+Amanda: Symmetry follows immediately:
+choosing k slots for b is equivalent to choosing n minus k slots for a.
+So n choose k equals n choose n minus k.
+Jack: Same symmetry appears in Pascal triangle and in combinations.
+Amanda: Yes, one structure, multiple representations.
+Amanda: Also remember the edge cases: n choose 0 equals 1 and n choose n equals 1.
+Jack: Does this symmetry help when expanding expressions under time pressure?
+Amanda: Definitely. If you need the coefficient of a power 2 b power 8 in a plus b to the 10,
+Amanda: you can compute 10 choose 8 or switch to 10 choose 2.
+Amanda: Most people choose 10 choose 2 because it is faster and less error-prone.
+Jack: So symmetry is both a theory insight and a speed trick.
+Amanda: Fair point. Good combinatorics is often about seeing equivalent views quickly.
+
+Slide 23: The Binomial Theorem
+Jack: Then we are ready for the binomial theorem.
+Amanda: Formal statement:
+a plus b to the n equals sum from k equals 0 to n of n choose k times a power n minus k times b power k.
+Amanda: Read it this way: for each possible number of b-choices, include that term and weight it by how many ways those choices can happen.
+Jack: For n equals 6, coefficients are row 6 of Pascal triangle.
+Amanda: Right. Expansion is
+a power 6,
+plus 6 a power 5 b,
+plus 15 a power 4 b squared,
+plus 20 a cubed b cubed,
+plus 15 a squared b power 4,
+plus 6 a b power 5,
+plus b power 6.
+Jack: Nice bridge from counting to symbolic expansion.
+Amanda: That bridge is one of the most useful in discrete mathematics.
+
+Slide 24: Further Examples and Closing
+Amanda: Finally, let us finish with further examples.
+Amanda: Set a equals 1 and b equals 1 in the binomial theorem.
+Then two power n equals sum from k equals 0 to n of n choose k.
+Jack: So row-sum identity for Pascal triangle is two power n.
+Amanda: Yes, that checks out.
+Now set a equals 1 and b equals minus 1.
+Then sum from k equals 0 to n of minus 1 power k times n choose k equals 0, for n at least 1.
+Jack: Alternating sum cancels out to zero.
+Amanda: That is right.
+Amanda: These two substitutions are useful memory checks: one gives total accumulation, the other gives cancellation.
+
+Slide 25: Conclusion
+Amanda: Before we wrap up, let us step back and look at the full journey.
+Amanda: We began by defining combinatorics as the mathematics of systematic counting.
+Amanda: We saw that some counting problems are straightforward, while others, like the partition number, become surprisingly deep.
+Jack: So even very innocent-looking questions can hide serious complexity.
+Amanda: Exactly. From there, we built the two main counting foundations.
+Amanda: The addition principle handles disjoint either-or choices, and the multiplication principle handles step-by-step independent choices.
+Jack: Then, once overlap entered the picture, we needed a correction mechanism.
+Amanda: Right, and that led us to inclusion-exclusion, which lets us count unions without double-counting shared elements.
+Amanda: After that, we organized selection problems using two key questions: does order matter, and is repetition allowed?
+Jack: And those two questions split the topic into the four big models.
+Amanda: Yes.
+Amanda: For ordered selection with replacement, we use k to the power n.
+Amanda: For ordered selection without repetition, we use permutations, P of n k.
+Amanda: For unordered selection without repetition, we use combinations, n choose k.
+Amanda: For unordered selection with replacement, we use the stars and bars model, giving n plus k minus 1 choose k.
+Jack: That classification really helps. Once you identify the model, the formula is usually close behind.
+Amanda: Precisely. We then connected these counting ideas to binomial coefficients, Pascal's triangle, and the binomial theorem.
+Amanda: So by the end of the lecture, counting was no longer separate from algebra. The two were working together.
+Jack: Which is probably the biggest lesson from this week: these formulas are not random facts. They come from structures we can explain and rebuild.
+Amanda: Well said.
+Amanda: If you can recognize the structure of a problem, you can usually choose the right counting method, justify it clearly, and avoid a lot of blind trial and error.
+Jack: That feels like the real takeaway for computing too. Good problem-solving starts with the right model.
+Amanda: Exactly. That brings Week 5 to a close.
+

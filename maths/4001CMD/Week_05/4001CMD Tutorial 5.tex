@@ -1,0 +1,270 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[normalem]{ulem}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{mathdots}
+\usepackage{arydshln}
+\usepackage{textcomp}
+\usepackage{mathpazo}
+%\usepackage{bbold}
+\usepackage[margin=1in]{geometry}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,      
+	urlcolor=cyan,
+}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand\blank{\hphantom{==}}
+
+\DeclareFontFamily{U}{MnSymbolC}{}
+\DeclareSymbolFont{MnSyC}{U}{MnSymbolC}{m}{n}
+\DeclareFontShape{U}{MnSymbolC}{m}{n}{
+	<-6>  MnSymbolC5
+	<6-7>  MnSymbolC6
+	<7-8>  MnSymbolC7
+	<8-9>  MnSymbolC8
+	<9-10> MnSymbolC9
+	<10-12> MnSymbolC10
+	<12->   MnSymbolC12}{}
+\DeclareMathSymbol{\intprod}{\mathbin}{MnSyC}{'270}
+
+\numberwithin{equation}{section}
+%\numberwithin{theorem}{section}
+
+%%% THEOREM STYLES %%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem*{lemma*}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{conjecture}{Conjecture}
+
+%%% DEFINITION STYLES %%%
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem*{definition*}{Definition}
+\newtheorem{example}{Example}
+\newtheorem*{example*}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{remark*}{Remark}
+\newtheorem{fact}{Fact}
+\newtheorem{problem}{Problem}
+\newtheorem*{problem*}{Problem}
+\newtheorem*{solution*}{Solution}
+\newtheorem*{claim*}{Claim}
+\newtheorem{exercise}{Exercise}
+
+%%% FUNCTIONS %%%
+\newcommand{\Aut}{\mathrm{Aut}}
+\newcommand{\Sym}{\mathrm{Sym}}
+\newcommand{\Syl}{\mathrm{Syl}}
+\newcommand{\intersection}{\mathop{\bigcap}}
+\newcommand{\union}{\mathop{\bigcup}}
+\newcommand{\disjointunion}{\mathop{\bigsqcup}}
+\newcommand{\evaluated}{\Big|}
+\newcommand{\re}{\mathrm{Re}}
+\newcommand{\im}{\mathrm{Im}}
+\newcommand{\Log}{\mathrm{Log}}
+\newcommand{\Res}{\mathrm{Res}}
+\newcommand{\Sk}{\mathrm{Sk}}
+\newcommand{\disc}{\mathrm{disc}}
+\newcommand{\then}{\Longrightarrow}
+\newcommand{\Int}{\mathrm{int}}
+\newcommand{\bd}{\mathrm{bd}}
+\newcommand{\diam}{\mathrm{diam}}
+\newcommand{\lcm}{\mathrm{lcm}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\del}{\partial}
+\newcommand{\len}{\mathrm{len}}
+\newcommand{\res}{\mathrm{res}}
+\newcommand{\esssup}{\mathrm{ess} \, \mathrm{sup}}
+\newcommand{\wlim}{\displaystyle\mathop{\mathrm{w}\textrm{-}\mathrm{lim}}}
+\newcommand{\vlim}{\displaystyle \mathop{\mathrm{v}\textrm{-}\mathrm{lim}}}
+\newcommand{\condE}[2]{\mathbb E\left[ #1 \,\middle|\, #2\right]}
+\newcommand{\condP}[2]{\mathbb P\left[ #1 \, \middle| \, #2\right]}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\Poi}{\mathrm{Poi}}
+
+%%% FONTS %%%
+\newcommand{\boldZ}{\boldsymbol{\mathrm{Z}}}
+\newcommand{\boldC}{\boldsymbol{\mathrm{C}}}
+\newcommand{\boldN}{\boldsymbol{\mathrm{N}}}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\U}{\mathbb U}
+\newcommand{\D}{\mathbb D}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Sbb}{\mathbb S}
+\newcommand{\Kbb}{\mathbb K}
+\newcommand{\F}{\mathbb F}
+\newcommand{\Pbb}{\mathbb P}
+\newcommand{\Ts}{\mathcal T}
+\newcommand{\Cs}{\mathcal C}
+\newcommand{\As}{\mathcal A}
+\newcommand{\Ss}{\mathcal S}
+\newcommand{\Ms}{\mathcal M}
+\newcommand{\Bs}{\mathcal B}
+\newcommand{\Ps}{\mathcal P}
+\newcommand{\Ds}{\mathcal D}
+\newcommand{\Ls}{\mathcal L}
+\newcommand{\Ns}{\mathcal N}
+\newcommand{\Rs}{\mathcal R}
+\newcommand{\Fs}{\mathcal F}
+\newcommand{\Os}{\mathcal O}
+\newcommand{\Ks}{\mathcal K}
+\newcommand{\Es}{\mathcal E}
+\newcommand{\Gs}{\mathcal G}
+\newcommand{\Us}{\mathcal U}
+\newcommand{\Zs}{\mathcal Z}
+\newcommand{\fp}{\mathfrak p}
+\newcommand{\fm}{\mathfrak m}
+\newcommand{\diff}{\,d}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\Span}{\mathrm{span}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand*{\charone}{\text{\usefont{U}{bbold}{m}{n}1}}
+\newcommand{\dlim}{\displaystyle\lim}
+\newcommand{\dsum}{\displaystyle\sum}
+\newcommand{\dint}{\displaystyle\int}
+\newcommand{\Var}{\mathbf{Var}}
+\newcommand{\Cov}{\mathbf{Cov}}
+\newcommand{\Lip}{\mathrm{Lip}}
+\newcommand{\sgn}{\mathrm{sgn}}
+
+\newcommand{\done}{\flushright$\diamondsuit$}
+
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+\let\oldphi\phi
+\let\phi\varphi
+\let\oldepsilon\epsilon
+\let\epsilon\varepsilon
+\let\oldIm\Im
+\let\oldRe\Re
+\renewcommand{\Im}{\mathrm{Im}\,}
+\renewcommand{\Re}{\mathrm{Re}\,}
+\let\oldtilde\tilde
+\let\tilde\widetilde
+\let\oldhat\hat
+\let\hat\widehat
+
+\begin{document}
+
+\begin{center}
+\Large{Tutorial Exercises - Week 5} \\
+\vspace{3mm}
+\large{4001CMD - Mathematical Skills for Computing Professionals} \\
+\vspace{5mm}
+
+
+{\scriptsize Attempt before your tutorial session. Problems with an asterisk (\textbf{*}) are more challenging!}
+\end{center}
+
+
+\section*{Addition and Sieve Principles}
+
+\begin{problem}
+	Write out a proof (using induction on $n$) of the fact that if $A_1, A_2, \ldots, A_n$ are disjoint finite sets, then \[
+	\#\left(A_1 \cup A_2 \cup \cdots \cup A_n\right) = (\#A_1) + (\#A_2) + \cdots + (\#A_n).
+	\]
+\end{problem}
+
+\begin{problem}
+	In a class of 67 mathematics students, 47 can read French, 35 can read German and 23 can read both languages.
+	\begin{enumerate}[label=(\alph*)]
+		\item How many can read neither language? 
+		\item If furthermore 20 can read Russian, of whom 12 can also read French, 11 read German also and 5 read all three languages, how many cannot read any of the three languages? 
+	\end{enumerate}
+\end{problem}
+
+\begin{problem}[\textbf{*}]
+	Find the number of ways of arranging the letters A, E, M, O, U, Y in a sequence in such a way that neither of the words ME nor YOU occur. (\emph{Hint:} Apply the sieve principle to the set of all rearrangements of the letters A, E, M, O, U, Y.)
+\end{problem}
+
+\section*{Ordered and Unordered Selection}
+
+\begin{problem}
+	How many national flags can be constructed from three equal vertical strips, using the colours red, white, blue, and green? (It is assumed that colours can be repeated, and that one vertical edge of the flag is distinguished as the ``flagpole side'', so that flipping the flag around results in a different flag.)
+\end{problem}
+
+\begin{problem}
+	Write down all of the subsets of the set $X = \{a,b,c\}$. Use the correspondence between $\Ps(X)$ and $\{0,1\}^3$ discussed in lecture to check that your list is complete. 
+\end{problem}
+
+\begin{problem}
+	In how many ways can we select a batting order of 11 from a pool of 14 cricketers? 
+\end{problem}
+
+\begin{problem}
+	Evaluate $\binom{16}4$ and $\binom{17}5$. 
+\end{problem}
+
+%\begin{problem}
+%	Explain why the number of words of length $n$ in the alphabet $\{0,1\}$ which contain exactly $r$ zeros is $\binom n r$. 
+%\end{problem}
+
+\begin{problem}
+	Suppose $X = \{a,b,c\}$. How many selections of 2 elements is are possible from $X$, when those selections are
+	\begin{enumerate}[label=(\alph*)]
+		\item ordered and repeating? 
+		\item ordered and non-repeating?
+		\item unordered and repeating? 
+		\item unordered and non-repeating? 
+	\end{enumerate}
+\end{problem}
+
+\begin{problem}
+	Keys are made by cutting incisions of various depths in a number of positions on a blank key. If there are eight possible depths, how many positions are required to make one million different keys? (\emph{Hint:} To facilitate the calculation, use the fact that $2^{10}$ is slightly greater than 1000.) 
+\end{problem}
+
+\begin{problem}
+	How many four-letter words can be made from an alphabet of 10 symbols if there are no restrictions on spelling except that no letter can be used more than once? 
+\end{problem}
+
+\begin{problem}
+	Show that when three indistinguishable dice are thrown, there are 56 possible outcomes. What is the number of outcomes when $n$ indistinguishable dice are thrown?
+\end{problem}
+
+\begin{problem}[\textbf{*}]
+	Show that the number of $n$-tuples $(x_1, \ldots, x_n)$ of non-negative integers which satisfy the equation 
+	\[
+	x_1 + x_2 + \cdots + x_n = r
+	\]
+	is $\binom{n+r-1}{r}$. (\emph{Hint:} Suppose that an unordered selection, with repetition, of $r$ objects from a set of $n$ objects contains $x_i$ copies of the $i$th object ($1 \leq i \leq n$).)
+\end{problem}
+
+\section*{Binomial Theorem}
+
+\begin{problem}
+	Write out the formulas for $(1+x)^8$ and $(1-x)^8$. 
+\end{problem}
+
+\begin{problem}
+	Calculate the coefficients of: 
+	\begin{enumerate}[label=(\alph*)]
+		\item $x^5$ in $(1+x)^{11}$
+		\item $a^2b^8$ in $(a+b)^{10}$
+		\item $a^6 b^6$ in $(a^2 + b^3)^5$
+		\item $x^3$ in $(3+4x)^6$
+	\end{enumerate}
+\end{problem}
+
+\end{document} 

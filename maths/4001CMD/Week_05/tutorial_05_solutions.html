@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial 5 Exercises and Solutions - 4001CMD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" xintegrity="sha384-KiWOvVjnN8qwKMlbsEOfOJaN8EvkycNwgTYSSi7mGv+B4v8zFAHmv/dpvR0/vGHD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" xintegrity="sha384-hIoBPJpTadxHRDO82BcO1F7S4CsgNchBFeS/fV7aV+E/CmhxhZmb4fvrWjQJgKRS" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" xintegrity="sha384-+XBljXPPJ+bVci3gwuDRaL5D1Y4NUPGNTM8PmLHjoWsNZrKSQGzC7/0mgM9aMuzx" crossorigin="anonymous"></script>
+    <style>
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        pre {
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: "Courier New", Courier, monospace;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 leading-relaxed">
+
+    <div class="max-w-4xl mx-auto p-6 sm:p-8">
+
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Tutorial 5 Exercises and Solutions</h1>
+            <p class="text-xl text-gray-600">4001CMD - Mathematical Skills for Computing Professionals</p>
+        </header>
+
+        <main>
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Basic Combinatorics</h2>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1</h3>
+                        <p class="mb-4 text-lg">Write out a proof (using induction on $n$) of the fact that if $A_1,A_2,\dots,A_n$ are disjoint finite sets, then $\#(A_1 \cup A_2 \cup \dots \cup A_n)=\#(A_1)+\#(A_2)+\dots+\#(A_n)$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>Proof by induction on $n$.</p>
+                            <p class="mt-2"><strong>Base case ($n=2$):</strong> For disjoint $A_1,A_2$, $\#(A_1\cup A_2)=\#(A_1)+\#(A_2)$ by the addition principle.</p>
+                            <p class="mt-2"><strong>Induction hypothesis:</strong> Assume true for $n=k$ disjoint sets.</p>
+                            <p class="mt-2"><strong>Induction step:</strong> For $k+1$ disjoint sets, let $B=A_1\cup\cdots\cup A_k$. Then $B$ and $A_{k+1}$ are disjoint, so</p>
+                            $$\#(B\cup A_{k+1})=\#(B)+\#(A_{k+1}).$$
+                            <p>By the hypothesis, $\#(B)=\#(A_1)+\cdots+\#(A_k)$, hence</p>
+                            $$\#(A_1\cup\cdots\cup A_{k+1})=\#(A_1)+\cdots+\#(A_k)+\#(A_{k+1}).$$
+                            <p>Therefore true for all $n\ge 2$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 2</h3>
+                        <p class="mb-4 text-lg">In a class of 67 mathematics students, 47 can read French, 35 can read German and 23 can read both. (a) How many can read neither language? (b) If 20 can read Russian, 12 can also read French, 11 also read German, and 5 read all three, how many cannot read any of the three languages?</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p><strong>(a)</strong> Using PIE for two sets:</p>
+                            $$|F\cup G|=|F|+|G|-|F\cap G|=47+35-23=59.$$
+                            <p>Neither language: $67-59=8$.</p>
+                            <p class="mt-3"><strong>(b)</strong> Using PIE for three sets:</p>
+                            $$|F\cup G\cup R|=|F|+|G|+|R|-|F\cap G|-|F\cap R|-|G\cap R|+|F\cap G\cap R|$$
+                            $$=47+35+20-23-12-11+5=61.$$
+                            <p>Cannot read any of the three: $67-61=6$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 3</h3>
+                        <p class="mb-4 text-lg">Find the number of ways of arranging the letters A, E, M, O, U, Y in a sequence so that neither the word <strong>ME</strong> nor <strong>YOU</strong> occurs. (Hint: apply the sieve principle / inclusion-exclusion.)</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>Total permutations: $6!=720$.</p>
+                            <p>Let $A$ be arrangements containing ME, and $B$ containing YOU.</p>
+                            <p>$|A|=5!=120$ (treat ME as one block).</p>
+                            <p>$|B|=4!=24$ (treat YOU as one block).</p>
+                            <p>$|A\cap B|=3!=6$ (blocks ME, YOU, and A).</p>
+                            <p>Bad arrangements: $|A\cup B|=120+24-6=138$.</p>
+                            <p>Required: $720-138=582$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 4</h3>
+                        <p class="mb-4 text-lg">How many national flags can be constructed from three equal vertical strips, using the colours red, white, blue, and green? (Colours can be repeated and order matters.)</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>Each of 3 strip positions has 4 choices, independently.</p>
+                            $$4^3=64.$$
+                            <p>So there are 64 possible flags.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 5</h3>
+                        <p class="mb-4 text-lg">Write down all subsets of $X=\{a,b,c\}$. Use the correspondence between $\mathcal{P}(X)$ and $\{0,1\}^3$ to check your list is complete.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>Subsets are:</p>
+                            <p>$\emptyset,\{a\},\{b\},\{c\},\{a,b\},\{a,c\},\{b,c\},\{a,b,c\}$.</p>
+                            <p>There are 8 subsets, matching $2^3=8$ and the 8 binary strings in $\{0,1\}^3$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 6</h3>
+                        <p class="mb-4 text-lg">In how many ways can we select a batting order of 11 from a pool of 14 cricketers?</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>Order matters and no repetition, so use permutations:</p>
+                            $$P(14,11)=\frac{14!}{(14-11)!}=\frac{14!}{3!}=1,452,972,864,000.$$
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 7</h3>
+                        <p class="mb-4 text-lg">Evaluate $\binom{16}{4}$ and $\binom{17}{5}$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            $$\binom{16}{4}=\frac{16\cdot 15\cdot 14\cdot 13}{4\cdot 3\cdot 2\cdot 1}=1820.$$
+                            $$\binom{17}{5}=\frac{17\cdot 16\cdot 15\cdot 14\cdot 13}{5\cdot 4\cdot 3\cdot 2\cdot 1}=6188.$$
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 8</h3>
+                        <p class="mb-4 text-lg">Suppose $X=\{a,b,c\}$. How many selections of 2 elements are possible when selections are: (a) ordered and repeating, (b) ordered and non-repeating, (c) unordered and repeating, (d) unordered and non-repeating?</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>$n=3, k=2$.</p>
+                            <p>(a) Ordered, repeating: $n^k=3^2=9$.</p>
+                            <p>(b) Ordered, no repetition: $P(3,2)=3\cdot2=6$.</p>
+                            <p>(c) Unordered, repeating: $\binom{n+k-1}{k}=\binom{4}{2}=6$.</p>
+                            <p>(d) Unordered, no repetition: $\binom{3}{2}=3$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 9</h3>
+                        <p class="mb-4 text-lg">If there are eight possible depths, how many positions are required to make one million different keys? (Hint: $2^{10}$ is slightly greater than 1000.)</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>Need $8^k\ge 10^6$. Since $8=2^3$, this is $2^{3k}\ge 10^6$.</p>
+                            <p>Using $2^{10}\approx 10^3$, we get $10^6\approx 2^{20}$, so $3k\ge 20$.</p>
+                            <p>Thus $k\ge 6.67$, so smallest integer is $k=7$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 10</h3>
+                        <p class="mb-4 text-lg">How many four-letter words can be made from an alphabet of 10 symbols if no letter can be used more than once?</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>Permutation without repetition:</p>
+                            $$P(10,4)=10\cdot 9\cdot 8\cdot 7=5040.$$
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 11</h3>
+                        <p class="mb-4 text-lg">Show that when three indistinguishable dice are thrown, there are 56 possible outcomes. What is the number of outcomes when $n$ indistinguishable dice are thrown?</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>Indistinguishable dice means unordered outcomes with repetition allowed from 6 faces.</p>
+                            <p>For 3 dice:</p>
+                            $$\binom{6+3-1}{3}=\binom{8}{3}=56.$$
+                            <p>For $n$ dice:</p>
+                            $$\binom{6+n-1}{n}=\binom{n+5}{n}=\binom{n+5}{5}.$$
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 12</h3>
+                        <p class="mb-4 text-lg">Show that the number of $n$-tuples $(x_1,\dots,x_n)$ of non-negative integers satisfying $x_1+x_2+\dots+x_n=r$ is $\binom{n+r-1}{r}$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>Stars and bars: represent the $r$ units as stars and separate $n$ variables with $n-1$ bars.</p>
+                            <p>Total symbols: $r+n-1$.</p>
+                            <p>Choose positions of the $r$ stars (or $n-1$ bars):</p>
+                            $$\#=\binom{n+r-1}{r}=\binom{n+r-1}{n-1}.$$
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 13</h3>
+                        <p class="mb-4 text-lg">Write out the formulas for $(1+x)^8$ and $(1-x)^8$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            $$
+                            (1+x)^8=1+8x+28x^2+56x^3+70x^4+56x^5+28x^6+8x^7+x^8.
+                            $$
+                            $$
+                            (1-x)^8=1-8x+28x^2-56x^3+70x^4-56x^5+28x^6-8x^7+x^8.
+                            $$
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 14</h3>
+                        <p class="mb-4 text-lg">Calculate the coefficients of: (a) $x^5$ in $(1+x)^{11}$, (b) $a^2b^8$ in $(a+b)^{10}$, (c) $a^6b^6$ in $(a^2+b^3)^5$, (d) $x^3$ in $(3+4x)^6$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">View Solution</summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <p>(a) Coefficient of $x^5$ in $(1+x)^{11}$ is $\binom{11}{5}=462$.</p>
+                            <p>(b) Coefficient of $a^2b^8$ in $(a+b)^{10}$ is $\binom{10}{8}=\binom{10}{2}=45$.</p>
+                            <p>(c) In $(a^2+b^3)^5$, general term is $\binom{5}{k}a^{10-2k}b^{3k}$. Set $3k=6\Rightarrow k=2$, coefficient $\binom{5}{2}=10$.</p>
+                            <p>(d) In $(3+4x)^6$, coefficient of $x^3$ is:</p>
+                            $$\binom{6}{3}3^{3}4^{3}=20\cdot 27\cdot 64=34,560.$$
+                        </div>
+                    </details>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false}
+                ]
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4001CMD Symbolic Logic Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        function initKaTeX() {
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError : false
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const checkKaTeX = setInterval(() => {
+                if (window.renderMathInElement) {
+                    initKaTeX();
+                    clearInterval(checkKaTeX);
+                }
+            }, 100);
+        });
+    </script>
+    <style>
+        .q-incorrect { border-color: #ef4444 !important; background-color: #fee2e2 !important; }
+        .q-correct { border-color: #22c55e !important; background-color: #f0fdf4 !important; }
+        
+        .option-item {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border-width: 1px;
+        }
+        .option-item:hover { background-color: #f3f4f6; }
+        .option-item.selected { 
+            border-color: #6366f1; 
+            background-color: #f5f3ff; 
+            border-width: 2px;
+        }
+
+        .tick-icon { display: none; position: absolute; top: 1rem; right: 1rem; color: #22c55e; }
+        section.q-correct .tick-icon { display: block; }
+
+        .explanation-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            color: white;
+        }
+        .explanation-btn-active { background-color: #3b82f6; }
+        .explanation-btn-active:hover { background-color: #2563eb; }
+        .explanation-btn-disabled { background-color: #9ca3af; cursor: not-allowed; opacity: 0.6; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); display: none;
+            justify-content: center; align-items: center; z-index: 100;
+        }
+        .modal-content {
+            background-color: white; padding: 2rem; border-radius: 0.75rem;
+            width: 90%; max-width: 600px; position: relative;
+            max-height: 80vh; overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans pb-20">
+
+    <header class="bg-indigo-700 text-white py-8 shadow-lg mb-8 sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold">4001CMD Logic Quiz</h1>
+                <p class="mt-1 text-indigo-100 italic">Propositions, Truth Tables, and Boolean Logic</p>
+            </div>
+            <div id="scorePanel" class="hidden bg-indigo-900 px-6 py-3 rounded-xl border border-indigo-500 shadow-inner">
+                <span id="scoreDisplay" class="text-xl font-bold">Score: 0 / 15</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 space-y-8">
+
+        <!-- Q1 -->
+        <section id="sect-q1" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                Question 1
+            </h2>
+            <div class="space-y-1 mb-4 text-sm bg-slate-50 p-3 rounded border border-slate-100">
+                <p>$p$: You run 10 laps daily.</p>
+                <p>$q$: You are healthy.</p>
+                <p>$r$: You take multi-vitamins.</p>
+            </div>
+            <p class="mb-4">Which of the following is the correct symbolic representation for the given statement?</p>
+            <p class="mb-4 italic font-semibold text-slate-600">"Despite running 10 laps daily and taking multi-vitamins you are not healthy."</p>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(1, 0)">a) $(p \land r) \implies \neg q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(1, 1)">b) $(p \lor r) \land \neg q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(1, 2)">c) $(p \land r) \land \neg q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(1, 3)">d) $p \land (r \lor \neg q)$</div>
+            </div>
+            <button id="exp-1" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(1)">Explain</button>
+        </section>
+
+        <!-- Q2 -->
+        <section id="sect-q2" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                Question 2
+            </h2>
+            <div class="space-y-1 mb-4 text-sm bg-slate-50 p-3 rounded border border-slate-100">
+                <p>$p$: You run 10 laps daily.</p>
+                <p>$q$: You are healthy.</p>
+                <p>$r$: You take multi-vitamins.</p>
+            </div>
+            <p class="mb-4">Which of the following is the correct symbolic representation for the given statement?</p>
+            <p class="mb-4 italic font-semibold text-slate-600">"If you don't take vitamins or run 10 laps daily, you will not be healthy."</p>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(2, 0)">a) $(\neg r \lor p) \implies \neg q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(2, 1)">b) $(\neg p \land r) \implies \neg q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(2, 2)">c) $(\neg r \lor p) \land \neg q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(2, 3)">d) $\neg q \implies (\neg r \lor p)$</div>
+            </div>
+            <button id="exp-2" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(2)">Explain</button>
+        </section>
+
+        <!-- Q3 -->
+        <section id="sect-q3" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+                Question 3
+            </h2>
+            <div class="space-y-1 mb-4 text-sm bg-slate-50 p-3 rounded border border-slate-100">
+                <p>$p$: You run 10 laps daily.</p>
+                <p>$q$: You are healthy.</p>
+                <p>$r$: You take multi-vitamins.</p>
+            </div>
+            <p class="mb-4">Which of the following is the correct symbolic representation for the given statement?</p>
+            <p class="mb-4 italic font-semibold text-slate-600">"You don't take vitamins, but run 10 laps daily, and you are still healthy."</p>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(3, 0)">a) $(p \land \neg r) \implies q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(3, 1)">b) $(\neg r \lor p) \land q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(3, 2)">c) $(p \land \neg r) \land q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(3, 3)">d) $\neg r \land (p \lor q)$</div>
+            </div>
+            <button id="exp-3" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(3)">Explain</button>
+        </section>
+
+        <!-- Q4 -->
+        <section id="sect-q4" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
+                Question 4
+            </h2>
+            <p class="mb-4">What is the correct negation of the statement:</p>
+            <p class="mb-4 italic font-semibold text-center bg-slate-50 py-2">$\forall x(-3 < x < 10)$</p>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(4, 0)">a) $ \exists x(x \le -3 \land x \ge 10) $</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(4, 1)">b) $ \forall x(x \ge -3 \lor x \le 10) $</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(4, 2)">c) $ \exists x(x \le -3 \lor x \ge 10) $</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(4, 3)">d) $ \exists x(-3 \ge x > 10) $</div>
+            </div>
+            <button id="exp-4" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(4)">Explain</button>
+        </section>
+
+        <!-- Q5 -->
+        <section id="sect-q5" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">5</span>
+                Question 5
+            </h2>
+            <p class="mb-4">The statement $R: \neg[P \lor \neg(P \land Q)]$ is equivalent to:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(5, 0)">a) $R \equiv P$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(5, 1)">b) $R \equiv Q$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(5, 2)">c) Tautology</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(5, 3)">d) Contingency</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(5, 4)">e) Contradiction</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(5, 5)">f) None of the above</div>
+            </div>
+            <button id="exp-5" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(5)">Explain</button>
+        </section>
+
+        <!-- Q6 -->
+        <section id="sect-q6" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">6</span>
+                Question 6
+            </h2>
+            <p class="mb-4">Construct a truth table to determine if the following compound proposition is a tautology, contradiction, or contingency:</p>
+            <p class="mb-4 font-semibold text-center py-2 bg-slate-50">$p \implies q \iff (\neg q \implies \neg p)$</p>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(6, 0)">a) Tautology</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(6, 1)">b) Contradiction</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(6, 2)">c) Contingency</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(6, 3)">d) None of the above</div>
+            </div>
+            <button id="exp-6" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(6)">Explain</button>
+        </section>
+
+        <!-- Q7 -->
+        <section id="sect-q7" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">7</span>
+                Question 7
+            </h2>
+            <p class="mb-4 text-sm text-slate-600 italic">Construct a truth table to determine if the following compound proposition is a tautology, contradiction, or contingency:</p>
+            <p class="mb-4 font-semibold text-center py-2 bg-slate-50">$(P \lor Q) \lor (\neg P \land \neg Q)$</p>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(7, 0)">a) Tautology</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(7, 1)">b) Contradiction</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(7, 2)">c) Contingency</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(7, 3)">d) None of the above</div>
+            </div>
+            <button id="exp-7" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(7)">Explain</button>
+        </section>
+
+        <!-- Q8 -->
+        <section id="sect-q8" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">8</span>
+                Question 8
+            </h2>
+            <p class="mb-4 text-sm text-slate-600 italic">Construct a truth table to determine if the following compound proposition is a tautology, contradiction, or contingency:</p>
+            <p class="mb-4 font-semibold text-center py-2 bg-slate-50">$(q \implies \neg p) \iff (p \iff q)$</p>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(8, 0)">a) Tautology</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(8, 1)">b) Contradiction</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(8, 2)">c) Contingency</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(8, 3)">d) None of the above</div>
+            </div>
+            <button id="exp-8" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(8)">Explain</button>
+        </section>
+
+        <!-- Q9 -->
+        <section id="sect-q9" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">9</span>
+                Question 9
+            </h2>
+            <div class="space-y-1 mb-4 text-sm bg-slate-50 p-3 rounded border border-slate-100">
+                <p>If $p = T$, $q = F$, $s = T$, and $r = F$, evaluation:</p>
+                <p class="font-bold">$(s \to (p \lor \neg r)) \land (p \to (r \land q)) \land s$</p>
+            </div>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(9, 0)">a) True</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(9, 1)">b) False</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(9, 2)">c) Cannot be determined</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(9, 3)">d) True only if r is True</div>
+            </div>
+            <button id="exp-9" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(9)">Explain</button>
+        </section>
+
+        <!-- Q10 -->
+        <section id="sect-q10" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">10</span>
+                Question 10
+            </h2>
+            <p class="mb-4">The statement $[¬ p \land (p \lor q)] \to q$ is:</p>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(10, 0)">a) Tautology</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(10, 1)">b) Contradiction</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(10, 2)">c) Contingency</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(10, 3)">d) None of the above</div>
+            </div>
+            <button id="exp-10" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(10)">Explain</button>
+        </section>
+
+        <!-- Q11 -->
+        <section id="sect-q11" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">11</span>
+                Question 11
+            </h2>
+            <p class="mb-4">The statement $(p \land \neg q) \land (\neg p \lor q)$ is:</p>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(11, 0)">a) Tautology</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(11, 1)">b) Contradiction</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(11, 2)">c) Contingency</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(11, 3)">d) None of the above</div>
+            </div>
+            <button id="exp-11" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(11)">Explain</button>
+        </section>
+
+        <!-- Q12 -->
+        <section id="sect-q12" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">12</span>
+                Question 12
+            </h2>
+            <p>Write the argument using symbolic logic. Let the propositions be defined as:</p>
+            <div class="space-y-1 mb-4 text-sm bg-slate-50 p-3 rounded border border-slate-100">
+                <ul class="list-disc pl-5">
+                    <li>$p$: The coffee is hot.</li>
+                    <li>$q$: The cup is hot.</li>
+                    <li>$r$: It is ready to be served.</li>
+                    <li>$s$: The bill is paid.</li>
+                    <li>$t$: The customer is happy.</li>
+                </ul>
+            </div>
+            <div class="text-sm space-y-1 mb-4 italic text-slate-600 bg-slate-50 p-4 rounded">
+                <p>Premise 1: If the coffee is hot, then the cup is hot.</p>
+                <p>Premise 2: If the cup is hot, then it is ready to be served.</p>
+                <p>Premise 3: If it is ready to be served, then the bill is paid and customer is happy.</p>
+                <p>Premise 4: The coffee is cold.</p>
+                <p class="font-bold">Conclusion: Therefore, the bill is not paid.</p>
+            </div>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(12, 0)">a) $(p \to q) \land (q \to r) \land (r \to (s \land t)) \land p \therefore s$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(12, 1)">b) $(p \to q) \land (q \to r) \land (r \to (s \land t)) \land \neg p \therefore \neg s$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(12, 2)">c) $(p \to q) \land (q \to r) \land (r \to (s \lor t)) \land \neg p \therefore \neg s$</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(12, 3)">d) The conclusion cannot be determined from the premises.</div>
+            </div>
+            <button id="exp-12" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(12)">Explain</button>
+        </section>
+
+        <!-- Q13 -->
+        <section id="sect-q13" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">13</span>
+                Question 13
+            </h2>
+            <p class="mb-4">If $x = 2$ before the statement is executed, what is the value of $x$ after this statement?</p>
+            <p class="mb-4 p-2 bg-slate-800 text-slate-100 rounded font-mono">if (x - 1 = 2) or (x + 2 = 5) then x := x + 1</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(13, 0)">a) 2</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(13, 1)">b) 3</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(13, 2)">c) 5</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(13, 3)">d) 6</div>
+            </div>
+            <button id="exp-13" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(13)">Explain</button>
+        </section>
+
+        <!-- Q14 -->
+        <section id="sect-q14" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">14</span>
+                Question 14
+            </h2>
+            <p class="mb-4">If $x = 4$ before the statement is executed, what is the value of $x$ after this statement?</p>
+            <p class="mb-4 p-2 bg-slate-800 text-slate-100 rounded font-mono">if (x + 1 = 5) and (3x - 1 = 11) then x := x + 1</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(14, 0)">a) 4</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(14, 1)">b) 5</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(14, 2)">c) 6</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(14, 3)">d) 7</div>
+            </div>
+            <button id="exp-14" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(14)">Explain</button>
+        </section>
+
+        <!-- Q15 -->
+        <section id="sect-q15" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">15</span>
+                Question 15
+            </h2>
+            <div class="space-y-3 mb-4 text-sm leading-relaxed text-slate-700">
+                <p>Suppose you are presented with two doors. The sign on the 1st door reads: "There is a cake in this room and in the other room there is a tiger." The sign on the 2nd door says: "In one of these rooms, there is a cake, and in one of them there is a tiger." You know that one of these signs is true and the other is false.</p>
+                <p class="font-bold">Behind which door is the cake?</p>
+            </div>
+            <div class="space-y-2 options-list">
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(15, 0)">a) Behind the 1st door</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(15, 1)">b) Behind the 2nd door</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(15, 2)">c) There is a cake in each room</div>
+                <div class="option-item p-3 rounded border border-slate-200" onclick="selectOption(15, 3)">d) Cannot be determined</div>
+            </div>
+            <button id="exp-15" class="explanation-btn explanation-btn-disabled mt-4" disabled onclick="showExplanation(15)">Explain</button>
+        </section>
+
+        <!-- Submit Button -->
+        <div class="pt-10 flex flex-col items-center gap-4">
+            <button onclick="submitQuiz()" class="bg-indigo-600 text-white px-12 py-4 rounded-full text-xl font-bold shadow-lg hover:bg-indigo-800 transition-all transform hover:scale-105 active:scale-95">
+                Submit Quiz
+            </button>
+            <p id="retryMsg" class="hidden text-sm text-slate-500 italic text-center">Please review the red highlighted areas and try again.</p>
+        </div>
+
+    </main>
+
+    <!-- Modal for Explanations -->
+    <div id="explanationModal" class="modal-overlay" onclick="closeExplanation()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="absolute top-4 right-4 text-2xl font-bold text-slate-400 hover:text-slate-600" onclick="closeExplanation()">&times;</button>
+            <h2 id="explanationTitle" class="text-2xl font-bold mb-4"></h2>
+            <div id="explanationBody" class="text-slate-700 leading-relaxed space-y-4"></div>
+        </div>
+    </div>
+
+    <footer class="text-center text-slate-400 py-10 text-sm">
+        4001CMD Interactive Logic Assessment &copy; 2025
+    </footer>
+
+    <script>
+        const quizAnswers = {
+            1: 2, 2: 0, 3: 2, 4: 2, 5: 4, 6: 0, 7: 0, 8: 2, 9: 1, 10: 0, 11: 1, 12: 3, 13: 0, 14: 1, 15: 1
+        };
+
+        const explanations = {
+            1: "<p>The phrase \"Despite running 10 laps daily and taking multi-vitamins\" translates to $(p \\land r)$. \"Not healthy\" is $\\neg q$. The conjunction of both parts gives $(p \\land r) \\land \\neg q$.</p>",
+            2: "<p>Antecedent: \"Don't take vitamins ($\neg r$) or run 10 laps daily ($p$)\" = $(\neg r \\lor p)$. Consequent: \"Not healthy\" ($\neg q$). Symbolic: $(\neg r \\lor p) \\implies \\neg q$.</p>",
+            3: "<p>\"You don't take vitamins\" ($\neg r$) AND \"run laps\" ($p$) AND \"still healthy\" ($q$). Representation: $(p \\land \\neg r) \\land q$.</p>",
+            4: "<p>$\\neg(\\forall x P(x)) \\equiv \\exists x \\neg P(x)$. Negation of $-3 < x < 10$ is $x \\le -3 \\lor x \\ge 10$. Thus $\\exists x (x \\le -3 \\lor x \\ge 10)$.</p>",
+            5: "<p>$\\neg[P \\lor \\neg(P \\land Q)]$ simplifies via De Morgan to $\\neg P \\land \\neg(\\neg(P \\land Q)) \\equiv \\neg P \\land (P \\land Q) \\equiv (\\neg P \\land P) \\land Q \\equiv F \\land Q \\equiv F$. It is a Contradiction.</p>",
+            6: "<p>This is the rule of contraposition: $p \\implies q \\equiv \\neg q \\implies \\neg p$. Since they are equivalent, the biconditional is always true. Tautology.</p>",
+            7: "<p>$(P \\lor Q) \\lor \\neg(P \\lor Q)$ follows the law $A \\lor \\neg A$, which is always true. Tautology.</p>",
+            8: "<p>Evaluating truth table: for $p=T, q=F$, the biconditional is false ($T \\iff F$). For $p=T, q=T$, it is true. Contingency.</p>",
+            9: "<p>Sub: $(T \\to (T \\lor T)) \\land (T \\to (F \\land F)) \\land T \\equiv (T \\to T) \\land (T \\to F) \\land T \\equiv T \\land F \\land T \\equiv F$. False.</p>",
+            10: "<p>$[\\neg p \\land (p \\lor q)] \\equiv [(\\neg p \\land p) \\lor (\\neg p \\land q)] \\equiv [F \\lor (\\neg p \\land q)] \\equiv \\neg p \\land q$. Statement: $(\\neg p \\land q) \\to q$ is always true. Tautology.</p>",
+            11: "<p>$(p \\land \\neg q) \\land \\neg(p \\land \\neg q)$ follows form $A \\land \\neg A$. Always false. Contradiction.</p>",
+            12: "<p>This is the Fallacy of Denying the Antecedent. Just because coffee is cold doesn't mean the conclusion about the bill is determined. Cannot be determined.</p>",
+            13: "<p>$2-1=2$ (F) OR $2+2=5$ (F). Condition is False. $x$ remains 2.</p>",
+            14: "<p>$4+1=5$ (T) AND $3(4)-1=11$ (T). Condition is True. $x$ becomes $4+1=5$.</p>",
+            15: "<p>If S1 is T, then S2 is also T. But only one is T. Thus S1 is F. If S1 is F and S2 is T, the only consistent state is Cake behind Door 2 and Tiger behind Door 1.</p>"
+        };
+
+        let userSelections = {};
+
+        function selectOption(qId, optIdx) {
+            userSelections[qId] = optIdx;
+            const parent = document.getElementById('sect-q' + qId);
+            const options = parent.querySelectorAll('.option-item');
+            
+            options.forEach(el => el.classList.remove('selected'));
+            options[optIdx].classList.add('selected');
+
+            // Enable Explain button
+            const expBtn = document.getElementById('exp-' + qId);
+            if (expBtn) {
+                expBtn.disabled = false;
+                expBtn.classList.remove('explanation-btn-disabled');
+                expBtn.classList.add('explanation-btn-active');
+            }
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            const totalQuestions = 15;
+
+            for(let i=1; i<=totalQuestions; i++) {
+                const sect = document.getElementById('sect-q' + i);
+                sect.classList.remove('q-correct', 'q-incorrect');
+                
+                if (userSelections[i] !== undefined) {
+                    if (userSelections[i] === quizAnswers[i]) {
+                        score++;
+                        sect.classList.add('q-correct');
+                    } else {
+                        sect.classList.add('q-incorrect');
+                    }
+                } else {
+                    sect.classList.add('q-incorrect');
+                }
+            }
+
+            document.getElementById('scoreDisplay').innerText = `Score: ${score} / ${totalQuestions}`;
+            document.getElementById('scorePanel').classList.remove('hidden');
+            document.getElementById('retryMsg').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showExplanation(qId) {
+            const modal = document.getElementById('explanationModal');
+            document.getElementById('explanationTitle').innerText = "Question " + qId + " Explanation";
+            document.getElementById('explanationBody').innerHTML = explanations[qId];
+            modal.style.display = 'flex';
+            initKaTeX();
+        }
+
+        function closeExplanation() {
+            document.getElementById('explanationModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

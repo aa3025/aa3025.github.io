@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 7 - Modular Arithmetic and RSA Cryptography</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: { ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
+        };
+    </script>
+    <!-- Load MathJax -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Copy ALL custom styles from Lecture 5 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        .lecture-section {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .section-heading-wrapper {
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-heading-wrapper h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        h1, h2 { color: #1f2937; }
+
+        h3 { 
+            color: #2b6cb0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem; 
+        }
+
+        .frame-title {
+            color: #2b6cb0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .MathJax > div {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background-color: #ebf8ff;
+            border-left: 5px solid #3182ce;
+            overflow-x: auto;
+        }
+        
+        .table-wrapper { 
+            overflow-x: auto; 
+            margin-top: 1rem; 
+        }
+        .pascal-table th, .pascal-table td {
+            text-align: center;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+        .pascal-table th {
+            background-color: #e9d8fd;
+            color: #553c9a;
+        }
+        .header-bg {
+            background-color: #4c51bf;
+        }
+        
+        .toc-list a { transition: color 0.1s; text-decoration: none; }
+        .toc-link {
+            color: #4c51bf;
+            transition: color 0.2s;
+        }
+        .toc-link:hover {
+            color: #6b46c1;
+        }
+
+        #status-message {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.75rem;
+            background-color: #48bb78;
+            color: white;
+            text-align: center;
+            font-weight: 600;
+            transition: transform 0.3s ease-out;
+            transform: translateY(100%);
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .status-show {
+            transform: translateY(0);
+        }
+
+        .audio-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: background 0.1s ease;
+            --slider-progress: 0%;
+            background: linear-gradient(to right, 
+                #4f46e5 0%, 
+                #4f46e5 var(--slider-progress), 
+                #e0e7ff var(--slider-progress), 
+                #e0e7ff 100%
+            );
+        }
+
+        .audio-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 1px;
+            width: 1px;
+            opacity: 0;
+            cursor: pointer;
+            background: transparent;
+        }
+        .audio-slider::-moz-range-thumb {
+            height: 1px;
+            width: 1px;
+            opacity: 0;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+        }
+
+        .seeking-active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 lg:p-12 text-gray-800">
+    <div class="max-w-4xl mx-auto">
+        <!-- HEADER (Will be populated by JS) -->
+        <header class="mb-8 p-4 text-center rounded-xl header-bg text-white shadow-xl" id="lecture-header">
+            <h1 class="text-3xl font-extrabold border-none pb-0 mb-0 text-white" id="lecture-title">Loading...</h1>
+            <h2 class="text-xl font-semibold mt-2 border-none text-white" id="course-name">Loading...</h2>
+            <p class="text-sm italic mt-1" id="lecture-date">October 2025</p>
+        </header>
+
+        <!-- Section 0: TABLE OF CONTENTS (Will be populated by JS) -->
+        <div class="lecture-section bg-gray-50 shadow-lg mb-8" id="section-0">
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_14.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold text-blue-800">1. Table of Contents</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 toc-list" id="toc-container">
+                <!-- Table of Contents will be populated by JS -->
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT SECTIONS (Will be populated by JS) -->
+        <div id="lecture-content">
+            <!-- Content sections will be populated here by JS -->
+        </div>
+
+        <footer class="text-center text-sm text-gray-500 mt-8 pt-4 border-t border-gray-300">
+            End of Lecture Notes.
+        </footer>
+    </div>
+
+    <!-- Status message bar -->
+    <div id="status-message">
+        Ready for voiceover playback. Click the play button on any section!
+    </div>
+
+    <!-- Load your Lecture 7 external JavaScript file -->
+    <script src="lecture7_2.js"></script>
+
+    <script>
+        // Content population and audio initialization
+        const statusMessage = document.getElementById('status-message');
+        let audioInitialized = false;
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${remainingSeconds}`;
+        }
+
+        function showStatus(message) {
+            if (statusMessage) {
+                statusMessage.textContent = message;
+                statusMessage.classList.add('status-show');
+                clearTimeout(statusMessage.timer);
+                statusMessage.timer = setTimeout(() => {
+                    statusMessage.classList.remove('status-show');
+                }, 3000);
+            }
+        }
+
+        function populateLectureContent() {
+            console.log('Populating lecture content...');
+            
+            if (typeof lectureData === 'undefined') {
+                console.error('lectureData is not defined. Check if lecture7_combined.js loaded correctly.');
+                showStatus('Error: Could not load lecture data');
+                return;
+            }
+
+            // Populate header
+            document.getElementById('lecture-title').textContent = lectureData.lectureTitle;
+            document.getElementById('course-name').textContent = lectureData.courseName;
+
+            // Populate Table of Contents
+            const tocContainer = document.getElementById('toc-container');
+            const leftColumn = document.createElement('ul');
+            const rightColumn = document.createElement('ul');
+            leftColumn.className = 'list-none space-y-1';
+            rightColumn.className = 'list-none space-y-1';
+
+            const midPoint = Math.ceil(lectureData.sections.length / 2);
+            
+            lectureData.sections.forEach((section, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<a href="#${section.id}" class="toc-link">${section.title}</a>`;
+                
+                if (index < midPoint) {
+                    leftColumn.appendChild(listItem);
+                } else {
+                    rightColumn.appendChild(listItem);
+                }
+            });
+
+            tocContainer.appendChild(leftColumn);
+            tocContainer.appendChild(rightColumn);
+
+            // Populate main content sections
+            const contentContainer = document.getElementById('lecture-content');
+            
+            lectureData.sections.forEach((section, index) => {
+                const sectionElement = document.createElement('section');
+                sectionElement.className = 'lecture-section';
+                sectionElement.id = section.id;
+
+                // Use the audioFile property from the section data
+                const audioSrc = section.audioFile;
+
+                sectionElement.innerHTML = `
+                    <div class="absolute top-4 right-4 flex items-center space-x-2">
+                        <audio class="section-audio hidden" preload="metadata">
+                            <source src="${audioSrc}" type="audio/wav">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                        </button>
+                    </div>
+                    <div class="section-heading-wrapper">
+                        <h2 class="text-2xl font-bold">${section.title}</h2>
+                        <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                        <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+                    </div>
+                    <div class="content-body">
+                        ${section.content.map(item => {
+                            switch(item.type) {
+                                case 'paragraph':
+                                    return `<p class="mb-4">${item.text}</p>`;
+                                case 'math-example':
+                                    return `<div class="math-example mb-4">${item.text}</div>`;
+                                case 'key-concept':
+                                    return `<div class="key-concept bg-blue-50 p-4 rounded-lg mb-4">${item.text}</div>`;
+                                default:
+                                    return `<div class="mb-4">${item.text}</div>`;
+                            }
+                        }).join('')}
+                    </div>
+                `;
+
+                contentContainer.appendChild(sectionElement);
+            });
+
+            console.log('Lecture content populated successfully');
+            showStatus('Content loaded successfully');
+        }
+
+        function setupAudioPlayer(audioPlayer, slider, playPauseBtn, sectionIndex, audioSrc) {
+            if (!audioPlayer || !slider || !playPauseBtn) {
+                console.warn(`Missing audio elements in section ${sectionIndex}`);
+                return;
+            }
+
+            console.log(`Setting up audio player for section ${sectionIndex} with audio: ${audioSrc}`);
+
+            const syncVisuals = (timeOverride = null) => {
+                try {
+                    const time = timeOverride !== null ? timeOverride : (audioPlayer.currentTime || 0);
+                    
+                    if (!slider.classList.contains('seeking-active')) {
+                        slider.value = time;
+                    }
+
+                    if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
+                        const progressPercent = (time / audioPlayer.duration) * 100;
+                        slider.style.setProperty('--slider-progress', `${progressPercent}%`);
+                    }
+
+                    const currentTimeSpan = slider.closest('.section-heading-wrapper')?.querySelector('.current-time');
+                    if (currentTimeSpan) {
+                        currentTimeSpan.textContent = formatTime(time);
+                    }
+                } catch (error) {
+                    console.error('Error in syncVisuals:', error);
+                }
+            };
+
+            let animationFrameId = null;
+
+            const updateLoop = () => {
+                if (!audioPlayer.paused) {
+                    syncVisuals();
+                    animationFrameId = requestAnimationFrame(updateLoop);
+                }
+            };
+
+            // Set up event listeners
+            audioPlayer.addEventListener('loadedmetadata', () => {
+                console.log(`Audio metadata loaded for section ${sectionIndex}`);
+                if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
+                    slider.max = audioPlayer.duration;
+                    syncVisuals(0);
+                }
+            });
+
+            audioPlayer.addEventListener('canplay', () => {
+                console.log(`Audio can play for section ${sectionIndex}`);
+                playPauseBtn.disabled = false;
+            });
+
+            audioPlayer.addEventListener('error', (e) => {
+                console.error(`Audio error in section ${sectionIndex}:`, audioPlayer.error);
+                showStatus(`Audio file error: ${audioPlayer.error?.message || 'File not found'}`);
+                playPauseBtn.disabled = true;
+            });
+
+            audioPlayer.addEventListener('seeking', () => {
+                playPauseBtn.disabled = true;
+            });
+
+            audioPlayer.addEventListener('seeked', () => {
+                if (audioPlayer.__wasPlaying) {
+                    audioPlayer.play().catch(e => {
+                        console.error("Play resume failed after seek:", e);
+                    });
+                    audioPlayer.__wasPlaying = false; 
+                } else {
+                    playPauseBtn.disabled = false;
+                }
+                syncVisuals();
+            });
+
+            playPauseBtn.addEventListener('click', async () => {
+                if (playPauseBtn.disabled) return;
+
+                const isPlaying = playPauseBtn.dataset.state === 'playing';
+                
+                // Pause all other players
+                document.querySelectorAll('.section-audio').forEach(otherAudio => {
+                    if (otherAudio !== audioPlayer && !otherAudio.paused) {
+                        otherAudio.pause();
+                        const otherBtn = otherAudio.closest('.lecture-section')?.querySelector('.play-pause-btn');
+                        if (otherBtn) {
+                            otherBtn.dataset.state = 'paused';
+                            otherBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>';
+                        }
+                    }
+                });
+
+                if (isPlaying) {
+                    audioPlayer.pause();
+                } else {
+                    try {
+                        // Reset to beginning if at the end
+                        if (audioPlayer.currentTime >= audioPlayer.duration - 0.1) {
+                            audioPlayer.currentTime = 0;
+                        }
+                        await audioPlayer.play();
+                    } catch (error) {
+                        console.error("Play failed:", error);
+                        showStatus("Could not play audio file");
+                    }
+                }
+            });
+
+            audioPlayer.addEventListener('play', () => {
+                playPauseBtn.dataset.state = 'playing';
+                playPauseBtn.disabled = false;
+                playPauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M160,216H96a16,16,0,0,1-16-16V56a16,16,0,0,1,16-16h64a16,16,0,0,1,16,16V200A16,16,0,0,1,160,216Z"></path></svg>';
+                showStatus("Audio Playing");
+                animationFrameId = requestAnimationFrame(updateLoop);
+            });
+
+            audioPlayer.addEventListener('pause', () => {
+                playPauseBtn.dataset.state = 'paused';
+                playPauseBtn.disabled = false;
+                playPauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>';
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                }
+            });
+
+            audioPlayer.addEventListener('ended', () => {
+                syncVisuals(0);
+                showStatus("Playback finished");
+            });
+
+            // Slider interaction
+            slider.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                audioPlayer.__wasPlaying = !audioPlayer.paused; 
+                if (!audioPlayer.paused) { 
+                    audioPlayer.pause(); 
+                }
+                e.target.classList.add('seeking-active');
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                }
+            });
+
+            slider.addEventListener('input', (e) => {
+                const newTime = parseFloat(e.target.value);
+                if (e.target.classList.contains('seeking-active') && audioPlayer.duration && !isNaN(audioPlayer.duration)) {
+                    const progressPercent = (newTime / audioPlayer.duration) * 100;
+                    e.target.style.setProperty('--slider-progress', `${progressPercent}%`);
+
+                    const currentTimeSpan = e.target.closest('.section-heading-wrapper')?.querySelector('.current-time');
+                    if (currentTimeSpan) {
+                        currentTimeSpan.textContent = formatTime(newTime);
+                    }
+                }
+            });
+
+            const endSeekHandler = (e) => {
+                if (!slider.classList.contains('seeking-active')) return;
+
+                const rect = slider.getBoundingClientRect();
+                const barWidth = rect.width;
+                
+                if (barWidth === 0) {
+                    slider.classList.remove('seeking-active');
+                    return;
+                }
+
+                let clientX;
+                if (e.changedTouches && e.changedTouches.length > 0) {
+                    clientX = e.changedTouches[0].clientX;
+                } else {
+                    clientX = e.clientX;
+                }
+
+                const clickPosition = Math.max(0, Math.min(barWidth, clientX - rect.left));
+                const duration = audioPlayer.duration || 100;
+                const newTime = (clickPosition / barWidth) * duration;
+
+                audioPlayer.currentTime = newTime;
+                syncVisuals(newTime);
+                slider.classList.remove('seeking-active');
+            };
+
+            slider.addEventListener('mouseup', endSeekHandler);
+            slider.addEventListener('touchend', endSeekHandler);
+
+            // Initialize
+            syncVisuals(0);
+        }
+
+        function initAudioPlayers() {
+            if (audioInitialized) return;
+            
+            const sections = document.querySelectorAll('.lecture-section');
+            console.log(`Found ${sections.length} lecture sections to initialize audio for`);
+            
+            sections.forEach((section, index) => {
+                const audioPlayer = section.querySelector('.section-audio');
+                const slider = section.querySelector('.playback-slider');
+                const playPauseBtn = section.querySelector('.play-pause-btn');
+                
+                // Get the audio source from the audio element
+                const audioSrc = audioPlayer?.querySelector('source')?.src;
+                
+                setupAudioPlayer(audioPlayer, slider, playPauseBtn, index, audioSrc);
+            });
+            
+            audioInitialized = true;
+            showStatus("Audio players initialized");
+        }
+
+        // Main initialization
+        window.addEventListener('load', function() {
+            console.log('Page loaded, populating content...');
+            
+            // Populate content first
+            populateLectureContent();
+            
+            // Then initialize audio players after a short delay
+            setTimeout(() => {
+                console.log('Initializing audio players...');
+                initAudioPlayers();
+                
+                // Re-render MathJax after content is populated
+                if (window.MathJax) {
+                    MathJax.typesetPromise().then(() => {
+                        console.log('MathJax typeset complete');
+                    });
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

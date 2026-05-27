@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4001CMD Week 1: Sets Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        function initKaTeX() {
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError : false
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const checkKaTeX = setInterval(() => {
+                if (window.renderMathInElement) {
+                    initKaTeX();
+                    clearInterval(checkKaTeX);
+                }
+            }, 100);
+        });
+    </script>
+    <style>
+        .drop-zone { min-height: 50px; border: 2px dashed #cbd5e1; transition: all 0.2s; }
+        .drop-zone.over { border-color: #3b82f6; background-color: #eff6ff; }
+        .draggable { cursor: grab; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+        .draggable:active { cursor: grabbing; }
+        
+        /* Feedback Styles */
+        .q-incorrect { border-color: #ef4444 !important; background-color: #fee2e2 !important; }
+        .input-incorrect { border-color: #ef4444 !important; outline: 2px solid #ef4444 !important; }
+        
+        .q-correct { border-color: #22c55e !important; background-color: #f0fdf4 !important; }
+        .input-correct { border-color: #22c55e !important; outline: 2px solid #22c55e !important; }
+
+        .q3-svg text { font-family: serif; user-select: none; }
+        .q3-opt { border-width: 2px; cursor: pointer; }
+        .q3-opt.selected { border-color: #6366f1; background-color: #f5f3ff; }
+        .venn-circle { fill: none; stroke: black; stroke-width: 2; }
+        
+        .custom-select-container { position: relative; width: 100%; }
+        .custom-select-trigger { 
+            width: 100%; padding: 0.5rem; font-size: 0.75rem; border: 1px solid #cbd5e1; 
+            border-radius: 0.375rem; background: white; text-align: left; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .custom-options {
+            position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+            background: white; border: 1px solid #cbd5e1; border-radius: 0.375rem;
+            margin-top: 2px; display: none; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .custom-option { padding: 0.5rem; cursor: pointer; font-size: 0.75rem; border-bottom: 1px solid #f1f5f9; }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background-color: #f8fafc; }
+        .show { display: block; }
+        
+        .q9-btn.selected, .q11-btn.selected { border-color: #6366f1; background-color: #f5f3ff; border-width: 2px; }
+        
+        .tick-icon { display: none; position: absolute; top: 1rem; right: 1rem; color: #22c55e; }
+        section.q-correct .tick-icon { display: block; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans pb-20">
+
+    <header class="bg-indigo-700 text-white py-8 shadow-lg mb-8 sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold">4001CMD Week 1 Sets Quiz</h1>
+                <p class="mt-1 text-indigo-100 italic">Operations with Sets, Notations, and Problem Solving</p>
+            </div>
+            <div id="scorePanel" class="hidden bg-indigo-900 px-6 py-3 rounded-xl border border-indigo-500 shadow-inner">
+                <span id="scoreDisplay" class="text-xl font-bold">Score: 0 / 22</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 space-y-12">
+
+        <!-- Q1: Definitions Matching -->
+        <section id="sect-q1" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                Operations Definitions
+            </h2>
+            <p class="mb-4 text-slate-600">Drag items from left column onto their correct definition cell in the right column.</p>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="diff">Difference</div>
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="union">Union</div>
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="symm">Symmetric Difference</div>
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="comp">Complement</div>
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="inter">Intersection</div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="inter"></div>
+                        <p class="text-sm py-2">is a new set that contains all the elements that are common to both set A and set B</p>
+                    </div>
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="symm"></div>
+                        <p class="text-sm py-2">is a new set that contains all the elements that are in either set A or B, but not in both</p>
+                    </div>
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="comp"></div>
+                        <p class="text-sm py-2">is the set of all elements not in A, but within a larger universal set U.</p>
+                    </div>
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="union"></div>
+                        <p class="text-sm py-2">is a new set that contains all the elements that are in set A, or in set B, or in both</p>
+                    </div>
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="diff"></div>
+                        <p class="text-sm py-2">is a new set that contains all the elements that are in set A but are not in set B.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Q2: Notations Matching -->
+        <section id="sect-q2" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                Notations
+            </h2>
+            <p class="mb-4 text-slate-600">Match the notation to its logical equivalent.</p>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="union">$A \cup B$</div>
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="comp">$A^c$ or $\overline{A}$</div>
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="symm">$A \triangle B$</div>
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="diff">$A \setminus B$</div>
+                    <div draggable="true" class="draggable bg-slate-100 p-3 rounded shadow-sm border border-slate-300" data-val="inter">$A \cap B$</div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="symm"></div>
+                        <p class="text-sm py-2">Elements in either A or B, but not both (XOR)</p>
+                    </div>
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="inter"></div>
+                        <p class="text-sm py-2">Elements common to both A and B</p>
+                    </div>
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="diff"></div>
+                        <p class="text-sm py-2">Elements in set A but not in set B</p>
+                    </div>
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="union"></div>
+                        <p class="text-sm py-2">Elements in A, or in B, or in both</p>
+                    </div>
+                    <div class="flex items-start gap-2 h-[50px] md:h-auto">
+                        <div class="drop-zone w-32 rounded p-2 text-center text-sm flex-shrink-0" data-answer="comp"></div>
+                        <p class="text-sm py-2">Elements not in A, within universal set U</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Q3: Venn Diagram Selection -->
+        <section id="sect-q3" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+                Diagram Selection
+            </h2>
+            <p class="mb-4 text-slate-600">
+                If $A = \{2, 5, 6, 3, 7\}$ and $B = \{1, 2, 3, 8, 9, 10\}$, which diagram is correct?
+            </p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <button onclick="selectQ3('a')" class="border p-0 rounded transition q3-opt bg-white overflow-hidden shadow-sm" id="q3-a">
+                    <span class="block text-xs font-bold bg-slate-50 border-b p-2 text-slate-500 text-left">Option a)</span>
+                    <svg viewBox="0 0 420 260" class="w-full h-auto q3-svg">
+                        <rect x="5" y="5" width="410" height="250" fill="none" stroke="black" stroke-width="2"/>
+                        <defs><clipPath id="cA_3a"><circle cx="160" cy="130" r="90"/></clipPath><clipPath id="cB_3a"><circle cx="260" cy="130" r="90"/></clipPath></defs>
+                        <g clip-path="url(#cA_3a)"><g clip-path="url(#cB_3a)"><rect x="0" y="0" width="420" height="260" fill="#bbb"/></g></g>
+                        <circle cx="160" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/><circle cx="260" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/>
+                        <text x="145" y="70" font-size="26">A</text><text x="265" y="70" font-size="26">B</text>
+                        <text x="105" y="125" font-size="28">7</text><text x="135" y="125" font-size="28">6</text><text x="110" y="170" font-size="28">10</text>
+                        <text x="200" y="125" font-size="28">2</text><text x="200" y="170" font-size="28">9</text>
+                        <text x="290" y="125" font-size="28">1</text><text x="320" y="125" font-size="28">3</text><text x="290" y="170" font-size="28">5</text><text x="320" y="170" font-size="28">8</text>
+                    </svg>
+                </button>
+                <button onclick="selectQ3('b')" class="border p-0 rounded transition q3-opt bg-white overflow-hidden shadow-sm" id="q3-b">
+                    <span class="block text-xs font-bold bg-slate-50 border-b p-2 text-slate-500 text-left">Option b)</span>
+                    <svg viewBox="0 0 420 260" class="w-full h-auto q3-svg">
+                        <rect x="5" y="5" width="410" height="250" fill="none" stroke="black" stroke-width="2"/>
+                        <defs><clipPath id="cA_3b"><circle cx="160" cy="130" r="90"/></clipPath><clipPath id="cB_3b"><circle cx="260" cy="130" r="90"/></clipPath></defs>
+                        <g clip-path="url(#cA_3b)"><g clip-path="url(#cB_3b)"><rect x="0" y="0" width="420" height="260" fill="#bbb"/></g></g>
+                        <circle cx="160" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/><circle cx="260" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/>
+                        <text x="145" y="70" font-size="26">A</text><text x="265" y="70" font-size="26">B</text>
+                        <text x="100" y="125" font-size="28">5</text><text x="130" y="125" font-size="28">7</text><text x="100" y="170" font-size="28">6</text><text x="130" y="170" font-size="28">2</text>
+                        <text x="205" y="145" font-size="28">3</text>
+                        <text x="285" y="115" font-size="28">10</text><text x="315" y="115" font-size="28">8</text><text x="285" y="160" font-size="28">1</text><text x="295" y="200" font-size="28">9</text>
+                    </svg>
+                </button>
+                <button onclick="selectQ3('c')" class="border p-0 rounded transition q3-opt bg-white overflow-hidden shadow-sm" id="q3-c">
+                    <span class="block text-xs font-bold bg-slate-50 border-b p-2 text-slate-500 text-left">Option c)</span>
+                    <svg viewBox="0 0 420 260" class="w-full h-auto q3-svg">
+                        <rect x="5" y="5" width="410" height="250" fill="none" stroke="black" stroke-width="2"/>
+                        <defs><clipPath id="cA_3c"><circle cx="160" cy="130" r="90"/></clipPath><clipPath id="cB_3c"><circle cx="260" cy="130" r="90"/></clipPath></defs>
+                        <g clip-path="url(#cA_3c)"><g clip-path="url(#cB_3c)"><rect x="0" y="0" width="420" height="260" fill="#bbb"/></g></g>
+                        <circle cx="160" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/><circle cx="260" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/>
+                        <text x="145" y="70" font-size="26">A</text><text x="265" y="70" font-size="26">B</text>
+                        <text x="105" y="140" font-size="28">5</text><text x="135" y="140" font-size="28">7</text><text x="120" y="185" font-size="28">6</text>
+                        <text x="202" y="125" font-size="28">2</text><text x="202" y="170" font-size="28">3</text>
+                        <text x="275" y="120" font-size="28">9</text><text x="302" y="120" font-size="28">8</text><text x="290" y="160" font-size="28">1</text><text x="290" y="205" font-size="28">10</text>
+                    </svg>
+                </button>
+                <button onclick="selectQ3('d')" class="border p-0 rounded transition q3-opt bg-white overflow-hidden shadow-sm" id="q3-d">
+                    <span class="block text-xs font-bold bg-slate-50 border-b p-2 text-slate-500 text-left">Option d)</span>
+                    <svg viewBox="0 0 420 260" class="w-full h-auto q3-svg">
+                        <rect x="5" y="5" width="410" height="250" fill="none" stroke="black" stroke-width="2"/>
+                        <defs><clipPath id="cA_3d"><circle cx="160" cy="130" r="90"/></clipPath><clipPath id="cB_3d"><circle cx="260" cy="130" r="90"/></clipPath></defs>
+                        <g clip-path="url(#cA_3d)"><g clip-path="url(#cB_3d)"><rect x="0" y="0" width="420" height="260" fill="#bbb"/></g></g>
+                        <circle cx="160" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/><circle cx="260" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/>
+                        <text x="145" y="70" font-size="26">A</text><text x="265" y="70" font-size="26">B</text>
+                        <text x="95" y="110" font-size="28">7</text><text x="125" y="110" font-size="28">5</text><text x="95" y="155" font-size="28">6</text><text x="125" y="155" font-size="28">3</text><text x="110" y="200" font-size="28">2</text>
+                        <text x="202" y="125" font-size="28">2</text><text x="202" y="170" font-size="28">3</text>
+                        <text x="275" y="115" font-size="28">1</text><text x="306" y="115" font-size="28">8</text><text x="275" y="160" font-size="28">10</text><text x="300" y="205" font-size="28">9</text>
+                    </svg>
+                </button>
+                <button onclick="selectQ3('e')" class="border p-0 rounded transition q3-opt bg-white overflow-hidden shadow-sm" id="q3-e">
+                    <span class="block text-xs font-bold bg-slate-50 border-b p-2 text-slate-500 text-left">Option e)</span>
+                    <svg viewBox="0 0 420 260" class="w-full h-auto q3-svg">
+                        <rect x="5" y="5" width="410" height="250" fill="none" stroke="black" stroke-width="2"/>
+                        <defs><clipPath id="cA_3e"><circle cx="160" cy="130" r="90"/></clipPath><clipPath id="cB_3e"><circle cx="260" cy="130" r="90"/></clipPath></defs>
+                        <g clip-path="url(#cA_3e)"><g clip-path="url(#cB_3e)"><rect x="0" y="0" width="420" height="260" fill="#bbb"/></g></g>
+                        <circle cx="160" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/><circle cx="260" cy="130" r="90" fill="none" stroke="black" stroke-width="2"/>
+                        <text x="145" y="70" font-size="26">A</text><text x="265" y="70" font-size="26">B</text>
+                        <text x="105" y="145" font-size="28">3</text><text x="135" y="145" font-size="28">2</text>
+                        <text x="202" y="120" font-size="28">6</text><text x="202" y="155" font-size="28">7</text><text x="202" y="190" font-size="28">5</text>
+                        <text x="275" y="115" font-size="28">8</text><text x="304" y="115" font-size="28">9</text><text x="280" y="160" font-size="28">1</text><text x="288" y="205" font-size="28">10</text>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- Q4: 3-Set Venn Matching -->
+        <section id="sect-q4" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
+                3-Set Regions
+            </h2>
+            <p class="mb-6 text-slate-600">Select the correct symbolic expression for each shaded diagram.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
+                <!-- Diagram 1 -->
+                <div class="flex flex-col items-center w-full max-w-[300px]">
+                    <svg width="100%" height="auto" viewBox="0 0 320 320" class="mb-4 bg-white border border-slate-100 rounded">
+                        <defs>
+                            <clipPath id="Aq4_final"><circle cx="105" cy="115" r="75"/></clipPath>
+                            <clipPath id="Bq4_final"><circle cx="215" cy="115" r="75"/></clipPath>
+                            <clipPath id="Cq4_final"><circle cx="160" cy="205" r="75"/></clipPath>
+                        </defs>
+                        <g clip-path="url(#Aq4_final)"><g clip-path="url(#Bq4_final)"><rect width="320" height="320" fill="#bbb"/></g></g>
+                        <g clip-path="url(#Bq4_final)"><g clip-path="url(#Cq4_final)"><rect width="320" height="320" fill="#bbb"/></g></g>
+                        <g clip-path="url(#Aq4_final)"><g clip-path="url(#Cq4_final)"><rect width="320" height="320" fill="#bbb"/></g></g>
+                        <g clip-path="url(#Aq4_final)"><g clip-path="url(#Bq4_final)"><g clip-path="url(#Cq4_final)"><rect width="320" height="320" fill="white"/></g></g></g>
+                        <circle cx="105" cy="115" r="75" class="venn-circle"/><circle cx="215" cy="115" r="75" class="venn-circle"/><circle cx="160" cy="205" r="75" class="venn-circle"/>
+                        <text x="85" y="70" font-size="20" font-family="serif">A</text><text x="215" y="70" font-size="20" font-family="serif">B</text>
+                        <text x="153" y="215" font-size="20" font-family="serif">C</text>
+                    </svg>
+                    <div class="custom-select-container q4-custom-select" data-correct="pairwise">
+                        <div class="custom-select-trigger" onclick="toggleDropdown(this)">
+                            <span class="trigger-label text-slate-400">Choose expression...</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="custom-options">
+                            <div class="custom-option" data-val="only" onclick="selectOption(this)">$(A\setminus(B\cup C))\cup(B\setminus(A\cup C))\cup(C\setminus(A\cup B))$</div>
+                            <div class="custom-option" data-val="abc" onclick="selectOption(this)">$A \cap B \cap C$</div>
+                            <div class="custom-option" data-val="complex" onclick="selectOption(this)">$(A\setminus(B\cap C))\cap(B\setminus(A\cap C))\cap(C\setminus(A\cap B))$</div>
+                            <div class="custom-option" data-val="union" onclick="selectOption(this)">$A \cup B \cup C$</div>
+                            <div class="custom-option" data-val="pairwise" onclick="selectOption(this)">$(A \cap B) \cup (B \cap C) \cup (A \cap C) \setminus (A \cap B \cap C)$</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diagram 2 -->
+                <div class="flex flex-col items-center w-full max-w-[300px]">
+                    <svg width="100%" height="auto" viewBox="0 0 320 320" class="mb-4 bg-white border border-slate-100 rounded">
+                        <g clip-path="url(#Aq4_final)"><g clip-path="url(#Bq4_final)"><g clip-path="url(#Cq4_final)"><rect width="320" height="320" fill="#bbb"/></g></g></g>
+                        <circle cx="105" cy="115" r="75" class="venn-circle"/><circle cx="215" cy="115" r="75" class="venn-circle"/><circle cx="160" cy="205" r="75" class="venn-circle"/>
+                        <text x="85" y="70" font-size="20" font-family="serif">A</text><text x="215" y="70" font-size="20" font-family="serif">B</text>
+                        <text x="153" y="215" font-size="20" font-family="serif">C</text>
+                    </svg>
+                    <div class="custom-select-container q4-custom-select" data-correct="abc">
+                        <div class="custom-select-trigger" onclick="toggleDropdown(this)">
+                            <span class="trigger-label text-slate-400">Choose expression...</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="custom-options">
+                            <div class="custom-option" data-val="only" onclick="selectOption(this)">$(A\setminus(B\cup C))\cup(B\setminus(A\cup C))\cup(C\setminus(A\cup B))$</div>
+                            <div class="custom-option" data-val="abc" onclick="selectOption(this)">$A \cap B \cap C$</div>
+                            <div class="custom-option" data-val="complex" onclick="selectOption(this)">$(A\setminus(B\cap C))\cap(B\setminus(A\cap C))\cap(C\setminus(A\cap B))$</div>
+                            <div class="custom-option" data-val="union" onclick="selectOption(this)">$A \cup B \cup C$</div>
+                            <div class="custom-option" data-val="pairwise" onclick="selectOption(this)">$(A \cap B) \cup (B \cap C) \cup (A \cap C) \setminus (A \cap B \cap C)$</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diagram 3 -->
+                <div class="flex flex-col items-center w-full max-w-[300px]">
+                    <svg width="100%" height="auto" viewBox="0 0 320 320" class="mb-4 bg-white border border-slate-100 rounded">
+                        <circle cx="105" cy="115" r="75" fill="#bbb" fill-opacity="0.5"/><circle cx="215" cy="115" r="75" fill="#bbb" fill-opacity="0.5"/><circle cx="160" cy="205" r="75" fill="#bbb" fill-opacity="0.5"/>
+                        <g clip-path="url(#Aq4_final)"><g clip-path="url(#Bq4_final)"><rect width="320" height="320" fill="white"/></g></g>
+                        <g clip-path="url(#Bq4_final)"><g clip-path="url(#Cq4_final)"><rect width="320" height="320" fill="white"/></g></g>
+                        <g clip-path="url(#Aq4_final)"><g clip-path="url(#Cq4_final)"><rect width="320" height="320" fill="white"/></g></g>
+                        <circle cx="105" cy="115" r="75" class="venn-circle"/><circle cx="215" cy="115" r="75" class="venn-circle"/><circle cx="160" cy="205" r="75" class="venn-circle"/>
+                        <text x="85" y="70" font-size="20" font-family="serif">A</text><text x="215" y="70" font-size="20" font-family="serif">B</text>
+                        <text x="153" y="215" font-size="20" font-family="serif">C</text>
+                    </svg>
+                    <div class="custom-select-container q4-custom-select" data-correct="only">
+                        <div class="custom-select-trigger" onclick="toggleDropdown(this)">
+                            <span class="trigger-label text-slate-400">Choose expression...</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="custom-options">
+                            <div class="custom-option" data-val="only" onclick="selectOption(this)">$(A\setminus(B\cup C))\cup(B\setminus(A\cup C))\cup(C\setminus(A\cup B))$</div>
+                            <div class="custom-option" data-val="abc" onclick="selectOption(this)">$A \cap B \cap C$</div>
+                            <div class="custom-option" data-val="complex" onclick="selectOption(this)">$(A\setminus(B\cap C))\cap(B\setminus(A\cap C))\cap(C\setminus(A\cap B))$</div>
+                            <div class="custom-option" data-val="union" onclick="selectOption(this)">$A \cup B \cup C$</div>
+                            <div class="custom-option" data-val="pairwise" onclick="selectOption(this)">$(A \cap B) \cup (B \cap C) \cup (A \cap C) \setminus (A \cap B \cap C)$</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Q5 & Q6 -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <section id="sect-q5" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+                <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">5</span>
+                    Equivalent Sets
+                </h2>
+                <div class="text-sm space-y-1 mb-4">
+                    <p>1) $A=\{9,4,2,7,8,5\}$</p>
+                    <p>2) $B=\{4,2,3,6,9,5\}$</p>
+                    <p>3) $C=\{1,8,3,5,4,7\}$</p>
+                    <p>4) $D=\{4,9,8,6,7,5\}$</p>
+                    <p>5) $E=\{7,6,9,5,4,8\}$</p>
+                </div>
+                <label class="block text-sm font-medium mb-1">Enter the digits of the two equivalent sets:</label>
+                <input type="text" id="q5-ans" class="w-full border p-2 rounded" placeholder="e.g. 1 and 5">
+            </section>
+
+            <section id="sect-q6" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+                <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">6</span>
+                    Union & Intersection
+                </h2>
+                <p class="text-sm mb-4">$A=\{1,4,5,9\}$ and $B=\{4,5,6,7,9\}$</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wide">$A \cup B$:</label>
+                        <input type="text" id="q6-union" class="w-full border p-2 rounded" placeholder="Enter set">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wide">$A \cap B$:</label>
+                        <input type="text" id="q6-inter" class="w-full border p-2 rounded" placeholder="Enter set">
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Q7 & Q8 -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <section id="sect-q7" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+                <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">7</span>
+                    Solve for $a$
+                </h2>
+                <p class="text-sm mb-2">$A=\{2, a^2-4a+7\}$</p>
+                <p class="text-sm mb-4">$B=\{a+1, a^2+1, a^2-1\}$</p>
+                <p class="text-sm font-bold mb-4">If $A \cap B = \{4\}$, find $a$.</p>
+                <input type="number" id="q7-ans" class="w-full border p-2 rounded" placeholder="Value of a">
+            </section>
+
+            <section id="sect-q8" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+                <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">8</span>
+                    Symmetric Difference
+                </h2>
+                <p class="text-sm mb-4">$A=\{1,2,3,7,8,9\}$, $B=\{2,3,4,5,7,8,9\}$</p>
+                <label class="block text-sm mb-1">$C = A \triangle B$:</label>
+                <input type="text" id="q8-ans" class="w-full border p-2 rounded" placeholder="Enter set">
+            </section>
+        </div>
+
+        <!-- Q9 & Q10 -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <section id="sect-q9" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+                <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">9</span>
+                    True or False?
+                </h2>
+                <p class="text-lg text-center font-serif italic py-6">
+                    $|A^{c} \cup B^{c} \cup C^{c}| = |(A \cap B \cap C)^{c}|$
+                </p>
+                <div class="flex flex-col gap-2">
+                    <button onclick="selectQ9(true)" class="border p-2 rounded hover:bg-slate-50 q9-btn" id="q9-t">True</button>
+                    <button onclick="selectQ9(false)" class="border p-2 rounded hover:bg-slate-50 q9-btn" id="q9-f">False</button>
+                    <button onclick="selectQ9(null)" class="border p-2 rounded hover:bg-slate-50 q9-btn" id="q9-u">Impossible to decide</button>
+                </div>
+            </section>
+
+            <section id="sect-q10" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+                <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">10</span>
+                    Student Activities
+                </h2>
+                <p class="text-sm mb-4 leading-relaxed">
+                    Class: 198 students. Singing: 158, Dancing: 164, Acting: 185, Studying: 189.<br>
+                    <strong>Minimum how many students love ALL four activities?</strong>
+                </p>
+                <input type="number" id="q10-ans" class="w-full border p-2 rounded" placeholder="Enter number">
+            </section>
+        </div>
+
+        <!-- Q11: Proper Subsets -->
+        <section id="sect-q11" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">11</span>
+                Proper Subsets
+            </h2>
+            <p class="mb-4">Given $A = \{6, 2, 4, 1, 5\}$. Which is <strong>NOT</strong> a proper subset of A?</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <button onclick="selectQ11(1)" class="border p-3 rounded q11-btn" id="q11-1">$\{1, 2, 4, 5\}$</button>
+                <button onclick="selectQ11(2)" class="border p-3 rounded q11-btn" id="q11-2">$\{2\}$</button>
+                <button onclick="selectQ11(3)" class="border p-3 rounded q11-btn" id="q11-3">$\{1, 2, 3\}$</button>
+                <button onclick="selectQ11(4)" class="border p-3 rounded q11-btn" id="q11-4">$\{6, 5, 2, 1\}$</button>
+            </div>
+        </section>
+
+        <!-- Q12 -->
+        <section id="sect-q12" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+            <div class="tick-icon"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">12</span>
+                Final Calculation
+            </h2>
+            <div class="text-sm space-y-2 mb-6 p-4 bg-slate-50 rounded border border-slate-100">
+                <p>$U = \{1,2,3,4,5,6,7,8,9\}$</p>
+                <p>$A = \{1,2,3,4,5,7,9\}$, $B = \{4,5,6,9\}$, $C = \{4,6\}$</p>
+                <p class="font-bold text-indigo-700">Calculate: $(A^{c} \cup B) \setminus C$</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div id="q12-step1-group">
+                        <label class="block text-xs font-bold uppercase">1. $A^c$</label>
+                        <input type="text" id="q12-step1" class="w-full border p-2 rounded">
+                    </div>
+                    <div id="q12-step2-group">
+                        <label class="block text-xs font-bold uppercase">2. $A^c \cup B$</label>
+                        <input type="text" id="q12-step2" class="w-full border p-2 rounded">
+                    </div>
+                </div>
+                <div id="q12-final-group">
+                    <label class="block text-xs font-bold uppercase">3. Final Result $(A^{c} \cup B) \setminus C$</label>
+                    <input type="text" id="q12-final" class="w-full border p-4 text-lg font-bold rounded" placeholder="Enter set">
+                </div>
+            </div>
+        </section>
+
+        <div class="pt-10 flex flex-col items-center gap-4">
+            <button onclick="submitQuiz()" class="bg-indigo-600 text-white px-12 py-4 rounded-full text-xl font-bold shadow-lg hover:bg-indigo-800 transition-all transform hover:scale-105 active:scale-95">
+                Submit Quiz
+            </button>
+            <p id="retryMsg" class="hidden text-sm text-slate-500 italic">Please review the highlighted areas and try again.</p>
+        </div>
+
+    </main>
+
+    <footer class="text-center text-slate-400 py-10 text-sm">
+        4001CMD Interactive Sets Assessment &copy; 2025
+    </footer>
+
+    <script>
+        let selectedQ3 = null;
+        let selectedQ9 = undefined;
+        let selectedQ11 = null;
+
+        function selectQ3(val) {
+            selectedQ3 = val;
+            document.querySelectorAll('.q3-opt').forEach(b => b.classList.remove('selected'));
+            document.getElementById('q3-' + val).classList.add('selected');
+        }
+
+        function selectQ9(val) {
+            selectedQ9 = val;
+            document.querySelectorAll('.q9-btn').forEach(b => b.classList.remove('selected'));
+            if (val === true) document.getElementById('q9-t').classList.add('selected');
+            else if (val === false) document.getElementById('q9-f').classList.add('selected');
+            else if (val === null) document.getElementById('q9-u').classList.add('selected');
+        }
+
+        function selectQ11(val) {
+            selectedQ11 = val;
+            document.querySelectorAll('.q11-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('q11-' + val).classList.add('selected');
+        }
+
+        function toggleDropdown(trigger) {
+            const menu = trigger.nextElementSibling;
+            const isOpen = menu.classList.contains('show');
+            document.querySelectorAll('.custom-options').forEach(m => m.classList.remove('show'));
+            if (!isOpen) menu.classList.add('show');
+        }
+
+        function selectOption(option) {
+            const container = option.closest('.custom-select-container');
+            const trigger = container.querySelector('.trigger-label');
+            const val = option.getAttribute('data-val');
+            trigger.innerHTML = option.innerHTML;
+            trigger.classList.remove('text-slate-400');
+            container.setAttribute('data-selected', val);
+            option.parentElement.classList.remove('show');
+            initKaTeX();
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.custom-select-container')) {
+                document.querySelectorAll('.custom-options').forEach(m => m.classList.remove('show'));
+            }
+        };
+
+        const draggables = document.querySelectorAll('.draggable');
+        const dropZones = document.querySelectorAll('.drop-zone');
+        draggables.forEach(d => {
+            d.addEventListener('dragstart', () => d.classList.add('opacity-50'));
+            d.addEventListener('dragend', () => d.classList.remove('opacity-50'));
+        });
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('over');
+                const draggedElement = document.querySelector('.opacity-50');
+                if (draggedElement) {
+                    zone.innerHTML = '';
+                    const clone = draggedElement.cloneNode(true);
+                    clone.classList.remove('opacity-50', 'draggable', 'bg-slate-100');
+                    clone.classList.add('text-xs', 'p-1', 'bg-white', 'w-full', 'h-full', 'flex', 'items-center', 'justify-center');
+                    clone.setAttribute('draggable', false);
+                    zone.appendChild(clone);
+                    zone.setAttribute('data-current', draggedElement.getAttribute('data-val'));
+                    initKaTeX();
+                }
+            });
+        });
+
+        const cleanSet = (str) => str.replace(/\D/g, '');
+        const sortString = (str) => str.split('').sort().join('');
+
+        function submitQuiz() {
+            let score = 0;
+            const sections = document.querySelectorAll('section');
+            sections.forEach(s => {
+                s.classList.remove('q-incorrect');
+                s.classList.remove('q-correct');
+            });
+            document.querySelectorAll('input').forEach(i => i.classList.remove('input-incorrect'));
+            document.querySelectorAll('.drop-zone').forEach(d => d.classList.remove('q-incorrect'));
+            document.querySelectorAll('.custom-select-trigger').forEach(t => t.classList.remove('input-incorrect'));
+            document.querySelectorAll('.q9-btn, .q11-btn, .q3-opt').forEach(b => b.classList.remove('q-incorrect'));
+
+            // Q1 Matching
+            const q1Zones = document.querySelectorAll('#sect-q1 .drop-zone');
+            let q1Correct = 0;
+            q1Zones.forEach(z => {
+                if (z.getAttribute('data-current') === z.getAttribute('data-answer')) q1Correct++;
+                else if (z.getAttribute('data-current')) z.classList.add('q-incorrect');
+            });
+            if (q1Correct === 5) document.getElementById('sect-q1').classList.add('q-correct');
+            else if (q1Correct > 0) document.getElementById('sect-q1').classList.add('q-incorrect');
+            score += q1Correct;
+
+            // Q2 Matching
+            const q2Zones = document.querySelectorAll('#sect-q2 .drop-zone');
+            let q2Correct = 0;
+            q2Zones.forEach(z => {
+                if (z.getAttribute('data-current') === z.getAttribute('data-answer')) q2Correct++;
+                else if (z.getAttribute('data-current')) z.classList.add('q-incorrect');
+            });
+            if (q2Correct === 5) document.getElementById('sect-q2').classList.add('q-correct');
+            else if (q2Correct > 0) document.getElementById('sect-q2').classList.add('q-incorrect');
+            score += q2Correct;
+
+            // Q3
+            if (selectedQ3 === 'c') {
+                score += 1;
+                document.getElementById('sect-q3').classList.add('q-correct');
+            } else if (selectedQ3 !== null) {
+                document.getElementById('q3-' + selectedQ3).classList.add('q-incorrect');
+                document.getElementById('sect-q3').classList.add('q-incorrect');
+            }
+
+            // Q4
+            let q4Correct = 0;
+            document.querySelectorAll('.q4-custom-select').forEach(sel => {
+                const selectedVal = sel.getAttribute('data-selected');
+                if (selectedVal === sel.getAttribute('data-correct')) q4Correct++;
+                else if (selectedVal) sel.querySelector('.custom-select-trigger').classList.add('input-incorrect');
+            });
+            if (q4Correct === 3) document.getElementById('sect-q4').classList.add('q-correct');
+            else if (q4Correct > 0) document.getElementById('sect-q4').classList.add('q-incorrect');
+            score += q4Correct;
+
+            // Q5
+            const q5raw = cleanSet(document.getElementById('q5-ans').value);
+            if (sortString(q5raw) === '45') {
+                score += 1;
+                document.getElementById('sect-q5').classList.add('q-correct');
+            } else if (q5raw) {
+                document.getElementById('q5-ans').classList.add('input-incorrect');
+                document.getElementById('sect-q5').classList.add('q-incorrect');
+            }
+
+            // Q6
+            const u6 = cleanSet(document.getElementById('q6-union').value);
+            const i6 = cleanSet(document.getElementById('q6-inter').value);
+            let q6Correct = 0;
+            if (sortString(u6) === '145679') q6Correct++; else if (u6) document.getElementById('q6-union').classList.add('input-incorrect');
+            if (sortString(i6) === '459') q6Correct++; else if (i6) document.getElementById('q6-inter').classList.add('input-incorrect');
+            if (q6Correct === 2) document.getElementById('sect-q6').classList.add('q-correct');
+            else if (q6Correct > 0) document.getElementById('sect-q6').classList.add('q-incorrect');
+            score += q6Correct;
+
+            // Q7
+            if (document.getElementById('q7-ans').value == 3) {
+                score += 1;
+                document.getElementById('sect-q7').classList.add('q-correct');
+            } else if (document.getElementById('q7-ans').value) {
+                document.getElementById('q7-ans').classList.add('input-incorrect');
+                document.getElementById('sect-q7').classList.add('q-incorrect');
+            }
+
+            // Q8
+            const q8raw = cleanSet(document.getElementById('q8-ans').value);
+            if (sortString(q8raw) === '145') {
+                score += 1;
+                document.getElementById('sect-q8').classList.add('q-correct');
+            } else if (q8raw) {
+                document.getElementById('q8-ans').classList.add('input-incorrect');
+                document.getElementById('sect-q8').classList.add('q-incorrect');
+            }
+
+            // Q9
+            if (selectedQ9 === true) {
+                score += 1;
+                document.getElementById('sect-q9').classList.add('q-correct');
+            } else if (selectedQ9 !== undefined) {
+                const btnId = selectedQ9 === false ? 'q9-f' : 'q9-u';
+                document.getElementById(btnId).classList.add('q-incorrect');
+                document.getElementById('sect-q9').classList.add('q-incorrect');
+            }
+
+            // Q10
+            if (document.getElementById('q10-ans').value == 102) {
+                score += 1;
+                document.getElementById('sect-q10').classList.add('q-correct');
+            } else if (document.getElementById('q10-ans').value) {
+                document.getElementById('q10-ans').classList.add('input-incorrect');
+                document.getElementById('sect-q10').classList.add('q-incorrect');
+            }
+
+            // Q11
+            if (selectedQ11 === 3) {
+                score += 1;
+                document.getElementById('sect-q11').classList.add('q-correct');
+            } else if (selectedQ11 !== null) {
+                document.getElementById('q11-' + selectedQ11).classList.add('q-incorrect');
+                document.getElementById('sect-q11').classList.add('q-incorrect');
+            }
+
+            // Q12
+            const s1 = cleanSet(document.getElementById('q12-step1').value);
+            const s2 = cleanSet(document.getElementById('q12-step2').value);
+            const f = cleanSet(document.getElementById('q12-final').value);
+            let q12Correct = 0;
+            if (sortString(s1) === '68') q12Correct++; else if (s1) document.getElementById('q12-step1').classList.add('input-incorrect');
+            if (sortString(s2) === '45689') q12Correct++; else if (s2) document.getElementById('q12-step2').classList.add('input-incorrect');
+            if (sortString(f) === '589') q12Correct++; else if (f) document.getElementById('q12-final').classList.add('input-incorrect');
+            if (q12Correct === 3) document.getElementById('sect-q12').classList.add('q-correct');
+            else if (q12Correct > 0) document.getElementById('sect-q12').classList.add('q-incorrect');
+            score += q12Correct;
+
+            // Final Update
+            document.getElementById('scoreDisplay').innerText = `Score: ${score} / 22`;
+            document.getElementById('scorePanel').classList.remove('hidden');
+            document.getElementById('retryMsg').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

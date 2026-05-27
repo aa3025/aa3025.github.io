@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Theory - Complete Lecture Notes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Configure MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: { ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
+        };
+    </script>
+    <!-- Load MathJax -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        .math-example {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .key-concept {
+            background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 1px solid #bae6fd;
+        }
+        .interactive-example {
+            background: #fef7ed;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 1px solid #fed7aa;
+        }
+        .cipher-visual {
+            background: #f0fdf4;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 1px solid #bbf7d0;
+        }
+        .step-by-step {
+            background: #faf5ff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 1px solid #e9d5ff;
+        }
+        .section-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 12px;
+            margin-right: 1rem;
+        }
+        .cookie {
+            width: 30px;
+            height: 30px;
+            background: #f59e0b;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .cookie::after {
+            content: "";
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #92400e;
+            border-radius: 50%;
+            top: 8px;
+            left: 8px;
+        }
+        .cookie-box {
+            border: 2px solid #d97706;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px;
+            background: #fef3c7;
+            display: inline-block;
+            text-align: center;
+        }
+        .remainder-cookies {
+            border: 2px dashed #d97706;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px;
+            background: #fffbeb;
+            display: inline-block;
+            text-align: center;
+        }
+        .proof-box {
+            background: #f8fafc;
+            border-left: 4px solid #10b981;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+        
+        /* Audio player styles from Lecture 5 */
+        .lecture-section {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            position: relative; /* CRITICAL: Enables absolute positioning of the audio button */
+        }
+        
+        /* New wrapper for title and progress bar */
+        .section-heading-wrapper {
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            /* No border-bottom here, the slider takes its place */
+        }
+        
+        .section-heading-wrapper h2 {
+            font-size: 1.5rem; 
+            font-weight: 700;
+        }
+
+        /* Style for primary subheadings (h3) */
+        h3 { 
+            color: #2b6cb0; /* Deep blue text */
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem; 
+        }
+
+        /* Style for secondary subheadings (h4) */
+        .frame-title {
+            color: #2b6cb0; /* Deep blue text */
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* Fixed status bar for audio messages */
+        #status-message {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.75rem;
+            background-color: #48bb78; /* Green background */
+            color: white;
+            text-align: center;
+            font-weight: 600;
+            transition: transform 0.3s ease-out;
+            transform: translateY(100%); /* Start hidden */
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .status-show {
+            transform: translateY(0);
+        }
+
+        /* ------------------ CUSTOM AUDIO SLIDER STYLES ------------------ */
+        .audio-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: background 0.1s ease;
+            --slider-progress: 0%;
+            background: linear-gradient(to right, 
+                #4f46e5 0%, 
+                #4f46e5 var(--slider-progress), 
+                #e0e7ff var(--slider-progress), 
+                #e0e7ff 100%
+            );
+        }
+
+        /* Hide the slider thumb (dot) completely */
+        .audio-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 1px;
+            width: 1px;
+            opacity: 0;
+            cursor: pointer;
+            background: transparent;
+        }
+        .audio-slider::-moz-range-thumb {
+            height: 1px;
+            width: 1px;
+            opacity: 0;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+        }
+
+        .seeking-active {
+            cursor: grabbing;
+        }
+        /* ---------------------------------------------------------------- */
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 text-gray-800 font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl p-8 shadow-lg">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Number Theory</h1>
+            <p class="text-xl md:text-2xl opacity-90 mb-2">Mathematical Skills for Computing Professionals</p>
+            <p class="text-lg opacity-80">Lecture 6 - Complete Notes</p>
+            <div class="mt-6 p-4 bg-white bg-opacity-20 rounded-lg max-w-2xl mx-auto">
+                <p class="flex items-center justify-center"><i class="fas fa-info-circle mr-2"></i>These notes cover fundamental concepts of number theory and their applications in cryptography</p>
+            </div>
+        </header>
+
+        <!-- Section 0: TABLE OF CONTENTS -->
+        <div class="lecture-section bg-gray-50 shadow-lg mb-8" id="section-0">
+            <!-- Audio Controls for Section 0 (Table of Contents) -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_00.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold text-blue-800">Table of Contents</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-blue-700 mb-4 flex items-center">
+                <i class="fas fa-list mr-3"></i> Table of Contents
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <h3 class="font-bold text-gray-700 mb-2">Cryptography</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-sm">
+                        <li><a href="#section-1" class="text-blue-600 hover:underline hover:text-blue-800">1. Introduction</a></li>
+                        <li><a href="#section-2" class="text-blue-600 hover:underline hover:text-blue-800">2. Caesar Cipher</a></li>
+                        <li><a href="#section-3" class="text-blue-600 hover:underline hover:text-blue-800">3. Permutation Cipher</a></li>
+                        <li><a href="#section-4" class="text-blue-600 hover:underline hover:text-blue-800">4. One-Time Pad</a></li>
+                        <li><a href="#section-5" class="text-blue-600 hover:underline hover:text-blue-800">5. Main Problem</a></li>
+                        <li><a href="#section-6" class="text-blue-600 hover:underline hover:text-blue-800">6. Public Key Cryptography</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-700 mb-2">Number Theory Basics</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-sm">
+                        <li><a href="#section-7" class="text-blue-600 hover:underline hover:text-blue-800">7. Divisibility</a></li>
+                        <li><a href="#section-8" class="text-blue-600 hover:underline hover:text-blue-800">8. Quotient & Remainder</a></li>
+                        <li><a href="#section-9" class="text-blue-600 hover:underline hover:text-blue-800">9. Number Bases</a></li>
+                        <li><a href="#section-10" class="text-blue-600 hover:underline hover:text-blue-800">10. Euclidean Algorithm</a></li>
+                        <li><a href="#section-11" class="text-blue-600 hover:underline hover:text-blue-800">11. Extended Euclidean Algorithm</a></li>
+                        <li><a href="#section-12" class="text-blue-600 hover:underline hover:text-blue-800">12. Coprime Integers</a></li>
+                        <li><a href="#section-13" class="text-blue-600 hover:underline hover:text-blue-800">13. LCM and GCD Revisited</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-700 mb-2">Advanced Concepts</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-sm">
+                        <li><a href="#section-14" class="text-blue-600 hover:underline hover:text-blue-800">14. Prime Numbers</a></li>
+                        <li><a href="#section-15" class="text-blue-600 hover:underline hover:text-blue-800">15. Prime Factorization</a></li>
+                        <li><a href="#section-16" class="text-blue-600 hover:underline hover:text-blue-800">16. Extending Integers</a></li>
+                        <li><a href="#section-17" class="text-blue-600 hover:underline hover:text-blue-800">17. Rational Numbers</a></li>
+                        <li><a href="#section-18" class="text-blue-600 hover:underline hover:text-blue-800">18. Decimal Expansions</a></li>
+                        <li><a href="#section-19" class="text-blue-600 hover:underline hover:text-blue-800">19. Irrational Numbers</a></li>
+                        <li><a href="#section-20" class="text-blue-600 hover:underline hover:text-blue-800">20. Real Numbers</a></li>
+                        <li><a href="#section-21" class="text-blue-600 hover:underline hover:text-blue-800">21. Approximating √2</a></li>
+                        <li><a href="#section-22" class="text-blue-600 hover:underline hover:text-blue-800">22. Summary</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Cryptography Introduction -->
+        <section class="lecture-section" id="section-1">
+            <!-- Audio Controls for Section 1 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_01.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">1. Cryptography</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4 text-lg">Cryptography is the study of techniques for secure communication, allowing only the intended recipient to read the message.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3 flex items-center">
+                        <i class="fas fa-key mr-2"></i> Core Concepts
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold text-green-700 mb-2">Plaintext</h4>
+                            <p>The original, readable message before encryption</p>
+                            <div class="mt-3 p-3 bg-white rounded-lg border border-green-200">
+                                <p class="font-mono text-center">"I have a secret to tell you"</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-purple-700 mb-2">Ciphertext</h4>
+                            <p>The encrypted, unreadable message after encryption</p>
+                            <div class="mt-3 p-3 bg-white rounded-lg border border-purple-200">
+                                <p class="font-mono text-center">"Q PIDM I AMKZMB BW BMTT GWC"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3 flex items-center">
+                        <i class="fas fa-user-secret mr-2"></i> Why Cryptography Matters
+                    </h3>
+                    <p>Imagine you're sending a private message to a friend, but someone might be listening. Cryptography ensures:</p>
+                    <ul class="list-disc pl-5 mt-2 space-y-2">
+                        <li><strong>Confidentiality:</strong> Only the intended recipient can read the message</li>
+                        <li><strong>Integrity:</strong> The message hasn't been altered in transit</li>
+                        <li><strong>Authentication:</strong> You can verify who sent the message</li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-white rounded-lg border">
+                        <p class="text-sm"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> <strong>Real-world example:</strong> When you visit a website with "https://" in the address, cryptography protects your communication with that site.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Caesar Cipher -->
+        <section class="lecture-section" id="section-2">
+            <!-- Audio Controls for Section 2 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_02.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">2. Caesar Cipher</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">The Caesar cipher is one of the simplest encryption techniques, used by Julius Caesar. Each letter in the plaintext is shifted by a fixed number of positions in the alphabet.</p>
+                
+                <div class="cipher-visual">
+                    <h3 class="font-bold text-green-700 mb-3">How it works:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Choose a shift value <span class="font-mono bg-green-100 px-2 py-1 rounded">n</span> between 1 and 25</li>
+                        <li>Replace each letter with the letter <span class="font-mono bg-green-100 px-2 py-1 rounded">n</span> positions later in the alphabet</li>
+                        <li>Wrap around from Z to A if needed</li>
+                    </ol>
+                    
+                    <div class="mt-4 p-4 bg-white rounded-lg border">
+                        <h4 class="font-bold mb-2">Example with shift of 8:</h4>
+                        <div class="flex flex-col md:flex-row justify-between items-center">
+                            <div class="text-center mb-4 md:mb-0">
+                                <p class="font-bold text-gray-700">Plaintext</p>
+                                <p class="font-mono bg-gray-100 px-4 py-2 rounded-lg border">i have a secret</p>
+                            </div>
+                            <div class="text-center">
+                                <i class="fas fa-arrow-right text-blue-500 text-xl mx-4"></i>
+                            </div>
+                            <div class="text-center">
+                                <p class="font-bold text-gray-700">Ciphertext</p>
+                                <p class="font-mono bg-gray-100 px-4 py-2 rounded-lg border">Q PIDM I AMKZMB</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-by-step">
+                    <h3 class="font-bold text-purple-700 mb-3">Step-by-step encryption:</h3>
+                    <p>Let's encrypt the word "hello" with a shift of 3:</p>
+                    <div class="mt-3 grid grid-cols-5 gap-2 text-center">
+                        <div class="p-2 bg-blue-50 rounded-lg">h → k</div>
+                        <div class="p-2 bg-blue-50 rounded-lg">e → h</div>
+                        <div class="p-2 bg-blue-50 rounded-lg">l → o</div>
+                        <div class="p-2 bg-blue-50 rounded-lg">l → o</div>
+                        <div class="p-2 bg-blue-50 rounded-lg">o → r</div>
+                    </div>
+                    <p class="mt-3 font-mono text-center">"hello" becomes "khoor"</p>
+                </div>
+                
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200 mt-4">
+                    <h4 class="font-bold text-red-700 mb-2 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> Security Issues
+                    </h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Only 25 possible keys (excluding 0)</li>
+                        <li>Easy to break by trying all possibilities (brute force attack)</li>
+                        <li>Vulnerable to frequency analysis (matching common letters)</li>
+                    </ul>
+                    <div class="mt-3 p-3 bg-white rounded border">
+                        <p class="text-sm"><i class="fas fa-user-secret mr-2"></i> An attacker could try all 25 shifts in seconds to find the readable message.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Permutation Cipher -->
+        <section class="lecture-section" id="section-3">
+            <!-- Audio Controls for Section 3 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_03.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">3. Permutation Cipher</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">In a permutation cipher, each letter in the plaintext alphabet is mapped to a unique letter in the ciphertext alphabet through a random permutation.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Key Features:</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>The key is the entire shuffled alphabet</li>
+                        <li>There are <span class="font-mono bg-blue-100 px-2 py-1 rounded">26! ≈ 4.03 × 10²⁶</span> possible keys</li>
+                        <li>Much more secure than Caesar cipher against brute force attacks</li>
+                    </ul>
+                    
+                    <div class="mt-4 p-4 bg-white rounded-lg border">
+                        <h4 class="font-bold mb-2">Example Mapping:</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                            <div class="p-2 bg-gray-50 rounded text-center">a → G</div>
+                            <div class="p-2 bg-gray-50 rounded text-center">b → D</div>
+                            <div class="p-2 bg-gray-50 rounded text-center">c → L</div>
+                            <div class="p-2 bg-gray-50 rounded text-center">d → H</div>
+                            <div class="p-2 bg-gray-50 rounded text-center">e → V</div>
+                            <div class="p-2 bg-gray-50 rounded text-center">f → U</div>
+                            <div class="p-2 bg-gray-50 rounded text-center">g → O</div>
+                            <div class="p-2 bg-gray-50 rounded text-center">h → C</div>
+                        </div>
+                        <div class="mt-3">
+                            <p><strong>Plaintext:</strong> <span class="font-mono bg-white px-2 py-1 rounded border">i have a secret</span></p>
+                            <p><strong>Ciphertext:</strong> <span class="font-mono bg-white px-2 py-1 rounded border">R CGJV G TVLIVP</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Understanding the Key Space</h3>
+                    <p>26! (26 factorial) is an astronomically large number:</p>
+                    <div class="mt-2 p-3 bg-white rounded-lg border">
+                        <p class="font-mono text-center">26! = 26 × 25 × 24 × ... × 3 × 2 × 1 = 403,291,461,126,605,635,584,000,000</p>
+                    </div>
+                    <p class="mt-2">That's over 403 septillion possible keys! Even if a computer could check 1 billion keys per second, it would take over 12 billion years to check them all.</p>
+                </div>
+                
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mt-4">
+                    <h4 class="font-bold text-yellow-700 mb-2">Vulnerability to Frequency Analysis</h4>
+                    <p>Despite the large key space, permutation ciphers are vulnerable to frequency analysis:</p>
+                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>In English, 'e' is the most common letter (about 12.7% of all letters)</li>
+                        <li>An attacker can match frequent ciphertext letters to frequent plaintext letters</li>
+                        <li>Longer messages make frequency analysis more reliable</li>
+                    </ul>
+                    <div class="mt-3 p-3 bg-white rounded border">
+                        <p class="text-sm"><i class="fas fa-chart-bar mr-2"></i> Common English letter frequencies: E (12.7%), T (9.1%), A (8.2%), O (7.5%), I (7.0%), N (6.7%)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: One-Time Pad -->
+        <section class="lecture-section" id="section-4">
+            <!-- Audio Controls for Section 4 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_04.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">4. One-Time Pad Cipher</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">The one-time pad is a theoretically unbreakable encryption method that uses a random key that is as long as the message and is never reused.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">How it works:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Both parties have identical codebooks of random numbers from 0 to 25</li>
+                        <li>For each plaintext letter, shift by the corresponding number in the codebook</li>
+                        <li>After use, destroy the page of the codebook</li>
+                    </ol>
+                    
+                    <div class="mt-4 p-4 bg-white rounded-lg border">
+                        <h4 class="font-bold mb-2">Example:</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <p class="font-bold text-gray-700">Key</p>
+                                <p class="font-mono bg-gray-100 px-4 py-2 rounded-lg border">5, 2, 8, 12, 18</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="font-bold text-gray-700">Plaintext</p>
+                                <p class="font-mono bg-gray-100 px-4 py-2 rounded-lg border">ihave</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="font-bold text-gray-700">Ciphertext</p>
+                                <p class="font-mono bg-gray-100 px-4 py-2 rounded-lg border">NUHHY</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-by-step">
+                    <h3 class="font-bold text-purple-700 mb-3">Step-by-step encryption:</h3>
+                    <p>Let's encrypt "ihave" with the key [5, 2, 8, 12, 18]:</p>
+                    <div class="mt-3 grid grid-cols-5 gap-2 text-center">
+                        <div class="p-2 bg-purple-50 rounded-lg">i + 5 = n</div>
+                        <div class="p-2 bg-purple-50 rounded-lg">h + 2 = j</div>
+                        <div class="p-2 bg-purple-50 rounded-lg">a + 8 = i</div>
+                        <div class="p-2 bg-purple-50 rounded-lg">v + 12 = h</div>
+                        <div class="p-2 bg-purple-50 rounded-lg">e + 18 = w</div>
+                    </div>
+                    <p class="mt-3 font-mono text-center">Wait, that gives us "njihw" not "nuhhy" - let me recalculate...</p>
+                    <div class="mt-3 grid grid-cols-5 gap-2 text-center">
+                        <div class="p-2 bg-purple-50 rounded-lg">i(8) + 5 = 13 → n</div>
+                        <div class="p-2 bg-purple-50 rounded-lg">h(7) + 2 = 9 → j</div>
+                        <div class="p-2 bg-purple-50 rounded-lg">a(0) + 8 = 8 → i</div>
+                        <div class="p-2 bg-purple-50 rounded-lg">v(21) + 12 = 33 → 7 → h</div>
+                        <div class="p-2 bg-purple-50 rounded-lg">e(4) + 18 = 22 → w</div>
+                    </div>
+                    <p class="mt-3 font-mono text-center">Actually, it seems there might be an error in the original example. Let's use a correct example:</p>
+                    <div class="mt-3 grid grid-cols-5 gap-2 text-center">
+                        <div class="p-2 bg-green-50 rounded-lg">i(8) + 5 = 13 → n</div>
+                        <div class="p-2 bg-green-50 rounded-lg">h(7) + 14 = 21 → v</div>
+                        <div class="p-2 bg-green-50 rounded-lg">a(0) + 0 = 0 → a</div>
+                        <div class="p-2 bg-green-50 rounded-lg">v(21) + 19 = 40 → 14 → o</div>
+                        <div class="p-2 bg-green-50 rounded-lg">e(4) + 4 = 8 → i</div>
+                    </div>
+                    <p class="mt-3 font-mono text-center">"ihave" with key [5,14,0,19,4] becomes "nvaoi"</p>
+                </div>
+                
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200 mt-4">
+                    <h4 class="font-bold text-green-700 mb-2 flex items-center">
+                        <i class="fas fa-shield-alt mr-2"></i> Advantages
+                    </h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>The only proven unbreakable encryption method</li>
+                        <li>No statistical patterns for cryptanalysis</li>
+                        <li>Perfect secrecy when implemented correctly</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200 mt-4">
+                    <h4 class="font-bold text-red-700 mb-2 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> Practical Challenges
+                    </h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Key distribution is difficult and must be absolutely secure</li>
+                        <li>Keys must be truly random and as long as the message</li>
+                        <li>Keys must never be reused</li>
+                        <li>Implementation is slow and prone to human error</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Main Problem in Cryptography -->
+        <section class="lecture-section" id="section-5">
+            <!-- Audio Controls for Section 5 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_05.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">5. The Main Problem in Cryptography</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">All the encryption methods discussed so far share a fundamental problem: both the sender and receiver need to share the same secret key.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">The Key Distribution Problem:</h3>
+                    <p>How can Alice and Bob agree on an encryption key without Eve intercepting it during transmission?</p>
+                    
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+                            <i class="fas fa-user text-red-500 text-3xl mb-2"></i>
+                            <h4 class="font-bold text-red-700">Alice</h4>
+                            <p class="text-sm mt-2">Wants to send a secure message to Bob</p>
+                        </div>
+                        <div class="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <i class="fas fa-user-secret text-yellow-500 text-3xl mb-2"></i>
+                            <h4 class="font-bold text-yellow-700">Eve</h4>
+                            <p class="text-sm mt-2">Trying to intercept and read the message</p>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                            <i class="fas fa-user text-green-500 text-3xl mb-2"></i>
+                            <h4 class="font-bold text-green-700">Bob</h4>
+                            <p class="text-sm mt-2">Wants to receive Alice's message securely</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">The Challenge</h3>
+                    <p>Imagine Alice and Bob want to communicate securely:</p>
+                    <ol class="list-decimal pl-5 mt-2 space-y-2">
+                        <li>They need to agree on an encryption method and key</li>
+                        <li>But if they communicate about it, Eve might intercept their conversation</li>
+                        <li>If they meet in person to exchange keys, that might not be practical</li>
+                    </ol>
+                    <div class="mt-4 p-3 bg-white rounded-lg border">
+                        <p class="text-sm"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> <strong>The solution:</strong> Public key cryptography, where different keys are used for encryption and decryption.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Public Key Cryptography -->
+        <section class="lecture-section" id="section-6">
+            <!-- Audio Controls for Section 6 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_06.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">6. Public Key Cryptography</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">Public key cryptography uses two different but mathematically related keys: a public key for encryption and a private key for decryption.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">RSA Encryption Example:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Bob chooses two prime numbers, e.g., 53 and 71</li>
+                        <li>Bob computes their product: <span class="font-mono bg-blue-100 px-2 py-1 rounded">53 × 71 = 3763</span></li>
+                        <li>Bob publishes 3763 as his public key (anyone can see this)</li>
+                        <li>Bob keeps 53 and 71 secret as his private key</li>
+                        <li>Alice uses 3763 to encrypt her message to Bob</li>
+                        <li>Only Bob can decrypt the message using 53 and 71</li>
+                    </ol>
+                </div>
+                
+                <div class="step-by-step">
+                    <h3 class="font-bold text-purple-700 mb-3">Visualizing the Process:</h3>
+                    <div class="flex flex-col space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center">1</div>
+                            <div class="ml-4">
+                                <p class="font-bold">Key Generation</p>
+                                <p class="text-sm">Bob generates his public/private key pair</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center">2</div>
+                            <div class="ml-4">
+                                <p class="font-bold">Key Distribution</p>
+                                <p class="text-sm">Bob shares his public key with Alice</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-yellow-500 text-white flex items-center justify-center">3</div>
+                            <div class="ml-4">
+                                <p class="font-bold">Encryption</p>
+                                <p class="text-sm">Alice encrypts her message with Bob's public key</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center">4</div>
+                            <div class="ml-4">
+                                <p class="font-bold">Decryption</p>
+                                <p class="text-sm">Bob decrypts the message with his private key</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Security:</h4>
+                        <p>The security relies on the difficulty of factoring large numbers:</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li>Factoring 65 = 5 × 13 is easy</li>
+                            <li>Factoring 3763 = 53 × 71 is harder</li>
+                            <li>Factoring numbers with hundreds of digits is computationally infeasible</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <h4 class="font-bold text-purple-700 mb-2">Applications:</h4>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>Secure web browsing (HTTPS)</li>
+                            <li>Digital signatures</li>
+                            <li>Secure email</li>
+                            <li>Cryptocurrencies</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-6">
+                    <p class="text-yellow-700 flex items-start">
+                        <i class="fas fa-exclamation-triangle mr-2 mt-1"></i>
+                        <span>Industry standard RSA uses prime numbers with hundreds of digits. Factoring such numbers would take millions of years with current technology.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Divisibility -->
+        <section class="lecture-section" id="section-7">
+            <!-- Audio Controls for Section 7 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_07.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">7. Divisibility</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">Divisibility is a fundamental concept in number theory that describes when one integer can be divided by another without leaving a remainder.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Definition:</h3>
+                    <p>If <span class="font-mono bg-blue-100 px-2 py-1 rounded">x = y × q</span> for some integer <span class="font-mono bg-blue-100 px-2 py-1 rounded">q</span>, then we say:</p>
+                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li><span class="font-mono">y</span> divides <span class="font-mono">x</span></li>
+                        <li><span class="font-mono">y</span> is a divisor or factor of <span class="font-mono">x</span></li>
+                        <li><span class="font-mono">x</span> is a multiple of <span class="font-mono">y</span></li>
+                        <li>We write this as <span class="font-mono bg-blue-100 px-2 py-1 rounded">y|x</span></li>
+                    </ul>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Examples:</h4>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>17|51 because 51 = 17 × 3</li>
+                            <li>5|65 because 65 = 5 × 13</li>
+                            <li>-17|51 because 51 = -17 × -3</li>
+                            <li>17|-51 because -51 = 17 × -3</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <h4 class="font-bold text-red-700 mb-2">Non-examples:</h4>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>4∤10 because 10 ÷ 4 = 2.5 (not an integer)</li>
+                            <li>7∤22 because 22 ÷ 7 ≈ 3.142 (not an integer)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Understanding Divisibility Rules</h3>
+                    <p>Some quick tests for divisibility:</p>
+                    <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-3 bg-white rounded-lg border">
+                            <p class="font-bold">Divisible by 2</p>
+                            <p class="text-sm">Last digit is even (0,2,4,6,8)</p>
+                            <p class="font-mono text-xs mt-1">Example: 346 (last digit 6 is even)</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border">
+                            <p class="font-bold">Divisible by 3</p>
+                            <p class="text-sm">Sum of digits is divisible by 3</p>
+                            <p class="font-mono text-xs mt-1">Example: 123 (1+2+3=6, 6÷3=2)</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border">
+                            <p class="font-bold">Divisible by 5</p>
+                            <p class="text-sm">Last digit is 0 or 5</p>
+                            <p class="font-mono text-xs mt-1">Example: 475 (last digit is 5)</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border">
+                            <p class="font-bold">Divisible by 10</p>
+                            <p class="text-sm">Last digit is 0</p>
+                            <p class="font-mono text-xs mt-1">Example: 890 (last digit is 0)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-4">
+                    <p class="text-yellow-700 flex items-start">
+                        <i class="fas fa-lightbulb mr-2 mt-1"></i>
+                        <span>Every integer divides 0 because 0 = n × 0 for any integer n. However, 0 does not divide any nonzero integer.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 8: Quotient and Remainder -->
+        <section class="lecture-section" id="section-8">
+            <!-- Audio Controls for Section 8 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_08.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">8. Quotient and Remainder</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">When we divide one integer by another, we get a quotient and a remainder.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Division Algorithm:</h3>
+                    <p>For any positive integers <span class="font-mono bg-blue-100 px-2 py-1 rounded">a</span> and <span class="font-mono bg-blue-100 px-2 py-1 rounded">b</span>, there exist unique integers <span class="font-mono bg-blue-100 px-2 py-1 rounded">q</span> (quotient) and <span class="font-mono bg-blue-100 px-2 py-1 rounded">r</span> (remainder) such that:</p>
+                    <p class="text-center font-mono text-xl my-3 bg-white p-3 rounded border">a = b × q + r</p>
+                    <p>with <span class="font-mono bg-blue-100 px-2 py-1 rounded">0 ≤ r < b</span></p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Example:</h4>
+                        <p class="mb-2">Divide 27 by 6:</p>
+                        <p class="font-mono text-center bg-white p-2 rounded border">27 = 6 × 4 + 3</p>
+                        <p class="mt-2">Quotient: 4, Remainder: 3</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <h4 class="font-bold text-purple-700 mb-2">Quick Calculation Method:</h4>
+                        <p class="mb-2">To divide 8247 by 345:</p>
+                        <ol class="list-decimal pl-5 space-y-1 text-sm">
+                            <li>8247 ÷ 345 ≈ 23.904</li>
+                            <li>345 × 23 = 7935</li>
+                            <li>8247 - 7935 = 312</li>
+                            <li>So 8247 = 345 × 23 + 312</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Visualizing Division with Remainder</h3>
+                    <p>Imagine you have 27 cookies and want to put them into boxes of 6:</p>
+                    
+                    <!-- Cookie Visualization -->
+                    <div class="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                        <div class="text-center mb-4">
+                            <p class="font-bold text-amber-800">27 Cookies Total</p>
+                            <div class="flex flex-wrap justify-center mt-2">
+                                <!-- Generating 27 cookies -->
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                                <div class="cookie"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+                            <div class="text-center mb-4 md:mb-0">
+                                <p class="font-bold text-amber-700">4 Full Boxes</p>
+                                <p class="text-sm text-amber-600">(6 cookies each)</p>
+                                <div class="flex space-x-2 mt-2">
+                                    <div class="cookie-box">
+                                        <div class="flex flex-wrap justify-center" style="width: 100px;">
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                        </div>
+                                        <p class="text-xs mt-1">Box 1</p>
+                                    </div>
+                                    <div class="cookie-box">
+                                        <div class="flex flex-wrap justify-center" style="width: 100px;">
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                        </div>
+                                        <p class="text-xs mt-1">Box 2</p>
+                                    </div>
+                                    <div class="cookie-box">
+                                        <div class="flex flex-wrap justify-center" style="width: 100px;">
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                        </div>
+                                        <p class="text-xs mt-1">Box 3</p>
+                                    </div>
+                                    <div class="cookie-box">
+                                        <div class="flex flex-wrap justify-center" style="width: 100px;">
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                            <div class="cookie"></div>
+                                        </div>
+                                        <p class="text-xs mt-1">Box 4</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm mt-2">4 boxes × 6 cookies = 24 cookies</p>
+                            </div>
+                            
+                            <div class="text-center">
+                                <p class="font-bold text-amber-700">Remainder: 3 Cookies</p>
+                                <div class="remainder-cookies mt-2">
+                                    <div class="flex flex-wrap justify-center" style="width: 60px;">
+                                        <div class="cookie"></div>
+                                        <div class="cookie"></div>
+                                        <div class="cookie"></div>
+                                    </div>
+                                    <p class="text-xs mt-1">Leftover</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center p-3 bg-white rounded border mt-4">
+                            <p class="font-mono font-bold">27 = 6 × 4 + 3</p>
+                            <p class="text-sm mt-1">Total = (Cookies per box × Number of boxes) + Remainder</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-3 bg-blue-50 rounded-lg">
+                            <h4 class="font-bold text-blue-700 mb-2">Quotient (q = 4)</h4>
+                            <p class="text-sm">The number of complete boxes we can fill</p>
+                        </div>
+                        <div class="p-3 bg-green-50 rounded-lg">
+                            <h4 class="font-bold text-green-700 mb-2">Remainder (r = 3)</h4>
+                            <p class="text-sm">The cookies left over that don't make a full box</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-4">
+                    <p class="text-yellow-700 flex items-start">
+                        <i class="fas fa-lightbulb mr-2 mt-1"></i>
+                        <span>The condition 0 ≤ r < b ensures that the quotient and remainder are unique. Without this condition, we could have multiple representations, e.g., 27 = 6×3 + 9, but 9 ≥ 6, so this doesn't satisfy the condition.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 9: Number Bases -->
+        <section class="lecture-section" id="section-9">
+            <!-- Audio Controls for Section 9 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_09.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">9. Number Bases</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">Numbers can be represented in different bases, not just base 10 (decimal). The base determines how many digits are used and how place values are calculated.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Base 10 (Decimal):</h3>
+                    <p class="font-mono text-center bg-white p-3 rounded border mb-2">537 = 5×10² + 3×10¹ + 7×10⁰</p>
+                    <p>This is the number system we use in everyday life.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Base 8 (Octal):</h4>
+                        <p class="mb-2">Convert 537 to base 8:</p>
+                        <div class="font-mono text-sm bg-white p-3 rounded border">
+                            <p>537 ÷ 512 (8³) = 1 remainder 25</p>
+                            <p>25 ÷ 64 (8²) = 0 remainder 25</p>
+                            <p>25 ÷ 8 (8¹) = 3 remainder 1</p>
+                            <p>1 ÷ 1 (8⁰) = 1 remainder 0</p>
+                        </div>
+                        <p class="mt-2 font-mono">537 = 1×8³ + 0×8² + 3×8¹ + 1×8⁰ = (1031)₈</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <h4 class="font-bold text-purple-700 mb-2">Base 2 (Binary):</h4>
+                        <p class="mb-2">Convert 109 to base 2:</p>
+                        <div class="font-mono text-sm bg-white p-3 rounded border">
+                            <p>109 ÷ 64 (2⁶) = 1 remainder 45</p>
+                            <p>45 ÷ 32 (2⁵) = 1 remainder 13</p>
+                            <p>13 ÷ 16 (2⁴) = 0 remainder 13</p>
+                            <p>13 ÷ 8 (2³) = 1 remainder 5</p>
+                            <p>5 ÷ 4 (2²) = 1 remainder 1</p>
+                            <p>1 ÷ 2 (2¹) = 0 remainder 1</p>
+                            <p>1 ÷ 1 (2⁰) = 1 remainder 0</p>
+                        </div>
+                        <p class="mt-2 font-mono">109 = (1101101)₂</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Understanding Place Values</h3>
+                    <p>In any base system, the rightmost digit represents the base⁰ place, the next digit represents the base¹ place, and so on.</p>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div class="p-3 bg-white rounded-lg border">
+                            <p class="font-bold">Binary (Base 2)</p>
+                            <p class="font-mono text-sm">(1101)₂ = 1×8 + 1×4 + 0×2 + 1×1 = 13</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border">
+                            <p class="font-bold">Octal (Base 8)</p>
+                            <p class="font-mono text-sm">(47)₈ = 4×8 + 7×1 = 39</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border">
+                            <p class="font-bold">Hexadecimal (Base 16)</p>
+                            <p class="font-mono text-sm">(2F)₁₆ = 2×16 + 15×1 = 47</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mt-4">
+                    <h4 class="font-bold text-yellow-700 mb-2">Importance in Computing:</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="font-bold">Binary (Base 2):</p>
+                            <ul class="list-disc pl-5 text-sm">
+                                <li>Fundamental to digital computers</li>
+                                <li>Represents on/off states in circuits</li>
+                                <li>Used in logic gates and Boolean algebra</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-bold">Hexadecimal (Base 16):</p>
+                            <ul class="list-disc pl-5 text-sm">
+                                <li>Uses digits 0-9 and A-F</li>
+                                <li>Compact representation of binary</li>
+                                <li>Common in programming and memory addressing</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 10: Euclidean Algorithm -->
+        <section class="lecture-section" id="section-10">
+            <!-- Audio Controls for Section 10 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_10.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">10. Euclidean Algorithm</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">The Euclidean Algorithm is an efficient method for finding the Greatest Common Divisor (GCD) of two integers.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">How it works:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Start with two numbers a and b (a > b)</li>
+                        <li>Divide a by b to get quotient q and remainder r</li>
+                        <li>Replace a with b and b with r</li>
+                        <li>Repeat until the remainder is 0</li>
+                        <li>The last non-zero remainder is the GCD</li>
+                    </ol>
+                </div>
+                
+                <div class="step-by-step">
+                    <h3 class="font-bold text-purple-700 mb-3">Example: GCD(2406, 654)</h3>
+                    <div class="font-mono text-sm bg-white p-3 rounded border">
+                        <p>2406 = 654×3 + 444 → GCD(2406,654) = GCD(654,444)</p>
+                        <p>654 = 444×1 + 210 → GCD(654,444) = GCD(444,210)</p>
+                        <p>444 = 210×2 + 24 → GCD(444,210) = GCD(210,24)</p>
+                        <p>210 = 24×8 + 18 → GCD(210,24) = GCD(24,18)</p>
+                        <p>24 = 18×1 + 6 → GCD(24,18) = GCD(18,6)</p>
+                        <p>18 = 6×3 + 0 → GCD(18,6) = 6</p>
+                    </div>
+                    <p class="mt-2 font-bold">∴ GCD(2406, 654) = 6</p>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Why This Works</h3>
+                    <p>The key insight is that GCD(a,b) = GCD(b, r) where r is the remainder when a is divided by b.</p>
+                    <p class="mt-2">This is because any common divisor of a and b must also divide r (since r = a - bq), and any common divisor of b and r must also divide a (since a = bq + r).</p>
+                    <div class="mt-3 p-3 bg-white rounded-lg border">
+                        <p class="text-sm"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> This process always terminates because the remainders get smaller at each step, and eventually we reach a remainder of 0.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 11: Extended Euclidean Algorithm -->
+        <section class="lecture-section" id="section-11">
+            <!-- Audio Controls for Section 11 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_11.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">11. Extended Euclidean Algorithm</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">The Extended Euclidean Algorithm not only finds the GCD of two numbers but also finds integers x and y such that:</p>
+                <p class="text-center font-mono text-xl my-3 bg-blue-50 p-3 rounded border">GCD(a,b) = a×x + b×y</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">How it works:</h3>
+                    <p>We work backwards through the steps of the Euclidean Algorithm, expressing each remainder in terms of a and b.</p>
+                </div>
+                
+                <div class="step-by-step">
+                    <h3 class="font-bold text-purple-700 mb-3">Example: Find x and y such that 2406x + 654y = 6</h3>
+                    
+                    <p class="mb-3">First, let's recall the Euclidean Algorithm steps:</p>
+                    <div class="font-mono text-sm bg-white p-3 rounded border mb-4">
+                        <p>(1) 2406 = 654×3 + 444  →  444 = 2406 - 654×3</p>
+                        <p>(2) 654 = 444×1 + 210  →  210 = 654 - 444×1</p>
+                        <p>(3) 444 = 210×2 + 24  →  24 = 444 - 210×2</p>
+                        <p>(4) 210 = 24×8 + 18  →  18 = 210 - 24×8</p>
+                        <p>(5) 24 = 18×1 + 6  →  6 = 24 - 18×1</p>
+                        <p>(6) 18 = 6×3 + 0</p>
+                    </div>
+                    
+                    <p class="mb-3">Now we work backwards:</p>
+                    
+                    <p class="mb-2">Start from step (5): 6 = 24 - 18×1</p>
+                    
+                    <p class="mb-2">Substitute 18 from step (4): 18 = 210 - 24×8</p>
+                    <p class="font-mono bg-blue-50 p-2 rounded mb-3">6 = 24 - (210 - 24×8)×1 = 24 - 210 + 24×8 = 24×9 - 210</p>
+                    
+                    <p class="mb-2">Substitute 24 from step (3): 24 = 444 - 210×2</p>
+                    <p class="font-mono bg-blue-50 p-2 rounded mb-3">6 = (444 - 210×2)×9 - 210 = 444×9 - 210×18 - 210 = 444×9 - 210×19</p>
+                    
+                    <p class="mb-2">Substitute 210 from step (2): 210 = 654 - 444×1</p>
+                    <p class="font-mono bg-blue-50 p-2 rounded mb-3">6 = 444×9 - (654 - 444×1)×19 = 444×9 - 654×19 + 444×19 = 444×28 - 654×19</p>
+                    
+                    <p class="mb-2">Substitute 444 from step (1): 444 = 2406 - 654×3</p>
+                    <p class="font-mono bg-blue-50 p-2 rounded mb-3">6 = (2406 - 654×3)×28 - 654×19 = 2406×28 - 654×84 - 654×19 = 2406×28 - 654×103</p>
+                    
+                    <p class="mt-3 font-bold">So we have: 6 = 2406×28 + 654×(-103)</p>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Application: Modular Inverses</h3>
+                    <p>The Extended Euclidean Algorithm is particularly useful for finding modular inverses.</p>
+                    <p class="mt-2">If GCD(a,n) = 1, then there exists an integer x such that:</p>
+                    <p class="text-center font-mono bg-white p-2 rounded border my-2">a×x ≡ 1 (mod n)</p>
+                    <p>This x is the modular inverse of a modulo n.</p>
+                    <div class="mt-3 p-3 bg-white rounded-lg border">
+                        <p class="text-sm"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> Modular inverses are essential in RSA encryption and many other cryptographic algorithms.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 12: Coprime Integers -->
+        <section class="lecture-section" id="section-12">
+            <!-- Audio Controls for Section 12 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_12.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">12. Coprime Integers</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">Two integers are coprime (or relatively prime) if their greatest common divisor is 1.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Key Property:</h3>
+                    <p>If GCD(a,b) = 1, then there exist integers m and n such that:</p>
+                    <p class="text-center font-mono text-xl my-3 bg-white p-3 rounded border">1 = a×m + b×n</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Examples:</h4>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>GCD(9,7) = 1, so 9 and 7 are coprime</li>
+                            <li>GCD(15,28) = 1, so 15 and 28 are coprime</li>
+                            <li>GCD(12,18) = 6, so 12 and 18 are not coprime</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <h4 class="font-bold text-purple-700 mb-2">Water Jug Problem:</h4>
+                        <p>With 7L and 9L jugs, how can you measure exactly 1L?</p>
+                        <p class="font-mono mt-2 bg-white p-2 rounded border">1 = 9×4 + 7×(-5)</p>
+                        <p class="mt-2">Solution: Fill the 9L jug 4 times and remove 5 fills of the 7L jug.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Visualizing the Water Jug Problem</h3>
+                    <p>We need to find integers x and y such that 9x + 7y = 1.</p>
+                    <p class="mt-2">Using the Extended Euclidean Algorithm:</p>
+                    <div class="font-mono text-sm bg-white p-3 rounded border mt-2">
+                        <p>9 = 7×1 + 2  →  2 = 9 - 7×1</p>
+                        <p>7 = 2×3 + 1  →  1 = 7 - 2×3</p>
+                        <p>Substitute: 1 = 7 - (9 - 7×1)×3 = 7 - 9×3 + 7×3 = 9×(-3) + 7×4</p>
+                    </div>
+                    <p class="mt-2">So we have 1 = 9×(-3) + 7×4, which means x = -3 and y = 4.</p>
+                    <p class="mt-2">This tells us to fill the 9L jug -3 times (which means empty it 3 times) and fill the 7L jug 4 times.</p>
+                    <p class="mt-2">In practical terms, we fill the 7L jug 4 times (28L total) and remove 3 fills of the 9L jug (27L), leaving 1L.</p>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-4">
+                    <p class="text-yellow-700 flex items-start">
+                        <i class="fas fa-lightbulb mr-2 mt-1"></i>
+                        <span>If a and b are coprime, then any integer can be expressed as a combination of a and b. If they're not coprime, only multiples of their GCD can be expressed this way.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 13: LCM and GCD Revisited -->
+        <section class="lecture-section" id="section-13">
+            <!-- Audio Controls for Section 13 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_13.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">13. LCM and GCD Revisited</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">Prime factorization provides an alternative method for finding the greatest common divisor (GCD) and least common multiple (LCM) of numbers.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Using Prime Factorization:</h3>
+                    <p>If we have the prime factorizations of two numbers:</p>
+                    <p class="text-center font-mono my-3 bg-white p-3 rounded border">a = p₁ˢ¹ × p₂ˢ² × ... × pₖˢᵏ</p>
+                    <p class="text-center font-mono my-3 bg-white p-3 rounded border">b = p₁ᵗ¹ × p₂ᵗ² × ... × pₖᵗᵏ</p>
+                    <p>Then we can find GCD and LCM as:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="p-3 bg-green-50 rounded-lg border border-green-200">
+                            <h4 class="font-bold text-green-700 mb-2">GCD Formula:</h4>
+                            <p class="font-mono text-center">GCD(a,b) = p₁ᵐⁱⁿ⁽ˢ¹,ᵗ¹⁾ × p₂ᵐⁱⁿ⁽ˢ²,ᵗ²⁾ × ... × pₖᵐⁱⁿ⁽ˢᵏ,ᵗᵏ⁾</p>
+                        </div>
+                        <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                            <h4 class="font-bold text-purple-700 mb-2">LCM Formula:</h4>
+                            <p class="font-mono text-center">LCM(a,b) = p₁ᵐᵃˣ⁽ˢ¹,ᵗ¹⁾ × p₂ᵐᵃˣ⁽ˢ²,ᵗ²⁾ × ... × pₖᵐᵃˣ⁽ˢᵏ,ᵗᵏ⁾</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-by-step">
+                    <h3 class="font-bold text-purple-700 mb-3">Example: GCD and LCM of 7000 and 88200</h3>
+                    
+                    <p class="mb-3">First, find the prime factorizations:</p>
+                    <div class="font-mono text-sm bg-white p-3 rounded border mb-4">
+                        <p>7000 = 2³ × 5³ × 7¹</p>
+                        <p>88200 = 2³ × 3² × 5² × 7²</p>
+                    </div>
+                    
+                    <p class="mb-3">Now apply the formulas:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-3 bg-green-50 rounded-lg">
+                            <h4 class="font-bold text-green-700 mb-2">GCD Calculation:</h4>
+                            <p class="font-mono text-sm">GCD = 2³ × 3⁰ × 5² × 7¹</p>
+                            <p class="mt-2">= 8 × 1 × 25 × 7 = 1400</p>
+                        </div>
+                        <div class="p-3 bg-purple-50 rounded-lg">
+                            <h4 class="font-bold text-purple-700 mb-2">LCM Calculation:</h4>
+                            <p class="font-mono text-sm">LCM = 2³ × 3² × 5³ × 7²</p>
+                            <p class="mt-2">= 8 × 9 × 125 × 49 = 441000</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Relationship Between GCD and LCM</h3>
+                    <p>There's an important relationship between GCD and LCM:</p>
+                    <p class="text-center font-mono text-xl my-3 bg-white p-3 rounded border">GCD(a,b) × LCM(a,b) = a × b</p>
+                    
+                    <div class="mt-3 p-3 bg-white rounded-lg border">
+                        <p class="text-sm"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> <strong>Verification:</strong> For our example, 1400 × 441000 = 617,400,000 and 7000 × 88200 = 617,400,000. The relationship holds!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 14: Prime Numbers -->
+        <section class="lecture-section" id="section-14">
+            <!-- Audio Controls for Section 14 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_14.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">14. Prime Numbers</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">A prime number is a positive integer greater than 1 that has no positive divisors other than 1 and itself.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Definition:</h3>
+                    <p>A positive integer p ≥ 2 is prime if its only positive divisors are 1 and p.</p>
+                    <p class="mt-2">Equivalently, p is not prime if there exist integers q, r ≥ 2 such that p = q×r.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Examples of Primes:</h4>
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <span class="bg-white p-2 rounded border">2</span>
+                            <span class="bg-white p-2 rounded border">3</span>
+                            <span class="bg-white p-2 rounded border">5</span>
+                            <span class="bg-white p-2 rounded border">7</span>
+                            <span class="bg-white p-2 rounded border">11</span>
+                            <span class="bg-white p-2 rounded border">13</span>
+                            <span class="bg-white p-2 rounded border">17</span>
+                            <span class="bg-white p-2 rounded border">19</span>
+                            <span class="bg-white p-2 rounded border">23</span>
+                            <span class="bg-white p-2 rounded border">29</span>
+                            <span class="bg-white p-2 rounded border">31</span>
+                            <span class="bg-white p-2 rounded border">37</span>
+                        </div>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <h4 class="font-bold text-red-700 mb-2">Non-Primes (Composites):</h4>
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <span class="bg-white p-2 rounded border">4</span>
+                            <span class="bg-white p-2 rounded border">6</span>
+                            <span class="bg-white p-2 rounded border">8</span>
+                            <span class="bg-white p-2 rounded border">9</span>
+                            <span class="bg-white p-2 rounded border">10</span>
+                            <span class="bg-white p-2 rounded border">12</span>
+                            <span class="bg-white p-2 rounded border">14</span>
+                            <span class="bg-white p-2 rounded border">15</span>
+                            <span class="bg-white p-2 rounded border">16</span>
+                            <span class="bg-white p-2 rounded border">18</span>
+                            <span class="bg-white p-2 rounded border">20</span>
+                            <span class="bg-white p-2 rounded border">21</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Sieve of Eratosthenes</h3>
+                    <p>This ancient algorithm finds all prime numbers up to a given limit:</p>
+                    <ol class="list-decimal pl-5 mt-2 space-y-2">
+                        <li>List all numbers from 2 to n</li>
+                        <li>The first number (2) is prime - mark it and cross out all its multiples</li>
+                        <li>The next unmarked number (3) is prime - mark it and cross out all its multiples</li>
+                        <li>Repeat until you've processed all numbers up to √n</li>
+                        <li>The remaining unmarked numbers are all prime</li>
+                    </ol>
+                    <div class="mt-3 p-3 bg-white rounded-lg border">
+                        <p class="text-sm"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> This method efficiently finds primes by eliminating composite numbers.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-4">
+                    <p class="text-yellow-700 flex items-start">
+                        <i class="fas fa-exclamation-triangle mr-2 mt-1"></i>
+                        <span>Determining whether a large number is prime is computationally difficult. This difficulty is the foundation of modern cybersecurity, particularly in RSA encryption.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 15: Prime Factorization -->
+        <section class="lecture-section" id="section-15">
+            <!-- Audio Controls for Section 15 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_15.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">15. Prime Factorization</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">Prime factorization expresses a number as a product of prime numbers. According to the Fundamental Theorem of Arithmetic, this representation is unique.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Fundamental Theorem of Arithmetic:</h3>
+                    <p>Every positive integer greater than 1 can be represented uniquely as a product of prime numbers, up to the order of the factors.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Examples:</h4>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>2406 = 2 × 3 × 401</li>
+                            <li>654 = 2 × 3 × 109</li>
+                            <li>7000 = 2³ × 5³ × 7</li>
+                            <li>88200 = 2³ × 3² × 5² × 7²</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <h4 class="font-bold text-purple-700 mb-2">Finding Prime Factors</h4>
+                        <p>To find the prime factors of a number, repeatedly divide by primes:</p>
+                        <div class="font-mono text-sm bg-white p-3 rounded border mt-2">
+                            <p>Find prime factors of 2406:</p>
+                            <p>2406 ÷ 2 = 1203</p>
+                            <p>1203 ÷ 3 = 401</p>
+                            <p>401 is prime</p>
+                            <p>So 2406 = 2 × 3 × 401</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="proof-box">
+                    <h3 class="font-bold text-green-700 mb-3">Proof of Uniqueness of Prime Factorization</h3>
+                    <p>The proof uses the fact that if a prime p divides a product of numbers, it must divide at least one of them.</p>
+                    <p class="mt-2">Suppose a number N has two different prime factorizations:</p>
+                    <p class="text-center font-mono my-2">N = p₁ × p₂ × ... × pₖ = q₁ × q₂ × ... × qₗ</p>
+                    <p>Since p₁ divides N, it must divide one of the qᵢ. But since p₁ and qᵢ are both prime, p₁ = qᵢ. Cancel this common factor and repeat the process. Eventually, all factors match, proving uniqueness.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 16: Extending Integers -->
+        <section class="lecture-section" id="section-16">
+            <!-- Audio Controls for Section 16 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_16.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">16. Extending Integers</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">The integers (ℤ) extend the natural numbers (ℕ) by introducing negative numbers, which allows us to define subtraction as a valid operation.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Key Properties of Integers:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-3 bg-green-50 rounded-lg border border-green-200">
+                            <h4 class="font-bold text-green-700 mb-2">Additive Structure:</h4>
+                            <ul class="list-disc pl-5 space-y-1 text-sm">
+                                <li><strong>Additive Identity:</strong> ∀x ∈ ℤ, x + 0 = x</li>
+                                <li><strong>Additive Inverses:</strong> ∀x ∈ ℤ, x + (-x) = 0</li>
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                            <h4 class="font-bold text-purple-700 mb-2">Multiplicative Structure:</h4>
+                            <ul class="list-disc pl-5 space-y-1 text-sm">
+                                <li><strong>Multiplicative Identity:</strong> ∀x ∈ ℤ, 1 × x = x</li>
+                                <li><strong>Limited Inverses:</strong> Only 1 and -1 have multiplicative inverses in ℤ</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-by-step">
+                    <h3 class="font-bold text-purple-700 mb-3">Multiplicative Inverses in ℤ</h3>
+                    <p>In ℤ, most numbers do not have multiplicative inverses. For example:</p>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-3 bg-red-50 rounded-lg">
+                            <p class="font-bold text-red-700">No Inverse:</p>
+                            <p class="font-mono text-sm">2 × ? = 1</p>
+                            <p class="text-sm mt-1">There is no integer that satisfies this equation.</p>
+                        </div>
+                        <div class="p-3 bg-green-50 rounded-lg">
+                            <p class="font-bold text-green-700">Has Inverse:</p>
+                            <p class="font-mono text-sm">1 × 1 = 1</p>
+                            <p class="font-mono text-sm">-1 × -1 = 1</p>
+                            <p class="text-sm mt-1">1 and -1 are their own inverses.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Motivation for Rational Numbers</h3>
+                    <p>The lack of multiplicative inverses in ℤ motivates the extension to rational numbers (ℚ), where every nonzero number has a multiplicative inverse.</p>
+                    <p class="mt-2">In ℚ, we can solve equations like:</p>
+                    <p class="text-center font-mono bg-white p-2 rounded border my-2">2 × x = 1 → x = ½</p>
+                    <p>This extension allows us to perform division (except by zero) as a valid operation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 17: Rational Numbers -->
+        <section class="lecture-section" id="section-17">
+            <!-- Audio Controls for Section 17 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_17.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">17. Rational Numbers</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">Rational numbers are numbers that can be expressed as a ratio of two integers.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Definition:</h3>
+                    <p>A number r is rational if there exist integers p and q (q ≠ 0) such that:</p>
+                    <p class="text-center font-mono text-xl my-3 bg-white p-3 rounded border">r = p/q</p>
+                    <p>The set of all rational numbers is denoted by ℚ.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Examples:</h4>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>1/2, 3/4, -5/7</li>
+                            <li>2 = 2/1</li>
+                            <li>0.75 = 3/4</li>
+                            <li>0.333... = 1/3</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <h4 class="font-bold text-purple-700 mb-2">Operations:</h4>
+                        <div class="font-mono text-sm bg-white p-3 rounded border">
+                            <p>a/b + c/d = (ad + bc)/(bd)</p>
+                            <p>a/b × c/d = (ac)/(bd)</p>
+                            <p>a/b < c/d if ad < bc</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Density of Rational Numbers</h3>
+                    <p>Between any two rational numbers, there is another rational number.</p>
+                    <p class="mt-2">For example, between 1/3 and 1/2:</p>
+                    <p class="font-mono text-center bg-white p-2 rounded border my-2">(1/3 + 1/2)/2 = (5/6)/2 = 5/12</p>
+                    <p>We can verify that 1/3 < 5/12 < 1/2:</p>
+                    <p class="font-mono text-center bg-white p-2 rounded border my-2">1/3 = 4/12, 5/12, 1/2 = 6/12</p>
+                    <p>And between 1/3 and 5/12, we can find another rational number, and so on.</p>
+                    <div class="mt-3 p-3 bg-white rounded-lg border">
+                        <p class="text-sm"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> This property means the rational numbers are "dense" - between any two, no matter how close, there are infinitely many others.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 18: Decimal Expansions -->
+        <section class="lecture-section" id="section-18">
+            <!-- Audio Controls for Section 18 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_18.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">18. Decimal Expansions</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">Decimal expansions represent numbers using powers of 10. Rational numbers have decimal expansions that either terminate or eventually repeat.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Types of Decimal Expansions:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded border">
+                            <h4 class="font-bold text-green-700 mb-2">Terminating Decimals</h4>
+                            <p class="font-mono">1/8 = 0.125</p>
+                            <p class="font-mono">117/40 = 2.925</p>
+                            <p class="text-sm mt-2">These have a finite number of digits after the decimal point.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded border">
+                            <h4 class="font-bold text-purple-700 mb-2">Repeating Decimals</h4>
+                            <p class="font-mono">1/3 = 0.333...</p>
+                            <p class="font-mono">3/11 = 0.272727...</p>
+                            <p class="text-sm mt-2">These have a repeating pattern of digits after the decimal point.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-by-step">
+                    <h3 class="font-bold text-purple-700 mb-3">Converting Repeating Decimals to Fractions</h3>
+                    <p>Let's convert 0.1234 (where 34 repeats) to a fraction:</p>
+                    
+                    <div class="font-mono text-sm bg-white p-3 rounded border mt-2">
+                        <p>Let x = 0.1234343434...</p>
+                        <p>Multiply by 100 (to move the non-repeating part): 100x = 12.34343434...</p>
+                        <p>Multiply by 10000 (to move one full cycle of the repeating part): 10000x = 1234.34343434...</p>
+                        <p>Subtract: 10000x - 100x = 1234.34343434... - 12.34343434...</p>
+                        <p>9900x = 1222</p>
+                        <p>x = 1222/9900</p>
+                        <p>Simplify: divide numerator and denominator by 2: 611/4950</p>
+                    </div>
+                    
+                    <p class="mt-3">Let's verify our result:</p>
+                    <div class="font-mono text-sm bg-white p-3 rounded border">
+                        <p>611 ÷ 4950 = 0.1234343434...</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Another Example: 0.272727...</h3>
+                    <p>Let's convert 0.272727... to a fraction:</p>
+                    
+                    <div class="font-mono text-sm bg-white p-3 rounded border mt-2">
+                        <p>Let x = 0.272727...</p>
+                        <p>Multiply by 100: 100x = 27.272727...</p>
+                        <p>Subtract: 100x - x = 27.272727... - 0.272727...</p>
+                        <p>99x = 27</p>
+                        <p>x = 27/99 = 3/11</p>
+                    </div>
+                    
+                    <p class="mt-3">Let's verify our result:</p>
+                    <div class="font-mono text-sm bg-white p-3 rounded border">
+                        <p>3 ÷ 11 = 0.272727...</p>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-4">
+                    <p class="text-yellow-700 flex items-start">
+                        <i class="fas fa-lightbulb mr-2 mt-1"></i>
+                        <span>Infinite decimal expansions represent infinite series. The study of when these series converge to finite values is part of real analysis.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 19: Irrational Numbers -->
+        <section class="lecture-section" id="section-19">
+            <!-- Audio Controls for Section 19 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_19.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">19. Irrational Numbers</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">Irrational numbers are numbers that cannot be expressed as a ratio of two integers. Their decimal expansions are infinite and non-repeating.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Proof that √2 is irrational:</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Assume √2 is rational: √2 = a/b (in lowest terms)</li>
+                        <li>Then 2 = a²/b² → a² = 2b²</li>
+                        <li>So a² is even, which means a is even</li>
+                        <li>Let a = 2k, then (2k)² = 2b² → 4k² = 2b² → 2k² = b²</li>
+                        <li>So b² is even, which means b is even</li>
+                        <li>But if both a and b are even, then a/b is not in lowest terms</li>
+                        <li>Contradiction! So √2 cannot be rational</li>
+                    </ol>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Examples of Irrational Numbers:</h4>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>√2, √3, √5 (square roots of non-perfect squares)</li>
+                            <li>π (ratio of circumference to diameter)</li>
+                            <li>e (base of natural logarithms)</li>
+                            <li>φ (golden ratio)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <h4 class="font-bold text-red-700 mb-2">Example of an Irrational Decimal:</h4>
+                        <p>Consider the number with 1s at prime positions:</p>
+                        <p class="font-mono bg-white p-2 rounded border mt-2">0.01101010001010001010001000001...</p>
+                        <p class="text-sm mt-2">1s at positions 2, 3, 5, 7, 11, 13, 17, 19, ...</p>
+                        <p class="text-sm">This decimal doesn't repeat, so the number is irrational.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Understanding Why √2 is Irrational</h3>
+                    <p>The proof that √2 is irrational is one of the most famous proofs in mathematics. Let's break it down:</p>
+                    <ul class="list-disc pl-5 mt-2 space-y-2">
+                        <li>We start by assuming the opposite of what we want to prove (this is called proof by contradiction)</li>
+                        <li>If √2 were rational, we could write it as a fraction in lowest terms</li>
+                        <li>But then we show that both numerator and denominator must be even</li>
+                        <li>This contradicts the assumption that the fraction was in lowest terms</li>
+                        <li>Therefore, our initial assumption must be false</li>
+                    </ul>
+                    <div class="mt-3 p-3 bg-white rounded-lg border">
+                        <p class="text-sm"><i class="fas fa-history mr-2"></i> This proof dates back to ancient Greek mathematicians, possibly the Pythagoreans in the 5th century BCE.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-4">
+                    <p class="text-yellow-700 flex items-start">
+                        <i class="fas fa-lightbulb mr-2 mt-1"></i>
+                        <span>If a and b are rational and b ≠ 0, then a + b√2 is irrational. This is because if a + b√2 were rational, then √2 would be rational, which we've proven is false.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 20: Real Numbers -->
+        <section class="lecture-section" id="section-20">
+            <!-- Audio Controls for Section 20 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_20.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">20. Real Numbers</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">The set of real numbers (ℝ) includes all rational and irrational numbers. Real numbers can be represented as points on a number line.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Definition:</h3>
+                    <p>The set of real numbers is the set of all possible decimal expansions, including those that neither terminate nor repeat.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-green-700 mb-2">Approximating Irrational Numbers:</h4>
+                        <p>Since irrational numbers have infinite decimal expansions, we often work with approximations.</p>
+                        <p class="font-mono mt-2 bg-white p-2 rounded border">√2 ≈ 1.414213562</p>
+                        <p class="font-mono bg-white p-2 rounded border mt-2">π ≈ 3.141592654</p>
+                        <p class="font-mono bg-white p-2 rounded border mt-2">e ≈ 2.718281828</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <h4 class="font-bold text-purple-700 mb-2">Example: Approximating √2</h4>
+                        <p>Using the sequence:</p>
+                        <div class="font-mono text-sm bg-white p-3 rounded border">
+                            <p>x₁ = 2</p>
+                            <p>x₂ = ½(2 + 2/2) = 1.5</p>
+                            <p>x₃ = ½(1.5 + 2/1.5) ≈ 1.4167</p>
+                            <p>x₄ = ½(1.4167 + 2/1.4167) ≈ 1.4142</p>
+                        </div>
+                        <p class="mt-2">This sequence converges to √2 very quickly!</p>
+                    </div>
+                </div>
+                
+<div class="interactive-example">
+    <h3 class="font-bold text-orange-700 mb-3">The Real Number Line</h3>
+    <p>Every real number corresponds to exactly one point on the number line, and every point on the number line corresponds to exactly one real number.</p>
+    
+    <div class="mt-4 p-4 bg-gray-50 rounded-lg border">
+        <div class="relative h-12 bg-white rounded border mb-4">
+            <!-- Number line with markers -->
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-400"></div>
+            </div>
+            
+            <!-- Integer markers -->
+            <div class="absolute left-0 top-0 w-px h-3 bg-gray-600 mt-1"></div>
+            <div class="absolute left-1/4 top-0 w-px h-3 bg-gray-600 mt-1"></div>
+            <div class="absolute left-1/2 top-0 w-px h-3 bg-gray-600 mt-1"></div>
+            <div class="absolute left-3/4 top-0 w-px h-3 bg-gray-600 mt-1"></div>
+            <div class="absolute right-0 top-0 w-px h-3 bg-gray-600 mt-1"></div>
+            
+            <!-- Labels -->
+            <div class="absolute left-0 -bottom-6 transform -translate-x-1/2 text-sm">-2</div>
+            <div class="absolute left-1/4 -bottom-6 transform -translate-x-1/2 text-sm">-1</div>
+            <div class="absolute left-1/2 -bottom-6 transform -translate-x-1/2 text-sm">0</div>
+            <div class="absolute left-3/4 -bottom-6 transform -translate-x-1/2 text-sm">1</div>
+            <div class="absolute right-0 -bottom-6 transform translate-x-1/2 text-sm">2</div>
+            
+            <!-- Sample points -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 -translate-y-1">
+                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <div class="text-xs text-center mt-1">0</div>
+            </div>
+            
+            <div class="absolute left-3/4 transform -translate-x-1/2 -translate-y-1" style="left: 62.5%">
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div class="text-xs text-center mt-1">½</div>
+            </div>
+            
+            <div class="absolute left-1/2 transform -translate-x-1/2 -translate-y-1" style="left: 57%">
+                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div class="text-xs text-center mt-1">√½</div>
+            </div>
+            
+            <div class="absolute left-3/4 transform -translate-x-1/2 -translate-y-1" style="left: 82%">
+                <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                <div class="text-xs text-center mt-1">φ</div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-sm">
+            <div class="p-2 bg-blue-50 rounded">
+                <div class="w-3 h-3 bg-blue-500 rounded-full mx-auto mb-1"></div>
+                <div>Integers</div>
+            </div>
+            <div class="p-2 bg-green-50 rounded">
+                <div class="w-3 h-3 bg-green-500 rounded-full mx-auto mb-1"></div>
+                <div>Rationals</div>
+            </div>
+            <div class="p-2 bg-red-50 rounded">
+                <div class="w-3 h-3 bg-red-500 rounded-full mx-auto mb-1"></div>
+                <div>Irrationals</div>
+            </div>
+            <div class="p-2 bg-purple-50 rounded">
+                <div class="w-3 h-3 bg-purple-500 rounded-full mx-auto mb-1"></div>
+                <div>Special Numbers</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-3 bg-green-50 rounded-lg">
+            <h4 class="font-bold text-green-700 mb-2">Density of Rationals</h4>
+            <p class="text-sm">Between any two real numbers, no matter how close, there are infinitely many rational numbers.</p>
+        </div>
+        <div class="p-3 bg-red-50 rounded-lg">
+            <h4 class="font-bold text-red-700 mb-2">Irrationals Complete the Line</h4>
+            <p class="text-sm">Irrational numbers fill the "gaps" between rationals, creating a continuous line.</p>
+        </div>
+    </div>
+    
+    <p class="mt-4">The real numbers form a continuum with no gaps - this is called <strong>completeness</strong>, which is essential for calculus and analysis.</p>
+</div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-4">
+                    <p class="text-yellow-700 flex items-start">
+                        <i class="fas fa-lightbulb mr-2 mt-1"></i>
+                        <span>The set of real numbers is complete, meaning there are no "gaps" in the number line. This property is essential for calculus and analysis.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 21: Approximating √2 -->
+        <section class="lecture-section" id="section-21">
+            <!-- Audio Controls for Section 21 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_21.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">21. Approximating √2</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <p class="mb-4">We can approximate irrational numbers like √2 using iterative methods that produce rational approximations.</p>
+                
+                <div class="key-concept">
+                    <h3 class="font-bold text-blue-700 mb-3">Iterative Method:</h3>
+                    <p>Define a sequence of numbers by:</p>
+                    <p class="text-center font-mono text-xl my-3 bg-white p-3 rounded border">x₁ = 2, xₙ₊₁ = ½(xₙ + 2/xₙ)</p>
+                    <p>This sequence converges to √2, and each xₙ is rational.</p>
+                </div>
+                
+                <div class="step-by-step">
+                    <h3 class="font-bold text-purple-700 mb-3">Step-by-step Calculation:</h3>
+                    
+                    <div class="font-mono text-sm bg-white p-3 rounded border mb-4">
+                        <p>x₁ = 2</p>
+                        <p>x₂ = ½(2 + 2/2) = ½(2 + 1) = 3/2 = 1.5</p>
+                        <p>x₃ = ½(3/2 + 2/(3/2)) = ½(3/2 + 4/3) = ½(9/6 + 8/6) = ½(17/6) = 17/12 ≈ 1.4166667</p>
+                        <p>x₄ = ½(17/12 + 2/(17/12)) = ½(17/12 + 24/17) = ½(289/204 + 288/204) = ½(577/204) = 577/408 ≈ 1.4142157</p>
+                        <p>x₅ = ½(577/408 + 2/(577/408)) = ½(577/408 + 816/577) = ½(332929/235416 + 332928/235416) = ½(665857/235416) = 665857/470832 ≈ 1.414213562</p>
+                    </div>
+                    
+                    <p class="mt-3">Notice how quickly this sequence converges to √2 ≈ 1.414213562!</p>
+                </div>
+                
+                <div class="interactive-example">
+                    <h3 class="font-bold text-orange-700 mb-3">Why This Works</h3>
+                    <p>If the sequence converges to some number X, then for large n, xₙ ≈ xₙ₊₁ ≈ X. So:</p>
+                    <p class="text-center font-mono bg-white p-2 rounded border my-2">X = ½(X + 2/X)</p>
+                    <p>Solving this equation:</p>
+                    <div class="font-mono text-sm bg-white p-3 rounded border mt-2">
+                        <p>X = ½(X + 2/X)</p>
+                        <p>2X = X + 2/X</p>
+                        <p>X = 2/X</p>
+                        <p>X² = 2</p>
+                        <p>X = √2</p>
+                    </div>
+                    <p class="mt-3">This shows that if the sequence converges, it must converge to √2.</p>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-4">
+                    <p class="text-yellow-700 flex items-start">
+                        <i class="fas fa-lightbulb mr-2 mt-1"></i>
+                        <span>This method of approximating square roots is known as the Babylonian method or Heron's method. It's remarkably efficient, doubling the number of correct digits with each iteration.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 22: Summary -->
+        <section class="lecture-section" id="section-22">
+            <!-- Audio Controls for Section 22 -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <audio class="section-audio hidden" preload="metadata">
+                    <source src="audio/slide_22.wav" type="audio/wav">
+                </audio>
+                <button class="play-pause-btn bg-purple-500 hover:bg-purple-600 text-white font-bold p-1.5 rounded-full transition duration-150 shadow-md" data-state="paused" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <div class="section-heading-wrapper">
+                <h2 class="text-2xl font-bold">22. Summary</h2>
+                <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+                <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-bold text-blue-700 mb-3 text-xl">Cryptography</h3>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>Caesar Cipher:</strong> Simple shift cipher, easily breakable</li>
+                            <li><strong>Permutation Cipher:</strong> More secure but vulnerable to frequency analysis</li>
+                            <li><strong>One-Time Pad:</strong> Theoretically unbreakable but impractical</li>
+                            <li><strong>Public Key Cryptography:</strong> Uses different keys for encryption and decryption</li>
+                            <li><strong>RSA Encryption:</strong> Based on the difficulty of factoring large numbers</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-blue-700 mb-3 text-xl">Number Theory Concepts</h3>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>Divisibility:</strong> Fundamental concept with notation a|b</li>
+                            <li><strong>Quotient & Remainder:</strong> a = bq + r with 0 ≤ r < b</li>
+                            <li><strong>Number Bases:</strong> Decimal, binary, octal representations</li>
+                            <li><strong>Euclidean Algorithm:</strong> Efficient method for finding GCD</li>
+                            <li><strong>Extended Euclidean Algorithm:</strong> Finds GCD as a linear combination</li>
+                            <li><strong>Coprime Integers:</strong> Numbers with GCD = 1</li>
+                            <li><strong>LCM and GCD Revisited:</strong> Using prime factorization</li>
+                            <li><strong>Prime Numbers:</strong> Building blocks of integers</li>
+                            <li><strong>Prime Factorization:</strong> Unique representation of numbers</li>
+                            <li><strong>Extending Integers:</strong> Motivation for rational numbers</li>
+                            <li><strong>Rational Numbers:</strong> Numbers expressible as fractions</li>
+                            <li><strong>Decimal Expansions:</strong> Terminating or repeating for rationals</li>
+                            <li><strong>Irrational Numbers:</strong> Numbers with non-repeating decimal expansions</li>
+                            <li><strong>Real Numbers:</strong> Complete set including rationals and irrationals</li>
+                            <li><strong>Approximating √2:</strong> Using iterative methods</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-8 p-5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg">
+                    <h3 class="font-bold text-xl mb-3">Key Takeaways</h3>
+                    <p>Number theory provides the mathematical foundation for modern cryptography. Concepts like prime numbers, divisibility, and modular arithmetic are essential for understanding how encryption algorithms work and why they are secure.</p>
+                    <p class="mt-3">The difficulty of certain mathematical problems (like factoring large numbers) ensures the security of cryptographic systems that protect our digital communications.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-600 mt-12 pt-6 border-t border-gray-300">
+            <p>Number Theory Lecture Notes - Mathematical Skills for Computing Professionals</p>
+            <p class="mt-2">Based on lecture slides from October 21, 2025</p>
+        </footer>
+    </div>
+
+    <!-- Status message bar -->
+    <div id="status-message" class="status-show">
+        Ready for voiceover playback. Click the play button on any section!
+    </div>
+
+    <script>
+        const statusMessage = document.getElementById('status-message');
+
+        /**
+         * Formats seconds into M:SS string.
+         */
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${remainingSeconds}`;
+        }
+
+        /**
+         * Displays a temporary status message using the global status div.
+         */
+        function showStatus(message) {
+            statusMessage.textContent = message;
+            statusMessage.classList.add('status-show');
+            clearTimeout(statusMessage.timer);
+            statusMessage.timer = setTimeout(() => {
+                statusMessage.classList.remove('status-show');
+            }, 3000);
+        }
+
+        /**
+         * Toggles the disabled state and visual appearance of the button.
+         */
+        function togglePlaybackButton(button, isEnabled) {
+            button.disabled = !isEnabled;
+        }
+
+        /**
+         * Main function to initialize all audio players on the page.
+         */
+        function initAudioPlayers() {
+            document.querySelectorAll('.lecture-section').forEach(section => {
+                const audioPlayer = section.querySelector('.section-audio');
+                const slider = section.querySelector('.playback-slider');
+                const playPauseBtn = section.querySelector('.play-pause-btn');
+                
+                if (!audioPlayer || !slider || !playPauseBtn) return; // Skip if elements are missing
+
+                /**
+                 * Updates the slider value (which is visually tied to the progress bar fill via CSS) and time display.
+                 */
+                const syncVisuals = (timeOverride = null) => {
+                    const time = timeOverride !== null ? timeOverride : audioPlayer.currentTime;
+                    
+                    // 1. Update the slider value
+                    if (!slider.classList.contains('seeking-active')) {
+                        slider.value = time;
+                    }
+
+                    // 2. Update the progress bar fill (CSS variable)
+                    if (audioPlayer.duration) {
+                        const progressPercent = (time / audioPlayer.duration) * 100;
+                        slider.style.setProperty('--slider-progress', `${progressPercent}%`);
+                    }
+
+                    // 3. Update the time display
+                    const currentTimeSpan = slider.closest('.section-heading-wrapper').querySelector('.current-time');
+                    if (currentTimeSpan) {
+                        currentTimeSpan.textContent = formatTime(time);
+                    }
+                };
+
+                // Use requestAnimationFrame for smooth, synchronized updates when playing
+                const updateLoop = () => {
+                    if (!audioPlayer.paused) {
+                        syncVisuals();
+                        audioPlayer.__animationFrameId = requestAnimationFrame(updateLoop);
+                    }
+                };
+                
+                // Set initial max value of slider after metadata loads
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    slider.max = audioPlayer.duration;
+                    syncVisuals(0); // Initial sync to 0:00
+                });
+
+                // --- SEEKING/SEEKED HANDLERS ---
+                audioPlayer.addEventListener('seeking', () => {
+                    togglePlaybackButton(playPauseBtn, false);
+                });
+
+                audioPlayer.addEventListener('seeked', () => {
+                    if (audioPlayer.__wasPlaying) {
+                        audioPlayer.play().catch(e => console.error("Play resume failed after seek:", e));
+                        audioPlayer.__wasPlaying = false; 
+                    } else {
+                        togglePlaybackButton(playPauseBtn, true);
+                        showStatus(`Ready to play from ${formatTime(audioPlayer.currentTime)}.`);
+                    }
+                    syncVisuals(); // Final sync after seek is complete
+                });
+                // --- END SEEKING HANDLERS ---
+
+                // Handle Play/Pause Button
+                playPauseBtn.addEventListener('click', () => {
+                    if (playPauseBtn.disabled) return; 
+
+                    const isPlaying = playPauseBtn.dataset.state === 'playing';
+                    
+                    // Pause all other players
+                    document.querySelectorAll('.section-audio').forEach(otherAudio => {
+                        if (otherAudio !== audioPlayer && !otherAudio.paused) {
+                            otherAudio.pause();
+                            cancelAnimationFrame(otherAudio.__animationFrameId); 
+                        }
+                    });
+
+                    if (isPlaying) {
+                        audioPlayer.pause();
+                    } else {
+                        audioPlayer.play().catch(e => console.error("Play failed:", e));
+                    }
+                });
+
+                // UI Update Listeners
+                audioPlayer.addEventListener('play', () => {
+                    playPauseBtn.dataset.state = 'playing';
+                    togglePlaybackButton(playPauseBtn, true); 
+                    // Set Pause Icon
+                    playPauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M160,216H96a16,16,0,0,1-16-16V56a16,16,0,0,1,16-16h64a16,16,0,0,1,16,16V200A16,16,0,0,1,160,216Z"></path></svg>';
+                    showStatus("Audio Playing.");
+                    // Start the smooth update loop
+                    audioPlayer.__animationFrameId = requestAnimationFrame(updateLoop);
+                });
+
+                audioPlayer.addEventListener('pause', () => {
+                    playPauseBtn.dataset.state = 'paused';
+                    togglePlaybackButton(playPauseBtn, true);
+                    // Set Play Icon
+                    playPauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>';
+                    showStatus("Audio Paused.");
+                    // Stop the smooth update loop
+                    cancelAnimationFrame(audioPlayer.__animationFrameId); 
+                });
+                
+                audioPlayer.addEventListener('ended', () => {
+                    syncVisuals(0); // Final sync to 0:00
+                    showStatus("Playback finished.");
+                });
+
+
+                // --- SLIDER INTERACTION HANDLERS (Seeking) ---
+
+                // Prepare for seeking on drag/click start
+                slider.addEventListener('mousedown', (e) => {
+                    // CRITICAL FIX: Prevent default range input behavior (which causes the 100% flash)
+                    e.preventDefault(); 
+
+                    audioPlayer.__wasPlaying = !audioPlayer.paused; 
+                    if (!audioPlayer.paused) { audioPlayer.pause(); }
+                    e.target.classList.add('seeking-active');
+                    // Stop the animation loop while dragging
+                    cancelAnimationFrame(audioPlayer.__animationFrameId); 
+                });
+                slider.addEventListener('touchstart', (e) => {
+                    // CRITICAL FIX: Prevent default range input behavior (which causes the 100% flash)
+                    e.preventDefault(); 
+                    
+                    audioPlayer.__wasPlaying = !audioPlayer.paused;
+                    if (!audioPlayer.paused) { audioPlayer.pause(); }
+                    e.target.classList.add('seeking-active');
+                    // Stop the animation loop while dragging
+                    cancelAnimationFrame(audioPlayer.__animationFrameId);
+                });
+
+                // Update visual progress during drag (input event)
+                slider.addEventListener('input', (e) => {
+                    const newTime = parseFloat(e.target.value);
+                    if (e.target.classList.contains('seeking-active') && audioPlayer.duration) {
+                        // While dragging, we update the bar and time based on the slider's value
+                        const progressPercent = (newTime / audioPlayer.duration) * 100;
+                        e.target.style.setProperty('--slider-progress', `${progressPercent}%`);
+
+                        const currentTimeSpan = e.target.closest('.section-heading-wrapper').querySelector('.current-time');
+                        if (currentTimeSpan) {
+                            currentTimeSpan.textContent = formatTime(newTime);
+                        }
+                    }
+                });
+                
+                /**
+                 * Core logic to handle seeking on mouseup/touchend, calculating time based on bar click position.
+                 */
+                const endSeekHandler = (e) => {
+                    if (!slider.classList.contains('seeking-active')) return;
+                    if (!audioPlayer.duration) return;
+
+                    // 1. Determine click/touch coordinates
+                    let clientX;
+                    const isTouch = e.changedTouches && e.changedTouches.length > 0;
+                    
+                    if (isTouch) {
+                        clientX = e.changedTouches[0].clientX;
+                    } else if (e.clientX !== undefined) {
+                        clientX = e.clientX;
+                    } else {
+                        slider.classList.remove('seeking-active');
+                        return;
+                    }
+
+                    // 2. Calculate new time based on click position relative to the slider bar
+                    const rect = slider.getBoundingClientRect();
+                    
+                    // Use barWidth to calculate percentage
+                    const barWidth = rect.width > 0 ? rect.width : slider.offsetWidth;
+                    
+                    if (barWidth === 0) {
+                        slider.classList.remove('seeking-active');
+                        return;
+                    }
+
+                    const clickPosition = clientX - rect.left;
+                    const duration = audioPlayer.duration;
+                    
+                    let newTime = (clickPosition / barWidth) * duration;
+                    
+                    // Clamp time to ensure it's within bounds
+                    newTime = Math.max(0, Math.min(duration, newTime));
+
+                    // 3. Update audio player time and immediately sync visuals
+                    audioPlayer.currentTime = newTime; // Seek audio
+                    
+                    // The syncVisuals call will set slider.value and the CSS progress
+                    syncVisuals(newTime); 
+
+                    slider.classList.remove('seeking-active');
+                };
+
+                // Finalize seek on drag/click release
+                slider.addEventListener('mouseup', endSeekHandler);
+                slider.addEventListener('touchend', endSeekHandler);
+            });
+            
+            showStatus("Lecture Notes Ready for audio.");
+        }
+        
+        // Start initialization once the window is loaded
+        window.onload = initAudioPlayers;
+    </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+\usepackage{tikz-cd}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{accents}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{cancel}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\newcommand\x{\times}
+\newcommand\y{\cellcolor{blue!20}}
+\usepackage{soul}
+%\usepackage{array}
+%\usepackage{booktabs}
+%\setlength{\heavyrulewidth}{1.5pt}
+%\setlength{\abovetopsep}{4pt}
+%\usepackage{enumitem}
+%\usepackage{hyperref}
+%\hypersetup{
+	%	colorlinks=true,
+	%	linkcolor=blue,
+	%	filecolor=magenta,      
+	%	urlcolor=blue,
+	%}
+
+%\usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+
+\usepackage{setspace}
+
+\usepackage{shadowtext}
+\usepackage{pifont,utfsym}
+
+\hypersetup{
+	colorlinks=true,
+	linkcolor=mygray,
+	filecolor=magenta,      
+	urlcolor=blue,
+	%    linkbordercolor=black,% hyperlink borders 
+	%	pdfborderstyle={/S/U/W 1}% border style will be underline of width 1pt
+}
+
+
+\usetheme{JuanLesPins}
+%\usetheme{Frankfurt}
+
+\definecolor{mygray}{rgb}{0.77, 0.77, 0.77}
+\definecolor{bluegray}{rgb}{0.90, 0.94, 0.90}
+\definecolor{bluegray}{rgb}{0.90, 0.94, 0.90}
+\definecolor{darkgreen}{rgb}{0.00, 0.38, 0.00}
+\definecolor{lightblue}{rgb}{0.9, 0.9, 1}
+
+
+\setbeamertemplate{headline}{}
+\setbeamertemplate{frametitle}
+{
+	\nointerlineskip
+	\begin{beamercolorbox}[sep=0.3cm,ht=1.8em,wd=\paperwidth]{frametitle}
+		\vbox{}\vskip-2ex%
+		\strut{\insertframetitle}\strut\hfill\vspace{-3mm}\includegraphics[height=0.7cm]{../../culogo}
+		%	\vskip-0.8ex%
+	\end{beamercolorbox}
+	\vspace{-4.2mm}\noindent\makebox[\linewidth]{\textcolor{mygray}{\rule{\paperwidth}{1mm}}} 
+}
+
+\setbeamertemplate{footline}{%
+	\hypersetup{linkcolor=mygray}
+	\leavevmode%
+	\hbox{%
+		\begin{beamercolorbox}[wd=.7\paperwidth,ht=2.25ex,dp=1ex,left]{author in head/foot}%
+			%			\usebeamerfont{author in head/foot} \hspace{2mm}\insertshorttitle ~ $\rightarrow$ ~ \insertsectionnumber . ~\insertsection \hspace*{1em}  ~ \insertsectionnumber .\insertsubsectionnumber . ~ \insertsubsection 
+			\usebeamerfont{author in head/foot} \hspace{2mm}\insertsubtitle ~ $\rightarrow$ ~ \insertsectionnumber . ~\insertsection \hspace*{1em}
+			
+		\end{beamercolorbox}%
+		\begin{beamercolorbox}[wd=.3\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+			\usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{1em}
+			\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+	\end{beamercolorbox}}%
+	\vskip0pt%
+	\hypersetup{linkcolor=blue}
+}
+
+\setbeamertemplate{itemize item}[triangle]
+
+
+\usebackgroundtemplate{\includegraphics[width=\paperwidth]{../../cu}}
+
+\makeatletter
+\newenvironment<>{proofs}[1][\proofname]{%
+	\par
+	\def\insertproofname{#1\@addpunct{.}}%
+	\usebeamertemplate{proof begin}#2}
+{\usebeamertemplate{proof end}}
+\makeatother
+
+\newcommand{\p}{\pause}
+\newcommand{\finger}{{\huge \raisebox{-2mm}{\ding{43}}}}
+
+
+
+
+% Define example numbering
+% Define a new counter for examples
+\newcounter{examplecounter}
+
+% Define a new environment for examples
+\newenvironment{examplen}[1][]{%
+	\refstepcounter{examplecounter}%
+	\begin{example}[\theexamplecounter #1]%
+	}{%
+	\end{example}%
+}
+
+
+% narrow block to put side by side, e.g. \begin{blockz}{0.2}{title}...\end{blockz}
+\newenvironment{blockz}[2]{
+	\begin{minipage}[t]{#1\linewidth}
+		\begin{block}{#2}
+			\begin{center}
+			}{%
+	\end{center}\end{block}\end{minipage}\hspace{2mm}%
+}
+
+
+\newcommand{\BOX}[2]{
+	\begin{minipage}{#1}
+		#2
+	\end{minipage}
+}
+
+
+\newenvironment{colorblock}[2]{%
+	\setbeamercolor{block body}{bg=bluegray,fg=black}%{#2}
+	\setbeamercolor{block title}{bg=#2,fg=white}
+	\begin{block}{#1}}{\end{block}}
+
+
+\makeatletter
+%\newenvironment<>{proofs}[1][\proofname]{%
+%	\par
+%	\def\insertproofname{#1\@addpunct{.}}%
+%	\usebeamertemplate{proof begin}#2}
+%{\usebeamertemplate{proof end}}
+\makeatother
+
+%CUSTOM COMMANDS
+
+%%%THEOREM STYLES%%%
+
+%\newtheorem{proposition}{Proposition}
+%%\newtheorem{lemma}{Lemma}
+%\newtheorem*{proposition*}{Proposition} 
+%\newtheorem*{conjecture*}{Conjecture}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+%%% FUNCTIONS %%%
+\newcommand{\Aut}{\mathrm{Aut}}
+\newcommand{\Sym}{\mathrm{Sym}}
+\newcommand{\Syl}{\mathrm{Syl}}
+\newcommand{\intersection}{\mathop{\bigcap}}
+\newcommand{\union}{\mathop{\bigcup}}
+\newcommand{\evaluated}{\Big|}
+\newcommand{\re}{\mathrm{Re}}
+\newcommand{\im}{\mathrm{Im}}
+\newcommand{\Log}{\mathrm{Log}}
+\newcommand{\Res}{\mathrm{Res}}
+\newcommand{\Sk}{\mathrm{Sk}}
+\newcommand{\disc}{\mathrm{disc}}
+\newcommand{\then}{\Longrightarrow}
+\newcommand{\Int}{\mathrm{int}}
+\newcommand{\bd}{\mathrm{bd}}
+\newcommand{\diam}{\mathrm{diam}}
+\newcommand{\lcm}{\mathrm{lcm}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\del}{\partial}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\htop}{h_{\mathrm{top}}}
+\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\wsum}{\mathop{\bigvee}}
+\newcommand{\Us}{\mathcal{U}}
+\newcommand{\dist}{\mathrm{dist}}
+\newcommand{\Diff}{\mathrm{Diff}}
+
+%%% FONTS %%%
+\newcommand{\boldZ}{\boldsymbol{\mathrm{Z}}}
+\newcommand{\boldC}{\boldsymbol{\mathrm{C}}}
+\newcommand{\boldN}{\boldsymbol{\mathrm{N}}}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\T}{\mathbb T}
+\newcommand{\Ts}{\mathcal T}
+\newcommand{\Fs}{\mathcal F}
+\newcommand{\Cs}{\mathcal C}
+\newcommand{\As}{\mathcal A}
+\newcommand{\Ss}{\mathcal S}
+\newcommand{\Ms}{\mathcal M}
+\newcommand{\Bs}{\mathcal B}
+\newcommand{\Ps}{\mathcal P}
+\newcommand{\Ds}{\mathcal D}
+\newcommand{\Ls}{\mathcal L}
+\newcommand{\Ns}{\mathcal N}
+\newcommand{\Vs}{\mathcal V}
+\newcommand{\Rs}{\mathcal R}
+\newcommand{\Os}{\mathcal O}
+\newcommand{\fp}{\mathfrak p}
+\newcommand{\diff}{\,d}
+\newcommand{\proj}{\mathrm{proj}}
+\newcommand{\comp}{\mathrm{comp}}
+\newcommand{\bi}{\mathbf i}
+\newcommand{\bj}{\mathbf j}
+\newcommand{\bk}{\mathbf k}
+\newcommand{\br}{\mathbf r}
+\newcommand{\bv}{\mathbf v}
+\newcommand{\ba}{\mathbf a}
+\newcommand{\Sbb}{\mathbb S}
+\newcommand{\Dbb}{\mathbb D}
+
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+\let\oldphi\phi
+\let\phi\varphi
+\let\oldepsilon\epsilon
+\let\epsilon\varepsilon
+\let\oldtilde\tilde
+\let\tilde\widetilde
+\let\oldbar\bar
+\let\bar\overline
+\let\Iff\iff
+\let\iff\Leftrightarrow
+\let\oldthen\then
+\let\then\Rightarrow
+%\let\oldhat\hat
+%\let\hat\widehat
+
+%\newcommand{\aut}{\textrm{Aut}}
+%\newcommand{\sym}{\textrm{Sym}}
+%\newcommand{\syl}{\textrm{Syl}}
+%\newcommand{\orbit}{\mathcal{O}}
+%\newcommand{\intersection}{\mathop{\bigcap}}
+%\newcommand{\union}{\mathop{\bigcup}}
+\newcommand{\padics}{\mathbb Q_p}
+%\let\oldemptyset\emptyset
+%\let\emptyset\varnothing
+%\let\oldphi\phi
+%\let\phi\varphi
+%\let\oldepsilon\epsilon
+%\let\epsilon\varepsilon

@@ -1,0 +1,224 @@
+Slide 0: Week 3 Recap and Week 4 Roadmap
+Amanda: Welcome to Week four! Before we dive in, let's take a very quick look back at what we built last week.
+Jack: Right, Week three was all about proofs and induction. We started from axioms — those undeniable ground-truth rules of arithmetic — and used them to prove theorems rigorously.
+Amanda: Exactly. We covered mathematical induction in detail: the base case, the inductive step, strong induction, and the well-ordering principle. And we proved things like Gauss's sum formula and summation identities.
+Jack: So now we have solid tools for proving things. What are we applying them to this week?
+Amanda: This week we zoom out and study one of the most important abstract ideas in all of mathematics and computer science: the concept of a Function. We will cover what functions are formally, different types of functions — injective, surjective, and bijective — and then talk about how to combine them through composition and inverses.
+Jack: And I remember you mentioned something about pigeons last time?
+Amanda: Ha! Yes — the Pigeonhole Principle. A beautifully simple idea that lets you prove the existence of something without finding it explicitly. And to finish the week we will stretch our minds all the way to infinity, comparing the sizes of infinite sets through the idea of Cardinality.
+Jack: Sizes of infinite sets? Isn't infinity just... infinity?
+Amanda: Not at all! As Cantor showed, some infinities are genuinely, provably larger than others. It is one of the most mind-bending results in mathematics, and we will see exactly why by the end of the lecture. Let's begin.
+
+Slide 1: Functions as Fundamental Objects
+Amanda: So far in this module, we have been building up a toolkit of fundamental mathematical objects. What have we studied?
+Jack: Well, we started with numbers — specifically natural numbers. Then we studied sets, which are just collections of objects. And we proved things about both using axioms and induction.
+Amanda: Perfect. Now think about what else appears constantly in your programming work. You define a variable, and you transform it somehow. You take a list and sort it. You take a string and encrypt it. What are you doing in each case?
+Jack: I'm taking some input and producing some output according to a rule.
+Amanda: And that, precisely, is a function. In programming, the SumTo algorithm we kept revisiting takes a natural number N as input and returns the sum one plus two up to N. In maths we write that as S of N equals N times N plus one, divided by two. Or think of the Least function — you pass it the set containing 4, 9, 5, 12, and 2, and it returns 2, the smallest element.
+Jack: So S is a function from the naturals to the naturals, and Least is a function from sets of naturals to naturals.
+Amanda: Exactly! Now let us give the formal definition. A function f is a rule that assigns elements of one set A to elements of another set B. We write f colon A arrow B.
+Jack: And the sets have specific names?
+Amanda: They do. The set A — the inputs — is called the Domain. The set B — the declared output universe — is called the Codomain. And for any specific input x in A, the corresponding output f of x is called the Value of f at x.
+Jack: So if f maps natural numbers to natural numbers and f of n equals three n plus four, then the domain is the naturals, the codomain is the naturals, and the value at n equals one is seven.
+Amanda: Spot on. One critical thing to notice: the codomain is the set we declare the function outputs into, not necessarily every value it actually hits. That distinction is so important it gets its own slide next.
+Jack: Sorting and encryption as functions is a cool way to think about it. The sort function takes a list like four, one, two, one, seven, three, five and always returns the same sorted list one, one, two, three, four, five, seven.
+Amanda: Right! And encryption: feed in the word "caesar" and the Caesar cipher returns "FDHVDU". Different input strings, different encrypted outputs. Functions are everywhere in computing.
+
+Slide 2: Codomain vs. Range (Image)
+Amanda: Here is a distinction that trips up a huge number of students, so pay close attention. The Codomain and the Range of a function are not the same thing.
+Jack: What is the difference?
+Amanda: The Codomain is the full set B that we declare the function maps into. It is like saying "the output will be some natural number." But the Range — also called the Image — is the specific subset of the codomain that the function actually hits. It is the set of all values f of x as x runs over the whole domain.
+Jack: So the Range is always a subset of the Codomain?
+Amanda: Always. Range of f is a subset of the Codomain of f, no exceptions. Here is a concrete example. Take f from the integers to the naturals, defined by f of x equals x squared plus one.
+Jack: Okay, so the domain is all integers, including negatives and zero. The codomain is the positive naturals.
+Amanda: Right. Now what values can f actually produce? If x is zero, f is one. If x is one or minus one, f is two. If x is two or minus two, f is five. If x is three or minus three, f is ten.
+Jack: So the range is one, two, five, ten, seventeen... all numbers of the form x squared plus one. But the codomain is all of the naturals. So numbers like three and four are in the codomain but NOT in the range, because no integer x satisfies x squared plus one equals three or four.
+Amanda: Exactly! Three would require x squared equals two, which has no integer solution. So the range is a strict subset of the codomain here.
+Jack: And a function is surjective — which I have heard but don't fully understand yet — if and only if the range equals the whole codomain?
+Amanda: You are getting ahead of the slides, but yes! That is exactly right. When every element in the codomain gets hit by at least one input, we call the function surjective. But let's build up to that properly.
+
+Slide 3: Defining Functions
+Amanda: A function can be defined in several different ways. The most straightforward is explicitly — you just write down a formula. For example, f of n equals three n plus four defines a function from the naturals to the naturals. The smallest value is f of one, which is seven.
+Jack: That is a classic algebraic formula. What are the other ways?
+Amanda: The second way is recursively. You may already know this from programming. Instead of a direct formula, you define the first one or two values explicitly, and then each subsequent value in terms of the previous ones.
+Jack: Like Fibonacci! We covered that last week.
+Amanda: Exactly. The Fibonacci function f from naturals to naturals is defined by: f of one equals one, f of two equals one, and for n greater than or equal to two, f of n plus one equals f of n plus f of n minus one.
+Jack: So f of three is f of two plus f of one, which is one plus one, equals two. Then f of four is two plus one equals three. Then five, eight, thirteen, twenty-one... that is Fibonacci.
+Amanda: Perfect. The third way to define a function is as a sequence. When the domain is the naturals, a function f from naturals to naturals is just an infinite sequence: f of one, f of two, f of three, and so on. We often write the values as f subscript n instead of f of n.
+Jack: So a sequence is literally just a function with the naturals as domain. I never thought of it that way before.
+Amanda: Most mathematical ideas are secretly functions in disguise. Once you see that, the whole subject snaps into focus.
+
+Slide 4: Injective Functions (One-to-One)
+Amanda: Now we get to the heart of this week: the different flavours of functions. The first type is called Injective, or One-to-One.
+Jack: What makes a function injective?
+Amanda: An injective function ensures that every element in the domain is sent to a unique element in the codomain. No two different inputs share the same output. Formally, f from A to B is injective if for every x one and x two in A, if f of x one equals f of x two, then x one must equal x two.
+Jack: So if the outputs are equal, the inputs must have been equal. There is no colliding.
+Amanda: Right. Think of it as a perfectly fair, no-duplicates mapping. Here is the key computer science example: an encryption function should be injective. If two different messages encrypted to the same ciphertext, you could not decrypt unambiguously. That would be a catastrophic failure.
+Jack: And the sorting function is not injective?
+Amanda: Correct! If sort of list X equals sort of list Y, we cannot conclude X equals Y. The lists X equals one, two, three and Y equals three, one, two are different, but they sort to the same output. So sort is not injective.
+Jack: So injectivity is about the inputs being uniquely identifiable from the outputs.
+Amanda: Precisely. And there is a simple visual test with arrow diagrams: if you draw arrows from domain elements to codomain elements, an injective function has no two arrows hitting the same target. Every codomain element that is hit, is hit by exactly one arrow.
+
+Slide 5: Surjective Functions (Onto)
+Amanda: The second flavour is surjective, also called Onto.
+Jack: And I think I already know this from Slide two — a surjection is when the range equals the whole codomain?
+Amanda: Exactly right! Formally, f from A to B is surjective if for every y in B, there exists an x in A such that f of x equals y. Every single element of the codomain gets hit by at least one input.
+Jack: So there are no "unloved" elements hiding in the codomain.
+Amanda: Ha, I like that phrasing! Every output value is reachable. At least one input maps to it. Now, put injectivity and surjectivity together and you get the most powerful type of function.
+Jack: That must be bijective?
+Amanda: Yes! A bijection is a function that is both injective and surjective simultaneously. It establishes a perfect one-to-one correspondence between the two sets. Every domain element maps to a unique codomain element, and every codomain element is hit by exactly one domain element.
+Jack: So in an arrow diagram, a bijection is a perfect pairing — one arrow from each domain element, and each codomain element has exactly one arrow pointing at it. Like a perfect matching.
+Amanda: Beautifully put. Bijections are incredibly powerful because they let us say two sets have "the same size" even when they are infinite — but we will come back to that when we discuss cardinality.
+
+Slide 6: Examples
+Amanda: Let us work through some concrete examples to make these ideas stick. We have two finite sets: X equals a, b, c, d, e — five elements — and Y equals one, two, three, four — four elements.
+Jack: So X has five elements and Y has four. Three functions are defined in the table.
+Amanda: Right. The first function, f from X to Y, is defined by: f of a is three, f of b is four, f of c is two, f of d is four, and f of e is one.
+Jack: Wait, f of b equals four AND f of d equals four. Two different inputs hit the same output. So f is not injective.
+Amanda: Correct. And is f surjective?
+Jack: The outputs are three, four, two, four, one. So the range contains one, two, three, and four. That covers all of Y! So yes, f is surjective even though it is not injective.
+Amanda: Good. Now the second function g maps X to itself. g of a is b, g of b is d, g of c is e, g of d is a, g of e is c.
+Jack: Every input gives a different output — no two elements of X are mapped to the same element. So g is injective. And since domain and codomain are the same set and it is injective... let me check. The range is b, d, e, a, c — that is all five elements of X. So g is surjective too! It is a bijection!
+Amanda: Excellent! g is a permutation of the set X — a bijection from X to itself. Now the third one: h from Y to X. h of one is a, h of two is c, h of three is b, h of four is e.
+Jack: Y has four elements, X has five. So h can't possibly hit all of X — there are not enough inputs. The element d is never hit. So h is not surjective. But since four inputs all give different outputs, h is injective.
+Amanda: Perfect analysis. Notice the sizes tell you a lot already: if the domain is strictly smaller than the codomain, you cannot be surjective. If the domain is strictly larger than the codomain, you cannot be injective. Only equal sizes allow bijections to exist — at least for finite sets.
+Jack: Let me check that last point with the infinite example. j from the naturals to the naturals, j of n equals two n.
+Amanda: Great, let's verify it. Is j injective? If j of n equals j of m, then two n equals two m, so n equals m. Yes, injective. Is j surjective?
+Jack: If j of n equals two n, the range is all even natural numbers: two, four, six, eight... Odd numbers like three are never hit. So j is not surjective!
+Amanda: Exactly. Even though both domain and codomain are the naturals, the function is still not surjective because it only covers half of them.
+
+Slide 7: Summary: Injections and Surjections
+Amanda: Let me give you a quick strategy guide for proving or disproving injectivity and surjectivity in a formal proof setting.
+Jack: Okay, shoot.
+Amanda: To prove f from A to B IS an injection: assume f of x equals f of y for some arbitrary x and y in A, and then derive algebraically that x must equal y. You work forward from equal outputs to equal inputs.
+Jack: And to prove f is NOT an injection?
+Amanda: You just need a single counterexample — one specific pair where x is not equal to y, but f of x equals f of y. One concrete example destroys injectivity.
+Jack: Like showing sort of one, two, three equals sort of three, one, two.
+Amanda: Exactly. Now, to prove f from A to B IS a surjection: take any arbitrary element z from B, and then construct or find an x in A such that f of x equals z. You work backwards from an arbitrary output to find an input.
+Jack: That sounds like solving an equation. If f of x equals two n equals z, I solve to get n equals z divided by two. But that only works when z is even, confirming that j is not surjective.
+Amanda: Brilliant, you nailed it. And to prove f is NOT a surjection, again just exhibit a single element in the codomain that has no preimage. No x satisfies j of x equals three, because two times anything is never odd. Done.
+Jack: So for both, disproving needs one example, and proving needs a general argument for all elements.
+Amanda: That is the core asymmetry of universal and existential statements — exactly what we covered back in Week two with logic!
+
+Slide 8: Identity and Inclusion
+Amanda: Now let us look at two very special, simple functions that pop up constantly in formal mathematics: the Identity function and the Inclusion function.
+Jack: Identity sounds like it might be boring.
+Amanda: It is simple, but extremely important. The Identity function on a set A, written i subscript A, sends every element to itself. So i A of x equals x for all x in A.
+Jack: So it is literally the "do nothing" function.
+Amanda: Right. But is it injective? If i A of x equals i A of y, that means x equals y — trivially yes. Is it surjective? For any y in A, we need x in A such that i A of x equals y. Just take x equals y. So yes, the identity is always a bijection.
+Jack: Makes sense. What about Inclusion?
+Amanda: The Inclusion function handles a subset. If B is a subset of A, the inclusion function j from B to A sends every element of B to itself in A. So j of x equals x, same formula, but now the domain is the smaller set B and the codomain is the larger set A.
+Jack: So it looks identical to the identity, but they are different because of the different domain and codomain?
+Amanda: Precisely! Here is the key difference. The Identity has the same domain and codomain — A to A. The Inclusion maps from a smaller set into a bigger one — B to A. Both satisfy f of x equals x, but they are fundamentally different functions.
+Jack: And is inclusion injective?
+Amanda: Always! If j of x equals j of y, then x equals y — trivially. But is it surjective?
+Jack: Only if B equals A. If B is a strict subset of A, there are elements in A not in B, so they never get hit. For example, the inclusion j from the naturals to the rationals sends each natural number n to n over one — every natural is in the rationals, but one half is in the rationals and is never hit. So it is not surjective.
+Amanda: Perfectly explained. A natural example: every natural number can be seen as a rational number. That embedding is the inclusion of the naturals into the rationals.
+
+Slide 9: Function Composition
+Amanda: Now we get to something really powerful: combining functions. If you have two functions in sequence — applying one and then immediately applying another — that combined process is called Function Composition.
+Jack: Like chaining functions in programming? f of g of x?
+Amanda: Exactly that. The composition of G after F, written G circle F, is defined by the rule: G circle F of x equals G of F of x. You first apply F, then apply G to the result.
+Jack: So the output of F becomes the input of G. For this to make sense, the codomain of F has to match the domain of G.
+Amanda: Yes! If F goes from A to B, and G goes from B to C, then the composition G circle F goes from A directly to C. The middle set B disappears.
+Jack: And what about the identity function under composition?
+Amanda: The identity acts exactly like multiplying by one in ordinary arithmetic. For any function f, f composed with the identity is just f, and the identity composed with f is also just f. It is the neutral element for composition.
+Jack: That is a beautiful structural parallel. Now, does composing two injections give an injection?
+Amanda: Yes! That is a theorem. If f from A to B and g from B to C are both injections, then g circle f is also an injection. Similarly, if both are surjections, the composition is a surjection.
+Jack: Can we see the proof quickly?
+Amanda: For injections: suppose g circle f of x equals g circle f of y. That means g of f of x equals g of f of y. Since g is injective, f of x equals f of y. Since f is injective, x equals y. Done — two applications of injectivity, working from the outside in.
+Jack: And for surjections?
+Amanda: Take any z in C. Since g is surjective, there exists y in B such that g of y equals z. Since f is surjective, there exists x in A such that f of x equals y. Then g circle f of x equals g of f of x equals g of y equals z. We hit every z in C.
+Jack: So compositions preserve both properties. That is really reassuring — you can chain lots of injective or surjective functions and the whole pipeline inherits the property.
+
+Slide 10: Inverse Functions
+Amanda: Function composition leads us naturally to the idea of undoing a function. If f takes x to y, the inverse function takes y back to x.
+Jack: Like decryption undoing encryption!
+Amanda: Exactly! But here is the critical requirement: you can only define an inverse if the function is bijective.
+Jack: Why does it need to be bijective?
+Amanda: Think about it. If f is not injective, say f of two and f of minus two both equal four, then when you try to go backwards from four, you don't know whether to return two or minus two. The inverse is not well-defined — it gives two possible answers.
+Jack: And if f is not surjective?
+Amanda: Then there are elements in the codomain with no preimage at all. You can't define where the inverse sends them. So you need injectivity to guarantee uniqueness going back, and surjectivity to guarantee existence. Together, that is bijectivity.
+Jack: Makes sense. So the non-invertible example on the slide is f from the integers to the naturals where f of n equals n squared. Not injective because f of two equals f of minus two equals four. So not invertible.
+Amanda: Correct. Now for the formal definition: if f from A to B is invertible, the inverse f inverse from B to A is defined by: f inverse of y equals x if and only if f of x equals y. It literally reverses the direction.
+Jack: And under composition, the inverse and the original function cancel each other out.
+Amanda: Precisely. f inverse composed with f equals the identity on A. And f composed with f inverse equals the identity on B. So f and f inverse are inverses of each other in the compositional sense.
+Jack: That is exactly like how two times one half equals one in ordinary multiplication. The inverse "undoes" the original.
+Amanda: Great analogy! And this whole framework is the mathematical backbone of cryptography — encryption and decryption are inverse bijections, and their security depends on how hard it is to compute the inverse even when you know the function.
+
+Slide 11: The Pigeonhole Principle
+Amanda: Now let us take a delightful detour into one of the most useful and surprising tools in combinatorics: the Pigeonhole Principle.
+Jack: I love the name. What does it actually say?
+Amanda: It says: if you have more pigeons than pigeonholes, at least one pigeonhole must contain more than one pigeon.
+Jack: That seems... obvious?
+Amanda: It sounds trivial, but its applications are genuinely surprising. Let me give you a formal statement. If you have a function f from A to B where A has more elements than B — that is, the domain is strictly larger than the codomain — then f cannot be injective. Some pair of inputs must share an output.
+Jack: Ah! So the Pigeonhole Principle is just saying: if the domain is bigger than the codomain, bijectivity is impossible, and in fact injectivity is impossible. There have to be collisions.
+Amanda: Exactly. And the Generalized version is more powerful: if n items are distributed into m containers, at least one container holds at least ceiling of n divided by m items. The ceiling function rounds up to the next integer.
+Jack: So with twenty-five computers and four operating systems, by the generalized principle, at least ceiling of twenty-five divided by four equals ceiling of six point two five equals seven computers must share the same operating system.
+Amanda: Spot on. Even without knowing which operating system it is, you know some one has at least seven machines. No searching required — just counting tells you it must exist.
+Jack: That is clever. What are some other applications?
+Amanda: In a group of three hundred and seventy students, at least two must share a birthday — since there are only three hundred and sixty-five days in a year. In any data compression algorithm handling more inputs than output codes, some two inputs must compress to the same code — meaning lossless compression has fundamental limits.
+Jack: Oh wow. Pigeonhole gives you impossibility results almost for free.
+Amanda: It is one of the most elegant tools in theoretical computer science. Simple idea, profound consequences.
+
+Slide 12: Cardinality (The "Size" of Sets)
+Amanda: The Pigeonhole Principle got us thinking about sizes of finite sets. Now let us scale that thinking up — all the way to infinity.
+Jack: Can you really compare the sizes of infinite sets? They're all infinitely big.
+Amanda: That is what your intuition says. But Cantor showed in 1874 that it's wrong. Some infinities are larger than others. The key insight is: to say two sets have the same size, you just need a bijection between them.
+Jack: Why bijection?
+Amanda: Because for finite sets, two sets have the same count if and only if you can pair up every element of one with exactly one element of the other, with nothing left over. That is exactly a bijection. We generalize that definition to infinite sets: two sets A and B have the same cardinality — the same "size" — if a bijection between them exists.
+Jack: So cardinality is size defined purely through bijections, with no counting required.
+Amanda: Precisely. And for infinite sets, this is the only workable definition. Now, the "size" of the set of natural numbers is given a special name: Aleph-Naught, written as the Hebrew letter Aleph with a subscript zero.
+Jack: Aleph-Naught. The first infinite cardinal number.
+Amanda: Right. Any set A that has a bijection with the natural numbers is said to have cardinality Aleph-Naught. We write the absolute value of A equals Aleph-Naught.
+Jack: So if I can list all the elements of an infinite set in a sequence — first, second, third, and so on — without missing any, then it has cardinality Aleph-Naught?
+Amanda: Exactly! If you can put its elements in a one-to-one correspondence with the positions one, two, three, four of the natural numbers, then its cardinality is Aleph-Naught. Such sets are called countably infinite. Sets that cannot be listed are a different, larger kind of infinity entirely.
+
+Slide 13: Countable Sets
+Amanda: So let's make the definition precise. A set A is called countable if it is either finite, or if it has the same cardinality as the natural numbers — that is, Aleph-Naught.
+Jack: If it is countably infinite, you can list all its elements in an infinite sequence.
+Amanda: Right. Now here is the first surprising example. What is the cardinality of the integers — all of the whole numbers, positive, negative, and zero?
+Jack: Well, the integers include all of the naturals, plus zero, plus all the negative numbers. So the integers seem twice as large as the naturals? Or maybe infinitely more?
+Amanda: That is the gut feeling! But it is wrong. The integers have exactly the same cardinality as the natural numbers.
+Jack: How? There are clearly more integers!
+Amanda: We construct a bijection. Map natural number one to zero, map two to one, map three to minus one, map four to two, map five to minus two, map six to three, map seven to minus three, and so on. We zig-zag between the positives and negatives.
+Jack: Oh! So the listing of integers goes: zero, one, minus one, two, minus two, three, minus three... That hits every integer exactly once, and every natural number is used exactly once as the list position. It is a bijection!
+Amanda: Therefore the cardinality of the integers equals Aleph-Naught — the same as the naturals. Even though intuitively the integers seem "twice as big," they are, by our rigorous definition, exactly the same size.
+Jack: That is wild. What about the rational numbers? There are infinitely many rationals between any two integers — that really seems bigger.
+Amanda: Also Aleph-Naught! The rational numbers are also countably infinite. The proof uses a two-dimensional zig-zag argument — you arrange all fractions p over q in an infinite grid and then trace a diagonal path through the grid, hitting every fraction. This constructs a bijection with the naturals.
+Jack: So the naturals, integers, and rationals all have the same "size" of infinity?
+Amanda: Every single one of them: cardinality Aleph-Naught. The fact that the rationals are dense — packed infinitely tightly between every pair of integers — does not make the set larger in the cardinality sense.
+
+Slide 14: Uncountable Sets (The Real Numbers)
+Amanda: So are all infinite sets the same size? Is every infinity Aleph-Naught?
+Jack: Given how this course works, I am guessing the answer is no.
+Amanda: Correct! There is a strictly larger infinity: the real numbers. The reals include not just the rationals, but also the irrationals — numbers like the square root of two and pi, which cannot be expressed as fractions.
+Jack: And Cantor proved in 1874 that the reals are uncountable?
+Amanda: Yes. His proof is called Cantor's Diagonal Argument, and it is one of the most elegant proofs in all of mathematics. It works by contradiction.
+Jack: So we assume the reals are countable, and then derive a contradiction?
+Amanda: Exactly. Assume — for the sake of contradiction — that all real numbers between zero and one can be listed in a sequence: r subscript one, r subscript two, r subscript three, and so on. Each real number is an infinite decimal expansion.
+Jack: Okay, so we have a hypothetical infinite list of infinite decimals.
+Amanda: Now, Cantor constructs a new real number r star as follows: look at the first decimal digit of r one — whatever it is, choose a different digit for the first digit of r star. Look at the second decimal digit of r two — choose a different digit for the second digit of r star. Look at the third decimal digit of r three — choose a different digit for the third digit of r star. And so on down the diagonal.
+Jack: Oh! So r star is defined to differ from r one in position one, from r two in position two, from r three in position three...
+Amanda: It differs from every single number on the list in at least one decimal position. Therefore r star cannot appear anywhere on the list.
+Jack: But we assumed the list contained all real numbers between zero and one! That is a contradiction!
+Amanda: Therefore our assumption was false. The reals cannot be listed. They are uncountable — strictly larger than Aleph-Naught. We denote the cardinality of the reals as c, for Continuum.
+Jack: That is genuinely mind-blowing. You can not even list all the real numbers. There are "more" real numbers than there are natural numbers, even though both are infinite.
+Amanda: And the proof constructed a specific example — r star — that is guaranteed not to be on any attempted list. It is constructive and devastatingly elegant.
+
+Slide 15: Summary of Infinite Sets
+Amanda: Let us tie everything together with a final overview of cardinality.
+Jack: Okay, so we have two different sizes of infinity so far: Aleph-Naught and the Continuum c.
+Amanda: Right. Aleph-Naught is the cardinality of countably infinite sets: the naturals, the integers, the rationals, the even numbers, the prime numbers — they all have cardinality Aleph-Naught.
+Jack: And an important philosophical point: if A is infinite and B is a proper subset of A, they can still have the same cardinality. Like the naturals and the even numbers — one is a subset of the other, but they are the same "size."
+Amanda: That is actually the hallmark of infinite sets! A set is infinite if and only if it can be put in bijection with a proper subset of itself. So the even numbers living inside the naturals, yet matching them perfectly by the bijection n maps to two n, is not a contradiction — it is a feature.
+Jack: So for infinite sets, "having fewer elements" does not mean "smaller cardinality."
+Amanda: Correct. Now, uncountable sets are strictly larger than Aleph-Naught. The reals have cardinality c, the Continuum. This is also sometimes written as Aleph-One, though whether c equals Aleph-One is a deep open question known as the Continuum Hypothesis — one of the most famous unsolved problems in mathematical logic.
+Jack: Wait, it is actually unsolved?
+Amanda: It is proven to be undecidable within standard set theory! Gödel showed it is consistent with our axioms that the Continuum Hypothesis is true, and Cohen showed it is consistent that it is false. So it cannot be proved or disproved from the usual axioms alone.
+Jack: Mathematics has things it fundamentally cannot decide?
+Amanda: Welcome to the deep end of mathematical logic! That is a teaser for topics far beyond this module, but yes — not everything is provable or disprovable. For now, the key takeaway is: countable sets line up with the naturals, uncountable sets are fundamentally larger, and bijections are the tool that lets you tell the difference.
+Jack: Aleph-Naught for naturals, integers, rationals. Continuum c for the reals. Different infinity sizes. Bijections measure cardinality. Got it.
+Amanda: Perfect summary, Jack. That wraps up Week four. Functions, injectivity, surjectivity, bijectivity, composition, inverses, the Pigeonhole Principle, and cardinality. Quite a week!
+Jack: Don't forget the quiz!
+Amanda: Never forget the quiz. Good luck everyone — see you in Week five!

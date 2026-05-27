@@ -1,0 +1,85 @@
+Slide 0: Recap and Transition to Logic
+Amanda: Before we begin part two, here is a fast recap of what we built in part one. We defined sets, learned roster and set-builder notation, and used membership symbols like 'in' and 'not in' to state whether an element belongs to a set.
+Jack: We also worked with major number sets like Natural numbers, Integers, Rational numbers, and Real numbers, and we compared sets using subsets and equal sets.
+Amanda: Exactly. Then we applied core operations: union, intersection, difference, complement, and symmetric difference, and we interpreted all of them visually with Venn diagrams.
+Jack: Right, and we finished by testing properties like commutative and associative laws, and spotting false claims using counterexamples.
+Amanda: Perfect summary. Now we level up from set operations to formal logic. In this session, we will treat mathematical statements as precise True-or-False objects, combine them with logical connectives, read truth tables, and learn key proof ideas including contradiction.
+Jack: So part one gave us the language of sets, and part two gives us the logic engine that powers mathematical reasoning.
+Amanda: Exactly. Let's jump in.
+
+Slide 1: Thinking with Numbers
+Amanda: Welcome back to part two! We just established what sets are and how to operate on them. Now, we are going to start thinking formally about logic and mathematical statements. Let's look closely at a simple English statement: "fifteen is a multiple of three".
+Jack: I mean, that's undeniably true, right? Basic arithmetic. Three times five is fifteen.
+Amanda: Yes, but in rigorous computer science and mathematics, we don't want to rely on messy English grammar. We want to express this statement purely symbolically so a machine could evaluate it. We formally write it as: there exists a variable 'k', which is an element of the set of Natural numbers, such that fifteen strictly equals three times 'k'.
+Jack: Ah! I see the symbol for "there exists" on the slide—it looks like a backwards capital 'E'. 
+Amanda: Correct! That backwards E is universally called an 'existential quantifier'. But let's change the parameters. What if I said "twenty is a multiple of three"? Symbolically, we'd be hunting for a natural integer 'k' that makes twenty equal to three 'k'. Since eighteen is three times six, and twenty-one is three times seven... 'k' would have to be a fraction! 
+Jack: And since 'k' must strictly be a Natural, whole number... there is absolutely no integer that satisfies the condition!
+Amanda: Spot on. Because the needed integer literally doesn't exist, the mathematical statement evaluates concretely to False.
+
+Slide 2: Propositions and Proofs: Terminology
+Amanda: In the realm of logic, any declarative statement that structurally evaluates strictly to a True or a False state is called a Proposition.
+Jack: That sounds exactly how we define a boolean variable in programming. It can't be 'maybe', it has to be a one or a zero. 
+Amanda: Exactly like a boolean! And as we build arguments, we use specific terminology. An 'Axiom' is a foundational starting assumption we universally accept as True without demanding proof. A 'Theorem' is a True statement that we have extensively proven. A 'Nontheorem' is mathematically a False statement. And finally, the 'Proof' itself is the rigorous, step-by-step logical sequence connecting the dots.
+Jack: So the Proof is the actual derivation engine that validates the Theorem. It's the "why" behind the answer. 
+Amanda: Yes! Formally we can say that ... "a proof is a finite sequence of statements, each of which is either an axiom, an assumption, or follows from the preceding statements by a rule of inference, concluding with the statement that is being proven."
+
+Slide 3: Compound Statements: AND, OR, NOT
+Amanda: We rarely evaluate single propositions in isolation. We constantly combine them using 'Logical Connectives'. The big three are NOT, AND, and OR.
+Jack: Okay, this definitely feels like writing complex if-statements in my code.
+Amanda: Yep! And we map out all possible scenarios using Truth Tables. Look at the grid on the slide. The 'NOT' operator simply flips the bit; True becomes False. The 'AND' operator acts as a strict gateway— it ONLY evaluates to True if both the left side AND the right side are independently True.
+Jack: And looking at the 'OR' table, it's a lot more forgiving. It evaluates to True as long as at least ONE of the sides is True. Like the example! If I declare "eighty-one is a multiple of three OR five"... it passes as True because eighty-one breaks down into three times twenty-seven! The fact that it isn't a multiple of five is irrelevant to the overall OR gate!
+
+Slide 4: Implication (IF...THEN)
+Amanda: Now let's tackle the Implication: 'if P, then Q', symbolized by an arrow pointing to the right. The core truth table for this one is the single biggest stumbling block for students. Pay close attention: an implication is considered mathematically True in every single scenario, unless the 'if-part' happens, but the 'then-part' explicitly doesn't!
+Jack: Wait, hold on. Looking at the bottom row of the table... if P evaluates to False, and Q evaluates to False, the overall implication evaluates to True!? That feels completely counter-intuitive. 
+Amanda: It does at first! Think of an implication like a strict legal contract. "If I am a vegetarian, then I won't have chicken tonight." If I am secretly NOT a vegetarian, meaning your starting assumption P is completely false... then me eating chicken, or me eating a salad, never violates the terms of the contract! 
+Jack: Oh! I get it! The only physical way you can prove I broke the contract is if P is True—I am a vegetarian—but Q is False, because I am eating chicken anyway! So unless the promise is broken, math just defaults to assuming the logical structure holds True. 
+
+Slide 5: IFF (If and Only If)
+Amanda: Moving on to the ultimate equivalence, the Biconditional. We usually speak it as 'IF AND ONLY IF', symbolized by a double-headed arrow pointing left and right.
+Jack: So a two-way street instead of a one-way implication.
+Amanda: Yes. The statement 'P if and only if Q' asserts that P completely implies Q, AND simultaneously perfectly implies P in reverse. Looking at its truth table, this biconditional only ever outputs True when the values of P and Q match perfectly. 
+Jack: I see the symmetry! If both are True, it evaluates True. If both are actually False, it still evaluates to True. But any mismatch, like True/False, completely invalidates the equality and outputs False. It's basically checking if the two sides are perfectly synonymous. 
+
+Slide 6: Summary of Logical Connectives
+Amanda: Here on this slide is our grand summary table bridging English grammar into pure Symbolic Logic. 
+Jack: This is super helpful. We have NOT, AND, OR, the standard Implies arrow, and the two-way If-And-Only-If arrow. AND at the bottom we have our two new heavy lifters: the quantifiers.
+Amanda: Correct. The backwards 'E' acting as the Existential quantifier for declaring "there exists", and the bold upside-down 'A' acting as our Universal quantifier for declaring "for all". Keep this table locked in your memory; these symbols are essentially the atomic building blocks of all computational theory. 
+
+Slide 7: Existential Statements
+Amanda: Let's expand a bit more on how we use that backwards 'E'. An Existential Statement places a very specific claim on reality: it claims that at least ONE object possessing a certain property physically exists somewhere within our defined set. 
+Jack: Give me an example. Like saying "There exists some integer 'n' in the Natural numbers, where 'n' squared perfectly equals 169".
+Amanda: Exactly! Now, the number thirteen squared happens to equal 169. Because we easily found thirteen, the existential statement evaluates mathematically to True! 
+Jack: But wait, does it mean thirteen is the ONLY possible answer in the universe?
+Amanda: Definitely not. Existential statements do not give any guarantee of uniqueness. There could be twenty numbers that work, or a billion. But because the backwards 'E' just means "at least one", the moment you find your first match, the overall mathematical statement is validated as True.
+
+Slide 8: Proving and Disproving Existential Statements
+Amanda: Because of that rule, how do we formally prove an existential statement is True? Simply by producing one concrete example! It's delightfully straightforward.
+Jack: That makes sense. You claim there's a black swan, and you bring me one black swan, proof over. But what about proving the statement is False? What if you claim a red swan exists? 
+Amanda: Disproving an existential claim is incredibly difficult! Since you can't find one, you mathematically must prove that the concept itself is universally impossible for every single object in existence. For example, look at Euler's Conjecture about sums of powers. It took mathematicians two hundred and eighteen whole years of searching to finally discover one massive counterexample that proved the existential statement True! 
+Jack: Two hundred years just to find out one exists!?
+Amanda: Yes! And to fully DISPROVE an existential statement, like the legendary Fermat's Last Theorem, we actually have to write a universal proof showing that the equation fundamentally fails for literally every single infinite combination of numbers imaginable! 
+
+Slide 9: Universal Statements
+Amanda: Which brings us nicely to Universal Statements, denoted by the aggressive upside-down 'A'. A universal statement proudly claims that a property holds true without exception for every single element residing in the given set.
+Jack: Oh! Let's do an example from the slide. "For all whole numbers 'n', the mathematical result of 'n' squared, plus 'n', is explicitly an even number." That's a huge claim! We can't just plug in the number three and call it a day, because we're making a claim about infinite numbers. How do you even prove that? 
+Amanda: Bingo, you can't just plug and play. We must rely on an algebraic Proof. We set up isolated, broad general cases. Since every whole number in the universe must either be even, or odd, we split the tracks. We prove that a generic 'even' formula resolves to an even output. Then, we separately prove that a generic 'odd' formula also resolves to an even output. 
+Jack: Wow. Since you've algebraically covered both tracks, you've blanketed every possibility in the entire mathematical universe! Guaranteed True. 
+Amanda: Absolutely. However, to DISPROVE a universal claim—like the slide's false claim that "for all whole numbers, 4n minus 1 is prime"—you only need to provide one single devastating counterexample! Just plug in N equals four... and the result is fifteen, which is not prime! The universal claim violently collapses from a single failure.
+
+Slide 10: Proof by Contradiction
+Amanda: Finally, let's look at one of the most powerful and wildly popular tricks in a mathematician's arsenal: Proof by Contradiction.
+Jack: The slide also calls it Reductio ad Absurdum! That is an amazing Latin name. 
+Amanda: It really translates to "reduction to the absurd". To prove a statement is true, we first maliciously assume the exact opposite. We assume it's completely False. Then, we begin executing completely flawless logical algebraic steps, pushing the assumption further and further, until we smash directly into a mathematical brick wall—a glaring contradiction!
+Jack: Alright, there's a classic example on the slide: proving the square root of two is irrational. We assume the total opposite—that it IS rational! We set it up dynamically as a fraction 'p' over 'q' in its simplest form.
+Amanda: Precisely! We follow that algebra down, and it leads us to the conclusion that 'p' is an even number, AND 'q' is an even number!
+Jack: But if they are both even, you just divide them both by two! Which means our initial assumption that the fraction was in "simplest form" was completely wrong! The logic crashes!
+Amanda: You nailed it. Because the mathematics system itself crashed under the weight of flawless logic, the initial malicious assumption MUST have been intrinsically impossible. Therefore, our original statement—that the square root of two is irrational—must be completely True by default. 
+
+Slide 11: Summary: Techniques of Proof
+Amanda: Let's do a quick, rapid-fire summary of our proof techniques. To prove an existential statement, aggressively hunt down one functioning example. To disprove a universal statement, find one single counterexample that collapses it. Proving a universal claim means meticulously handling all logical cases. And Proof by Contradiction lets us deliberately crash the system to reveal the underlying truth.
+Jack: Seeing it broken down like this makes learning to code feel a lot more structural. Logic isn't just arbitrary rules, it's essentially the physics of computation.
+
+Slide 12: Next Class Preview
+Amanda: That is exactly the right mindset! And that wraps up week one! We'll continue diving deeply into Logic and learning to stack these complex Rules of Inference next week. Don't forget to wrap up and submit Quiz 1, and make sure to review your Tutorial Sheets over on the Aula platform.
+Jack: Will do! I'll be jumping right into those tutorial questions. Thanks Amanda! See you next week!

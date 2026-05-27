@@ -1,0 +1,482 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{mathpazo}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[normalem]{ulem}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{mathdots}
+\usepackage{arydshln}
+%\usepackage{bbold}
+\usepackage[margin=1in]{geometry}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,      
+	urlcolor=cyan,
+}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand\blank{\hphantom{==}}
+
+\DeclareFontFamily{U}{MnSymbolC}{}
+\DeclareSymbolFont{MnSyC}{U}{MnSymbolC}{m}{n}
+\DeclareFontShape{U}{MnSymbolC}{m}{n}{
+	<-6>  MnSymbolC5
+	<6-7>  MnSymbolC6
+	<7-8>  MnSymbolC7
+	<8-9>  MnSymbolC8
+	<9-10> MnSymbolC9
+	<10-12> MnSymbolC10
+	<12->   MnSymbolC12}{}
+\DeclareMathSymbol{\intprod}{\mathbin}{MnSyC}{'270}
+
+\numberwithin{equation}{section}
+%\numberwithin{theorem}{section}
+
+%%% THEOREM STYLES %%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem*{lemma*}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{conjecture}{Conjecture}
+
+%%% DEFINITION STYLES %%%
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem*{definition*}{Definition}
+\newtheorem{example}{Example}
+\newtheorem*{example*}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{remark*}{Remark}
+\newtheorem{fact}{Fact}
+\newtheorem{problem}{Problem}
+\newtheorem*{problem*}{Problem}
+\newtheorem*{solution*}{Solution}
+\newtheorem*{claim*}{Claim}
+\newtheorem{exercise}{Exercise}
+
+%%% FUNCTIONS %%%
+\newcommand{\Aut}{\mathrm{Aut}}
+\newcommand{\Sym}{\mathrm{Sym}}
+\newcommand{\Syl}{\mathrm{Syl}}
+\newcommand{\intersection}{\mathop{\bigcap}}
+\newcommand{\union}{\mathop{\bigcup}}
+\newcommand{\disjointunion}{\mathop{\bigsqcup}}
+\newcommand{\evaluated}{\Big|}
+\newcommand{\re}{\mathrm{Re}}
+\newcommand{\im}{\mathrm{Im}}
+\newcommand{\Log}{\mathrm{Log}}
+\newcommand{\Res}{\mathrm{Res}}
+\newcommand{\Sk}{\mathrm{Sk}}
+\newcommand{\disc}{\mathrm{disc}}
+\newcommand{\then}{\Longrightarrow}
+\newcommand{\Int}{\mathrm{int}}
+\newcommand{\bd}{\mathrm{bd}}
+\newcommand{\diam}{\mathrm{diam}}
+\newcommand{\lcm}{\mathrm{lcm}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\normal}{\trianglelefteq}
+\newcommand{\del}{\partial}
+\newcommand{\len}{\mathrm{len}}
+\newcommand{\res}{\mathrm{res}}
+\newcommand{\esssup}{\mathrm{ess} \, \mathrm{sup}}
+\newcommand{\wlim}{\displaystyle\mathop{\mathrm{w}\textrm{-}\mathrm{lim}}}
+\newcommand{\vlim}{\displaystyle \mathop{\mathrm{v}\textrm{-}\mathrm{lim}}}
+\newcommand{\condE}[2]{\mathbb E\left[ #1 \,\middle|\, #2\right]}
+\newcommand{\condP}[2]{\mathbb P\left[ #1 \, \middle| \, #2\right]}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\Poi}{\mathrm{Poi}}
+
+%%% FONTS %%%
+\newcommand{\boldZ}{\boldsymbol{\mathrm{Z}}}
+\newcommand{\boldC}{\boldsymbol{\mathrm{C}}}
+\newcommand{\boldN}{\boldsymbol{\mathrm{N}}}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\U}{\mathbb U}
+\newcommand{\D}{\mathbb D}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Sbb}{\mathbb S}
+\newcommand{\Kbb}{\mathbb K}
+\newcommand{\F}{\mathbb F}
+\newcommand{\Pbb}{\mathbb P}
+\newcommand{\Ts}{\mathcal T}
+\newcommand{\Cs}{\mathcal C}
+\newcommand{\As}{\mathcal A}
+\newcommand{\Ss}{\mathcal S}
+\newcommand{\Ms}{\mathcal M}
+\newcommand{\Bs}{\mathcal B}
+\newcommand{\Ps}{\mathcal P}
+\newcommand{\Ds}{\mathcal D}
+\newcommand{\Ls}{\mathcal L}
+\newcommand{\Ns}{\mathcal N}
+\newcommand{\Rs}{\mathcal R}
+\newcommand{\Fs}{\mathcal F}
+\newcommand{\Os}{\mathcal O}
+\newcommand{\Ks}{\mathcal K}
+\newcommand{\Es}{\mathcal E}
+\newcommand{\Gs}{\mathcal G}
+\newcommand{\Us}{\mathcal U}
+\newcommand{\Zs}{\mathcal Z}
+\newcommand{\fp}{\mathfrak p}
+\newcommand{\fm}{\mathfrak m}
+\newcommand{\diff}{\,d}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\Span}{\mathrm{span}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand*{\charone}{\text{\usefont{U}{bbold}{m}{n}1}}
+\newcommand{\dlim}{\displaystyle\lim}
+\newcommand{\dsum}{\displaystyle\sum}
+\newcommand{\dint}{\displaystyle\int}
+\newcommand{\Var}{\mathbf{Var}}
+\newcommand{\Cov}{\mathbf{Cov}}
+\newcommand{\Lip}{\mathrm{Lip}}
+\newcommand{\sgn}{\mathrm{sgn}}
+
+\newcommand{\done}{\flushright$\diamondsuit$}
+
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+\let\oldphi\phi
+\let\phi\varphi
+\let\oldepsilon\epsilon
+\let\epsilon\varepsilon
+\let\oldIm\Im
+\let\oldRe\Re
+\renewcommand{\Im}{\mathrm{Im}\,}
+\renewcommand{\Re}{\mathrm{Re}\,}
+\let\oldtilde\tilde
+\let\tilde\widetilde
+\let\oldhat\hat
+\let\hat\widehat
+\let\then\Rightarrow
+\let\oldthen\then
+
+\begin{document}
+
+\begin{center}
+\Large{Tutorial Exercises - Week 1} \\
+\vspace{3mm}
+\large{4001CMD - Mathematical Skills for Computing Professionals} \\
+\vspace{5mm}
+\end{center}
+
+\noindent The following exercises should be attempted before your next tutorial session this week. They focus on material covered in Week 1, namely set theory and 1st part of symbolic logic. 
+
+\section*{Set Theory}
+
+\begin{problem}
+	For the following, show rigorously that $A = B$. 
+	\begin{enumerate}[label=(\alph*)]
+		\item $A = \{1,2,3\}$, $B = \{n : n \in \N, n^2 < 10\}$. 
+		\item $A = \{x \in \R: x^2 - 4x + 4 = 1\}$, $B = \{1,3\}$
+	\end{enumerate}
+\end{problem}
+
+\begin{problem}
+	For the following, show rigorously that $A \neq B$. 
+	\begin{enumerate}[label=(\alph*)]
+		\item $A = \{1,2\}$, $B=\{x \in \R : x^3 - 2x^2 - x + 2 = 0\}$
+		\item $A = \{1,3,5\}$, $B = \{n : n \in \N, n^2 - 1 \leq n\}$
+	\end{enumerate}
+\end{problem}
+
+\begin{problem}
+	For the following, determine whether $A = B$. 
+	\begin{enumerate}[label=(\alph*)]
+		\item $A = \{x : x^2 + x = 2\}$, $B = \{1,-1\}$
+		\item $A = \{x \in \R : 0 < x \leq 2\}$, $B = \{1,2\}$
+	\end{enumerate}
+\end{problem}
+
+\begin{problem}
+	For the following, determine whether that $A \subseteq B$. 
+	\begin{enumerate}[label=(\alph*)]
+		\item $A = \{1,2\}$, $B = \{x : x^3 - 6x^2 + 11x = 6\}$
+		\item $A = \{2n : n \in \N\}$, $B = \N$
+		\item $A = \{x \in \R : x^3 - 2x^2 - x + 2 = 0\}$, $B =\{1,2\}$
+		\item $A = \{1,2,3,4\}$, $C = \{5,6,7,8\}$, $B = \{n \in \N : n+m = 8 \textrm{ for some } m \in C\}$
+	\end{enumerate} 
+\end{problem}
+
+\begin{problem}
+	The \emph{symmetric difference} fo two sets $A$ and $B$ is the set defined by \[
+	A \triangle B = (A \cup B) \setminus (A \cap B)
+	\]
+	(recall for sets $X$ and $Y$ with $Y \subseteq X$, $X \setminus Y$, read ``$X$ minus $Y$'', is the set of elements of $X$ that are not elements of $Y$). 
+	\begin{enumerate}[label=(\alph*)]
+		\item If $A = \{1,2,3\}$ and $B = \{2,3,4,5\}$, find $A \triangle B$. 
+		\item Describe in words the symmetric difference of two sets $A$ and $B$ (not necessarily those sets in part (a)). 
+	\end{enumerate} 
+\end{problem}
+
+\section*{Symbolic Logic 1}
+
+\begin{problem}
+	Given that $p$ is false, $q$ is true, $r$ is false, and $s$ is true, determine whether the following propositions are true or false. 
+	\begin{enumerate}[label=(\alph*)]
+		\item $\neg p \vee \neg(q \wedge r)$
+		\item $\neg(p \vee q) \wedge (\neg p \vee r)$
+		\item $(p \vee \neg r) \wedge \neg ((q \vee r) \vee \neg (r \vee p))$
+		\item $(p \then q) \wedge (q \then r)$
+		\item $(p \then q) \then r$
+		\item $p \then (q \then r)$
+		\item $(s \then( p \wedge \neg r)) \wedge ((p \then (r \vee q)) \wedge s)$
+		\item $((p \wedge \neg q) \then (q \wedge r)) \then (s \vee \neg q)$
+	\end{enumerate} 
+\end{problem}
+
+\begin{problem}
+	For each of the following, formulate the symbolic expression in words, assuming the propositions stand for the following statements: 
+	\begin{align*}
+	p &: \textrm{ You play football.} \\
+	q &: \textrm{ You miss the midterm exam.} \\
+	r &: \textrm{ You pass the module.}
+	\end{align*}
+	\begin{enumerate}[label=(\alph*)]
+		\item $p \vee q \vee r$
+		\item $\neg(p \vee q) \vee r$
+		\item $(p \wedge q) \vee (\neg q \wedge r)$
+	\end{enumerate} 
+\end{problem}
+
+\begin{problem}
+	For each of the following, represent the proposition symbolically by letting
+	\begin{align*}
+	p &: \textrm{ You run 10 laps daily.} \\
+	q &: \textrm{ You are healthy.} \\
+	r &: \textrm{ You take multi-vitamins.}
+	\end{align*}
+	\begin{enumerate}[label= (\alph*)]
+		\item You run 10 laps daily, but you are not healthy. 
+		\item You do not run 10 laps daily, you do not take multi-vitamins, and you are not healthy. 
+		\item Either you are healthy or you do not run 10 laps daily, and you do not take multi-vitamins. 
+	\end{enumerate}
+\end{problem}
+
+%\begin{problem}
+%	Formulate the following arguments symbolically, and determine whether each is valid, using: 
+%	\[
+%	p : \textrm{ I study hard.} \quad q : \textrm{ I get A's.} \quad r : \textrm{ I get rich.}
+%	\]
+%	\begin{enumerate}[label=(\alph*)]
+%	\item
+%	\begin{tabular}{l}
+%		If I study hard, then I get A's. \\
+%		I study hard. \\
+%		\hline
+%		$\therefore$ I get A's.
+%	\end{tabular} 
+%	\item 
+%	\begin{tabular}{l}
+%		If I study hard, then I get A's. \\
+%		If I don't get rich, then I don't get A's. \\
+%		\hline
+%		$\therefore$ I get rich. 
+%	\end{tabular} 
+%	\item \begin{tabular}{l}
+%		I study hard if and only if I get rich. \\
+%		I get rich. \\
+%		\hline
+%		$\therefore$ I study hard. 
+%	\end{tabular} 
+%	\item \begin{tabular}{l}
+%		If I study hard or I get rich, then I get A's. \\
+%		 I get A's. \\
+%		 \hline
+%		 $\therefore$ If I don't study hard, then I get rich. 
+%	\end{tabular} 
+%	\end{enumerate}
+%\end{problem}
+%
+%\begin{problem}
+%	For each of the following, write the given argument in words and determine whether each argument is valid. Let: \begin{align*}
+%	p &: \textrm{ The for loop is faulty.} \\
+%	q &: \textrm{ The while loop is faulty.} \\
+%	r &: \textrm{ The hardware is unreliable.} \\
+%	s &: \textrm{ The output is correct.} 
+%	\end{align*}
+%	\begin{enumerate}[label=(\alph*)]
+%		\item \begin{tabular}{l}
+%			$(r \vee s) \then p$ \\
+%			$s \then q$ \\
+%			$p \vee s$ \\
+%			\hline
+%			$\therefore r$
+%		\end{tabular} 
+%		\item \begin{tabular}{l}
+%			$(p \then r) \then q$ \\
+%			$(q \then s) \then p$ \\
+%			$r \wedge s$ \\
+%			$p \vee q$ \\
+%			\hline
+%			$\therefore p \wedge q$
+%		\end{tabular} 
+%		\item \begin{tabular}{l}
+%			$p \then q$ \\
+%			$q \then r$ \\
+%			$\neg r$ \\
+%			$s \then r$ \\
+%			\hline 
+%			$\therefore \neg s$
+%		\end{tabular} 
+%		\item \begin{tabular}{l}
+%			$p \then (q \vee r)$\\
+%			$q \then (p \vee s)$ \\
+%			$p \vee \neg q$ \\
+%			$\neg s$ \\
+%			\hline
+%			$\therefore p \vee r$
+%		\end{tabular}
+%	\end{enumerate} 
+%\end{problem}
+
+%\begin{problem}
+%	Write a symbolic logic expression equivalent to the following logic circuits. 
+%	\begin{enumerate}[label=(\alph*)]
+%		\item \ \\ \begin{center}
+%			\includegraphics[scale=0.3]{circuit1}
+%		\end{center}
+%		\item \ \\ \begin{center}
+%			\includegraphics[scale=0.3]{circuit2}
+%		\end{center}
+%		\item \ \\ \begin{center}
+%			\includegraphics[scale=0.3]{circuit3}
+%		\end{center}
+%		\item (This one is hard!)
+%		\begin{center}
+%			\includegraphics[scale=0.3]{circuit5}
+%		\end{center}
+%	\end{enumerate}
+%\end{problem}
+%
+%\begin{problem}
+%	Show that the following logic circuits are equivalent.  
+%	\begin{enumerate}[label=(\alph*)]
+%		\item \ \\ \begin{center}
+%			\includegraphics[scale=0.3]{circuits1}
+%		\end{center}
+%		\item \ \\ \begin{center}
+%			\includegraphics[scale=0.3]{circuits2}
+%		\end{center}
+%		\item \ \\ \begin{center}
+%			\includegraphics[scale=0.3]{circuits3}
+%		\end{center}
+%		\item \ \\
+%		\begin{center}
+%			\includegraphics[scale=0.3]{circuits4}
+%		\end{center}
+%	\end{enumerate}
+%\end{problem}
+
+%\section*{Rules of inference} 
+%
+%The following rules of inference may be used in working out the syllogisms in this tutorial sheet: 
+%
+%\begin{itemize}
+%	\item Addition: 
+%	\begin{center}
+%		\begin{tabular}{r}
+%			$P$ \\
+%			\hline
+%			$\therefore P \vee Q$
+%		\end{tabular}
+%	\end{center}
+%	\item Conjunction: 
+%	\begin{center}
+%		\begin{tabular}{r}
+%			$P$ \\
+%			$Q$ \\
+%			\hline
+%			$\therefore P \wedge Q$
+%		\end{tabular}
+%	\end{center}
+%	\item Simplification: 
+%	\begin{center}
+%		\begin{tabular}{r}
+%			$P \wedge Q$ \\
+%			\hline
+%			$\therefore P$
+%		\end{tabular}
+%	\end{center}
+%	\item Disjunctive syllogism: 
+%	\begin{center}
+%		\begin{tabular}{r}
+%			$P \vee Q$ \\
+%			$\neg P$ \\
+%			\hline
+%			$\therefore Q$
+%		\end{tabular}
+%	\end{center}
+%	\item Hypothetical syllogism:
+%	\begin{center}
+%		\begin{tabular}{r}
+%			$P \then Q$ \\
+%			$Q \then R$ \\
+%			\hline
+%			$\therefore P \then R$
+%		\end{tabular}
+%	\end{center}
+%	\item \textit{Modus ponens}:
+%	\begin{center}
+%		\begin{tabular}{r}
+%			$P \then Q$ \\
+%			$P$ \\
+%			\hline
+%			$\therefore Q$
+%		\end{tabular}
+%	\end{center}
+%	\item \textit{Modus tollens}:
+%	\begin{center}
+%		\begin{tabular}{r}
+%			$P \then Q$ \\
+%			$\neg Q$ \\
+%			\hline
+%			$\therefore \neg P$
+%		\end{tabular}
+%	\end{center}
+%	\item Commutativity: 
+%	\[
+%	P \vee Q \iff Q \vee P \qquad P \wedge Q \iff Q \wedge P
+%	\]
+%	\item Associativity: 
+%	\[
+%	P \vee (Q \vee R) \iff (P \vee Q) \vee R \qquad P \wedge (Q \wedge R) \iff (P \wedge Q) \wedge R
+%	\]
+%	\item Distributivity:
+%	\[
+%	(P \vee Q) \wedge (P \vee R) \iff P \vee (Q \wedge P) \qquad (P \wedge Q) \vee (P \wedge R) \iff P \wedge (Q \vee R)
+%	\]
+%	\item de Morgan's Laws:
+%	\[
+%	\neg (P \vee Q) \iff (\neg P) \wedge (\neg Q) \qquad \neg(P \wedge Q) \iff (\neg P) \vee(\neg Q)
+%	\]
+%	\item Negation: 
+%	\[
+%	P \iff \neg\neg P \qquad P \vee \neg P \textrm{ is TRUE} \qquad P \wedge \neg P \textrm{ is FALSE}
+%	\]
+%	\item Tautology: 
+%	\[
+%	P \iff (P \vee P) \qquad P \iff (P \wedge P)
+%	\]
+%\end{itemize}
+%
+%Additionally, you may use Substitution: if $X \iff Y$ is true, and $X$ appears in a proposition, you may replace $X$ with $Y$. 
+
+\end{document}

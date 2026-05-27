@@ -1,0 +1,301 @@
+RSA CRYPTOGRAPHY WALKTHROUGH — VOICEOVER SCRIPT
+Instructions for Google AI Studio:
+  - Two speakers: "Teacher" (authoritative, calm, explanatory) and
+    "Student" (curious, engaged, asks clarifying questions).
+  - Each [SECTION] below corresponds to one audio file.
+  - Generate each section as a separate audio file using the filename shown.
+  - Read all numbers, symbols and equations aloud in natural spoken English.
+  - Do NOT read HTML, LaTeX, or markdown formatting — only the plain spoken text.
+
+
+Slide 0: Introduction and RSA Recap
+Amanda: Welcome to this step-by-step walkthrough of RSA cryptography. By the end of this session, you'll know exactly how RSA works — from generating keys to encrypting and decrypting a real message, with every single calculation shown in detail. Let's start with the big picture.
+
+Jack: Great! I've heard RSA is a type of public-key cryptography. What does that actually mean?
+
+Amanda: Excellent question. In public-key cryptography, every user has two mathematically linked keys: a public key that anyone can see, and a private key that only they know. The clever part is this — if I encrypt a message using your public key, only your private key can decrypt it. These two keys are mathematical opposites.
+
+Jack: So it's like a padlock and a key? Anyone can lock the padlock, but only the owner can unlock it?
+
+Amanda: That's a perfect analogy. RSA achieves this using the mathematical difficulty of factoring very large numbers. It's easy to multiply two large prime numbers together, but it's astronomically hard to reverse that — to find the two primes if you only know the product. That asymmetry is the security foundation.
+
+Jack: Okay. So what are the actual steps involved in RSA?
+
+Amanda: RSA has five main steps. Step one: Key Generation. We choose two large prime numbers, p and q, and compute the modulus n as p times q. We also compute the totient z, which is the product of p minus 1 and q minus 1.
+
+Step two: Public Key Selection. We choose a public exponent e such that e is greater than 1 and less than z, and the greatest common divisor of e and z equals 1 — meaning they share no common factors other than 1.
+
+Step three: Private Key Derivation. We calculate the private exponent d as the modular multiplicative inverse of e modulo z. This is done using the Extended Euclidean Algorithm. In plain terms, d is the number such that d times e leaves a remainder of 1 when divided by z.
+
+Step four: Encryption. To encrypt a message m, we raise m to the power e, then take the remainder when divided by n. That gives us the ciphertext c.
+
+Step five: Decryption. To decrypt ciphertext c, we raise c to the power d, then take the remainder when divided by n. That recovers the original message.
+
+Jack: And what are the specific numbers we'll use in this example?
+
+Amanda: We'll use p equals 53, q equals 17, and the message m equals 123. These are small numbers chosen deliberately so we can do all the arithmetic by hand and follow every step clearly. In a real-world RSA implementation, p and q would each be hundreds of digits long — but the method is identical.
+
+Jack: Perfect. Let's get started!
+
+
+Slide 1: Step 1: Compute Modulus n and Totient z
+Amanda: Step one is all about computing two important values: the modulus n, and the totient z. Let's take them one at a time.
+
+Jack: What exactly is the modulus n and why do we need it?
+
+Amanda: The modulus n is the cornerstone of RSA. It's the number we'll use in every modular arithmetic operation throughout the entire algorithm. Both the public key and the private key include n. It's computed simply as p times q — the product of our two prime numbers.
+
+With p equals 53 and q equals 17, we calculate:
+n equals 53 times 17, which equals 901.
+
+So our modulus is 901.
+
+Jack: That's straightforward. What about z, the totient?
+
+Amanda: The totient z — also known as Euler's totient — is a count of how many integers from 1 up to n are coprime to n, meaning they share no factors with n other than 1. For RSA we don't need to compute it the long way. Because n is the product of exactly two primes p and q, the totient simplifies beautifully to the formula: z equals p minus 1, times q minus 1.
+
+Think about it this way: the only numbers from 1 to 901 that share a factor with 901 are the multiples of 53 and the multiples of 17. Everything else is coprime to n.
+
+Jack: So what's the calculation?
+
+Amanda: z equals p minus 1 times q minus 1, which is 53 minus 1 times 17 minus 1, which is 52 times 16, which equals 832.
+
+So z equals 832.
+
+Jack: Why does z matter? Where does it appear later?
+
+Amanda: The totient z is crucial for two reasons. First, it determines the valid range for our public exponent e. Second, and most importantly, it defines the modulus of the ring in which we'll compute the private exponent d. The entire security of RSA depends on the fact that z cannot be computed without knowing p and q. If an attacker doesn't know the prime factors, they can't compute z, and without z they can't find d, the private key.
+
+Jack: So keeping p and q secret is what protects d?
+
+Amanda: Precisely. In practice, once n is published as part of the public key, the prime factors p and q are immediately discarded and never stored. The security rests entirely on the computational difficulty of factoring n — finding 53 and 17 from 901 is trivial, but doing the same with 617-digit numbers takes longer than the age of the universe with classical computers.
+
+Jack: To summarise — after Step 1 we have n equals 901 and z equals 832.
+
+Amanda: Exactly. These two values carry us through every step that follows.
+
+
+Slide 2: Step 2: Select the Public Exponent e
+Amanda: In Step 2 we choose the public exponent e — one half of the public key. Remember, the public key is the pair (n, e), so choosing e wisely matters.
+
+Jack: What constraints does e have to satisfy?
+
+Amanda: There are two strict mathematical conditions. First, e must be strictly between 1 and z — so 1 is less than e, which is less than 832 in our case. Second, the greatest common divisor of e and z must equal 1. In other words, e and z must be coprime — they must share no common factor other than 1.
+
+Jack: Why must they be coprime?
+
+Amanda: This is the key mathematical reason: we later need to find d, the modular multiplicative inverse of e modulo z. A modular inverse only exists when the two numbers are coprime. If gcd of e and z were greater than 1, no valid private key d would exist at all, and the whole system would fail.
+
+Jack: Got it. So how do we pick a good e?
+
+Amanda: We test candidate values. Let's start with 2. What's the greatest common divisor of 2 and 832?
+
+Jack: Well, 832 is even, so they both divide by 2. That means gcd of 2 and 832 is 2, not 1. So e equals 2 fails.
+
+Amanda: Correct. Let's try e equals 3. Is 3 a factor of 832? Let's check: 832 divided by 3 is approximately 277.3 — not a whole number, so 3 does not divide 832. Therefore gcd of 3 and 832 equals 1. So e equals 3 is valid.
+
+Jack: What about e equals 5? And e equals 7?
+
+Amanda: e equals 5 also works — 5 does not divide 832. And e equals 7 works too. In this solution, we choose e equals 15. Let's verify that carefully.
+
+Jack: Why 15 specifically?
+
+Amanda: It's a pedagogical choice — it's larger than 3 or 7, giving us a slightly more complex encryption calculation to practise. Let's verify: we need gcd of 15 and 832 to equal 1. To check this efficiently, we look at the prime factorisations.
+
+832 factors as 2 to the power 6, times 13. That is: 832 equals 64 times 13.
+
+15 factors as 3 times 5.
+
+Jack: And 3 and 5 are neither 2 nor 13, so they share nothing with 832?
+
+Amanda: Exactly right. The prime factors of 15 are {3, 5}. The prime factors of 832 are {2, 13}. There is no overlap at all, so their greatest common divisor is 1. The condition is satisfied.
+
+Jack: So e equals 15 is our public exponent. That means the public key is the pair (901, 15)?
+
+Amanda: That's correct. The public key is (n, e) equals (901, 15). Anyone who wants to send us an encrypted message will use these two numbers. Now we need to keep that public key and compute the corresponding private key.
+
+
+Slide 3: Step 3: Find the Private Exponent d using the Extended Euclidean Algorithm
+Amanda: Step 3 is mathematically the most involved step — finding the private exponent d. We need to find d such that d times e is congruent to 1 modulo z. In other words, when we multiply d by 15 and divide the result by 832, the remainder must be exactly 1.
+
+Jack: How do we find such a number?
+
+Amanda: We use the Extended Euclidean Algorithm, often abbreviated as EEA. The standard Euclidean Algorithm finds the greatest common divisor of two numbers by repeated division. The extended version goes further — it also finds two integers, let's call them d and k, such that the equation d times 15 plus k times 832 equals 1.
+
+When we rearrange that equation modulo 832, the k times 832 term vanishes because 832 mod 832 is zero. That leaves d times 15 congruent to 1 modulo 832, which is exactly what we need. So d is our private exponent.
+
+Jack: Let's walk through the algorithm step by step.
+
+Amanda: Absolutely. The algorithm works by repeatedly dividing the larger number by the smaller and keeping track of remainders. Here we go.
+
+Step one: divide 832 by 15.
+832 equals 55 times 15, plus a remainder. 55 times 15 equals 825. 832 minus 825 equals 7. So:
+832 equals 55 times 15, plus 7.
+
+Jack: That's the first division done. Now what?
+
+Amanda: Now divide 15 by the remainder 7.
+15 equals 2 times 7, plus a remainder. 2 times 7 equals 14. 15 minus 14 equals 1. So:
+15 equals 2 times 7, plus 1.
+
+Jack: The remainder is 1 — which is the greatest common divisor! Since gcd of 15 and 832 is 1 — we already knew that from Step 2.
+
+Amanda: Exactly. Now comes the back-substitution phase — this is where we express 1 as a linear combination of 15 and 832.
+
+Step three: isolate the remainder 1 from the second equation.
+1 equals 15 minus 2 times 7.
+
+Step four: substitute the expression for 7. From the first equation, 7 equals 832 minus 55 times 15. Replace 7 in our expression:
+1 equals 15 minus 2 times (832 minus 55 times 15).
+
+Jack: Let me expand that bracket: negative 2 times 832, plus negative 2 times negative 55 times 15 — that gives minus 2 times 832, plus 110 times 15.
+
+Amanda: Perfect. So step five: collect the terms with 15 together.
+1 equals 15 plus 110 times 15, minus 2 times 832.
+1 equals 111 times 15, minus 2 times 832.
+
+Jack: So the coefficient of 15 is 111. That means d equals 111!
+
+Amanda: Exactly. We have found that 111 times 15, minus 2 times 832, equals 1. This directly means 111 times 15 is congruent to 1 modulo 832. So the private exponent is d equals 111.
+
+Jack: Can we quickly verify that? 111 times 15 equals...
+
+Amanda: Let's check: 100 times 15 is 1500, plus 11 times 15 which is 165. 1500 plus 165 equals 1665. Now divide 1665 by 832: 1665 minus 832 equals 833. 833 minus 832 equals 1. So 1665 equals 2 times 832, plus 1. The remainder is indeed 1. Verification confirmed!
+
+Jack: So the private key is (n, d) equals (901, 111). This is the key we must keep secret.
+
+Amanda: Absolutely. The private key (901, 111) is never shared. Anyone who obtains d could decrypt messages or forge signatures. The difficulty of computing d from e and n alone — without knowing the factors p and q, and therefore without being able to compute z — is what makes RSA secure.
+
+
+Slide 4: Step 4: Encrypt the Message m = 123
+Amanda: Step 4 is encryption. We have message m equals 123 and public key (n, e) equals (901, 15). The formula is c equals m to the power e, modulo n — so we need 123 to the power 15, modulo 901.
+
+Jack: 123 to the 15th is enormous. How do we avoid computing the full number?
+
+Amanda: We use exponentiation by squaring. Write 15 in binary: 1111, which is 8 plus 4 plus 2 plus 1. So 123 to the 15 equals 123 to the 8, times 123 to the 4, times 123 to the 2, times 123 to the 1. We build a table by repeatedly squaring, reducing modulo 901 each time to keep numbers small.
+
+Jack: Let's build that table.
+
+Amanda: 123 to the power 1 is 123.
+
+Now I'll show the full method once. 123 squared is 15129. Dividing by 901 gives 16 times, that's 14416. The remainder is 15129 minus 14416, which is 713. So 123 squared mod 901 equals 713.
+
+From here I'll use the shorthand — square the previous result and take the remainder.
+
+713 squared mod 901 gives 205.
+
+205 squared mod 901 gives 579.
+
+Jack: So our four values are: power 1 gives 123, power 2 gives 713, power 4 gives 205, power 8 gives 579. All four bits of 15 are set, so we multiply all four together.
+
+Amanda: Right — in stages, reducing after each step.
+
+579 times 205 mod 901 gives 664.
+
+713 times 123 mod 901 gives 302.
+
+664 times 302 mod 901 gives 506.
+
+Jack: So the ciphertext c equals 506. That's what gets sent over the network.
+
+Amanda: Exactly. Message 123 encrypts to 506 under public key (901, 15). Without the private key d, this reveals nothing about the original. Next we'll decrypt it.
+
+
+Slide 5: Step 5: Decrypt the Ciphertext c = 506
+Amanda: The final step is decryption. We have ciphertext c equals 506 and use the private key (n, d) equals (901, 111). The formula is: m-prime equals c to the power d, modulo n — so we need 506 to the power 111, modulo 901.
+
+Jack: 111 is a larger exponent. How do we convert it to binary?
+
+Amanda: Divide repeatedly by 2 and read off the remainders:
+111 divided by 2 is 55 remainder 1.
+55 divided by 2 is 27 remainder 1.
+27 divided by 2 is 13 remainder 1.
+13 divided by 2 is 6 remainder 1.
+6 divided by 2 is 3 remainder 0.
+3 divided by 2 is 1 remainder 1.
+1 divided by 2 is 0 remainder 1.
+
+Reading from most significant to least: 111 is 1101111 in binary — that's 64 plus 32 plus 8 plus 4 plus 2 plus 1.
+
+Jack: Bit 4, the value 16, is zero — so we skip 506 to the power 16 in the final product.
+
+Amanda: Right — we still compute it as a stepping stone, but don't include it. Let me show the full working once for row 2, then use shorthand.
+
+506 to the power 1 is 506.
+
+506 squared is 256036. 901 goes in 284 times, giving 255884. The remainder is 152. So 506 squared mod 901 is 152.
+
+Continuing with the shorthand:
+
+152 squared mod 901 gives 579.
+
+579 squared mod 901 gives 69.
+
+69 squared mod 901 gives 256. That's the power-16 row — we compute it but skip it in the product.
+
+256 squared mod 901 gives 664.
+
+664 squared mod 901 gives 307.
+
+Jack: So the six values we multiply are: 307 for power 64, 664 for power 32, 69 for power 8, 579 for power 4, 152 for power 2, and 506 for power 1.
+
+Amanda: Exactly. In stages:
+
+307 times 664 mod 901 gives 222.
+
+69 times 579 mod 901 gives 307.
+
+152 times 506 mod 901 gives 327.
+
+222 times 307 mod 901 gives 579.
+
+579 times 327 mod 901 gives 123.
+
+Jack: The decrypted message is 123 — exactly what we started with!
+
+Amanda: That's RSA in action. We encrypted 123 to get 506, and decrypting 506 gives back 123. Euler's theorem guarantees this — raising a message to the power e then d, modulo n, always returns the original, as long as the key generation conditions are met.
+
+Jack: So encryption and decryption are truly inverse operations.
+
+Amanda: Exactly. An attacker who sees only n and e cannot feasibly find d — that would require factoring n, which is computationally infeasible for large numbers.
+
+
+Slide 6: Final Summary
+Amanda: Congratulations — you've completed the full RSA walkthrough! Let's take a moment to review what we've done and cement the key takeaways.
+
+Jack: Can you summarise all five steps and the values we computed?
+
+Amanda: Absolutely. Let's go through each one.
+
+Step 1 — Key Generation setup. We chose primes p equals 53 and q equals 17. We computed the modulus n equals 53 times 17 equals 901, and the totient z equals 52 times 16 equals 832.
+
+Step 2 — Public Exponent. We selected e equals 15, verified that the greatest common divisor of 15 and 832 is 1, confirming they are coprime. The public key is the pair (901, 15).
+
+Step 3 — Private Exponent. Using the Extended Euclidean Algorithm on 15 and 832, we found d equals 111. Verification: 111 times 15 equals 1665, which equals 2 times 832 plus 1, confirming that 111 times 15 is congruent to 1 modulo 832. The private key is the pair (901, 111).
+
+Step 4 — Encryption. Message m equals 123. Using exponentiation by squaring to compute 123 to the power 15 modulo 901, we obtained the ciphertext c equals 506.
+
+Step 5 — Decryption. Ciphertext c equals 506. Using exponentiation by squaring to compute 506 to the power 111 modulo 901, we recovered m-prime equals 123, which matches the original message.
+
+Jack: So the full picture is: original message 123, encrypted to 506, decrypted back to 123. The public key is (901, 15) and the private key is (901, 111).
+
+Amanda: That's a perfect summary. Now a few important practical notes.
+
+In a real RSA implementation, the primes p and q are each at least 1024 bits long — that's over 300 decimal digits each. The modulus n would be over 2048 bits. Current recommendations are 3072 or 4096 bits for long-term security.
+
+Jack: And the public exponent — would it still be 15?
+
+Amanda: In practice, the most common public exponent is 65537 — which is 2 to the power 16, plus 1. This is called the 5th Fermat prime. Its binary representation has only two 1-bits, making exponentiation extremely fast. The choice e equals 15 was only for teaching purposes.
+
+Jack: What about keeping p and q secret? Are they stored anywhere?
+
+Amanda: No. Once the modulus n and the private exponent d are computed, p and q are destroyed. If an attacker ever found p and q from n, they could immediately recompute z and then d. The entire security relies on the intractability of integer factorisation.
+
+Jack: One last question — what stops an attacker from just trying all possible values of d?
+
+Amanda: With a 2048-bit modulus, the private exponent d is a number with roughly 617 decimal digits. Testing all possible values even at a trillion attempts per second would take longer than the age of the universe. That's what computational infeasibility means — not logically impossible, but practically impossible within any meaningful timeframe.
+
+Jack: This walkthrough has made RSA feel completely demystified. The mathematics is elegant — each step follows logically from the last.
+
+Amanda: That's exactly the right takeaway. RSA is built on centuries-old number theory — modular arithmetic, Euler's theorem, and the Euclidean algorithm — combined into a system that secures much of the internet's encrypted communication today. Well done for working through every step!
+

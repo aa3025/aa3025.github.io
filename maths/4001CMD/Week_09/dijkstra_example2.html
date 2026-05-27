@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Updated title -->
+    <title>Dijkstra's Algorithm Visualization - Example 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none; /* Prevents "bounce" on mobile */
+        }
+        /* Style for the step text lists */
+        #descriptionPanel ul {
+            list-style-type: disc;
+            padding-left: 2rem;
+            margin-top: 0.5rem;
+        }
+        #descriptionPanel li {
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body class="flex justify-center p-4">
+
+    <!-- Container is narrower (max-w-2xl) to fit the canvas width -->
+    <!-- Changed max-w-2xl to a precise style to fit 680px canvas + padding -->
+    <!-- Removed bg-white, p-6, rounded-lg, shadow-lg -->
+    <div class="w-full" style="max-width: 728px; margin: 0 auto;">
+        
+        <!-- Layout is now a single vertical column -->
+        <div class="flex flex-col items-center">
+            <!-- Updated h1 -->
+            <h1 class="text-2xl font-bold mb-0 text-center">Dijkstra's Algorithm: Example 2</h1>
+
+            <!-- Left Panel: Text Content (ID added) -->
+            <!-- min-h-[15rem] is kept to prevent layout jumping -->
+            <div id="descriptionPanel" class="w-full text-gray-700 space-y-4 min-h-[15rem] p-4">
+                <!-- Content will be injected by JavaScript -->
+            </div>
+
+            <!-- Right Panel: Graph -->
+            <div class="w-full flex flex-col items-center">
+                <!-- Canvas width 680, height 450 -->
+                <canvas id="graphCanvas" width="680" height="450" class="border border-gray-300 rounded-md"></canvas>
+                
+                <!-- Step Info (IDs added) -->
+                <div class="w-full mt-4 text-center">
+                    <p class="text-lg font-medium text-gray-800">Unvisited Set (T): <span id="tSet" class="font-normal text-gray-600"></span></p>
+                    <p class="text-lg font-medium text-gray-800">Visited Set: <span id="visitedSet" class="font-normal text-gray-600"></span></p>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-center w-full space-x-4 mt-6">
+                    <button id="prevButton" class="px-6 py-2 bg-gray-600 text-white rounded-md font-semibold shadow-md hover:bg-gray-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                        &larr; Backward
+                    </button>
+                    <button id="nextButton" class="px-6 py-2 bg-blue-600 text-white rounded-md font-semibold shadow-md hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed">
+                        Forward &rarr;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NEW BASE GRAPH STRUCTURE (EXAMPLE 2) ---
+        const nodeRadius = 20;
+        // New node positions for the hexagon layout
+        const baseNodes = {
+            'A': { x: 200, y: 225, labelPos: 'left' },
+            'B': { x: 300, y: 125, labelPos: 'above' },
+            'D': { x: 300, y: 325, labelPos: 'below' },
+            'C': { x: 440, y: 125, labelPos: 'above' },
+            'E': { x: 440, y: 325, labelPos: 'below' },
+            'Z': { x: 540, y: 225, labelPos: 'right' }
+        };
+
+        // New edge definitions (Example 2)
+        const baseEdges = [
+            { from: 'A', to: 'B', weight: '2', pos: { x: 250, y: 175 } },
+            { from: 'B', to: 'C', weight: '3', pos: { x: 370, y: 125 } },
+            { from: 'C', to: 'Z', weight: '2', pos: { x: 490, y: 175 } },
+            { from: 'E', to: 'Z', weight: '2', pos: { x: 490, y: 275 } },
+            { from: 'D', to: 'E', weight: '1', pos: { x: 370, y: 325 } },
+            { from: 'A', to: 'D', weight: '1', pos: { x: 250, y: 275 } },
+            { from: 'B', to: 'E', weight: '1', pos: { x: 370, y: 225 } }
+        ];
+
+        // --- NEW ALGORITHM STEPS DATA (EXAMPLE 2) ---
+        const algorithmSteps = [
+            {
+                // STEP 0: Initialization
+                description: `
+                    <p class="font-semibold text-lg">Find the minimum distance from A to Z.</p>
+                    <ul>
+                        <li><strong>Initialization:</strong> Set L(A) = 0, L(v) = ∞ for all other vertices.</li>
+                    </ul>
+                `,
+                nodes: {
+                    'A': { label: '0', visited: false },
+                    'B': { label: '∞', visited: false },
+                    'C': { label: '∞', visited: false },
+                    'D': { label: '∞', visited: false },
+                    'E': { label: '∞', visited: false },
+                    'Z': { label: '∞', visited: false }
+                },
+                tSet: '{A, B, C, D, E, Z}',
+                visitedSet: '{ }',
+                highlightEdges: []
+            },
+            {
+                // STEP 1: Visit A
+                description: `
+                    <p class="font-semibold text-lg">Iteration:</p>
+                    <ul>
+                        <li>Minimal vertex in T is A (0). Visit A, update B and D:</li>
+                        <li>L(B) = ∞, L(A) + d(A,B) = 2 &rarr; L(B) = 2<sub>A</sub></li>
+                        <li>L(D) = ∞, L(A) + d(A,D) = 1 &rarr; L(D) = 1<sub>A</sub></li>
+                    </ul>
+                    <p class="text-sm text-gray-600 mt-2">The subscript (e.g., the 'A' in 2<sub>A</sub>) is the <strong>predecessor node</strong>, showing which node found this path.</p>
+                `,
+                nodes: {
+                    'A': { label: '0', visited: true },
+                    'B': { label: '2_A', visited: false },
+                    'C': { label: '∞', visited: false },
+                    'D': { label: '1_A', visited: false },
+                    'E': { label: '∞', visited: false },
+                    'Z': { label: '∞', visited: false }
+                },
+                tSet: '{B, C, D, E, Z}',
+                visitedSet: '{A}',
+                highlightEdges: []
+            },
+            {
+                // STEP 2: Visit D
+                description: `
+                    <p class="font-semibold text-lg">Iteration:</p>
+                    <ul>
+                        <li>Minimal vertex in T is D (1). Visit D, update E:</li>
+                        <li>L(E) = ∞, L(D) + d(D,E) = 2 &rarr; L(E) = 2<sub>D</sub></li>
+                    </ul>
+                `,
+                nodes: {
+                    'A': { label: '0', visited: true },
+                    'B': { label: '2_A', visited: false },
+                    'C': { label: '∞', visited: false },
+                    'D': { label: '1_A', visited: true },
+                    'E': { label: '2_D', visited: false },
+                    'Z': { label: '∞', visited: false }
+                },
+                tSet: '{B, C, E, Z}',
+                visitedSet: '{A, D}',
+                highlightEdges: []
+            },
+            {
+                // STEP 3: Visit B
+                description: `
+                    <p class="font-semibold text-lg">Iteration:</p>
+                    <ul>
+                        <li>Minimal vertex in T is B (2) (also E). Visit B, update C, E:</li>
+                        <li>L(E) = 2<sub>D</sub>, L(B) + d(B,E) = 3 &rarr; Do not update.</li>
+                        <li>L(C) = ∞, L(B) + d(B,C) = 5 &rarr; L(C) = 5<sub>B</sub></li>
+                    </ul>
+                `,
+                nodes: {
+                    'A': { label: '0', visited: true },
+                    'B': { label: '2_A', visited: true },
+                    'C': { label: '5_B', visited: false },
+                    'D': { label: '1_A', visited: true },
+                    'E': { label: '2_D', visited: false },
+                    'Z': { label: '∞', visited: false }
+                },
+                tSet: '{C, E, Z}',
+                visitedSet: '{A, D, B}',
+                highlightEdges: []
+            },
+            {
+                // STEP 4: Visit E
+                description: `
+                    <p class="font-semibold text-lg">Iteration:</p>
+                    <ul>
+                        <li>Minimal vertex in T is E (2). Visit E, update Z:</li>
+                        <li>L(Z) = ∞, L(E) + d(E,Z) = 4 &rarr; L(Z) = 4<sub>E</sub></li>
+                    </ul>
+                `,
+                nodes: {
+                    'A': { label: '0', visited: true },
+                    'B': { label: '2_A', visited: true },
+                    'C': { label: '5_B', visited: false },
+                    'D': { label: '1_A', visited: true },
+                    'E': { label: '2_D', visited: true },
+                    'Z': { label: '4_E', visited: false }
+                },
+                tSet: '{C, Z}',
+                visitedSet: '{A, D, B, E}',
+                highlightEdges: []
+            },
+            {
+                // STEP 5: Visit Z (Final)
+                description: `
+                    <p class="font-semibold text-lg">Iteration:</p>
+                    <ul>
+                        <li>Minimal vertex in T is Z (4). Visit Z.</li>
+                        <li>We find the path by following the predecessor subscripts backward from Z:</li>
+                        <li style="list-style-type: none; margin-left: 1rem;">
+                            &bull; Z's label is 4<sub>E</sub> &rarr; came from <strong>E</strong>.<br>
+                            &bull; E's label is 2<sub>D</sub> &rarr; came from <strong>D</strong>.<br>
+                            &bull; D's label is 1<sub>A</sub> &rarr; came from <strong>A</strong>.
+                        </li>
+                    </ul>
+                    <p class="text-center font-bold text-lg text-blue-700 mt-2">Final Path: A &rarr; D &rarr; E &rarr; Z, length 4.</p>
+                `,
+                nodes: {
+                    'A': { label: '0', visited: true },
+                    'B': { label: '2_A', visited: true },
+                    'C': { label: '5_B', visited: false },
+                    'D': { label: '1_A', visited: true },
+                    'E': { label: '2_D', visited: true },
+                    'Z': { label: '4_E', visited: true }
+                },
+                tSet: '{C}',
+                visitedSet: '{A, D, B, E, Z}',
+                highlightEdges: ['A-D', 'D-E', 'E-Z'] // Edges to highlight in the final step
+            }
+            // Note: We don't need a step for visiting C, as the path to Z has been found.
+        ];
+
+        // --- STATE & UI ELEMENTS (Identical to Example 1) ---
+        let currentStep = 0;
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // UI Element References
+        const descriptionPanel = document.getElementById('descriptionPanel');
+        const tSetElement = document.getElementById('tSet');
+        const visitedSetElement = document.getElementById('visitedSet');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+
+        // --- DRAWING FUNCTIONS (Identical to Example 1) ---
+
+        /**
+         * Draws a single node on the canvas.
+         * @param {object} node - The base node object (x, y, labelPos).
+         * @param {object} state - The current state for this node (label, visited).
+         */
+        function drawNode(node, state) {
+            // Set fill style based on visited state
+            ctx.fillStyle = state.visited ? '#BFDBFE' : '#FFFFFF'; // light-blue-200 or white
+            
+            // Draw circle
+            ctx.strokeStyle = '#374151'; // gray-700
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, nodeRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Draw node letter (A, B, C...)
+            ctx.fillStyle = '#111827'; // gray-900
+            ctx.font = 'bold 16px Inter';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(node.name, node.x, node.y);
+
+            // Draw distance label (0, ∞, 2_A, etc.)
+            ctx.font = '16px Inter'; // Increased font size
+            ctx.textBaseline = 'middle';
+            
+            let labelY;
+            if (node.labelPos === 'above') {
+                labelY = node.y - nodeRadius - 12;
+            } else if (node.labelPos === 'below') {
+                labelY = node.y + nodeRadius + 12;
+            } else if (node.labelPos === 'left') {
+                labelY = node.y;
+            } else { // 'right'
+                labelY = node.y;
+            }
+
+            let labelX = node.x;
+            if (node.labelPos === 'left') {
+                labelX = node.x - nodeRadius - 8;
+                ctx.textAlign = 'right';
+            } else if (node.labelPos === 'right') {
+                labelX = node.x + nodeRadius + 8;
+                ctx.textAlign = 'left';
+            } else { // 'above' or 'below'
+                ctx.textAlign = 'center';
+            }
+
+            // Handle subscript (e.g., "2_A")
+            if (state.label.includes('_')) {
+                const parts = state.label.split('_');
+                const mainText = parts[0];
+                const subText = parts[1];
+
+                // Measure text widths for centering
+                const mainWidth = ctx.measureText(mainText).width;
+                ctx.font = '12px Inter'; // Subscript font
+                const subWidth = ctx.measureText(subText).width;
+                const totalWidth = mainWidth + subWidth;
+
+                // Adjust starting X for 'above'/'below'
+                let startX = labelX;
+                if (node.labelPos === 'above' || node.labelPos === 'below') {
+                    startX = labelX - totalWidth / 2;
+                } else if (node.labelPos === 'left') {
+                    startX = labelX - subWidth; // Align right edge
+                }
+                
+                // Draw main text
+                ctx.font = '16px Inter';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(mainText, startX + (node.labelPos === 'left' ? 0 : mainWidth / 2), labelY);
+
+                // Draw subscript text
+                ctx.font = '12px Inter';
+                ctx.textBaseline = 'middle'; // Align middle
+                ctx.fillText(subText, startX + mainWidth + (node.labelPos === 'left' ? 0 : subWidth / 2), labelY + 4); // Slightly lower
+                
+            } else {
+                // No subscript
+                ctx.fillText(state.label, labelX, labelY);
+            }
+        }
+
+        /**
+         * Draws a single edge on the canvas.
+         * @param {object} edge - The edge object to draw.
+         * @param {boolean} isHighlighted - Whether to draw this edge as part of the final path.
+         */
+        function drawEdge(edge, isHighlighted) {
+            const fromNode = baseNodes[edge.from];
+            const toNode = baseNodes[edge.to];
+
+            // Set style
+            ctx.strokeStyle = isHighlighted ? '#2563EB' : '#9CA3AF'; // blue-600 or gray-400
+            ctx.lineWidth = isHighlighted ? 4 : 2;
+
+            // Draw line
+            ctx.beginPath();
+            ctx.moveTo(fromNode.x, fromNode.y);
+            ctx.lineTo(toNode.x, toNode.y);
+            ctx.stroke();
+
+            // Draw edge weight
+            ctx.fillStyle = '#374151'; // gray-700
+            ctx.font = '16px Inter'; // Increased font size
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            // Simple background "erase" for text clarity
+            ctx.clearRect(edge.pos.x - 8, edge.pos.y - 10, 16, 20);
+            ctx.fillText(edge.weight, edge.pos.x, edge.pos.y);
+        }
+
+        // --- MAIN RENDER FUNCTION (Identical to Example 1) ---
+
+        /**
+         * Renders the entire visualization for a given step.
+         * @param {number} stepIndex - The index of the step to render from algorithmSteps.
+         */
+        function renderStep(stepIndex) {
+            const step = algorithmSteps[stepIndex];
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+            // --- 1. Update Text Content ---
+            descriptionPanel.innerHTML = step.description;
+            tSetElement.textContent = step.tSet;
+            visitedSetElement.textContent = step.visitedSet;
+
+            // --- 2. Draw Edges ---
+            const highlightedSet = new Set(step.highlightEdges);
+            baseEdges.forEach(edge => {
+                const edgeId1 = `${edge.from}-${edge.to}`;
+                const edgeId2 = `${edge.to}-${edge.from}`;
+                const isHighlighted = highlightedSet.has(edgeId1) || highlightedSet.has(edgeId2);
+                drawEdge(edge, isHighlighted);
+            });
+
+            // --- 3. Draw Nodes ---
+            // We draw nodes *after* edges so they appear on top
+            Object.keys(baseNodes).forEach(nodeName => {
+                const nodeBase = { ...baseNodes[nodeName], name: nodeName };
+                const nodeState = step.nodes[nodeName];
+                drawNode(nodeBase, nodeState);
+            });
+
+            // --- 4. Update Button States ---
+            prevButton.disabled = (stepIndex === 0);
+            nextButton.disabled = (stepIndex === algorithmSteps.length - 1);
+        }
+
+        // --- EVENT LISTENERS (Identical to Example 1) ---
+        prevButton.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                renderStep(currentStep);
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentStep < algorithmSteps.length - 1) {
+                currentStep++;
+                renderStep(currentStep);
+            }
+        });
+
+        // --- INITIAL RENDER ---
+        window.onload = () => {
+            renderStep(0); // Render the initial state (Step 0)
+        };
+    </script>
+</body>
+</html>

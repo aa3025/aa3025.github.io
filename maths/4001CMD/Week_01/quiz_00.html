@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venn Diagram Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <style>
+        .quiz-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        svg {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #000;
+            margin-bottom: 1.5rem;
+        }
+        .shaded {
+            fill: url(#diagonalHatch);
+            stroke: none;
+        }
+        .circle-outline {
+            fill: none;
+            stroke: #000;
+            stroke-width: 1.5;
+        }
+        .text-label {
+            font-family: serif;
+            font-style: italic;
+            font-size: 16px;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .option-btn:hover:not(:disabled) {
+            border-color: #6366f1;
+            background-color: #f5f3ff;
+        }
+        .option-btn.correct {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+        }
+        .option-btn.wrong {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
+
+    <header class="bg-indigo-700 text-white py-6 px-4 shadow-lg mb-8">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold">Venn Diagram Mastery Quiz</h1>
+                <p class="text-indigo-100 text-sm">Select the correct set expression for the diagram.</p>
+            </div>
+            <div class="flex items-center gap-3 bg-indigo-800 p-2 rounded-lg">
+                <label for="questionCount" class="text-sm font-medium">Questions:</label>
+                <select id="questionCount" class="bg-white text-gray-900 rounded px-2 py-1 text-sm outline-none" onchange="resetQuiz()">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20" selected>20</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center px-4 mb-12">
+        <svg width="0" height="0" style="position:absolute;">
+            <defs>
+                <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="4" style="stroke:black; stroke-width:0.5" />
+                </pattern>
+                
+                <!-- Standard 2-set Coordinates: cy=80 -->
+                <clipPath id="circleA"> <circle cx="110" cy="80" r="45" /> </clipPath>
+                <clipPath id="circleB"> <circle cx="170" cy="80" r="45" /> </clipPath>
+                
+                <!-- Lifted 3-set Coordinates: A(110, 65), B(170, 65), C(140, 105) -->
+                <clipPath id="circleA3"> <circle cx="110" cy="65" r="45" /> </clipPath>
+                <clipPath id="circleB3"> <circle cx="170" cy="65" r="45" /> </clipPath>
+                <clipPath id="circleC3"> <circle cx="140" cy="105" r="45" /> </clipPath>
+            </defs>
+        </svg>
+
+        <div id="quiz-container" class="quiz-card">
+            <div id="intro-screen" class="text-center">
+                <h2 class="text-2xl font-bold mb-4">Are you ready?</h2>
+                <p class="text-gray-600 mb-6">Test your knowledge of set theory and Venn diagrams.</p>
+                <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition-colors">
+                    Start Quiz
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-400 py-4 text-center text-sm">
+        <p>Interactive Set Theory Quiz &bull; Powered by SVG & MathJax</p>
+    </footer>
+
+    <script>
+        const DIAGRAMS = [
+            { id: 1, label: "\\( A \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="140" cy="80" r="45" class="shaded" />
+                <circle cx="140" cy="80" r="45" class="circle-outline" />
+                <text x="135" y="85" class="text-label">A</text>`
+            },
+            { id: 2, label: "\\( U \\)", template: `
+                <rect width="280" height="160" class="shaded" />
+                <rect width="280" height="160" fill="none" stroke="black" stroke-width="1" />
+                <text x="135" y="85" class="text-label">U</text>`
+            },
+            { id: 3, label: "\\( A \\cup B \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="110" cy="80" r="45" class="shaded" />
+                <circle cx="170" cy="80" r="45" class="shaded" />
+                <circle cx="110" cy="80" r="45" class="circle-outline" />
+                <circle cx="170" cy="80" r="45" class="circle-outline" />
+                <text x="100" y="85" class="text-label">A</text>
+                <text x="175" y="85" class="text-label">B</text>`
+            },
+            { id: 4, label: "\\( A \\cap B \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="110" cy="80" r="45" class="circle-outline" />
+                <circle cx="170" cy="80" r="45" class="circle-outline" />
+                <circle cx="170" cy="80" r="45" class="shaded" clip-path="url(#circleA)" />
+                <text x="100" y="85" class="text-label">A</text>
+                <text x="175" y="85" class="text-label">B</text>`
+            },
+            { id: 5, label: "\\( A \\subseteq B \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="140" cy="80" r="55" class="circle-outline" />
+                <circle cx="130" cy="80" r="25" class="circle-outline" />
+                <text x="125" y="85" class="text-label">A</text>
+                <text x="175" y="85" class="text-label">B</text>`
+            },
+            { id: 6, label: "\\( A - B \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <mask id="m6"><circle cx="110" cy="80" r="45" fill="white" /><circle cx="170" cy="80" r="45" fill="black" /></mask>
+                <circle cx="110" cy="80" r="45" class="shaded" mask="url(#m6)" />
+                <circle cx="110" cy="80" r="45" class="circle-outline" />
+                <circle cx="170" cy="80" r="45" class="circle-outline" />
+                <text x="100" y="85" class="text-label">A</text>
+                <text x="175" y="85" class="text-label">B</text>`
+            },
+            { id: 7, label: "\\( \\sim A \\)", template: `
+                <rect width="280" height="160" class="shaded" />
+                <circle cx="140" cy="80" r="45" fill="white" stroke="black" stroke-width="1.5" />
+                <text x="260" y="25" class="text-label">U</text>
+                <text x="135" y="85" class="text-label">A</text>`
+            },
+            { id: 8, label: "\\( A \\cap B = \\phi \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="85" cy="80" r="45" class="circle-outline" />
+                <circle cx="195" cy="80" r="45" class="circle-outline" />
+                <text x="80" y="85" class="text-label">A</text>
+                <text x="190" y="85" class="text-label">B</text>`
+            },
+            { id: 9, label: "\\( A \\cap \\sim B \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <mask id="m9"><circle cx="110" cy="80" r="45" fill="white" /><circle cx="170" cy="80" r="45" fill="black" /></mask>
+                <circle cx="110" cy="80" r="45" class="shaded" mask="url(#m9)" />
+                <circle cx="110" cy="80" r="45" class="circle-outline" />
+                <circle cx="170" cy="80" r="45" class="circle-outline" />
+                <text x="100" y="85" class="text-label">A</text>
+                <text x="175" y="85" class="text-label">B</text>`
+            },
+            { id: 10, label: "\\( B \\cap \\sim A \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <mask id="m10"><circle cx="170" cy="80" r="45" fill="white" /><circle cx="110" cy="80" r="45" fill="black" /></mask>
+                <circle cx="170" cy="80" r="45" class="shaded" mask="url(#m10)" />
+                <circle cx="110" cy="80" r="45" class="circle-outline" />
+                <circle cx="170" cy="80" r="45" class="circle-outline" />
+                <text x="100" y="85" class="text-label">A</text>
+                <text x="175" y="85" class="text-label">B</text>`
+            },
+            { id: 11, label: "\\( A \\cup B \\) (Disjoint)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="85" cy="80" r="45" class="shaded" />
+                <circle cx="195" cy="80" r="45" class="shaded" />
+                <circle cx="85" cy="80" r="45" class="circle-outline" />
+                <circle cx="195" cy="80" r="45" class="circle-outline" />
+                <text x="80" y="85" class="text-label">A</text>
+                <text x="190" y="85" class="text-label">B</text>`
+            },
+            { id: 12, label: "\\( A \\cap B \\cap C \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="110" cy="65" r="45" class="circle-outline" />
+                <circle cx="170" cy="65" r="45" class="circle-outline" />
+                <circle cx="140" cy="105" r="45" class="circle-outline" />
+                <g clip-path="url(#circleA3)"><g clip-path="url(#circleB3)"><circle cx="140" cy="105" r="45" class="shaded" /></g></g>
+                <text x="90" y="55" class="text-label">A</text><text x="180" y="55" class="text-label">B</text><text x="135" y="140" class="text-label">C</text>`
+            },
+            { id: 13, label: "\\( A \\cap C \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="110" cy="65" r="45" class="circle-outline" />
+                <circle cx="170" cy="65" r="45" class="circle-outline" />
+                <circle cx="140" cy="105" r="45" class="circle-outline" />
+                <circle cx="140" cy="105" r="45" class="shaded" clip-path="url(#circleA3)" />
+                <text x="90" y="55" class="text-label">A</text><text x="180" y="55" class="text-label">B</text><text x="135" y="140" class="text-label">C</text>`
+            },
+            { id: 14, label: "\\( (A \\cap B) \\cup (A \\cap C) \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="110" cy="65" r="45" class="circle-outline" /><circle cx="170" cy="65" r="45" class="circle-outline" /><circle cx="140" cy="105" r="45" class="circle-outline" />
+                <circle cx="170" cy="65" r="45" class="shaded" clip-path="url(#circleA3)" />
+                <circle cx="140" cy="105" r="45" class="shaded" clip-path="url(#circleA3)" />
+                <text x="90" y="55" class="text-label">A</text><text x="180" y="55" class="text-label">B</text><text x="135" y="140" class="text-label">C</text>`
+            },
+            { id: 15, label: "\\( B \\cup C \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="170" cy="65" r="45" class="shaded" /><circle cx="140" cy="105" r="45" class="shaded" />
+                <circle cx="110" cy="65" r="45" class="circle-outline" /><circle cx="170" cy="65" r="45" class="circle-outline" /><circle cx="140" cy="105" r="45" class="circle-outline" />
+                <text x="90" y="55" class="text-label">A</text><text x="180" y="55" class="text-label">B</text><text x="135" y="140" class="text-label">C</text>`
+            },
+            { id: 16, label: "\\( A \\cap (B \\cup C) \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="110" cy="65" r="45" class="circle-outline" /><circle cx="170" cy="65" r="45" class="circle-outline" /><circle cx="140" cy="105" r="45" class="circle-outline" />
+                <g clip-path="url(#circleA3)"><circle cx="170" cy="65" r="45" class="shaded" /><circle cx="140" cy="105" r="45" class="shaded" /></g>
+                <text x="90" y="55" class="text-label">A</text><text x="180" y="55" class="text-label">B</text><text x="135" y="140" class="text-label">C</text>`
+            },
+            { id: 17, label: "\\( A \\oplus B \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <mask id="m17a"><rect width="280" height="160" fill="white" /><circle cx="170" cy="80" r="45" fill="black" /></mask>
+                <mask id="m17b"><rect width="280" height="160" fill="white" /><circle cx="110" cy="80" r="45" fill="black" /></mask>
+                <circle cx="110" cy="80" r="45" class="shaded" mask="url(#m17a)" />
+                <circle cx="170" cy="80" r="45" class="shaded" mask="url(#m17b)" />
+                <circle cx="110" cy="80" r="45" class="circle-outline" /><circle cx="170" cy="80" r="45" class="circle-outline" />
+                <text x="100" y="85" class="text-label">A</text><text x="175" y="85" class="text-label">B</text>`
+            },
+            { id: 18, label: "\\( A \\oplus B \\) (Disjoint)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="85" cy="80" r="45" class="shaded" /><circle cx="195" cy="80" r="30" class="shaded" />
+                <circle cx="85" cy="80" r="45" class="circle-outline" /><circle cx="195" cy="80" r="30" class="circle-outline" />
+                <text x="80" y="85" class="text-label">A</text><text x="190" y="85" class="text-label">B</text>`
+            },
+            { id: 19, label: "\\( A \\oplus B = A - B \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <mask id="m19"><circle cx="140" cy="80" r="60" fill="white" /><circle cx="130" cy="80" r="30" fill="black" /></mask>
+                <circle cx="140" cy="80" r="60" class="shaded" mask="url(#m19)" />
+                <circle cx="140" cy="80" r="60" class="circle-outline" /><circle cx="130" cy="80" r="30" class="circle-outline" />
+                <text x="175" y="85" class="text-label">A</text><text x="125" y="85" class="text-label">B</text>`
+            },
+            { id: 20, label: "\\( (A \\cap B) \\cup (B \\cap C) \\cup (C \\cap A) \\)", template: `
+                <rect width="280" height="160" fill="white" />
+                <text x="260" y="25" class="text-label">U</text>
+                <circle cx="110" cy="65" r="45" class="circle-outline" /><circle cx="170" cy="65" r="45" class="circle-outline" /><circle cx="140" cy="105" r="45" class="circle-outline" />
+                <circle cx="170" cy="65" r="45" class="shaded" clip-path="url(#circleA3)" />
+                <circle cx="140" cy="105" r="45" class="shaded" clip-path="url(#circleA3)" />
+                <circle cx="140" cy="105" r="45" class="shaded" clip-path="url(#circleB3)" />
+                <text x="90" y="55" class="text-label">A</text><text x="180" y="55" class="text-label">B</text><text x="135" y="140" class="text-label">C</text>`
+            }
+        ];
+
+        let state = { questions: [], currentIndex: 0, score: 0, active: false };
+
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+
+        function resetQuiz() {
+            state.active = false;
+            document.getElementById('quiz-container').innerHTML = `
+                <div id="intro-screen" class="text-center">
+                    <h2 class="text-2xl font-bold mb-4">Quiz Reset</h2>
+                    <p class="text-gray-600 mb-6">Changing the number of questions restarts the session.</p>
+                    <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition-colors">Restart Quiz</button>
+                </div>`;
+        }
+
+        function startQuiz() {
+            const count = parseInt(document.getElementById('questionCount').value);
+            const shuffled = shuffle([...DIAGRAMS]);
+            state.questions = shuffled.slice(0, count);
+            state.currentIndex = 0; state.score = 0; state.active = true;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('quiz-container');
+            const q = state.questions[state.currentIndex];
+            const distractors = shuffle(DIAGRAMS.filter(d => d.id !== q.id)).slice(0, 3);
+            const options = shuffle([q, ...distractors]);
+            container.innerHTML = `
+                <div class="mb-4 flex justify-between items-center text-sm font-medium text-gray-400">
+                    <span>Question ${state.currentIndex + 1} of ${state.questions.length}</span>
+                    <span>Score: ${state.score}</span>
+                </div>
+                <h3 class="text-center text-gray-800 font-semibold mb-6 text-lg">Select the expression corresponding to the shaded area:</h3>
+                <div class="flex justify-center"><svg viewBox="0 0 280 160" width="300">${q.template}</svg></div>
+                <div id="options-grid" class="space-y-2">${options.map(opt => `<button class="option-btn" onclick="checkAnswer(${opt.id}, this)">${opt.label}</button>`).join('')}</div>
+                <div id="feedback" class="mt-4 h-6 font-bold text-center"></div>`;
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkAnswer(selectedId, btn) {
+            const q = state.questions[state.currentIndex];
+            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+            const feedback = document.getElementById('feedback');
+            if (selectedId === q.id) {
+                state.score++; btn.classList.add('correct', 'font-bold', 'text-green-700');
+                feedback.className = "mt-4 h-6 font-bold text-center text-green-600"; feedback.innerText = "Correct!";
+            } else {
+                btn.classList.add('wrong', 'text-red-700');
+                feedback.className = "mt-4 h-6 font-bold text-center text-red-600"; feedback.innerText = "Incorrect.";
+            }
+            setTimeout(() => {
+                state.currentIndex++;
+                if (state.currentIndex < state.questions.length) renderQuestion(); else showResults();
+            }, 1200);
+        }
+
+        function showResults() {
+            const container = document.getElementById('quiz-container');
+            const percentage = Math.round((state.score / state.questions.length) * 100);
+            container.innerHTML = `
+                <div class="text-center py-6">
+                    <h2 class="text-3xl font-bold mb-2">Quiz Complete</h2>
+                    <div class="text-6xl font-black text-indigo-600 my-6">${state.score} / ${state.questions.length}</div>
+                    <p class="text-xl font-medium text-gray-700 mb-2">${percentage === 100 ? 'Perfect!' : 'Good job!'}</p>
+                    <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition-colors">Play Again</button>
+                </div>`;
+        }
+    </script>
+</body>
+</html>

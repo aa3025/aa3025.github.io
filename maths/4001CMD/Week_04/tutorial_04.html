@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial 4 Exercises - 4001CMD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <style>
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        pre {
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: "Courier New", Courier, monospace;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 leading-relaxed">
+
+<div class="max-w-4xl mx-auto p-6 sm:p-8">
+    <header class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">Tutorial 4 Exercises</h1>
+        <p class="text-xl text-gray-600">4001CMD - Mathematical Skills for Computing Professionals</p>
+    </header>
+
+    <main>
+        <section class="mb-12">
+            <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Functions</h2>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1</h3><p class="mb-4 text-lg">For the recursive function $s(1)=1$, $s(2)=2$, and $s(n+1)=2s(n)-s(n-1)$, compute $s(1)$ through $s(6)$, conjecture a closed formula, and prove it by induction.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 2</h3><p class="mb-4 text-lg">Given $A=\{a,b,c,d\}$ and $B=\{1,2,3,4,5\}$ with functions $p:A\to B$, $q:B\to B$, $r:B\to A$ as in the worksheet table, determine which are injective, surjective, and bijective.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 3</h3><p class="mb-4 text-lg">Classify the functions $f(n)=n^3$, $g(n)=n+3$, and $h(n)=\begin{cases}n+1&n\text{ odd}\\n-1&n\text{ even}\end{cases}$ from $\mathbb N$ to $\mathbb N$ as injective/surjective/bijective.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 4</h3><p class="mb-4 text-lg">For the Collatz-type recursive function $u(1)=1$ and $u(n+1)=u(n)/2$ if even, otherwise $3u(n)+1$: (a) show not injective/surjective, (b) repeat with $u(1)=5$, (c) test another starting value.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 5</h3><p class="mb-4 text-lg">Let $s(x)=x+1$ and $t(x)=2x$. Show that $t\circ s$ and $s\circ t$ are different and give explicit formulas for each.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 6</h3><p class="mb-4 text-lg">Prove that if $f$ and $g$ are bijections and $g\circ f$ is defined, then $(g\circ f)^{-1}=f^{-1}\circ g^{-1}$.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 7</h3><p class="mb-4 text-lg">Show that $f:X\to Y$ has a left inverse iff $f$ is injective.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 8</h3><p class="mb-4 text-lg">For $X=\{1,2,3,4,5\}$ and $f(1)=2,f(2)=2,f(3)=4,f(4)=4,f(5)=4$: (a) show $f\circ f=f$, (b) find a different $g$ such that $f\circ g=f$ and $g\circ f=f$.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 9</h3><p class="mb-4 text-lg">Construct bijections $s,t:S\to S$ for $S=\{1,2,3\}$ with (a) $s\circ s=i$, $s\ne i$, and (b) $t\circ t\circ t=i$, $t\ne i$. Describe $s^{-1}$ and $t^{-1}$.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 10</h3><p class="mb-4 text-lg">For $S=\{1,2,3\}$, how many bijections $f:S\to S$ are there, and how many satisfy $f=f^{-1}$?</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Cardinality and Counting</h2>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 11</h3><p class="mb-4 text-lg">Prove uniqueness of finite cardinality: if $f:A\to\{1,\ldots,m\}$ and $g:A\to\{1,\ldots,n\}$ are bijections, then $m=n$.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 12</h3><p class="mb-4 text-lg">Let $X=\{1,2,3\}$ and $Y=\{0,1\}$. (a) Give one function $f:X\to Y$. (b) List all functions and show there are 8.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 13</h3><p class="mb-4 text-lg">If $|X|=m$ and $|Y|=2$, find the size of the set of functions $X\to Y$. Conjecture and prove by induction.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 14</h3><p class="mb-4 text-lg">Assign 4 students to 7 tutors, with no tutor taking more than one student. How many assignments are possible?</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 15</h3><p class="mb-4 text-lg">A drawer has 10 grey and 10 brown socks. What is the minimum number selected to guarantee a matching pair?</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 16</h3><p class="mb-4 text-lg">Show any set $S$ of 12 natural numbers contains two distinct $s_1,s_2$ such that $s_1-s_2$ is a multiple of 11.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 17</h3><p class="mb-4 text-lg">For $X\subseteq\{1,\ldots,2n\}$ and odd set $Y=\{1,3,\ldots,2n-1\}$, define $f(x)$ as the greatest odd divisor in $Y$. Show if $|X|\ge n+1$, then $f$ is not injective and deduce two distinct elements with one a multiple of the other.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 18</h3><p class="mb-4 text-lg">With notation from Problem 17, show there exists $X\subseteq\{1,\ldots,2n\}$ of size $n$ such that no member is a multiple of another.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 19</h3><p class="mb-4 text-lg">Construct bijections from $\mathbb N$ to each set: (a) $\{n\in\mathbb N:n\ge 10^6\}$ and (b) the set of multiples of 3.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 20</h3><p class="mb-4 text-lg">Prove: if $X\subseteq Y$ and $X$ is infinite, then $Y$ is infinite.</p></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+
+            <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden"><div class="p-6"><h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 21</h3><p class="mb-4 text-lg">Let $X$ be a non-empty subset of $\mathbb{N}$ which has no greatest member.</p><ol class="list-decimal list-inside ml-4 text-lg"><li class="mb-2">Using the Axioms of Algebra and the results of Week 2's lectures (such as the well-ordering principle), show that we can choose members $x_1, x_2, \ldots$ of $X$ such that $x_{n+1} > x_n$ for all $n \in \mathbb{N}$.</li><li class="mb-2">Use the preceding exercise to conclude that $X$ is infinite.</li><li class="mb-2">Prove the converse: that if $X$ is infinite, there is a sequence $x_1, x_2, \ldots$ with $x_{n+1} > x_n$ for all $n$.</li></ol></div><div class="bg-amber-50 border-t border-gray-200 p-4"><button class="hint-btn px-3 py-2 bg-amber-600 text-white rounded-md font-semibold hover:bg-amber-700">Show Hint</button><div class="hint-content hidden mt-3 p-3 bg-white border border-amber-200 rounded-md text-gray-800"></div></div></div>
+        </section>
+    </main>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "\\[", right: "\\]", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\\(", right: "\\)", display: false}
+        ]
+    });
+});
+</script>
+
+<script>
+const hints = {
+1: "Compute first few terms directly from recursion; pattern suggests a linear formula. For induction, check n=1,2 then use recurrence with k and k-1.",
+2: "Injection: look for repeated outputs. Surjection: check whether every codomain element appears at least once.",
+3: "For f and g, test injective by algebra and surjective by missing values. For h, split odd/even cases and construct preimages.",
+4: "Generate enough terms to detect a cycle; a cycle proves non-injectivity and usually shows many numbers are never hit.",
+5: "Compute both compositions symbolically: t(s(x)) and s(t(x)); one counterexample input also proves they differ.",
+6: "Show both compositions with f^-1 o g^-1 give identity in the right domains/codomains.",
+7: "For => apply left inverse to f(x1)=f(x2). For <= define inverse on image first, then extend to all Y.",
+8: "For (a), evaluate f(f(i)) for each i. For (b), enforce g(2)=2 and g(4)=4 so composition constraints hold.",
+9: "Use permutations: a transposition gives order 2; a 3-cycle gives order 3. Inverses are the reverse moves.",
+10: "Count permutations of 3 elements; then identify involutions (identity + transpositions).",
+11: "Compose one labeling inverse with the other labeling and use pigeonhole both directions to force m<=n and n<=m.",
+12: "Each x in X independently chooses 0 or 1. You can list by triples (f(1),f(2),f(3)).",
+13: "Conjecture 2^m by choice counting; induction step adds one new element with two output choices.",
+14: "Assign students one by one without replacement: 7 choices then 6 then 5 then 4.",
+15: "Pigeonhole with 2 colors: worst case first two are different; third guarantees a pair.",
+16: "Map each number to remainder modulo 11; 12 numbers into 11 remainder classes forces collision.",
+17: "Odd-part map lands in a set of size n; with n+1 inputs it must collide. Equal odd part implies one value is power-of-2 multiple of the other.",
+18: "Try the top half set {n+1,...,2n}; show a multiple relation would force contradiction in range bounds.",
+19: "Use explicit formulas n -> n+10^6-1 and n -> 3n; then verify injective and surjective.",
+20: "Use contrapositive: if Y finite then any subset X must be finite.",
+21: "Use well-ordering repeatedly to choose least remaining element; for converse, a finite subset of N has a maximum."
+};
+
+document.querySelectorAll(".hint-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const card = btn.closest(".bg-white");
+        const heading = card.querySelector("h3");
+        const match = heading && heading.innerText.match(/Problem\s+(\d+)/);
+        const probNum = match ? Number(match[1]) : null;
+        const content = btn.nextElementSibling;
+
+        if (!probNum) {
+            content.innerHTML = "No hint available.";
+            content.classList.remove("hidden");
+            return;
+        }
+
+        if (content.classList.contains("hidden")) {
+            content.innerHTML = hints[probNum] || "No hint available for this problem yet.";
+            content.classList.remove("hidden");
+            btn.innerText = "Hide Hint";
+        } else {
+            content.classList.add("hidden");
+            btn.innerText = "Show Hint";
+        }
+    });
+});
+</script>
+
+</body>
+</html>

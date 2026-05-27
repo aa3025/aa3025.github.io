@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSA Cryptography Solution (Full Steps)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load MathJax -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Custom styles for tables */
+        table {
+            width: 100%;
+            margin-top: 1rem;
+            border-collapse: collapse;
+            font-family: 'Inter', sans-serif;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style for math blocks */
+        .math-block {
+            display: block;
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: #f8faff;
+            border-radius: 0.5rem;
+            border: 1px solid #e0e7ff;
+            text-align: center;
+            overflow-x: auto;
+        }
+        /* Style for inline math */
+        .math-inline {
+            display: inline;
+        }
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+        }
+        /* ── Audio Player (lecture7_1 style) ── */
+        .section-heading-wrapper {
+            position: relative;
+            padding-bottom: 0.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .step-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+        .play-pause-btn {
+            flex-shrink: 0;
+            background-color: #a855f7;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.15s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+            margin-left: 1rem;
+        }
+        .play-pause-btn:hover { background-color: #9333ea; }
+        .play-pause-btn:disabled { background-color: #d8b4fe; cursor: not-allowed; }
+        .audio-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 0.3rem;
+            cursor: pointer;
+            transition: background 0.1s ease;
+            --slider-progress: 0%;
+            background: linear-gradient(to right,
+                #4f46e5 0%,
+                #4f46e5 var(--slider-progress),
+                #e0e7ff var(--slider-progress),
+                #e0e7ff 100%);
+        }
+        .audio-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 1px; width: 1px;
+            opacity: 0;
+            cursor: pointer;
+            background: transparent;
+        }
+        .audio-slider::-moz-range-thumb {
+            height: 1px; width: 1px;
+            opacity: 0;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+        }
+        .current-time {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        #status-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            padding: 0.6rem;
+            background-color: #4f46e5;
+            color: white;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transform: translateY(100%);
+            transition: transform 0.25s ease-out;
+            z-index: 1000;
+        }
+        .status-show { transform: translateY(0) !important; }
+    </style>
+</head>
+<body class="bg-gray-50 p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-6 md:p-10">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-700 mb-6 border-b pb-3">
+            RSA Cryptography Solution
+        </h1>
+
+        <!-- RSA Recap Section -->
+        <div class="section-heading-wrapper">
+            <audio class="section-audio hidden" preload="metadata">
+                <source src="audio/slide_00.wav" type="audio/wav">
+            </audio>
+            <div class="step-title-row">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    Recap: The Main Steps of RSA
+                </h2>
+                <button class="play-pause-btn" data-state="paused" title="Play/Pause Voiceover">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+            <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+        </div>
+        <ol class="list-decimal list-inside ml-4 space-y-2 text-gray-700 mb-8 p-3 bg-gray-100 rounded-lg border border-gray-200">
+            <li><span class="font-bold">Key Generation:</span> Choose two large prime numbers (<span class="math-inline">\(p\)</span> and <span class="math-inline">\(q\)</span>), compute the modulus <span class="math-inline">\(n = p \times q\)</span>, and the totient <span class="math-inline">\(z = (p-1)(q-1)\)</span>.</li>
+            <li><span class="font-bold">Public Key (<span class="math-inline">\(e\)</span>):</span> Select an encryption exponent <span class="math-inline">\(e\)</span> such that <span class="math-inline">\(1 < e < z\)</span> and <span class="math-inline">\(\gcd(e, z) = 1\)</span>. The Public Key is <span class="math-inline">\((n, e)\)</span>.</li>
+            <li><span class="font-bold">Private Key (<span class="math-inline">\(d\)</span>):</span> Calculate the decryption exponent <span class="math-inline">\(d\)</span> as the modular multiplicative inverse of <span class="math-inline">\(e\)</span> modulo <span class="math-inline">\(z\)</span>. This is found using the Extended Euclidean Algorithm (EEA): <span class="math-inline">\(d \cdot e \equiv 1 \pmod{z}\)</span>. The Private Key is <span class="math-inline">\((n, d)\)</span>.</li>
+            <li><span class="font-bold">Encryption:</span> To encrypt a message <span class="math-inline">\(m\)</span>, calculate the ciphertext <span class="math-inline">\(c\)</span> using the public key: <span class="math-inline">\(c = m^e \pmod{n}\)</span>.</li>
+            <li><span class="font-bold">Decryption:</span> To decrypt the ciphertext <span class="math-inline">\(c\)</span>, calculate the original message <span class="math-inline">\(m'\)</span> using the private key: <span class="math-inline">\(m' = c^d \pmod{n}\)</span>.</li>
+        </ol>
+
+        <div class="text-gray-700 space-y-4 mb-8">
+            <p>This detailed solution applies these steps using the following specific parameters:</p>
+            <ul class="list-disc list-inside ml-4 space-y-1">
+                <li><span class="font-bold">Primes:</span> <span class="math-inline">\( p = 53 \)</span>, <span class="math-inline">\( q = 17 \)</span></li>
+                <li><span class="font-bold">Message:</span> <span class="math-inline">\( m = 123 \)</span></li>
+            </ul>
+        </div>
+
+        <!-- STEP 1: Compute Modulus and Totient -->
+        <div class="section-heading-wrapper mt-8">
+            <audio class="section-audio hidden" preload="metadata">
+                <source src="audio/slide_01.wav" type="audio/wav">
+            </audio>
+            <div class="step-title-row">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    <span class="step-number">1</span> Step 1: Compute Modulus (<span class="math-inline">\( n \)</span>) and Totient (<span class="math-inline">\( z \)</span>)
+                </h2>
+                <button class="play-pause-btn" data-state="paused" title="Play/Pause Voiceover">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+            <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+        </div>
+
+        <h3 class="text-xl font-medium text-indigo-600 mt-4">A. Calculate Modulus (<span class="math-inline">\( n \)</span>)</h3>
+        <div class="math-block">
+            \[
+            n = p \times q
+            \]
+            \[
+            n = 53 \times 17 = 901
+            \]
+        </div>
+
+        <h3 class="text-xl font-medium text-indigo-600 mt-4">B. Calculate Totient (<span class="math-inline">\( z \)</span>)</h3>
+        <div class="math-block">
+            \[
+            z = (p-1)(q-1)
+            \]
+            \[
+            z = (53-1)(17-1) = 52 \times 16 = 832
+            \]
+        </div>
+
+        <!-- STEP 2: Select the Public Exponent e -->
+        <div class="section-heading-wrapper mt-8">
+            <audio class="section-audio hidden" preload="metadata">
+                <source src="audio/slide_02.wav" type="audio/wav">
+            </audio>
+            <div class="step-title-row">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    <span class="step-number">2</span> Step 2: Select the Public Exponent (<span class="math-inline">\( e \)</span>)
+                </h2>
+                <button class="play-pause-btn" data-state="paused" title="Play/Pause Voiceover">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+            <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+        </div>
+        
+        <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">Criteria for Choosing <span class="math-inline">\( e \)</span>:</h3>
+            <ul class="list-disc list-inside ml-4 space-y-1 text-blue-700">
+                <li><span class="math-inline">\( 1 < e < z \)</span> where <span class="math-inline">\( z = (p-1)(q-1) \)</span></li>
+                <li><span class="math-inline">\( \gcd(e, z) = 1 \)</span> (coprime to <span class="math-inline">\( z \)</span>)</li>
+                <li>Common choices: small primes like 3, 17, or 65537 for efficiency</li>
+            </ul>
+        </div>
+
+        <h3 class="text-xl font-medium text-indigo-600 mt-4">Test Candidate Values for <span class="math-inline">\( e \)</span></h3>
+        <p class="text-gray-700 mb-4">
+            We need to find an <span class="math-inline">\( e \)</span> such that <span class="math-inline">\( \gcd(e, 832) = 1 \)</span>. Let's test some candidates:
+        </p>
+
+        <div class="overflow-x-auto rounded-lg border mb-6">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate <span class="math-inline">\( e \)</span></th>
+                        <th>gcd(e, 832)</th>
+                        <th>Valid?</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2</td>
+                        <td>2</td>
+                        <td class="text-red-600 font-semibold">No</td>
+                        <td>832 is even → gcd(2,832) = 2</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>1</td>
+                        <td class="text-green-600 font-semibold">Yes</td>
+                        <td>3 is prime and doesn't divide 832</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>1</td>
+                        <td class="text-green-600 font-semibold">Yes</td>
+                        <td>5 is prime and doesn't divide 832</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>1</td>
+                        <td class="text-green-600 font-semibold">Yes</td>
+                        <td>7 is prime and doesn't divide 832</td>
+                    </tr>
+                    <tr class="bg-green-50">
+                        <td>15</td>
+                        <td>1</td>
+                        <td class="text-green-600 font-semibold">Yes</td>
+                        <td>gcd(15,832) = gcd(\(3×5, ~(2^6×13)\) = 1</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>1</td>
+                        <td class="text-green-600 font-semibold">Yes</td>
+                        <td>17 is prime and doesn't divide 832</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="text-xl font-medium text-indigo-600 mt-4">Select <span class="math-inline">\( e = 15 \)</span> and Verify</h3>
+        <div class="math-block">
+            \[
+            \text{Prime factorization: } 832 = 2^6 \times 13
+            \]
+            \[
+            \text{Prime factorization: } 15 = 3 \times 5
+            \]
+            \[
+            \gcd(15, 832) = \gcd(3 \times 5, 2^6 \times 13) = 1
+            \]
+        </div>
+
+        <p class="mt-4 text-lg font-semibold text-green-700">
+            The public exponent <span class="math-inline">\( e = 15 \)</span> is valid because <span class="math-inline">\( \gcd(15, 832) = 1 \)</span>.
+        </p>
+        <p class="mt-2 text-lg font-semibold text-green-700">
+            The <span class="font-bold">Public Key</span> is <span class="math-inline">\( (n, e) = (901, 15) \)</span>.
+        </p>
+
+        <!-- STEP 3: Find the Private Exponent (d) -->
+        <div class="section-heading-wrapper mt-8">
+            <audio class="section-audio hidden" preload="metadata">
+                <source src="audio/slide_03.wav" type="audio/wav">
+            </audio>
+            <div class="step-title-row">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    <span class="step-number">3</span> Step 3: Find the Private Exponent (<span class="math-inline">\( d \)</span>)
+                </h2>
+                <button class="play-pause-btn" data-state="paused" title="Play/Pause Voiceover">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+            <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+        </div>
+        <p class="text-gray-700">
+            We find <span class="font-bold"><span class="math-inline">\( d \)</span></span>, the modular multiplicative inverse of <span class="math-inline">\( e \)</span> modulo <span class="math-inline">\( z \)</span>, such that:
+        </p>
+        <div class="math-block">
+            \[
+            d \times 15 \equiv 1 \pmod{832}
+            \]
+        </div>
+
+        <h3 class="text-xl font-medium text-indigo-600 mt-4">Extended Euclidean Algorithm (EEA)</h3>
+        <p class="text-gray-700">
+            We find integers <span class="math-inline">\( d \)</span> and <span class="math-inline">\( k \)</span> such that <span class="math-inline">\( 15d + 832k = 1 \)</span>.
+        </p>
+        <div class="math-block">
+            \begin{align*}
+            1. &\quad \text{Divide 832 by 15:} & 832 &= 55 \times 15 + 7 \\
+            2. &\quad \text{Divide 15 by 7:} & 15 &= 2 \times 7 + 1 \\
+            3. &\quad \text{Isolate the GCD (1):} & 1 &= 15 - 2 \times 7 \\
+            4. &\quad \text{Substitute 7:} & 1 &= 15 - 2 \times (832 - 55 \times 15) \\
+            5. &\quad \text{Simplify and collect:} & 1 &= 15 - 2 \times 832 + 110 \times 15 \\
+               & & 1 &= 111 \times 15 - 2 \times 832
+            \end{align*}
+        </div>
+        <p class="mt-4 text-lg font-semibold text-green-700">
+            The private exponent is <span class="font-bold"><span class="math-inline">\( d = 111 \)</span></span>. <br>
+            The <span class="font-bold">Private Key</span> is <span class="math-inline">\( (n, d) = (901, 111) \)</span>.
+        </p>
+
+        <!-- STEP 4: Encrypt the Message -->
+        <div class="section-heading-wrapper mt-8">
+            <audio class="section-audio hidden" preload="metadata">
+                <source src="audio/slide_04.wav" type="audio/wav">
+            </audio>
+            <div class="step-title-row">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    <span class="step-number">4</span> Step 4: Encrypt the Message (<span class="math-inline">\( m = 123 \)</span>)
+                </h2>
+                <button class="play-pause-btn" data-state="paused" title="Play/Pause Voiceover">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+            <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+        </div>
+        <p class="text-gray-700">
+            We calculate the ciphertext <span class="font-bold"><span class="math-inline">\( c \)</span></span> using the public key: <span class="math-inline">\( c = m^{e} \pmod{n} \)</span>.
+        </p>
+        <div class="math-block">
+            \[
+            c = 123^{15} \pmod{901}
+            \]
+        </div>
+
+        <h3 class="text-xl font-medium text-indigo-600 mt-4">Exponentiation by Squaring (Doubling Method)</h3>
+        <p class="text-gray-700">
+            The exponent is <span class="math-inline">\( e = 15 \)</span>, which in binary is <span class="math-inline">\( 1111_{2} \)</span>. Thus, <span class="math-inline">\( 15 = 8 + 4 + 2 + 1 \)</span>.
+        </p>
+
+        <h4 class="text-lg font-semibold mt-4">A. Calculate Powers of 123 (mod 901)</h4>
+        <div class="overflow-x-auto rounded-lg border">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Power <span class="math-inline">\( 2^{i} \)</span></th>
+                        <th>Base (<span class="math-inline">\( B \)</span>)</th>
+                        <th>Calculation (mod 901)</th>
+                        <th>Result (<span class="math-inline">\( B^{2^{i}} \)</span>)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{0} \)</span></td>
+                        <td>123</td>
+                        <td>123</td>
+                        <td>123</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{1} \)</span></td>
+                        <td><span class="math-inline">\( 123^{2} \)</span></td>
+                        <td><span class="math-inline">\( 123^{2} = 15129 \equiv 713 \pmod{901} \)</span></td>
+                        <td>713</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{2} \)</span></td>
+                        <td><span class="math-inline">\( 713^{2} \)</span></td>
+                        <td><span class="math-inline">\( 713^{2} = 508369 \equiv 205 \pmod{901} \)</span></td>
+                        <td>205</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{3} \)</span></td>
+                        <td><span class="math-inline">\( 205^{2} \)</span></td>
+                        <td><span class="math-inline">\( 205^{2} = 42025 \equiv 579 \pmod{901} \)</span></td>
+                        <td>579</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 class="text-lg font-semibold mt-6">B. Multiply Components</h4>
+        <div class="math-block">
+            \begin{align*}
+            c &\equiv 579 \times 205 \times 713 \times 123 \pmod{901} \\
+            1. &\quad 579 \times 205 = 118695 \equiv 664 \pmod{901} \\
+            2. &\quad 713 \times 123 = 87699 \equiv 302 \pmod{901} \\
+            3. &\quad c \equiv 664 \times 302 \pmod{901} \\
+            4. &\quad c \equiv 200528 \pmod{901} \\
+            5. &\quad 200528 = 222 \times 901 + 506 \\
+               &\quad c = 506
+            \end{align*}
+        </div>
+        <p class="mt-4 text-lg font-semibold text-green-700">
+            The <span class="font-bold">Encrypted Ciphertext</span> is <span class="font-bold"><span class="math-inline">\( c = 506 \)</span></span>.
+        </p>
+
+        <!-- STEP 5: Decrypt the Ciphertext -->
+        <div class="section-heading-wrapper mt-8">
+            <audio class="section-audio hidden" preload="metadata">
+                <source src="audio/slide_05.wav" type="audio/wav">
+            </audio>
+            <div class="step-title-row">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    <span class="step-number">5</span> Step 5: Decrypt the Ciphertext (<span class="math-inline">\( c = 506 \)</span>)
+                </h2>
+                <button class="play-pause-btn" data-state="paused" title="Play/Pause Voiceover">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+            <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+        </div>
+        <p class="text-gray-700">
+            We use the private key <span class="math-inline">\( d \)</span> to recover the original message <span class="math-inline">\( m' \)</span>: <span class="math-inline">\( m' = c^{d} \pmod{n} \)</span>.
+        </p>
+        <div class="math-block">
+            \[
+            m' = 506^{111} \pmod{901}
+            \]
+        </div>
+
+        <h3 class="text-xl font-medium text-indigo-600 mt-4">Exponentiation by Squaring (Doubling Method)</h3>
+        <p class="text-gray-700">
+            The exponent is <span class="math-inline">\( d = 111 \)</span>, which in binary is <span class="math-inline">\( 1101111_{2} \)</span>. Thus, <span class="math-inline">\( 111 = 64 + 32 + 8 + 4 + 2 + 1 \)</span>.
+        </p>
+
+        <h4 class="text-lg font-semibold mt-4">A. Calculate Powers of 506 (mod 901)</h4>
+        <div class="overflow-x-auto rounded-lg border">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Power <span class="math-inline">\( 2^{i} \)</span></th>
+                        <th>Base (<span class="math-inline">\( B \)</span>)</th>
+                        <th>Calculation (mod 901)</th>
+                        <th>Result (<span class="math-inline">\( B^{2^{i}} \)</span>)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{0} \)</span></td>
+                        <td>506</td>
+                        <td>506</td>
+                        <td>506</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{1} \)</span></td>
+                        <td><span class="math-inline">\( 506^{2} \)</span></td>
+                        <td><span class="math-inline">\( 506^{2} = 256036 \equiv 152 \pmod{901} \)</span></td>
+                        <td>152</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{2} \)</span></td>
+                        <td><span class="math-inline">\( 152^{2} \)</span></td>
+                        <td><span class="math-inline">\( 152^{2} = 23104 \equiv 579 \pmod{901} \)</span></td>
+                        <td>579</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{3} \)</span></td>
+                        <td><span class="math-inline">\( 579^{2} \)</span></td>
+                        <td><span class="math-inline">\( 579^{2} = 335241 \equiv 69 \pmod{901} \)</span></td>
+                        <td>69</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{4} \)</span></td>
+                        <td><span class="math-inline">\( 69^{2} \)</span></td>
+                        <td><span class="math-inline">\( 69^{2} = 4761 \equiv 256 \pmod{901} \)</span></td>
+                        <td>256</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{5} \)</span></td>
+                        <td><span class="math-inline">\( 256^{2} \)</span></td>
+                        <td><span class="math-inline">\( 256^{2} = 65536 \equiv 664 \pmod{901} \)</span></td>
+                        <td>664</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-inline">\( 2^{6} \)</span></td>
+                        <td><span class="math-inline">\( 664^{2} \)</span></td>
+                        <td><span class="math-inline">\( 664^{2} = 440896 \equiv 307 \pmod{901} \)</span></td>
+                        <td>307</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 class="text-lg font-semibold mt-6">B. Multiply Components</h4>
+        <div class="math-block">
+            \begin{align*}
+            m' &\equiv 307 \times 664 \times 69 \times 579 \times 152 \times 506 \pmod{901} \\
+            1. &\quad R_1 = 307 \times 664 = 203848 \equiv 222 \pmod{901} \\
+            2. &\quad R_2 = 69 \times 579 = 39951 \equiv 307 \pmod{901} \\
+            3. &\quad R_3 = 152 \times 506 = 76912 \equiv 327 \pmod{901} \\
+            4. &\quad R_4 = 222 \times 307 = 68154 \equiv 579 \pmod{901} \\
+            5. &\quad R_5 = 579 \times 327 = 189333 \equiv 123 \pmod{901} \\
+            &\quad m' = 123
+            \end{align*}
+        </div>
+        
+        <p class="mt-6 text-2xl font-bold text-indigo-700 pt-4 border-t-2 border-indigo-200">
+            Decrypted Message: 123
+        </p>
+
+        <!-- Final Result Summary -->
+        <div class="section-heading-wrapper mt-8">
+            <audio class="section-audio hidden" preload="metadata">
+                <source src="audio/slide_06.wav" type="audio/wav">
+            </audio>
+            <div class="step-title-row">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    Final Result Summary
+                </h2>
+                <button class="play-pause-btn" data-state="paused" title="Play/Pause Voiceover">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>
+                </button>
+            </div>
+            <input type="range" min="0" max="100" value="0" step="0.01" class="audio-slider playback-slider">
+            <span class="current-time text-sm font-medium text-gray-500">0:00</span>
+        </div>
+        <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-lg space-y-2">
+            <p><span class="font-bold">Original Message (<span class="math-inline">\( m \)</span>):</span> 123</p>
+            <p><span class="font-bold">Public Key (<span class="math-inline">\( e, n \)</span>):</span> <span class="math-inline">\( (15, 901) \)</span></p>
+            <p><span class="font-bold">Private Key (<span class="math-inline">\( d, n \)</span>):</span> <span class="math-inline">\( (111, 901) \)</span></p>
+            <p><span class="font-bold">Ciphertext (<span class="math-inline">\( c \)</span>):</span> 506</p>
+            <p><span class="font-bold">Decrypted Message (<span class="math-inline">\( m' \)</span>):</span> 123</p>
+        </div>
+
+        <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h3 class="text-lg font-semibold text-yellow-800 mb-2">Note on Public Exponent \( e \) Selection</h3>
+            <p class="text-yellow-700">
+                In practice, RSA implementations often use fixed public exponents like 3, 17, or 65537 
+                because they have a small number of 1-bits in their binary representation, which makes 
+                modular exponentiation more efficient. The value 65537 (5<sup>th</sup> Fermat prime, \( F_n=2^{2n}+1, ~ n=0,1,2,3,4\) ) is particularly common in modern implementations as it provides a good balance between security and performance.
+            </p>
+        </div>
+    </div>
+
+    <!-- Status bar -->
+    <div id="status-bar"></div>
+
+    <script>
+        (function () {
+            const statusBar = document.getElementById('status-bar');
+            let statusTimer;
+
+            function showStatus(msg) {
+                statusBar.textContent = msg;
+                statusBar.classList.add('status-show');
+                clearTimeout(statusTimer);
+                statusTimer = setTimeout(() => statusBar.classList.remove('status-show'), 2800);
+            }
+
+            function formatTime(s) {
+                if (!isFinite(s)) return '0:00';
+                return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+            }
+
+            const PLAY_ICON  = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.34,228.66a16,16,0,0,1-16.2.33A15.93,15.93,0,0,1,64,215.15V40.85A15.93,15.93,0,0,1,72.14,27a16,16,0,0,1,16.2.33L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path></svg>';
+            const PAUSE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M160,216H96a16,16,0,0,1-16-16V56a16,16,0,0,1,16-16h64a16,16,0,0,1,16,16V200A16,16,0,0,1,160,216Z"></path></svg>';
+
+            document.querySelectorAll('.section-heading-wrapper').forEach(bar => {
+                const audio  = bar.querySelector('.section-audio');
+                const btn    = bar.querySelector('.play-pause-btn');
+                const slider = bar.querySelector('.audio-slider');
+                const timeEl = bar.querySelector('.current-time');
+                let raf;
+
+                function syncSlider() {
+                    if (!audio.duration) return;
+                    const pct = (audio.currentTime / audio.duration) * 100;
+                    slider.value = pct;
+                    slider.style.setProperty('--slider-progress', pct + '%');
+                    timeEl.textContent = formatTime(audio.currentTime);
+                }
+
+                function loop() { syncSlider(); if (!audio.paused) raf = requestAnimationFrame(loop); }
+
+                audio.addEventListener('loadedmetadata', () => {
+                    slider.max = 100;
+                    syncSlider();
+                });
+
+                audio.addEventListener('error', () => {
+                    showStatus('Audio not yet available — place the .wav file in audio/');
+                    btn.disabled = true;
+                });
+
+                btn.addEventListener('click', async () => {
+                    if (btn.disabled) return;
+                    // Pause all other players
+                    document.querySelectorAll('.section-audio').forEach(a => {
+                        if (a !== audio && !a.paused) {
+                            a.pause();
+                            const ob = a.closest('.section-heading-wrapper').querySelector('.play-pause-btn');
+                            if (ob) { ob.dataset.state = 'paused'; ob.innerHTML = PLAY_ICON; }
+                        }
+                    });
+                    if (!audio.paused) {
+                        audio.pause();
+                    } else {
+                        if (audio.currentTime >= audio.duration - 0.1) audio.currentTime = 0;
+                        try { await audio.play(); } catch (e) { showStatus('Playback failed: ' + e.message); }
+                    }
+                });
+
+                audio.addEventListener('play', () => {
+                    btn.dataset.state = 'playing'; btn.innerHTML = PAUSE_ICON;
+                    showStatus('Playing…');
+                    raf = requestAnimationFrame(loop);
+                });
+                audio.addEventListener('pause', () => {
+                    btn.dataset.state = 'paused'; btn.innerHTML = PLAY_ICON;
+                    cancelAnimationFrame(raf);
+                });
+                audio.addEventListener('ended', () => {
+                    btn.dataset.state = 'paused'; btn.innerHTML = PLAY_ICON;
+                    syncSlider(); showStatus('Finished');
+                });
+
+                // Scrubbing
+                let wasPLaying = false;
+                slider.addEventListener('mousedown', () => {
+                    wasPLaying = !audio.paused;
+                    if (!audio.paused) audio.pause();
+                });
+                slider.addEventListener('input', () => {
+                    if (!audio.duration) return;
+                    const t = (slider.value / 100) * audio.duration;
+                    slider.style.setProperty('--slider-progress', slider.value + '%');
+                    timeEl.textContent = formatTime(t);
+                });
+                slider.addEventListener('mouseup', async () => {
+                    if (!audio.duration) return;
+                    audio.currentTime = (slider.value / 100) * audio.duration;
+                    if (wasPLaying) try { await audio.play(); } catch (_) {}
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

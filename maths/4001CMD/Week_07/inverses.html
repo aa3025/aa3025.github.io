@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explanation of Modular Inverses</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load MathJax for LaTeX rendering -->
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <!-- Configure MathJax to use standard LaTeX delimiters -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <style>
+        .math-block {
+            background-color: #f7f7ff;
+            border-left: 4px solid #4f46e5;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            overflow-x: auto;
+        }
+        .key-concept {
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 sm:p-8 font-['Inter']">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 shadow-2xl rounded-xl">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-indigo-700 mb-2">
+            The Modular Inverse: The Key to Division
+        </h1>
+        <p class="text-gray-600 mb-6 border-b pb-4">
+            A modular inverse is the equivalent of division in modular arithmetic, essential for operations like RSA decryption.
+        </p>
+
+        <!-- Section 1: Definition -->
+        <h2 class="text-2xl font-semibold text-indigo-600 mt-6 mb-4">
+            1. Formal Definition
+        </h2>
+        <p class="text-gray-700 mb-4">
+            For an integer $a$ and a modulus $m$, the <b>modular inverse</b> of $a$ (denoted $a^{-1}$) is an integer $x$ such that when $a$ is multiplied by $x$, the result is congruent to $1$ modulo $m$.
+        </p>
+
+        <div class="math-block">
+            $$a \cdot x \equiv 1 \pmod{m}$$
+            $$\text{where } x = a^{-1}$$
+        </div>
+        <p class="text-gray-700 mt-4">
+            The inverse $x$ allows us to effectively "divide by $a$" in $\mathbb{Z}_m$. It is not a fraction; it is another integer in the set $\mathbb{Z}_m$.
+        </p>
+
+        <!-- Section 2: Existence of the Inverse (GCD Rule) -->
+        <h2 class="text-2xl font-semibold text-indigo-600 mt-8 mb-4">
+            2. When Does an Inverse Exist?
+        </h2>
+        <p class="text-gray-700 mb-4">
+            A modular inverse $a^{-1}$ modulo $m$ exists <b>if and only if</b> $a$ and $m$ are relatively prime.
+        </p>
+
+        <div class="key-concept">
+            The necessary and sufficient condition for $a^{-1}$ to exist modulo $m$ is:
+            $$\gcd(a, m) = 1$$
+            If $\gcd(a, m) > 1$, then $a$ is a <span class="text-red-600 font-bold">zero divisor</span> and has no inverse.
+        </div>
+        
+        <h3 class="text-lg font-bold text-gray-800 mt-6">Example in $\mathbb{Z}_7$:</h3>
+        <ul class="list-disc list-inside space-y-1 text-gray-700 ml-4">
+            <li>Find $3^{-1} \pmod{7}$: Since $\gcd(3, 7) = 1$, the inverse exists. We find $3 \times 5 = 15 \equiv 1 \pmod{7}$. Thus, $3^{-1} = 5$.</li>
+        </ul>
+        <h3 class="text-lg font-bold text-gray-800 mt-4">Example in $\mathbb{Z}_6$:</h3>
+        <ul class="list-disc list-inside space-y-1 text-gray-700 ml-4">
+            <li>Find $2^{-1} \pmod{6}$: Since $\gcd(2, 6) = 2 \neq 1$, the inverse does <b>not</b> exist. $2$ is a zero divisor ($2 \times 3 \equiv 0 \pmod{6}$).</li>
+        </ul>
+
+        <!-- Section 3: Finding the Inverse (EEA) -->
+        <h2 class="text-2xl font-semibold text-indigo-600 mt-8 mb-4">
+            3. Finding the Inverse using the Extended Euclidean Algorithm (EEA)
+        </h2>
+        <p class="text-gray-700 mb-4">
+            When $\gcd(a, m) = 1$, the EEA finds integers $x$ and $y$ such that:
+        </p>
+
+        <div class="math-block">
+            $$a \cdot x + m \cdot y = 1$$
+        </div>
+        <p class="text-gray-700 mt-4">
+            If we take this equation and reduce it modulo $m$, the $m \cdot y$ term drops out because $m \cdot y \equiv 0 \pmod{m}$:
+        </p>
+
+        <div class="math-block bg-green-50">
+            $$a \cdot x + m \cdot y \equiv 1 \pmod{m}$$
+            $$a \cdot x + 0 \equiv 1 \pmod{m}$$
+            $$\mathbf{a \cdot x \equiv 1 \pmod{m}}$$
+        </div>
+        <p class="text-gray-700 mt-4">
+            This means the integer $x$ found by the Extended Euclidean Algorithm is the modular inverse of $a$ (i.e., $x = a^{-1}$). This is the precise technique used to find the RSA private key $d$, which is the inverse of $e$ modulo $z = \phi(n)$.
+        </p>
+    </div>
+
+</body>
+</html>

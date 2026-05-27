@@ -1,0 +1,75 @@
+Slide 0: Introduction
+Amanda: Welcome to the first class of our course! In this session, we are going to lay the foundational groundwork for all of modern computing by exploring Set Theory. 
+Jack: I'm ready! What exactly are we going to cover? It sounds like we have a lot of ground to get through.
+Amanda: We'll start with the hardcore basics: what sets actually are, the notation used to write them, and how to define the elements inside them. From there, we'll look at the universal sets of numbers, how to create subsets, and the concept of equal and empty sets.
+Jack: So we learn how to define and categorize them first. Will we look at how to actually manipulate them?
+Amanda: Exactly! The second half of the session is all about Set Operations—how to combine them using unions, intersections, and differences. We'll visualize these relationships using Venn Diagrams and wrap up by establishing their core mathematical properties. By the end, you'll be fully prepared for symbolic logic, which we will start in the 2nd part of week 1!
+
+Slide 1: Introduction to Sets
+Amanda: Welcome to Week one of Mathematics for Computing Professionals! Today we're diving into the absolute foundation of modern computer science: Set Theory and Basic Logic. Let's start with the most fundamental concept of all: sets. A set is, simply put, a collection of distinct things. They could be numbers, words, symbols, poems, or absolutely anything else. 
+Jack: Okay, so if I'm thinking like a programmer, is a set kind of like an array or a list?
+Amanda: It's very similar! Just like we use data structures to organize data formally in memory, we use mathematical sets to organize concepts. And essentially, every database you'll ever query is built upon these principles. Sets can be finite, meaning they have a specific, countable number of items, or they can be entirely infinite. 
+Jack: I can picture a finite set easily. For example, a set of names like John, Paul, George, and Ringo. That's exactly four elements. But how does an infinite set work in practice?
+Amanda: Great question. An infinite set goes on forever. For instance, the set of all numbers that are multiples of eleven: eleven, twenty-two, thirty-three, into infinity. Because it never ends, we obviously can't just list all the elements out. We have to define it differently.
+
+Slide 2: Set Notation
+Amanda: Because we can't always list everything, mathematicians developed two primary ways to write sets down. The first is called Roster notation. This is where we simply list the exact elements inside curly braces, like the numbers one, two, and five. 
+Jack: So Roster notation is basically hardcoding the exact items into an array in your source code. You just declare them explicitly. But what about the infinite ones? We use the second way for those?
+Amanda: Exactly! We use what's called Set-Builder notation. Instead of listing items, we write a formal mathematical rule. We might use a variable, like 'n', followed by a straight vertical line or a colon. That line translates to the English phrase "such that". 
+Jack: Okay, let me try. So for the multiples of eleven, we'd write something like... open brace, "n such that n is a multiple of 11", close brace. 
+Amanda: Spot on. If Roster notation is a hardcoded list, Set-Builder notation is like writing a filter function. It defines the strict criteria an object must meet to mathematically "qualify" to be in the set.
+
+Slide 3: Elements of Sets
+Amanda: The objects residing inside a set are officially called 'elements' or 'members'. We denote this relationship using a special symbol that looks like a curved, lowercase 'e' or the Euro sign. It translates directly to "is an element of".
+Jack: So it's basically checking if an item exists inside a container. And if we draw a diagonal slash through that 'e' symbol, I'm guessing it means "is not an element of"?
+Amanda: You've got it. Let's look at our previous finite set A, containing one, two, and five. We can mathematically write "two is an element of A". But if we look at our infinite set of multiples of eleven, we'd write "twenty-three is NOT an element of that set", using the slashed symbol, because twenty-three doesn't mathematically satisfy the Set-Builder rule. 
+
+Slide 4: Sets of Numbers
+Amanda: In mathematics, we have a few special, foundational sets of numbers that we use so often they get their own fancy, double-struck blackboard letters. The first is 'N' for the Natural numbers. This represents all the positive counting numbers: one, two, three, four, and so on.
+Jack: Okay, that sounds like standard unsigned integers in programming. What about negative numbers or zero? 
+Amanda: For those, we step up to a larger set called the Integers, denoted by the letter 'Z'. The Integers include all the natural numbers, plus zero, and all the negative counting numbers representing things like financial debt or freezing temperatures. 
+Jack: And what if I need fractions? Like writing half a mile?
+Amanda: Then you need the Rational numbers, denoted by 'Q'. A rational number is absolutely any fraction created by dividing one integer by another. Finally, we have 'R', the Real numbers. This massive set includes everything on the continuous number line, including irrational numbers that go on forever without repeating, like Pi or the square root of two. 
+
+Slide 5: Subsets
+Amanda: Now let's talk about relationships between sets, starting with Subsets. If every single element of set A is also guaranteed to be found within set B, we officially declare that A is a subset of B. The symbol looks like an elongated 'U' pushed onto its side, with a little horizontal line beneath it.
+Jack: So wait, stepping back to our number sets... the set of all Natural numbers has to be a subset of the Integers? Because every positive counting number already exists inside the integer set!
+Amanda: What a perfect example! Yes, N is absolutely a subset of Z. Now, I have a tricky conceptual question for you. Is a set containing the number two, an element of the Natural numbers?
+Jack: Let me think... no! Because the number two itself is an element. But a *set* containing the number two is a mathematical container. A container isn't a number! So it's a subset of the natural numbers, but definitely not an element of it!
+Amanda: Brilliant distinction! You can think of it like an integer vs an array containing one integer. They aren't the same data type.
+
+Slide 6: Equal Sets
+Amanda: So when are two sets actually equal? Mathematically, we define equality quite rigorously. Set A and set B are equal if and only if A is a subset of B, AND simultaneously B is a subset of A.
+Jack: That makes logical sense. If A has nothing B is missing, and B has nothing A is missing... they have to be absolutely identical collections. 
+Amanda: Precisely. Let's look at a proof example. Let's say Set C is the multiples of six. And Set D is the defined as numbers that are multiples of both three AND two. If you pick any number in C, say it's six times 'k', you can factor it mathematically into three times two 'k', so it must be in D! And conversely, if a number is a multiple of two and three, the algebra forces it to be a multiple of six, so it must be in C!
+Jack: Wow, so by proving the logic flows perfectly in both directions, we proven that Set C and Set D are exactly the same equal set!
+
+Slide 7: The Empty Set
+Amanda: Now for a concept that sometimes breaks people's intuition at first: The Empty Set. It's exactly what it sounds like—a set that contains absolutely nothing, zero elements. We denote it visually with a circle with a diagonal slash right through it.
+Jack: A set with nothing in it? Why on earth do we need to talk about that? It sounds useless, like creating an empty array and never putting data into it.
+Amanda: Oh, it is deeply useful! Think of a set like a paper bag. You can absolutely hold a paper bag that has nothing inside it. The bag still physically exists even if the contents are completely empty. And formally speaking in set theory, this empty set is mathematically considered a universal subset of every single set in existence!
+
+Slide 8: Union, Intersection, Difference, Symmetric Difference
+Amanda: Time for Set Operations! These are the verbs of set theory; they let us actively combine and manipulate sets. Let's say we have two databases of users. The 'Union' of set A and set B—symbolized by a big 'U' shape—is basically merging them together. It includes any element that is in A, or in B, or in both. 
+Jack: And if I only want the users that appear in both databases simultaneously?
+Amanda: Then you want the 'Intersection', symbolized by an upside-down 'U'. It strictly returns elements that live in both A AND B. But what if you want users in database A who have not yet been added to database B? That's the 'Difference', subtracting B completely away from A.
+Jack: And the last one on the slide, the 'Symmetric Difference'?
+Amanda: The Symmetric Difference is like an exclusive-or. It includes elements that are in A, or in B, but strictly throws out anyone sitting in the overlap. It isolates the unique outliers!
+
+Slide 9: Venn Diagrams and Disjoint Sets
+Amanda: To visualize all this abstract algebra, we use Venn Diagrams. You've probably seen these classic overlapping circles before, popularized by the mathematician John Venn. 
+Jack: Oh yeah, they make seeing intersections and unions super easy visually. You just look at where the circles cross over each other. 
+Amanda: They really do. And what if two sets have completely zero overlap? For example, the set of all Apple devices and the set of all Android devices. They don't intersect.
+Jack: So the intersection of those two sets would just be the Empty Set we talked about earlier!
+Amanda: Correct! When the intersection is the Empty Set, we give it a special name: we call them 'disjoint' sets.
+
+Slide 10: Properties of Union and Intersection
+Amanda: Let's discuss some structural properties. Sets follow intuitive algebraic rules. First, they are 'Commutative'. This means A union B behaves exactly identically to B union A. The physical order you write them in doesn't change the final merged set.
+Jack: That's just like how three plus four is identical to four plus three in regular math. Are they also Associative?
+Amanda: Yes! You can shift the parentheses around for a string of unions, or a string of intersections, without changing the final outcome. But a critical warning! You cannot just mix unions and intersections recklessly and expect them to magically balance out. For instance, the statement "A union the group B intersection C" is absolutely not identical to "C union the group B intersection A". 
+Jack: I guess that's why we have to rely on formal proofs and Venn diagrams instead of just guessing the algebra. One wrong assumption completely breaks the logic. 
+
+Slide 11: Summary: Set Theory
+Amanda: Let's wrap up our foundation in Set Theory. Remember, sets are collections of distinct things. Elements are the items living inside them, and subsets are entirely self-contained collections nesting inside larger ones. 
+Jack: And we have our core operations: union for a total merge, intersection to find the exact overlap, difference to subtract, and disjoint sets when they have absolutely nothing in common!
+Amanda: Excellent summary, Jack! Mastering this core conceptual base is exactly what prepares us for diving headfirst into constructing more complex, rigorous Symbolic Logic in part two. I'll see you on the other side!

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof of RSA Decryption Correctness</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load MathJax for LaTeX rendering -->
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <!-- Configure MathJax to use standard LaTeX delimiters -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <style>
+        .math-block {
+            background-color: #f7f7ff;
+            border-left: 4px solid #4f46e5;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 sm:p-8 font-['Inter']">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 shadow-2xl rounded-xl">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-indigo-700 mb-2">
+            Mathematical Foundation: Why RSA Works
+        </h1>
+        <p class="text-gray-600 mb-6 border-b pb-4">
+            This proof demonstrates that applying the private key ($d$) to the ciphertext ($c$) recovers the original message ($m$).
+        </p>
+
+        <!-- Proof Goal -->
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-3">Goal: Prove Decryption Recovers Message</h2>
+            <p class="text-gray-700 mb-2">
+                We must show that the original message $m$ is congruent to the decrypted message $m'$ modulo $n$.
+            </p>
+            <div class="math-block">
+                $$m^{ed} \equiv m \pmod{n}$$
+            </div>
+        </div>
+
+        <!-- Section 1: Key Relationship Setup -->
+        <h2 class="text-2xl font-semibold text-indigo-600 mt-6 mb-4">
+            1. The Key Algebraic Relationship
+        </h2>
+        <p class="text-gray-700 mb-4">
+            The proof begins with the defining property of the keys, which we established using the Extended Euclidean Algorithm: $d$ is the inverse of $e$ modulo the totient $\phi(n)$.
+        </p>
+
+        <ul class="list-disc list-inside space-y-2 text-gray-700 mb-4 ml-4">
+            <li>$n = p \cdot q$ (modulus)</li>
+            <li>$\phi(n) = z = (p-1)(q-1)$ (totient)</li>
+            <li>$ed \equiv 1 \pmod{z}$</li>
+        </ul>
+        <p class="text-gray-700">
+            This congruence means that $ed$ must equal 1 plus some multiple of $z$:
+        </p>
+        <div class="math-block">
+            $$ed = 1 + k \cdot z \quad \text{for some integer } k \ge 1$$
+            $$ed = 1 + k(p-1)(q-1)$$
+        </div>
+
+        <!-- Section 2: Divide and Conquer -->
+        <h2 class="text-2xl font-semibold text-indigo-600 mt-8 mb-4">
+            2. Divide and Conquer Strategy
+        </h2>
+        <p class="text-gray-700">
+            Since $n = p \cdot q$, if we can prove the congruence holds for both $p$ and $q$ separately, it must hold for $n$:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-gray-700 mb-4 ml-4">
+            <li>If $m^{ed} \equiv m \pmod{p}$ <b>AND</b></li>
+            <li>If $m^{ed} \equiv m \pmod{q}$ <b>THEN</b></li>
+            <li>$m^{ed} \equiv m \pmod{n}$</li>
+        </ul>
+        <p class="text-gray-700">
+            We only need to prove the first congruence, as the second is identical.
+        </p>
+
+        <!-- Section 3: Proof Modulo p -->
+        <h2 class="text-2xl font-semibold text-indigo-600 mt-8 mb-4">
+            3. Proof Modulo $p$ (Using Fermat's Little Theorem)
+        </h2>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-4">Case A: $p$ divides $m$ (i.e., $m$ is a multiple of $p$)</h3>
+        <p class="text-gray-700">
+            If $p$ divides $m$, then $m \equiv 0 \pmod{p}$.
+        </p>
+        <div class="math-block">
+            $$m^{ed} \equiv 0^{ed} \equiv 0 \pmod{p}$$
+            $$\text{Since } m \equiv 0 \pmod{p}, \text{ the statement } m^{ed} \equiv m \pmod{p} \text{ holds.}$$
+        </div>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6">Case B: $p$ does NOT divide $m$</h3>
+        <p class="text-gray-700">
+            In this case, we rely on <b>Fermat's Little Theorem (FLT)</b>, which states: $m^{p-1} \equiv 1 \pmod{p}$.
+        </p>
+        <p class="text-gray-700 mb-4">
+            We rewrite the exponent $ed$ using the relationship from Section 1: $ed = 1 + k(p-1)(q-1)$.
+        </p>
+        <div class="math-block">
+            $$m^{ed} = m^{1 + k(p-1)(q-1)}$$
+            $$m^{ed} = m^1 \cdot m^{k(p-1)(q-1)}$$
+            $$m^{ed} = m \cdot (m^{p-1})^{k(q-1)}$$
+        </div>
+        <p class="text-gray-700">
+            Now, we reduce the expression modulo $p$. Applying FLT, we replace $(m^{p-1})$ with $1$:
+        </p>
+        <div class="math-block">
+            $$m^{ed} \equiv m \cdot (\mathbf{1})^{k(q-1)} \pmod{p}$$
+            $$m^{ed} \equiv m \cdot 1 \pmod{p}$$
+            $$m^{ed} \equiv m \pmod{p}$$
+        </div>
+
+        <!-- Section 4: Final Conclusion -->
+        <h2 class="text-2xl font-semibold text-indigo-600 mt-8 mb-4">
+            4. Final Conclusion
+        </h2>
+        <p class="text-gray-700">
+            Since the congruence $m^{ed} \equiv m$ holds in both Case A and Case B (i.e., $m^{ed} \equiv m \pmod{p}$), and by symmetry it must also hold modulo $q$, we conclude:
+        </p>
+        <div class="math-block bg-green-50">
+            $$\mathbf{m^{ed} \equiv m \pmod{n}}$$
+        </div>
+        <p class="text-gray-700 mt-4">
+            This proves that the plaintext $m$ is successfully recovered when the ciphertext $c=m^e$ is raised to the private exponent $d$ modulo $n$.
+        </p>
+    </div>
+
+</body>
+</html>

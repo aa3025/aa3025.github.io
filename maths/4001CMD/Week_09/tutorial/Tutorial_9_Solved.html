@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial 9 Solutions - 4001CMD</title>
+    
+    <!-- Tailwind CSS via CDN (production warning is expected but won't affect functionality) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- KaTeX CSS and JS without integrity checks to avoid blocking -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    
+    <style>
+        /* Custom styles for rendered KaTeX */
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        /* Custom styles for code blocks */
+        pre {
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .w-\[85\%\] {
+                width: 95% !important;
+                padding: 0.5rem !important;
+                margin: 0 auto !important;
+            }
+            
+            .text-4xl { font-size: 1.5rem !important; }
+            .text-3xl { font-size: 1.25rem !important; }
+            .text-xl { font-size: 0.875rem !important; }
+            .text-lg { font-size: 0.75rem !important; }
+            
+            .p-6, .p-8 { padding: 1rem !important; }
+            .p-4 { padding: 0.75rem !important; }
+            .mb-8, .mb-12, .mb-6, .mb-4, .mb-2 { margin-bottom: 0.5rem !important; }
+            
+            pre {
+                padding: 0.5rem !important;
+                font-size: 0.7rem !important;
+                margin: 0.25rem 0 !important;
+            }
+            
+            img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            details summary {
+                padding: 0.5rem !important;
+                font-size: 0.8rem !important;
+            }
+            
+            details div {
+                padding: 0.75rem !important;
+            }
+            
+            .list-inside { margin-left: 0.5rem !important; }
+            
+            .katex-display {
+                overflow-x: auto;
+                font-size: 0.9em !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .w-\[85\%\] {
+                width: 98% !important;
+                padding: 0.25rem !important;
+            }
+            
+            .text-4xl { font-size: 1.25rem !important; }
+            .text-3xl { font-size: 1.125rem !important; }
+            
+            pre {
+                font-size: 0.65rem !important;
+                padding: 0.375rem !important;
+            }
+        }
+
+        /* Math styling */
+        .math {
+            font-family: KaTeX_Math;
+            font-style: italic;
+        }
+        
+        /* Solution styling */
+        .solution-step {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+        
+        .algorithm-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .algorithm-table th, .algorithm-table td {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        
+        .algorithm-table th {
+            background-color: #e5e7eb;
+            font-weight: 600;
+        }
+        
+        .path-highlight {
+            background-color: #dbeafe;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        
+        .weight-highlight {
+            background-color: #fef3c7;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 leading-relaxed">
+
+    <div class="w-[85%] mx-auto p-6 sm:p-8">
+        
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Tutorial 9 Exercises & Solutions</h1>
+            <p class="text-xl text-gray-600">4001CMD - Mathematical Skills for Computing Professionals</p>
+        </header>
+
+        <!-- Toggle All Solutions -->
+        <div class="flex items-center justify-end mb-6 bg-white p-4 rounded-lg shadow-md">
+            <label for="toggle-all" class="mr-3 font-semibold text-gray-700 cursor-pointer">Show All Solutions</label>
+            <input type="checkbox" id="toggle-all" class="h-5 w-5 text-blue-600 rounded cursor-pointer focus:ring-blue-500 border-gray-300">
+        </div>
+
+        <main>
+            <!-- Section: Tutorial problems -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Tutorial problems</h2>
+                <p class="text-lg text-gray-700 mb-6">The following exercises should be attempted before or during your next tutorial session.</p>
+
+                <!-- Problem 1 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1</h3>
+                        <p class="mb-4 text-lg">For each of the following graphs, find a minimal spanning tree using (i) Kruskal's algorithm, and (ii) the Prim-Jarník algorithm. Draw the tree, and give its weight.</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) Graph 1</li>
+                            <li class="mb-2">(b) Graph 2</li>
+                            <li class="mb-2">(c) Graph 3</li>
+                        </ol>
+                        <div class="flex flex-col items-center my-4">
+<div class="flex justify-center gap-4 my-4">
+    <figure><img src="figures_tut/graph1a.png" alt="Graph 1a" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(a) Graph 1</figcaption></figure>    
+    <figure><img src="figures_tut/graph1b.png" alt="Graph 1b" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(b) Graph 2</figcaption></figure>
+    <figure><img src="figures_tut/graph1c.png" alt="Graph 1c" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(c) Graph 3</figcaption></figure>
+</div>
+                        </div>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(a)</strong></p>
+                            <p class="mb-2"><strong>Kruskal's Algorithm:</strong></p>
+                            <p class="mb-2">We sort the edges:</p>
+                            <table class="min-w-full border-collapse border border-gray-400 mb-4">
+                                <thead>
+                                    <tr>
+                                        <th class="border border-gray-300 px-4 py-2">Edge</th>
+                                        <th class="border border-gray-300 px-4 py-2">(E,D)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(E,C)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(B,C)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,E)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(D,C)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(D,F)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(B,F)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,B)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2">Weight</td>
+                                        <td class="border border-gray-300 px-4 py-2">2</td>
+                                        <td class="border border-gray-300 px-4 py-2">3</td>
+                                        <td class="border border-gray-300 px-4 py-2">3</td>
+                                        <td class="border border-gray-300 px-4 py-2">3</td>
+                                        <td class="border border-gray-300 px-4 py-2">4</td>
+                                        <td class="border border-gray-300 px-4 py-2">4</td>
+                                        <td class="border border-gray-300 px-4 py-2">5</td>
+                                        <td class="border border-gray-300 px-4 py-2">12</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="mb-2">We add the edges in this order, skipping edges that create a cycle:</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Add (E,D)</li>
+                                <li>Add (E,C)</li>
+                                <li>Add (B,C)</li>
+                                <li>Add (A,E)</li>
+                                <li>Skip (D,C) (creates cycle)</li>
+                                <li>Add (D,F)</li>
+                                <li>All vertices visited; stop</li>
+                            </ul>
+                            
+                            <p class="mb-2"><strong>Prim-Jarník Algorithm:</strong></p>
+                            <p class="mb-2">We start with vertex A:</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Visit A</li>
+                                <li>Min. edge is (A,E). Add (A,E), visit E</li>
+                                <li>Min. edge is (E,D). Add (E,D), visit D</li>
+                                <li>Min. edge is (E,C). Add (E,C), visit C</li>
+                                <li>Min. edge is (B,C). Add (B,C), visit B</li>
+                                <li>Min. edge is (D,F). Add (D,F), visit F</li>
+                                <li>All vertices visited; stop</li>
+                            </ul>
+                            <p class="mb-4">In both cases, the weight of the tree is <span class="math">2+3+3+3+4 = 15</span>.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(b)</strong></p>
+                            <p class="mb-2"><strong>Kruskal's Algorithm:</strong></p>
+                            <p class="mb-2">We sort the edges:</p>
+                            <table class="min-w-full border-collapse border border-gray-400 mb-4">
+                                <thead>
+                                    <tr>
+                                        <th class="border border-gray-300 px-4 py-2">Edge</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,B)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,C)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(C,F)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,G)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(B,E)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(C,G)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(D,E)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(C,D)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(D,F)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(F,G)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(B,D)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2">Weight</td>
+                                        <td class="border border-gray-300 px-4 py-2">1</td>
+                                        <td class="border border-gray-300 px-4 py-2">2</td>
+                                        <td class="border border-gray-300 px-4 py-2">2</td>
+                                        <td class="border border-gray-300 px-4 py-2">3</td>
+                                        <td class="border border-gray-300 px-4 py-2">4</td>
+                                        <td class="border border-gray-300 px-4 py-2">4</td>
+                                        <td class="border border-gray-300 px-4 py-2">5</td>
+                                        <td class="border border-gray-300 px-4 py-2">9</td>
+                                        <td class="border border-gray-300 px-4 py-2">10</td>
+                                        <td class="border border-gray-300 px-4 py-2">12</td>
+                                        <td class="border border-gray-300 px-4 py-2">13</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="mb-2">We add the edges in this order, skipping edges that create a cycle:</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Add (A,B)</li>
+                                <li>Add (A,C)</li>
+                                <li>Add (C,F)</li>
+                                <li>Add (A,G)</li>
+                                <li>Add (B,E)</li>
+                                <li>Skip (C,G) (creates cycle)</li>
+                                <li>Add (D,E)</li>
+                                <li>All vertices visited; stop</li>
+                            </ul>
+                            
+                            <p class="mb-2"><strong>Prim-Jarník Algorithm:</strong></p>
+                            <p class="mb-2">We start with vertex A:</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Visit A</li>
+                                <li>Min. edge is (A,B). Add (A,B), visit B</li>
+                                <li>Min. edge is (A,C). Add (A,C), visit C</li>
+                                <li>Min. edge is (C,F). Add (C,F), visit F</li>
+                                <li>Min. edge is (A,G). Add (A,G), visit G</li>
+                                <li>Min. edge is (B,E). Add (B,E), visit E</li>
+                                <li>Min. edge is (D,E). Add (D,E), visit D</li>
+                                <li>All vertices visited; stop</li>
+                            </ul>
+                            <p class="mb-4">In both cases, the tree weight is <span class="math">1+2+2+3+4+5 = 17</span>.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(c)</strong></p>
+                            <p class="mb-2"><strong>Kruskal's Algorithm:</strong></p>
+                            <p class="mb-2">We sort the edges:</p>
+                            <table class="min-w-full border-collapse border border-gray-400 mb-4">
+                                <thead>
+                                    <tr>
+                                        <th class="border border-gray-300 px-4 py-2">Edge</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,E)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(D,E)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,F)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,B)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,D)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(B,C)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(E,F)</th>
+                                        <th class="border border-gray-300 px-4 py-2">(A,C)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2">Weight</td>
+                                        <td class="border border-gray-300 px-4 py-2">2</td>
+                                        <td class="border border-gray-300 px-4 py-2">3</td>
+                                        <td class="border border-gray-300 px-4 py-2">3</td>
+                                        <td class="border border-gray-300 px-4 py-2">4</td>
+                                        <td class="border border-gray-300 px-4 py-2">8</td>
+                                        <td class="border border-gray-300 px-4 py-2">13</td>
+                                        <td class="border border-gray-300 px-4 py-2">17</td>
+                                        <td class="border border-gray-300 px-4 py-2">21</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="mb-2">We add the edges in this order, skipping edges that create a cycle:</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Add (A,E)</li>
+                                <li>Add (D,E)</li>
+                                <li>Add (A,F)</li>
+                                <li>Add (A,B)</li>
+                                <li>Skip (A,D) (creates cycle)</li>
+                                <li>Add (B,C)</li>
+                                <li>All vertices visited; stop</li>
+                            </ul>
+                            
+                            <p class="mb-2"><strong>Prim-Jarník Algorithm:</strong></p>
+                            <p class="mb-2">We start with vertex A:</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Visit A</li>
+                                <li>Min. edge is (A,E). Add (A,E), visit E</li>
+                                <li>Min. edge is (A,F). Add (A,F), visit F</li>
+                                <li>Min. edge is (D,E). Add (D,E), visit D</li>
+                                <li>Min. edge is (A,B). Add (A,B), visit B</li>
+                                <li>Min. edge is (B,C). Add (B,C), visit C</li>
+                            </ul>
+                            <p class="mb-4">In both cases, the tree weight is <span class="math">2 + 3 + 3 + 4 + 13 = 25</span>.</p>
+                        </div>
+<div class="flex justify-center gap-4 my-4">
+    <figure><img src="figures_tut/tree1a.png" alt="Tree 1a" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(a) Tree 1</figcaption></figure>    
+    <figure><img src="figures_tut/tree1b.png" alt="Tree 1b" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(b) Tree 2</figcaption></figure>
+    <figure><img src="figures_tut/tree1c.png" alt="Tree 1c" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(c) Tree 3</figcaption></figure>
+</div>
+                    </details>
+                </div>
+
+                <!-- Problem 2 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 2</h3>
+                        <p class="mb-4 text-lg">Use Dijkstra's algorithm to find the shortest paths from Node A to Node E in the following networks and give their length.</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) Network 1</li>
+                            <li class="mb-2">(b) Network 2</li>
+                            <li class="mb-2">(c) Network 3</li>
+                        </ol>
+                        <div class="flex flex-col items-center my-4">
+                            <div class="text-center text-gray-600 my-4">
+<div class="flex justify-center gap-4 my-4">
+    <figure><img src="figures_tut/graph2a.png" alt="Graph 2a" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(a) Network 1</figcaption></figure>    
+    <figure><img src="figures_tut/graph2b.png" alt="Graph 2b" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(b) Network 2</figcaption></figure>
+    <figure><img src="figures_tut/graph2c.png" alt="Graph 2c" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(c) Network 3</figcaption></figure>
+</div>
+                            </div>
+                        </div>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(a)</strong></p>
+                            <p class="mb-2">Label all vertices with <span class="math">L(u) = \infty</span> and <span class="math">L(A) = 0</span>. At each step, visit the unvisited node with the minimal <span class="math">L</span> value, and update <span class="math">L</span> values of the adjacent nodes.</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Visit <span class="math">A</span>, <span class="math">L(A) = 0</span>. Update <span class="math">B,D,E</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(A,B) = 4</span>, <span class="math">L(B) = \min\{\infty, 4\} =4</span></li>
+                                        <li><span class="math">d(A,D) = 3</span>, <span class="math">L(D) = \min\{\infty, 3\} = 3</span></li>
+                                        <li><span class="math">d(A,E) = 20</span>, <span class="math">L(E) = \min\{\infty, 20\} = 20</span></li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">D</span>, <span class="math">L(D) = 3</span>. Update <span class="math">B, E, C</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(B,D) = 16</span>, <span class="math">L(B) = \min\{4, 16 + 3\} = 4</span>. Do not update</li>
+                                        <li><span class="math">d(D,C) = 2</span>, <span class="math">L(C) = \min\{\infty, 2+3\} = 5</span></li>
+                                        <li><span class="math">d(D,E) = 5</span>, <span class="math">L(E) = \min\{20, 5+3\} = 8</span></li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">B</span>, <span class="math">L(B) = 4</span>. Update <span class="math">E, C</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(B,E) = 6</span>, <span class="math">L(E) = \min\{8, 6+4\} = 8</span>. Do not update</li>
+                                        <li><span class="math">d(B,C) = 6</span>, <span class="math">L(C) = \min\{5, 6+4\} = 5</span>. Do not update</li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">C</span>. No unvisited adjacent vertices</li>
+                                <li>Visit <span class="math">E</span>. Stop</li>
+                            </ul>
+                            <p class="mb-4">The minimum-distance path has length 8. The path is <span class="math">A \rightarrow D \rightarrow E</span>.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(b)</strong></p>
+                            <p class="mb-2">Label all vertices with <span class="math">L(u) = \infty</span> and <span class="math">L(A) = 0</span>. At each step, visit the unvisited node with the minimal <span class="math">L</span> value, and update <span class="math">L</span> values of the adjacent nodes.</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Visit <span class="math">A</span>, <span class="math">L(A) = 0</span>. Update <span class="math">B, E</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(A,B) = 2</span>, <span class="math">L(B) = \min\{\infty, 2\} = 2</span></li>
+                                        <li><span class="math">d(A,E) = 9</span>, <span class="math">L(E) = \min\{\infty, 9\} = 9</span></li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">B</span>, <span class="math">L(B) = 2</span>. Update <span class="math">C</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(B,C) = 4</span>, <span class="math">L(C) = \min\{\infty, 4+2\} = 6</span></li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">C</span>, <span class="math">L(C) = 6</span>. Update <span class="math">D</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(C,D) = 1</span>, <span class="math">L(D) = \min\{\infty, 1+6\} = 7</span></li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">D</span>, <span class="math">L(D) = 7</span>. Update <span class="math">E</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(D,E) = 3</span>, <span class="math">L(E) = \min\{9, 3+7\} = 9</span>. Do not update</li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">E</span>. Stop</li>
+                            </ul>
+                            <p class="mb-4">The minimum-distance path has length 9. The path is <span class="math">A \rightarrow E</span>.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(c)</strong></p>
+                            <p class="mb-2">Label all vertices with <span class="math">L(u) = \infty</span> and <span class="math">L(A) = 0</span>. At each step, visit the unvisited node with the minimal <span class="math">L</span> value, and update <span class="math">L</span> values of the adjacent nodes.</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Visit <span class="math">A</span>, <span class="math">L(A) = 0</span>. Update <span class="math">B, C, G</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(A,B) = 11</span>, <span class="math">L(B) = \min\{\infty, 11\} = 11</span></li>
+                                        <li><span class="math">d(A,C) = 19</span>, <span class="math">L(C) = \min\{\infty, 19\}=19</span></li>
+                                        <li><span class="math">d(A,G) = 3</span>, <span class="math">L(G) =\min\{\infty, 3\} = 3</span></li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">G</span>, <span class="math">L(G) = 3</span>. Update <span class="math">C, F</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(C,G) = 23</span>, <span class="math">L(C) = \min\{19, 23+3\} = 19</span>. Do not update</li>
+                                        <li><span class="math">d(F,G) = 29</span>, <span class="math">L(F) = \min\{\infty, 29\} = 29</span></li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">B</span>, <span class="math">L(B) = 11</span>. Update <span class="math">E, D</span>:
+                                    <ul class="list-circle list-inside ml-4">
+                                        <li><span class="math">d(B,E) = 2</span>, <span class="math">L(E) = \min\{\infty, 2+11\} = 13</span></li>
+                                        <li><span class="math">d(B,D) = 17</span>, <span class="math">L(D) = \min\{\infty, 17+11\} = 28</span></li>
+                                    </ul>
+                                </li>
+                                <li>Visit <span class="math">E</span>. Stop</li>
+                            </ul>
+                            <p class="mb-4">The minimum-distance path has length 13. The path is <span class="math">A \rightarrow B \rightarrow E</span>.</p>
+                        </div>
+
+<div class="flex justify-center gap-4 my-4 bg-white">
+    <figure><img src="figures_tut/path2a.png" alt="Path 2a" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(a) Path 1</figcaption></figure>    
+    <figure><img src="figures_tut/path2b.png" alt="Path 2b" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(b) Path 2</figcaption></figure>
+    <figure><img src="figures_tut/path2c.png" alt="Path 2c" class="max-w-[100%] h-auto rounded-lg shadow-inner">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">(c) Path 3</figcaption></figure>
+</div>
+                    </details>
+                </div>
+
+                <!-- Problem 3 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 3</h3>
+                        <p class="mb-4 text-lg">List the order in which the vertices in the trees below are processed using preorder, inorder, and postorder traversal.</p>
+                        <div class="flex flex-col items-center my-4">
+                            <div class="text-center text-gray-600 my-4">
+<div class="flex justify-center my-4">
+    <figure class="text-center">
+        <img src="figures_tut/problem3.png" alt="Problem 3 Trees" class="max-w-[60%] h-auto rounded-lg shadow-inner mx-auto">
+        <figcaption class="text-sm text-gray-600 mt-2">Problem 3 Tree Diagrams</figcaption>
+    </figure>
+</div>
+                            </div>
+                        </div>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(a)</strong></p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Preorder: A, B, D, C, E</li>
+                                <li>Inorder: B, D, A, E, C</li>
+                                <li>Postorder: D, B, E, C, A</li>
+                            </ul>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(b)</strong></p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Preorder: A, B, H, I, K, L, M, J, C, D, E, F, G</li>
+                                <li>Inorder: I, L, K, M, H, J, B, A, D, F, E, G, C</li>
+                                <li>Postorder: L, M, K, I, J, H, B, F, G, E, D, C, A</li>
+                            </ul>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(c)</strong></p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Preorder: A, B, C, D, E, F</li>
+                                <li>Inorder: C, B, F, E, D, A</li>
+                                <li>Postorder: C, F, E, D, B, A</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+            </section>
+            
+            <!-- Section: Additional Problems -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Additional problems</h2>
+                
+                <p class="text-lg text-gray-700 mb-6">The following problems refer to the following graph.</p>
+                
+<div class="flex flex-col items-center my-4">
+    <figure class="text-center"><img src="figures_tut/problem2_123.png" alt="Additional Problems Graph" class="max-w-[60%] h-auto rounded-lg  mx-auto">
+    <figcaption class="text-sm text-gray-600 mt-2 text-center">Graph for Additional Problems</figcaption></figure>
+</div>
+                
+
+                <!-- Problem 4 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 4</h3>
+                        <p class="mb-4 text-lg">Use (a) the Prim-Jarník algorithm and (b) Kruskal's algorithm to construct minimum spanning trees for this graph. Compute the weights of each tree and verify that they are the same.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">Prim-Jarník Algorithm:</p>
+                                <ul class="list-disc list-inside ml-4 mb-4">
+                                    <li>Start with vertex A: L(A) = 0</li>
+                                    <li>Visit A, add edge (A,B) with weight 4, visit B</li>
+                                    <li>Min edge is (B,C) with weight 2, add (B,C), visit C</li>
+                                    <li>Min edge is (C,F) with weight 1, add (C,F), visit F</li>
+                                    <li>Min edge is (F,E) with weight 3, add (F,E), visit E</li>
+                                    <li>Min edge is (E,D) with weight 5, add (E,D), visit D</li>
+                                    <li>Min edge is (D,G) with weight 6, add (D,G), visit G</li>
+                                    <li>Min edge is (G,H) with weight 4, add (G,H), visit H</li>
+                                    <li>Min edge is (H,I) with weight 3, add (H,I), visit I</li>
+                                    <li>All vertices visited; stop</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">Kruskal's Algorithm:</p>
+                                <p class="mb-2">Sorted edges by weight:</p>
+                                <table class="algorithm-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Edge</th>
+                                            <th>(C,F)</th>
+                                            <th>(B,C)</th>
+                                            <th>(H,I)</th>
+                                            <th>(F,E)</th>
+                                            <th>(A,B)</th>
+                                            <th>(G,H)</th>
+                                            <th>(E,D)</th>
+                                            <th>(D,G)</th>
+                                            <th>(A,D)</th>
+                                            <th>(B,E)</th>
+                                            <th>(C,D)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Weight</td>
+                                            <td>1</td>
+                                            <td>2</td>
+                                            <td>3</td>
+                                            <td>3</td>
+                                            <td>4</td>
+                                            <td>4</td>
+                                            <td>5</td>
+                                            <td>6</td>
+                                            <td>7</td>
+                                            <td>8</td>
+                                            <td>9</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="mb-2">Add edges in order, skipping cycles:</p>
+                                <ul class="list-disc list-inside ml-4 mb-4">
+                                    <li>Add (C,F)</li>
+                                    <li>Add (B,C)</li>
+                                    <li>Add (H,I)</li>
+                                    <li>Add (F,E)</li>
+                                    <li>Add (A,B)</li>
+                                    <li>Add (G,H)</li>
+                                    <li>Add (E,D)</li>
+                                    <li>Add (D,G)</li>
+                                    <li>Skip (A,D) - creates cycle</li>
+                                    <li>Skip (B,E) - creates cycle</li>
+                                    <li>Skip (C,D) - creates cycle</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold">Total weight calculation:</p>
+                                <p class="mb-2">1 + 2 + 3 + 3 + 4 + 4 + 5 + 6 = <span class="weight-highlight">28</span></p>
+                                <p>Both algorithms produce the same minimum spanning tree with weight <span class="weight-highlight">28</span>.</p>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 5 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 5</h3>
+                        <p class="mb-4 text-lg">Use Dijkstra's algorithm to find:</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) A shortest path from A to I, and the length of this path</li>
+                            <li class="mb-2">(b) A shortest path from A to Z, and the length of this path</li>
+                            <li class="mb-2">(c) A shortest path from A to Z that passes through C, and the length of this path</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">Dijkstra's Algorithm from A:</p>
+                                <p class="mb-2">Initial: L(A) = 0, all others ∞</p>
+                                <ol class="list-decimal list-inside ml-4 mb-4">
+                                    <li>Visit A: Update B(4), D(7)</li>
+                                    <li>Visit B (L=4): Update C(4+2=6), E(4+8=12)</li>
+                                    <li>Visit C (L=6): Update F(6+1=7)</li>
+                                    <li>Visit F (L=7): Update E(7+3=10), I(7+9=16)</li>
+                                    <li>Visit D (L=7): Update G(7+6=13)</li>
+                                    <li>Visit E (L=10): Update H(10+7=17), I(10+5=15)</li>
+                                    <li>Visit G (L=13): Update H(13+4=17), Z(13+11=24)</li>
+                                    <li>Visit H (L=17): Update I(17+3=20), Z(17+8=25)</li>
+                                    <li>Visit I (L=15): Update Z(15+6=21)</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">(a) Shortest path A to I:</p>
+                                <p class="path-highlight">A → B → C → F → E → I</p>
+                                <p>Length: <span class="weight-highlight">15</span></p>
+                            </div>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">(b) Shortest path A to Z:</p>
+                                <p class="path-highlight">A → B → C → F → E → I → Z</p>
+                                <p>Length: <span class="weight-highlight">21</span></p>
+                            </div>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">(c) Shortest path A to Z through C:</p>
+                                <ul class="list-disc list-inside ml-4 mb-2">
+                                    <li>A to C: A → B → C (length 6)</li>
+                                    <li>C to Z: C → F → E → I → Z (length 1+3+5+6=15)</li>
+                                </ul>
+                                <p>Total: 6 + 15 = <span class="weight-highlight">21</span></p>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 6 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 6</h3>
+                        <p class="mb-4 text-lg">List the order of the vertices that would be processed in this graph during:</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) A breadth-first search starting at A</li>
+                            <li class="mb-2">(b) A breadth-first search starting at F</li>
+                            <li class="mb-2">(c) A depth-first search starting at A</li>
+                            <li class="mb-2">(d) A depth-first search starting at F</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">(a) BFS starting at A:</p>
+                                <p class="path-highlight">A, B, D, C, E, G, F, H, I, Z</p>
+                                <p class="text-sm text-gray-600">(Level order: A; B,D; C,E,G; F,H; I; Z)</p>
+                            </div>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">(b) BFS starting at F:</p>
+                                <p class="path-highlight">F, C, E, I, B, D, H, Z, A, G</p>
+                                <p class="text-sm text-gray-600">(Level order: F; C,E,I; B,D,H,Z; A,G)</p>
+                            </div>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">(c) DFS starting at A:</p>
+                                <p class="path-highlight">A, B, C, F, E, H, G, D, I, Z</p>
+                                <p class="text-sm text-gray-600">(Assuming alphabetical order for neighbors)</p>
+                            </div>
+                            
+                            <div class="solution-step">
+                                <p class="font-semibold mb-2">(d) DFS starting at F:</p>
+                                <p class="path-highlight">F, C, B, A, D, G, H, E, I, Z</p>
+                                <p class="text-sm text-gray-600">(Assuming alphabetical order for neighbors)</p>
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-yellow-50 border-l-4 border-yellow-400">
+                                <p class="text-sm text-gray-700"><strong>Note:</strong> These traversal orders assume we visit neighbors in alphabetical order when multiple choices are available. The actual order may vary slightly depending on the specific implementation, but the general pattern follows the BFS (level-by-level) and DFS (depth-first) principles.</p>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- KaTeX Auto-render script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Render all math elements with class "math"
+            const mathElements = document.querySelectorAll('.math');
+            mathElements.forEach(element => {
+                katex.render(element.textContent, element, {
+                    throwOnError: false
+                });
+            });
+        });
+    </script>
+
+    <!-- Toggle All Solutions Script -->
+    <script>
+        document.getElementById('toggle-all').addEventListener('change', function() {
+            const areVisible = this.checked;
+            const allDetails = document.querySelectorAll('main details');
+            allDetails.forEach(detail => {
+                detail.open = areVisible;
+            });
+        });
+    </script>
+</body>
+</html>

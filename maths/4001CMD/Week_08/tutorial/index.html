@@ -1,0 +1,834 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial 8 Solutions - 4001CMD</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" xintegrity="sha384-KiWOvVjnN8qwKMlbsEOfOJaN8EvkycNwgTYSSi7mGv+B4v8zFAHmv/dpvR0/vGHD" crossorigin="anonymous">
+    <!-- KaTeX JS -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" xintegrity="sha384-hIoBPJpTadxHRDO82BcO1F7S4CsgNchBFeS/fV7aV+E/CmhxhZmb4fvrWjQJgKRS" crossorigin="anonymous"></script>
+    <!-- KaTeX Auto-render extension -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" xintegrity="sha384-+XBljXPPJ+bVci3gwuDRaL5D1Y4NUPGNTM8PmLHjoWsNZrKSQGzC7/0mgM9aMuzx" crossorigin="anonymous"></script>
+        <style>
+        /* Custom styles for rendered KaTeX */
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        /* Custom styles for code blocks */
+        pre {
+            background-color: #f3f4f6; /* gray-100 */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 1rem; /* p-4 */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+
+
+
+
+
+<style>
+/* Mobile optimization - add to existing styles */
+@media (max-width: 768px) {
+    .w-\[85\%\] {
+        width: 95% !important;
+        padding: 0.5rem !important;
+        margin: 0 auto !important;
+    }
+    
+    /* Reduce text sizes by ~50% */
+    .text-4xl { font-size: 1.5rem !important; }
+    .text-3xl { font-size: 1.25rem !important; }
+    .text-xl { font-size: 0.875rem !important; }
+    .text-lg { font-size: 0.75rem !important; }
+    
+    /* Reduce padding and margins */
+    .p-6, .p-8 { padding: 1rem !important; }
+    .p-4 { padding: 0.75rem !important; }
+    .mb-8, .mb-12, .mb-6, .mb-4, .mb-2 { margin-bottom: 0.5rem !important; }
+    
+    /* Make code blocks more compact */
+    pre {
+        padding: 0.5rem !important;
+        font-size: 0.7rem !important;
+        margin: 0.25rem 0 !important;
+    }
+    
+    /* Reduce image sizes */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* Make details/summary more compact */
+    details summary {
+        padding: 0.5rem !important;
+        font-size: 0.8rem !important;
+    }
+    
+    details div {
+        padding: 0.75rem !important;
+    }
+    
+    /* Adjust lists */
+    .list-inside { margin-left: 0.5rem !important; }
+    
+    /* Make KaTeX formulas more readable on mobile */
+    .katex-display {
+        overflow-x: auto;
+        font-size: 0.9em !important;
+    }
+}
+
+/* Additional mobile-specific improvements */
+@media (max-width: 480px) {
+    .w-\[85\%\] {
+        width: 98% !important;
+        padding: 0.25rem !important;
+    }
+    
+    .text-4xl { font-size: 1.25rem !important; }
+    .text-3xl { font-size: 1.125rem !important; }
+    
+    pre {
+        font-size: 0.65rem !important;
+        padding: 0.375rem !important;
+    }
+}
+
+/* Hide solutions */
+details {
+    display: none !important;
+}
+
+#toggle-all, [for="toggle-all"] {
+    display: none !important;
+}
+
+.hint-controls {
+    border-top: 1px solid #e5e7eb;
+    background-color: #f8fafc;
+    padding: 1rem 1.5rem;
+}
+
+.hint-btn {
+    background-color: #1d4ed8;
+    color: #ffffff;
+    border: 0;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hint-btn:hover {
+    background-color: #1e40af;
+}
+
+.hint-panel {
+    margin-top: 0.75rem;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    display: none;
+}
+
+.hint-panel.show {
+    display: block;
+}
+</style>
+
+
+
+
+
+
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 leading-relaxed">
+
+    <div class="w-[85%] mx-auto p-6 sm:p-8">
+        
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Tutorial 8 Exercises & Solutions</h1>
+            <p class="text-xl text-gray-600">4001CMD - Mathematical Skills for Computing Professionals</p>
+        </header>
+
+        <!-- Toggle All Solutions -->
+        <div class="flex items-center justify-end mb-6 bg-white p-4 rounded-lg shadow-md">
+            <label for="toggle-all" class="mr-3 font-semibold text-gray-700 cursor-pointer">Show All Solutions</label>
+            <input type="checkbox" id="toggle-all" class="h-5 w-5 text-blue-600 rounded cursor-pointer focus:ring-blue-500 border-gray-300">
+        </div>
+
+        <main>
+            <!-- Section: Tutorial problems -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Tutorial problems</h2>
+                <p class="text-lg text-gray-700 mb-6">The following exercises should be attempted before and/or during your next two tutorial sessions.</p>
+
+                <!-- Problem 1 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1</h3>
+                        <p class="mb-4 text-lg">Find the asymptotic complexity of the following functions. Specifically, find a function $g(n)$ so that each of the following functions is $O(g(n))$.</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) $(6n+1)(4+\log n)$</li>
+                            <li>(b) $\dfrac{(n+1)(n+3)}{n+2}$</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2"><strong class="font-semibold">(a)</strong> The function expands to $(6n+1)(4+\log n) = 24n + 6n\log n + 4 + \log n$. When analyzing asymptotic complexity, we look for the fastest-growing term. Comparing the terms:</p>
+                            <ul class="list-disc list-inside ml-4 my-2">
+                                <li>$6n\log n$ grows faster than $24n$.</li>
+                                <li>$24n$ grows faster than $\log n$.</li>
+                                <li>$\log n$ grows faster than $4$.</li>
+                            </ul>
+                            <p class="mb-4">The dominant, fastest-growing term is $6n\log n$. Therefore, the function is $O(n\log n)$.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">(b)</strong> The numerator is $(n+1)(n+3) = n^2 + 4n + 3$. As $n \to \infty$, the dominant term is $n^2$, so the numerator is $O(n^2)$.</p>
+                            <p class="mb-2">The denominator is $n+2$. As $n \to \infty$, the dominant term is $n$, so the denominator is $O(n)$.</p>
+                            <p class="mb-4">The complexity of the fraction is the complexity of the numerator divided by the complexity of the denominator: $\dfrac{O(n^2)}{O(n)} = O(n)$.</p>
+                            <p>Therefore, the function is $O(n)$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 2 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 2</h3>
+                        <p class="mb-4 text-lg">For each of the following, find the asymptotic complexity of the algorithm, i.e., a function $g(n)$ for which the command $x = x+1$ gets executed $O(g(n))$ times:</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">
+                                (a)
+<pre class="bg-gray-100">
+i = 1
+x = 0
+while i &lt;= 2n:
+    x = x + 1
+    i = i + 2
+return x
+</pre>
+                            </li>
+                            <li class="mb-2">
+                                (b)
+<pre class="bg-gray-100">
+x = 0
+for i from 1 to n:
+    for j from 1 to n:
+        for k from 1 to n:
+            x = x + 1
+return x
+</pre>
+                            </li>
+                            <li class="mb-2">
+                                (c)
+<pre class="bg-gray-100">
+x = 0
+i = 2
+while i &lt;= n:
+    x = x + 1
+    i = i^2
+return x
+</pre>
+                            </li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2"><strong class="font-semibold">(a)</strong> The <code>while</code> loop starts with $i=1$ and stops when $i > 2n$. In each iteration, $i$ increases by 2. The values of $i$ will be $1, 3, 5, \dots$. Let $k$ be the number of iterations. After $k$ iterations, $i = 1 + (k-1) \times 2$.</p>
+                            <p class="mb-2">We want to find $k$ when $1 + (k-1) \times 2 \approx 2n$.</p>
+                            <p class="mb-2">$2k - 2 + 1 \approx 2n \implies 2k - 1 \approx 2n \implies 2k \approx 2n+1 \implies k \approx n$.</p>
+                            <p class="mb-4">The command $x=x+1$ is executed exactly once per iteration, so it is executed $n$ times. The algorithm is $O(n)$.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(b)</strong> This algorithm has three nested loops. The outer loop runs $n$ times (for $i$). For each of those iterations, the middle loop runs $n$ times (for $j$). For each of *those* iterations, the inner loop runs $n$ times (for $k$).</p>
+                            <p class="mb-4">The total number of executions of $x=x+1$ is $n \times n \times n = n^3$. So the algorithm is $O(n^3)$.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">(c)</strong> The value of $i$ follows the sequence $2, 2^2, (2^2)^2, ((2^2)^2)^2, \dots$ which is $2^1, 2^2, 2^4, 2^8, \dots, 2^{2^k}$.</p>
+                            <p class="mb-2">The loop terminates after $k$ steps when $i_k > n$. So we need to find $k$ such that $2^{2^k} > n$.</p>
+                            <p class="mb-2">Take $\log_2$ of both sides: $2^k > \log_2 n$.</p>
+                            <p class="mb-2">Take $\log_2$ again: $k > \log_2(\log_2 n)$.</p>
+                            <p class="mb-4">The number of iterations $k$ is proportional to $\log(\log n)$. So the algorithm is $O(\log\log n)$.</p>
+                        </div>
+                    </details>
+                </div>
+                
+                <!-- Problem 3 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 3</h3>
+                        <p class="mb-4 text-lg">For each of the following graphs:</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">Find the degree of edge-connectivity ($\lambda(G)$) and a minimal cutset.</li>
+                            <li class="mb-2">Is the graph Eulerian? (Contains an Eulerian circuit)</li>
+                            <li class="mb-2">Is the graph Hamiltonian? (Contains a Hamiltonian cycle)</li>
+                        </ol>
+                        <img src="img/threegraphs.png" alt="Three graphs for Problem 3" class="w-full max-w-2xl mx-auto rounded-lg shadow-inner my-4">
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+
+                            <strong class="font-semibold">Graph 1 (Left):</strong>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li><b>Edge-connectivity $\lambda(G) = 1$</b>. The edge $(3,4)$ is a bridge. Removing it disconnects the graph. Minimal cutset: $\{(3,4)\}$.</li>
+                                <li><b>Not Eulerian</b>. An Eulerian circuit exists if and only if every vertex has an even degree. Vertices 3 and 4 have degree 3 (odd).</li>
+                                <li><b>Not Hamiltonian</b>. A Hamiltonian cycle must visit every vertex exactly once. To visit vertices 1 and 2, any path must enter and leave the set $\{1, 2, 3\}$ via vertex 3. Similarly for $\{4, 5, 6\}$ via vertex 4. To visit all 6 vertices, any path must pass through the edge $(3,4)$. A cycle would need to cross it *twice* (e.g., $1-3-4-5-6-4-3-2-1$), which is not allowed.</li>
+                            </ul>
+
+                            <strong class="font-semibold">Graph 2 (Center):</strong>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li><b>Edge-connectivity $\lambda(G) = 2$</b>. Removing any single edge does not disconnect the graph. However, removing the edges $(1,3)$ and $(2,4)$ disconnects the graph into two components $\{1, 2\}$ and $\{3, 4, 5, 6\}$. Minimal cutset: $\{(1,3), (2,4)\}$.</li>
+                                <li><b>Not Eulerian</b>. Vertices 1, 2, 5, 6 all have degree 2 (even), but vertices 3 and 4 have degree 3 (odd).</li>
+                                <li><b>Hamiltonian</b>. A Hamiltonian cycle exists. For example: $1-2-4-6-5-3-1$. This cycle visits every vertex exactly once.</li>
+                            </ul>
+
+                            <strong class="font-semibold">Graph 3 (Right):</strong>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li><b>Edge-connectivity $\lambda(G) = 3$</b>. This graph is $K_4$, the complete graph on 4 vertices. The minimum degree $\delta(G) = 3$. A theorem states $\lambda(G) \le \delta(G)$, so $\lambda(G) \le 3$. Removing any two edges (e.g., $(1,2)$ and $(1,3)$) leaves the graph connected. You must remove all 3 edges from a single vertex (e.g., $\{(1,2), (1,3), (1,4)\}$) to disconnect it. Minimal cutset: $\{(1,2), (1,3), (1,4)\}$.</li>
+                                <li><b>Not Eulerian</b>. All 4 vertices have degree 3 (odd).</li>
+                                <li><b>Hamiltonian</b>. A Hamiltonian cycle exists. For example: $1-2-3-4-1$.</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 4 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 4</h3>
+                        <p class="mb-4 text-lg">For each problem, try to give two different simple undirected graphs with the given properties, or explain why doing so is impossible.</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) Two different trees with 4 vertices. (Note: all trees with $n$ vertices have $n-1$ edges).</li>
+                            <li class="mb-2">(b) Two different connected graphs of 8 vertices all of degree 2.</li>
+                            <li class="mb-2">(c) Two different graphs of 5 vertices all of degree 4.</li>
+                            <li class="mb-2">(d) Two different graphs of 5 vertices all of degree 3.</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(a) Possible.</strong> A "tree" is a connected graph with no cycles.
+                                <br><b>Graph 1:</b> A straight path $P_4$: $v_1 - v_2 - v_3 - v_4$. (Degrees: 1, 2, 2, 1)
+                                <br><b>Graph 2:</b> A "star" graph $K_{1,3}$: $v_1$ connected to $v_2$, $v_3$, and $v_4$. (Degrees: 3, 1, 1, 1)
+                                <br>Both are trees with 4 vertices and 3 edges.
+                            </p>
+
+                            <p class="mb-2"><strong class="font-semibold">(b) Impossible.</strong> A connected graph where every vertex has degree 2 must be a cycle. The only connected graph with 8 vertices all of degree 2 is the cycle graph $C_8$. Any other arrangement (like two $C_4$ graphs) would be disconnected. Since there is only one such graph (up to isomorphism), it's impossible to find two different ones.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(c) Impossible.</strong> A simple graph with $n$ vertices where every vertex has degree $n-1$ is the complete graph $K_n$. Here we have 5 vertices all of degree $5-1=4$. The only graph with this property is $K_5$. It's impossible to find two different graphs.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(d) Impossible.</strong> This follows from the <b>Handshaking Lemma</b>, which states that the sum of degrees of all vertices in a graph must be an even number (since it equals $2 \times |E|$).
+                                <br>Here, we have 5 vertices, each with degree 3.
+                                <br>Sum of degrees = $3 + 3 + 3 + 3 + 3 = 15$.
+                                <br>Since 15 is an odd number, no such graph can exist.
+                            </p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 5 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 5</h3>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) Give the adjacency matrix for the following two graphs. Use the adjacency matrix connectivity algorithm to show the first is connected and the second is not.
+                                <img src="img/twographs.png" alt="Two graphs for Problem 5a" class="w-full max-w-2xl mx-auto rounded-lg shadow-inner my-4">
+                            </li>
+                            <li class="mb-2">(b) Consider the following two adjacency matrices. Use the connectivity algorithm to determine which are connected.
+                            $$
+                            A_1 = \begin{pmatrix}
+                            0 & 1 & 0 & 0 & 0 \\
+                            1 & 0 & 1 & 0 & 0 \\
+                            0 & 1 & 0 & 0 & 0 \\
+                            0 & 0 & 0 & 0 & 1 \\
+                            0 & 0 & 0 & 1 & 0
+                            \end{pmatrix} \quad
+                            A_2 = \begin{pmatrix}
+                            0 & 1 & 1 & 1 & 1 \\
+                            1 & 0 & 1 & 1 & 1 \\
+                            1 & 1 & 0 & 1 & 1 \\
+                            1 & 1 & 1 & 0 & 1 \\
+                            1 & 1 & 1 & 1 & 0
+                            \end{pmatrix}
+                            $$
+                            </li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(a) Graph 1 (Left) - Adjacency Matrix:</strong></p>
+                            $$ A_L = \begin{pmatrix}
+                            % 1  2  3  4  5  6
+                              0 & 1 & 0 & 0 & 0 & 0 \\
+                              1 & 0 & 0 & 1 & 0 & 0 \\
+                              0 & 0 & 0 & 1 & 0 & 1 \\
+                              0 & 1 & 1 & 0 & 1 & 1 \\
+                              0 & 0 & 0 & 1 & 0 & 1 \\
+                              0 & 0 & 1 & 1 & 1 & 0 
+                            \end{pmatrix} $$
+                            <b>Connectivity Algorithm:</b>
+                            <ul class="list-disc list-inside ml-4 mb-2">
+                                <li>Start with $C = \{1\}$.</li>
+                                <li><b>Row 1:</b> Has '1' in col 2. New vertex: 2. $C = \{1, 2\}$.</li>
+                                <li><b>Row 2:</b> Has '1' in col 1 (in C), col 4. New vertex: 4. $C = \{1, 2, 4\}$.</li>
+                                <li><b>Row 4:</b> Has '1' in cols 2 (in C), 3, 5, 6. New vertices: 3, 5, 6. $C = \{1, 2, 4, 3, 5, 6\}$.</li>
+                            </ul>
+                            <p class="mb-4">Since $C$ now contains all 6 vertices, the graph is <b>connected</b>.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">(a) Graph 2 (Right) - Adjacency Matrix:</strong></p>
+                            $$ A_R = \begin{pmatrix}
+                            % 1  2  3  4  5  6  7
+                              0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+                              1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+                              0 & 0 & 0 & 1 & 1 & 1 & 1 \\
+                              0 & 0 & 1 & 0 & 1 & 0 & 1 \\
+                              0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+                              0 & 0 & 1 & 0 & 1 & 0 & 1 \\
+                              0 & 0 & 1 & 1 & 1 & 1 & 0 
+                            \end{pmatrix} $$
+                            <b>Connectivity Algorithm:</b>
+                            <ul class="list-disc list-inside ml-4 mb-2">
+                                <li>Start with $C = \{1\}$.</li>
+                                <li><b>Row 1:</b> Has '1' in col 2. New vertex: 2. $C = \{1, 2\}$.</li>
+                                <li><b>Row 2:</b> Has '1' in col 1 (in C). No new vertices.</li>
+                            </ul>
+                            <p class="mb-4">The algorithm terminates. The set of reachable vertices is $C = \{1, 2\}$. Since $C$ does not contain all 7 vertices, the graph is <b>not connected</b>. (It has two components: $\{1, 2\}$ and $\{3, 4, 5, 6, 7\}$).</p>
+
+                            <p class="mb-2"><strong class="font-semibold">(b) Matrix $A_1$:</strong></p>
+                            <ul class="list-disc list-inside ml-4 mb-2">
+                                <li>Start with $C = \{1\}$.</li>
+                                <li><b>Row 1:</b> Has '1' in col 2. New vertex: 2. $C = \{1, 2\}$.</li>
+                                <li><b>Row 2:</b> Has '1' in col 1 (in C), col 3. New vertex: 3. $C = \{1, 2, 3\}$.</li>
+                                <li><b>Row 3:</b> Has '1' in col 2 (in C). No new vertices.</li>
+                            </ul>
+                            <p class="mb-4">Algorithm terminates. $C = \{1, 2, 3\}$. This does not include vertices 4 and 5. The graph is <b>not connected</b>. (It has two components: $\{1, 2, 3\}$ and $\{4, 5\}$).</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(b) Matrix $A_2$:</strong></p>
+                            <ul class="list-disc list-inside ml-4 mb-2">
+                                <li>Start with $C = \{1\}$.</li>
+                                <li><b>Row 1:</b> Has '1' in cols 2, 3, 4, 5. New vertices: 2, 3, 4, 5. $C = \{1, 2, 3, 4, 5\}$.</li>
+                            </ul>
+                            <p class="mb-4">Since $C$ now contains all 5 vertices, the graph is <b>connected</b>. (This is the adjacency matrix for $K_5$, the complete graph on 5 vertices).</p>
+
+                        </div>
+                    </details>
+                </div>
+            </section>
+            
+            <!-- Section: Additional Problems -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Additional problems</h2>
+                
+                <!-- Problem 6 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 6</h3>
+                        <p class="mb-4 text-lg">Find a function $g(n)$ for which the command $x=x+1$ gets executed $O(g(n))$ times.</p>
+<pre class="bg-gray-100">
+x = 0
+for i from 1 to n:
+    for j from 1 to i:
+        for k from 1 to j:
+            x = x + 1
+return x
+</pre>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">We need to find the total number of times the inner command $x=x+1$ is executed. We can express this as a triple summation:</p>
+                            $$ \text{Total Executions} = \sum_{i=1}^{n} \sum_{j=1}^{i} \sum_{k=1}^{j} 1 $$
+                            <p class="mb-2">Let's solve this from the inside out:</p>
+                            <p class="mb-2"><b>Innermost sum:</b> $\sum_{k=1}^{j} 1 = j$</p>
+                            <p class="mb-2"><b>Middle sum:</b> $\sum_{j=1}^{i} j = \frac{i(i+1)}{2} = \frac{1}{2}i^2 + \frac{1}{2}i$</p>
+                            <p class="mb-2"><b>Outermost sum:</b> $\sum_{i=1}^{n} \left( \frac{1}{2}i^2 + \frac{1}{2}i \right) = \frac{1}{2} \sum_{i=1}^{n} i^2 + \frac{1}{2} \sum_{i=1}^{n} i$</p>
+                            <p class="mb-2">We use the standard formulas for sums of powers:</p>
+                            $$ \sum_{i=1}^{n} i = \frac{n(n+1)}{2} \sim O(n^2) $$
+                            $$ \sum_{i=1}^{n} i^2 = \frac{n(n+1)(2n+1)}{6} \sim O(n^3) $$
+                            <p class="mb-2">Substituting these in:</p>
+                            $$ \text{Total} = \frac{1}{2} \left( \frac{n(n+1)(2n+1)}{6} \right) + \frac{1}{2} \left( \frac{n(n+1)}{2} \right) $$
+                            $$ = \frac{2n^3 + \dots}{12} + \frac{n^2 + \dots}{4} $$
+                            <p class="mb-2">The dominant term in this polynomial is $n^3$. Therefore, the asymptotic complexity is $O(n^3)$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 7 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 7</h3>
+                        <p class="mb-4 text-lg">Among a group of 7 people, is it possible for everyone to be friends with exactly 2 of the people in the group? Is it possible for everyone to be friends with exactly 3 people in the group? Draw the graphs if possible.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2"><strong class="font-semibold">(a) Friends with 2 people: Possible.</strong></p>
+                            <p class="mb-2">This describes a graph with 7 vertices, where every vertex has a degree of 2 (a 2-regular graph). A connected graph where every vertex has degree 2 is a cycle.</p>
+                            <p class="mb-4"><b>Graph:</b> The cycle graph $C_7$. Draw 7 vertices in a circle, and connect each vertex to its two immediate neighbors. Every vertex has exactly degree 2. It is also possible to have disconnected components, such as $C_3$ and $C_4$, which also satisfies the condition.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(b) Friends with 3 people: Impossible.</strong></p>
+                            <p class="mb-2">This describes a graph with 7 vertices, where every vertex has a degree of 3 (a 3-regular graph).</p>
+                            <p class="mb-2">We use the <b>Handshaking Lemma</b>: The sum of the degrees of all vertices must be an even number (since $\sum \deg(v) = 2|E|$).</p>
+                            <p class="mb-2">In this case, we have 7 vertices, each with degree 3.</p>
+                            <p class="mb-4">Sum of degrees = $7 \times 3 = 21$.</p>
+                            <p>Since 21 is an odd number, it violates the Handshaking Lemma. Therefore, <b>no such graph can exist</b>.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 8 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 8</h3>
+                        <p class="mb-4 text-lg">Consider the following graph. How many paths of length two are there between vertices 1 and 3? How many paths of length three are there between vertices 2 and 4?</p>
+                        <img src="img/onegraph.png" alt="Graph for Problem 8" class="w-full max-w-xs mx-auto rounded-lg shadow-inner my-4">
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-4">We can solve this by listing the paths, or by using the adjacency matrix $A$. The number of paths of length $k$ from $i$ to $j$ is the entry $(i,j)$ in the matrix $A^k$.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">Adjacency Matrix (A):</strong></p>
+                            $$ A = \begin{pmatrix}
+                            % 1  2  3  4
+                              0 & 1 & 1 & 0 \\
+                              1 & 0 & 1 & 0 \\
+                              1 & 1 & 0 & 1 \\
+                              0 & 0 & 1 & 0 
+                            \end{pmatrix} $$
+
+                            <p class="mb-2"><strong class="font-semibold">(a) Paths of length 2 from 1 to 3:</strong></p>
+                            <p class="mb-2">We are looking for $(A^2)_{1,3}$. Let's compute $A^2$:</p>
+                            $$ A^2 = A \times A = \begin{pmatrix} 0 & 1 & 1 & 0 \\ 1 & 0 & 1 & 0 \\ 1 & 1 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix}
+                                               \begin{pmatrix} 0 & 1 & 1 & 0 \\ 1 & 0 & 1 & 0 \\ 1 & 1 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix}
+                                             = \begin{pmatrix} 2 & 1 & 1 & 1 \\ 1 & 2 & 1 & 1 \\ 1 & 1 & 3 & 0 \\ 1 & 1 & 0 & 1 \end{pmatrix} $$
+                            <p class="mb-4">The entry $(A^2)_{1,3}$ is <b>1</b>. So there is 1 path of length two.
+                            <br><b>By listing:</b> The only path is $1-2-3$.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(b) Paths of length 3 from 2 to 4:</strong></p>
+                            <p class="mb-2">We are looking for $(A^3)_{2,4}$. Let's compute $A^3$:</p>
+                            $$ A^3 = A \times A^2 = \begin{pmatrix} 0 & 1 & 1 & 0 \\ 1 & 0 & 1 & 0 \\ 1 & 1 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix}
+                                                 \begin{pmatrix} 2 & 1 & 1 & 1 \\ 1 & 2 & 1 & 1 \\ 1 & 1 & 3 & 0 \\ 1 & 1 & 0 & 1 \end{pmatrix}
+                                               = \begin{pmatrix} 2 & 3 & 4 & 1 \\ 3 & 2 & 4 & 1 \\ 4 & 4 & 2 & 3 \\ 1 & 1 & 3 & 0 \end{pmatrix} $$
+                            <p class="mb-4">The entry $(A^3)_{2,4}$ is <b>1</b>. So there is 1 path of length three.
+                            <br><b>By listing:</b> The only path is $2-1-3-4$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 9 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 9 (The "Good Will Hunting" problem)</h3>
+                        <p class="mb-4 text-lg">Given the graph:</p>
+                        <img src="img/goodwillhunting.png" alt="Graph for Problem 9" class="w-full max-w-xs mx-auto rounded-lg shadow-inner my-4">
+                        <p class="mb-4 text-lg">Find (a) the adjacency matrix of the graph, and (b) the matrix giving the number of all 3-step paths between the vertices.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">This is a multigraph (it has multiple edges between vertices 2 and 3). When creating the adjacency matrix for a multigraph, the entry $(i,j)$ is the number of edges between $i$ and $j$.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(a) The Adjacency Matrix (A):</strong></p>
+                            <ul class="list-disc list-inside ml-4 mb-2">
+                                <li>$v_1$ connects to $v_2$ (1) and $v_4$ (1).</li>
+                                <li>$v_2$ connects to $v_1$ (1), $v_3$ (2 edges), and $v_4$ (1).</li>
+                                <li>$v_3$ connects to $v_2$ (2 edges).</li>
+                                <li>$v_4$ connects to $v_1$ (1) and $v_2$ (1).</li>
+                            </ul>
+                            $$ A = \begin{pmatrix}
+                            % 1  2  3  4
+                              0 & 1 & 0 & 1 \\
+                              1 & 0 & 2 & 1 \\
+                              0 & 2 & 0 & 0 \\
+                              1 & 1 & 0 & 0 
+                            \end{pmatrix} $$
+                            
+                            <p class="mb-2"><strong class="font-semibold">(b) The matrix for all 3-step paths ($A^3$):</strong></p>
+                            <p class="mb-2">First, we compute $A^2 = A \times A$:</p>
+                            $$ A^2 = \begin{pmatrix} 0 & 1 & 0 & 1 \\ 1 & 0 & 2 & 1 \\ 0 & 2 & 0 & 0 \\ 1 & 1 & 0 & 0 \end{pmatrix} \begin{pmatrix} 0 & 1 & 0 & 1 \\ 1 & 0 & 2 & 1 \\ 0 & 2 & 0 & 0 \\ 1 & 1 & 0 & 0 \end{pmatrix} = \begin{pmatrix} 2 & 1 & 2 & 1 \\ 1 & 6 & 0 & 1 \\ 2 & 0 & 4 & 2 \\ 1 & 1 & 2 & 2 \end{pmatrix} $$
+                            <p class="mb-2">Now, we compute $A^3 = A \times A^2$:</p>
+                            $$ A^3 = \begin{pmatrix} 0 & 1 & 0 & 1 \\ 1 & 0 & 2 & 1 \\ 0 & 2 & 0 & 0 \\ 1 & 1 & 0 & 0 \end{pmatrix} \begin{pmatrix} 2 & 1 & 2 & 1 \\ 1 & 6 & 0 & 1 \\ 2 & 0 & 4 & 2 \\ 1 & 1 & 2 & 2 \end{pmatrix} = \begin{pmatrix} (0+1+0+1) & (0+6+0+1) & (0+0+0+2) & (0+1+0+2) \\ (2+0+4+1) & (1+0+0+1) & (2+0+8+2) & (1+0+4+2) \\ (0+2+0+0) & (0+12+0+0) & (0+0+0+0) & (0+2+0+0) \\ (2+1+0+0) & (1+6+0+0) & (2+0+0+0) & (1+1+0+0) \end{pmatrix} $$
+                            <p class="mb-4">The matrix giving the number of all 3-step paths is $A^3$:
+                            $$ A^3 = \begin{pmatrix} 2 & 7 & 2 & 3 \\ 7 & 2 & 12 & 7 \\ 2 & 12 & 0 & 2 \\ 3 & 7 & 2 & 2 \end{pmatrix} $$
+                            </p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- NEW Problem 10 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 10</h3>
+                        <p class="mb-4 text-lg">Show how to calculate the adjacency matrix powers $A^2$ and $A^3$ from Problem 9 using Python. Provide a sample code snippet and its output.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-4">We can efficiently perform matrix multiplication and calculate matrix powers using the <b>NumPy</b> library in Python. The <code>@</code> operator is used for matrix multiplication.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(a) Python Code using NumPy:</strong></p>
+                            <p class="mb-2">This code will define the adjacency matrix $A$ from Problem 9, then calculate and print $A^2$ and $A^3$.</p>
+                            <pre class="bg-gray-900 text-green-300 p-4 rounded-md font-mono">
+import numpy as np
+
+# Set print options for better matrix display
+np.set_printoptions(linewidth=100)
+
+# 1. Define the Adjacency Matrix A from Problem 9
+A = np.array([
+    [0, 1, 0, 1],
+    [1, 0, 2, 1],
+    [0, 2, 0, 0],
+    [1, 1, 0, 0]
+])
+
+print("--- Adjacency Matrix (A) ---")
+print(A)
+
+# 2. Calculate A^2 (Paths of length 2)
+# We use the '@' operator for matrix multiplication
+A2 = A @ A
+
+print("\n--- A^2 (Paths of length 2) ---")
+print(A2)
+
+# 3. Calculate A^3 (Paths of length 3)
+# We can do this by (A @ A @ A) or (A @ A2)
+A3 = A @ A2
+
+print("\n--- A^3 (Paths of length 3) ---")
+print(A3)
+</pre>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(b) Output of the Code:</strong></p>
+                            <p class="mb-2">Running the code above will produce the following output, which exactly matches our manually calculated matrices in Problem 9.</p>
+                            <pre class="bg-gray-800 text-gray-100 p-4 rounded-md font-mono">
+--- Adjacency Matrix (A) ---
+[[0 1 0 1]
+ [1 0 2 1]
+ [0 2 0 0]
+ [1 1 0 0]]
+
+--- A^2 (Paths of length 2) ---
+[[2 1 2 1]
+ [1 6 0 1]
+ [2 0 4 2]
+ [1 1 2 2]]
+
+--- A^3 (Paths of length 3) ---
+[[ 2  7  2  3]
+ [ 7  2 12  7]
+ [ 2 12  0  2]
+ [ 3  7  2  2]]
+</pre>
+                        </div>
+                    </details>
+                </div>
+                <!-- END NEW Problem 10 -->
+
+            </section>
+        </main>
+    </div>
+
+    <!-- KaTeX Auto-render script initialization -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                // options
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '\\[', right: '\\]', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false}
+                ]
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const hints = {
+                "1": "For each expression, expand or simplify first, then keep only dominant growth terms. For (a), compare n log n versus n; for (b), compare highest powers in numerator and denominator.",
+                "2": "Count executions of x = x + 1 by loop structure: (a) arithmetic progression, (b) product of loop sizes, (c) repeated squaring gives a double-log number of iterations.",
+                "3": "Check cut edges/edge cuts for lambda(G), then use degree conditions for Eulerian cycles (all even), and explicit cycle search for Hamiltonian cycles.",
+                "4": "Use standard graph facts: trees on n vertices have n-1 edges, connected 2-regular graphs are cycles, degree n-1 forces complete graph Kn, and odd total degree sum is impossible.",
+                "5": "For connectivity from adjacency matrices, run the reachable-set algorithm row by row starting from one vertex. For path counts, remember entries of A^k count k-step walks.",
+                "6": "Rewrite the triple loop count as nested sums: sum_i sum_j sum_k 1. Evaluate inner sums first and use known formulas for sum i and sum i^2.",
+                "7": "Translate to regular graphs on 7 vertices. Degree-2 case is possible (e.g., C7), while degree-3 fails by handshaking because 7*3 is odd.",
+                "8": "Either list paths carefully or compute A^2 and A^3. The entry (i,j) in A^k gives the number of k-step paths from i to j.",
+                "9": "Because the graph has parallel edges, place multiplicities in adjacency entries. Then compute A^3 to get all 3-step path counts.",
+                "10": "In Python, define A as a NumPy array, then use matrix multiplication with @: A2 = A @ A and A3 = A @ A2. Print both matrices and compare with manual results."
+            };
+
+            const toggleInput = document.getElementById("toggle-all");
+            if (toggleInput) {
+                const toggleContainer = toggleInput.closest("div");
+                if (toggleContainer) {
+                    toggleContainer.remove();
+                }
+            }
+
+            const cards = document.querySelectorAll("main .bg-white.shadow-md.rounded-lg.mb-6.overflow-hidden");
+            cards.forEach((card) => {
+                const heading = card.querySelector("h3");
+                if (!heading) {
+                    return;
+                }
+
+                const match = heading.textContent.match(/Problem\s+([0-9]+(?:\.[0-9]+)?)/i);
+                if (!match) {
+                    return;
+                }
+
+                const key = match[1];
+                if (!hints[key]) {
+                    return;
+                }
+
+                const controls = document.createElement("div");
+                controls.className = "hint-controls";
+                controls.innerHTML = `
+                    <button type="button" class="hint-btn" data-problem="${key}" aria-expanded="false">Show Hint</button>
+                    <div class="hint-panel" id="hint-${key.replace(/\./g, "-")}">
+                        <p class="font-semibold text-blue-900 mb-1">Hint</p>
+                        <p class="text-gray-700">${hints[key]}</p>
+                    </div>
+                `;
+
+                const details = card.querySelector("details");
+                if (details) {
+                    card.insertBefore(controls, details);
+                } else {
+                    card.appendChild(controls);
+                }
+            });
+
+            document.addEventListener("click", function(event) {
+                const button = event.target.closest(".hint-btn");
+                if (!button) {
+                    return;
+                }
+
+                const key = button.getAttribute("data-problem");
+                if (!key) {
+                    return;
+                }
+
+                const panel = document.getElementById(`hint-${key.replace(/\./g, "-")}`);
+                if (!panel) {
+                    return;
+                }
+
+                const isOpen = panel.classList.toggle("show");
+                button.textContent = isOpen ? "Hide Hint" : "Show Hint";
+                button.setAttribute("aria-expanded", String(isOpen));
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+<script>
+// Mobile optimization script
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to check if device is mobile
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+    
+    // Adjust layout for mobile
+    function optimizeForMobile() {
+        if (!isMobile()) return;
+        
+        // Add mobile class to body for additional targeting
+        document.body.classList.add('mobile-device');
+        
+        // Make all images responsive
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+        });
+        
+        // Adjust code block overflow
+        const codeBlocks = document.querySelectorAll('pre');
+        codeBlocks.forEach(block => {
+            block.style.overflowX = 'auto';
+            block.style.webkitOverflowScrolling = 'touch';
+        });
+    }
+    
+    // Initial optimization
+    optimizeForMobile();
+    
+    // Re-optimize on window resize
+    window.addEventListener('resize', optimizeForMobile);
+    
+    // Improve touch scrolling for math elements
+    const mathElements = document.querySelectorAll('.katex-display');
+    mathElements.forEach(math => {
+        math.style.webkitOverflowScrolling = 'touch';
+    });
+});
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

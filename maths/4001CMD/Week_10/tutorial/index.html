@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial 10 Solutions - 4001CMD</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    
+    <style>
+        /* Custom styles for rendered KaTeX */
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        /* Custom styles for code blocks */
+        pre {
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .w-\[85\%\] {
+                width: 95% !important;
+                padding: 0.5rem !important;
+                margin: 0 auto !important;
+            }
+            
+            .text-4xl { font-size: 1.5rem !important; }
+            .text-3xl { font-size: 1.25rem !important; }
+            .text-xl { font-size: 0.875rem !important; }
+            .text-lg { font-size: 0.75rem !important; }
+            
+            .p-6, .p-8 { padding: 1rem !important; }
+            .p-4 { padding: 0.75rem !important; }
+            .mb-8, .mb-12, .mb-6, .mb-4, .mb-2 { margin-bottom: 0.5rem !important; }
+            
+            pre {
+                padding: 0.5rem !important;
+                font-size: 0.7rem !important;
+                margin: 0.25rem 0 !important;
+            }
+            
+            img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            details summary {
+                padding: 0.5rem !important;
+                font-size: 0.8rem !important;
+            }
+            
+            details div {
+                padding: 0.75rem !important;
+            }
+            
+            .list-inside { margin-left: 0.5rem !important; }
+            
+            .katex-display {
+                overflow-x: auto;
+                font-size: 0.9em !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .w-\[85\%\] {
+                width: 98% !important;
+                padding: 0.25rem !important;
+            }
+            
+            .text-4xl { font-size: 1.25rem !important; }
+            .text-3xl { font-size: 1.125rem !important; }
+            
+            pre {
+                font-size: 0.65rem !important;
+                padding: 0.375rem !important;
+            }
+        }
+
+        /* Math styling */
+        .math {
+            font-family: KaTeX_Math;
+            font-style: italic;
+        }
+        
+        /* Solution styling */
+        .solution-step {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+        
+        .algorithm-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .algorithm-table th, .algorithm-table td {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        
+        .algorithm-table th {
+            background-color: #e5e7eb;
+            font-weight: 600;
+        }
+        
+        .path-highlight {
+            background-color: #dbeafe;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        
+        .weight-highlight {
+            background-color: #fef3c7;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        
+        /* Hide solutions */
+        details {
+            display: none !important;
+        }
+        
+        #toggle-all, [for="toggle-all"] {
+            display: none !important;
+        }
+        
+        /* Hide solutions */
+        details {
+            display: none !important;
+        }
+        
+        #toggle-all, [for="toggle-all"] {
+            display: none !important;
+        }
+
+        .hint-controls {
+            border-top: 1px solid #e5e7eb;
+            background-color: #f8fafc;
+            padding: 1rem 1.5rem;
+        }
+
+        .hint-btn {
+            background-color: #1d4ed8;
+            color: #ffffff;
+            border: 0;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .hint-btn:hover {
+            background-color: #1e40af;
+        }
+
+        .hint-panel {
+            margin-top: 0.75rem;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            display: none;
+        }
+
+        .hint-panel.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 leading-relaxed">
+
+    <div class="w-[85%] mx-auto p-6 sm:p-8">
+        
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Tutorial 10 Exercises &amp; Solutions</h1>
+            <p class="text-xl text-gray-600">4001CMD - Mathematical Skills for Computing Professionals</p>
+        </header>
+
+        <div class="flex items-center justify-end mb-6 bg-white p-4 rounded-lg shadow-md">
+            <label for="toggle-all" class="mr-3 font-semibold text-gray-700 cursor-pointer">Show All Solutions</label>
+            <input type="checkbox" id="toggle-all" class="h-5 w-5 text-blue-600 rounded cursor-pointer focus:ring-blue-500 border-gray-300">
+        </div>
+
+        <main>
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Tutorial problems</h2>
+                <p class="text-lg text-gray-700 mb-6">The following exercises should be attempted before or during your next tutorial session.</p>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1</h3>
+                        <p class="mb-4 text-lg">Use heapsort to sort the following list of numbers into (a) increasing, and (b) decreasing order:</p>
+                        <p class="mb-4 text-xl font-mono text-center bg-gray-100 p-2 rounded-md">[1, 5, 3, 8, 10, 2, 6]</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution &amp; Explanation</h4>
+                            <p class="mb-4">The algorithm is to put the data into an array as a valid Minheap (for increasing order) or Maxheap (for decreasing order), swap the root and the last node, prune the last node to a new array, reheapify, and repeat.</p>
+                            
+                            <p class="mb-2"><strong>(a) Increasing Order (Minheap):</strong></p>
+                            <p class="mb-2">The initial array $[1, 5, 3, 8, 10, 2, 6]$ must first be Minheapified. The resulting Minheap array is $\mathbf{[1, 5, 2, 8, 10, 3, 6]}$.</p>
+                            <p class="mb-2">Initial Minheap Structure:</p>
+<pre>
+      1
+    /   \
+   5     2
+  / \   / \
+ 8  10 3   6
+</pre>
+
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 1: Swap 1 (root) and 6 (last), Prune 1</p>
+                                <p>Heap Array: <span class="font-mono">[6, 5, 2, 8, 10, 3]</span>. Sorted Array: <span class="font-mono">[1]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 2: Heapify [6, 5, 2, 8, 10, 3]</p>
+                                <p>Swap 6 and 2 (smaller child). Resulting Minheap array: $\mathbf{[2, 5, 3, 8, 10, 6]}$.</p>
+<pre>
+      2
+    /   \
+   5     3
+  / \   / 
+ 8  10 6   
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 3: Swap 2 (root) and 6 (last), Prune 2</p>
+                                <p>Heap Array: <span class="font-mono">[6, 5, 3, 8, 10]</span>. Sorted Array: <span class="font-mono">[1, 2]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 4: Heapify [6, 5, 3, 8, 10]</p>
+                                <p>Swap 6 and 3 (smaller child). Resulting Minheap array: $\mathbf{[3, 5, 6, 8, 10]}$.</p>
+<pre>
+      3
+    /   \
+   5     6
+  / \    
+ 8  10   
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 5: Swap 3 (root) and 10 (last), Prune 3</p>
+                                <p>Heap Array: <span class="font-mono">[10, 5, 6, 8]</span>. Sorted Array: <span class="font-mono">[1, 2, 3]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 6: Heapify [10, 5, 6, 8]</p>
+                                <p>Swap 10 and 5 (smaller child). Resulting Minheap array: $\mathbf{[5, 8, 6, 10]}$.</p>
+<pre>
+      5
+    /  \
+   8    6
+  /     
+ 10     
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 7: Swap 5 (root) and 10 (last), Prune 5</p>
+                                <p>Heap Array: <span class="font-mono">[10, 8, 6]</span>. Sorted Array: <span class="font-mono">[1, 2, 3, 5]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 8: Heapify [10, 8, 6]</p>
+                                <p>Swap 10 and 6 (smaller child). Resulting Minheap array: $\mathbf{[6, 8, 10]}$.</p>
+<pre>
+      6
+    /  \
+   8    10
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 9: Swap 6 (root) and 10 (last), Prune 6</p>
+                                <p>Heap Array: <span class="font-mono">[10, 8]</span>. Sorted Array: <span class="font-mono">[1, 2, 3, 5, 6]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 10: Heapify [10, 8]</p>
+                                <p>Swap 10 and 8. Resulting Minheap array: $\mathbf{[8, 10]}$.</p>
+<pre>
+      8
+    / 
+   10  
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 11: Swap 8 (root) and 10 (last), Prune 8</p>
+                                <p>Heap Array: <span class="font-mono">[10]</span>. Sorted Array: <span class="font-mono">[1, 2, 3, 5, 6, 8]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 12: Heapify (trivial), Prune 10</p>
+                                <p>Heap: <span class="font-mono">[]</span>. Sorted Array: <span class="font-mono">[1, 2, 3, 5, 6, 8, 10]</span></p>
+                            </div>
+                            <p class="mb-4">Final Sorted Array (Increasing Order): <span class="path-highlight">[1, 2, 3, 5, 6, 8, 10]</span></p>
+                            
+                            <hr class="my-4">
+                            
+                            <p class="mb-2"><strong>(b) Decreasing Order (Maxheap):</strong></p>
+                            <p class="mb-2">The initial array $[1, 5, 3, 8, 10, 2, 6]$ must first be Maxheapified. The resulting Maxheap array is $\mathbf{[10, 8, 6, 5, 1, 2, 3]}$.</p>
+                            <p class="mb-2">Initial Maxheap Structure:</p>
+<pre>
+       10
+     /    \
+    8      6
+   / \    / \
+  5   1  2   3
+</pre>
+
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 1: Swap 10 (root) and 3 (last), Prune 10</p>
+                                <p>Heap Array: <span class="font-mono">[3, 8, 6, 5, 1, 2]</span>. Sorted Array: <span class="font-mono">[10]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 2: Heapify [3, 8, 6, 5, 1, 2]</p>
+                                <p>Swap 3 and 8 (larger child). Resulting Maxheap array: $\mathbf{[8, 5, 6, 3, 1, 2]}$.</p>
+<pre>
+       8
+     /   \
+    5     6
+   / \   / 
+  3   1 2  
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 3: Swap 8 (root) and 2 (last), Prune 8</p>
+                                <p>Heap Array: <span class="font-mono">[2, 5, 6, 3, 1]</span>. Sorted Array: <span class="font-mono">[10, 8]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 4: Heapify [2, 5, 6, 3, 1]</p>
+                                <p>Swap 2 and 6 (larger child). Resulting Maxheap array: $\mathbf{[6, 5, 2, 3, 1]}$.</p>
+<pre>
+       6
+     /   \
+    5     2
+   / \    
+  3   1   
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 5: Swap 6 (root) and 1 (last), Prune 6</p>
+                                <p>Heap Array: <span class="font-mono">[1, 5, 2, 3]</span>. Sorted Array: <span class="font-mono">[10, 8, 6]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 6: Heapify [1, 5, 2, 3]</p>
+                                <p>Swap 1 and 5 (larger child). Resulting Maxheap array: $\mathbf{[5, 3, 2, 1]}$.</p>
+<pre>
+       5
+     /   \
+    3     2
+   /      
+  1       
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 7: Swap 5 (root) and 1 (last), Prune 5</p>
+                                <p>Heap Array: <span class="font-mono">[1, 3, 2]</span>. Sorted Array: <span class="font-mono">[10, 8, 6, 5]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 8: Heapify [1, 3, 2]</p>
+                                <p>Swap 1 and 3 (larger child). Resulting Maxheap array: $\mathbf{[3, 1, 2]}$.</p>
+<pre>
+       3
+     /   \
+    1     2
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 9: Swap 3 (root) and 2 (last), Prune 3</p>
+                                <p>Heap Array: <span class="font-mono">[2, 1]</span>. Sorted Array: <span class="font-mono">[10, 8, 6, 5, 3]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 10: Heapify (already a heap)</p>
+                                <p>Maxheap array: $\mathbf{[2, 1]}$.</p>
+<pre>
+       2
+     / 
+    1  
+</pre>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 11: Swap 2 (root) and 1 (last), Prune 2</p>
+                                <p>Heap Array: <span class="font-mono">[1]</span>. Sorted Array: <span class="font-mono">[10, 8, 6, 5, 3, 2]</span></p>
+                            </div>
+                            <div class="solution-step">
+                                <p class="font-semibold">Step 12: Heapify (trivial), Prune 1</p>
+                                <p>Heap: <span class="font-mono">[]</span>. Sorted Array: <span class="font-mono">[10, 8, 6, 5, 3, 2, 1]</span></p>
+                            </div>
+                            <p class="mb-4">Final Sorted Array (Decreasing Order): <span class="path-highlight">[10, 8, 6, 5, 3, 2, 1]</span></p>
+                            
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 2</h3>
+                        <p class="mb-4 text-lg">
+                            (a) Construct an optimal Huffman code for the following set of symbols and associated frequencies:
+                        </p>
+                        <p class="mb-4 font-mono text-center bg-gray-100 p-2 rounded-md">
+                            e: 0.4, t: 0.29, s: 0.16, a: 0.1, c: 0.05
+                        </p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(b) Find the average encoded symbol length for this code.</li>
+                            <li class="mb-2">(c) Use this code to encode the word <strong>seat</strong>.</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution &amp; Explanation</h4>
+                            
+                            <p class="mb-2"><strong>(a) Huffman Code Construction:</strong></p>
+                            <p class="mb-4">The symbols are sorted by weight, and the two lowest weights are combined repeatedly to build the tree.</p>
+                            
+                            <p class="mb-2">The resulting optimal Huffman Code is:</p>
+                            <table class="algorithm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Frequency ($f_i$)</th>
+                                        <th>Code</th>
+                                        <th>Length ($l_i$)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>e</td>
+                                        <td>0.40</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>t</td>
+                                        <td>0.29</td>
+                                        <td>10</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>s</td>
+                                        <td>0.16</td>
+                                        <td>111</td>
+                                        <td>3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>a</td>
+                                        <td>0.10</td>
+                                        <td>1101</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>c</td>
+                                        <td>0.05</td>
+                                        <td>1100</td>
+                                        <td>4</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="mb-2">Codes: $\mathbf{a: 1101}$, $\mathbf{c: 1100}$, $\mathbf{e: 0}$, $\mathbf{s: 111}$, $\mathbf{t: 10}$</p>
+
+                            <hr class="my-4">
+                            
+                            <p class="mb-2"><strong>(b) Average Encoded Symbol Length:</strong></p>
+                            <p class="mb-2">The average length $L$ is calculated as the sum of (frequency $\times$ code length) for all symbols:</p>
+                            <div class="katex-display">
+                                $$L = 4(0.1) + 4(0.05) + 1(0.4) + 3(0.16) + 2(0.29)$$
+                            </div>
+                            <div class="katex-display">
+                                $$L = 0.4 + 0.2 + 0.4 + 0.48 + 0.58 = \mathbf{2.06}$$
+                            </div>
+                            <p class="mb-4">The average encoded symbol length is <span class="weight-highlight">2.06</span>.</p>
+
+                            <hr class="my-4">
+                            
+                            <p class="mb-2"><strong>(c) Encoding the word "seat":</strong></p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>s: 111</li>
+                                <li>e: 0</li>
+                                <li>a: 1101</li>
+                                <li>t: 10</li>
+                            </ul>
+                            <p class="mb-4">The encoded word "seat" is: <span class="path-highlight">1110110110</span></p>
+                        </div>
+                    </details>
+                </div>
+
+            </section>
+            
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Additional problems</h2>
+                
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 3</h3>
+                        <p class="mb-4 text-lg">Use heapsort to sort the following list of numbers into (a) increasing, and (b) decreasing order:</p>
+                        <p class="mb-4 text-xl font-mono text-center bg-gray-100 p-2 rounded-md">[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution &amp; Explanation</h4>
+                            <p class="mb-4">The list <span class="font-mono">[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]</span> is already sorted in decreasing order (and is a valid Maxheap).</p>
+
+                            <p class="mb-2"><strong>(a) Increasing Order (Minheap):</strong></p>
+                            <p class="mb-2">Initial Minheapification rearranges the array to satisfy the minheap property (root $\le$ children). Applying Heapsort (Minheap for increasing order) repeatedly extracts the minimum element.</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>Initial Minheapified array (example state): [1, 2, 4, 3, 6, 5, 8, 10, 7, 9].</li>
+                                <li>The process involves 9 swap/prune/re-heapify steps, extracting 1, then 2, etc.</li>
+                                <li><strong>Final Sorted Array</strong>: <span class="path-highlight">[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span></li>
+                            </ul>
+                            
+                            <hr class="my-4">
+                            
+                            <p class="mb-2"><strong>(b) Decreasing Order (Maxheap):</strong></p>
+                            <p class="mb-2">The initial array is already a Maxheap. Maxheap sort extracts the largest element (the root) repeatedly.</p>
+                            <ul class="list-disc list-inside ml-4 mb-4">
+                                <li>The process involves 9 swap/prune/re-heapify steps, extracting 10, then 9, etc.</li>
+                                <li><strong>Final Sorted Array</strong>: <span class="path-highlight">[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]</span></li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 4</h3>
+                        <p class="mb-4 text-lg">
+                            (a) Construct two different optimal Huffman codes for the following set of symbols and associated frequencies:
+                        </p>
+                        <p class="mb-4 font-mono text-center bg-gray-100 p-2 rounded-md">
+                            a: 0.1, b: 0.2, c: 0.2, d: 0.3, e: 0.2
+                        </p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(b) Show that the average encoded symbol lengths of the two codes is the same.</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution &amp; Explanation</h4>
+                            
+                            <p class="mb-2"><strong>(a) Two Different Optimal Huffman Codes:</strong></p>
+                            <p class="mb-4">Multiple optimal codes are possible due to the identical frequencies of b, c, and e (0.2). The different grouping choices lead to different codes.</p>
+                            
+                            <p class="mb-2"><strong>Code 1 Construction: Group (a, b) and (c, e)</strong></p>
+                            <ul class="list-disc list-inside ml-4 mb-2">
+                                <li>1. Combine a(0.1) + b(0.2) = 0.3. Combine c(0.2) + e(0.2) = 0.4.</li>
+                                <li>2. Combine d(0.3) + (a,b)[0.3] = 0.6.</li>
+                                <li>3. Combine (c,e)[0.4] + (d,a,b)[0.6] = 1.0 (Root).</li>
+                            </ul>
+                            <table class="algorithm-table max-w-md mx-auto mb-4">
+                                <thead>
+                                    <tr><th>Symbol</th><th>Code</th><th>Length ($l_i$)</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>d</td><td>00</td><td>2</td></tr>
+                                    <tr><td>a</td><td>010</td><td>3</td></tr>
+                                    <tr><td>b</td><td>011</td><td>3</td></tr>
+                                    <tr><td>c</td><td>10</td><td>2</td></tr>
+                                    <tr><td>e</td><td>11</td><td>2</td></tr>
+                                </tbody>
+                            </table>
+
+                            <p class="mb-2"><strong>Code 2 Construction: Group (a, e) and (b, c)</strong></p>
+                            <ul class="list-disc list-inside ml-4 mb-2">
+                                <li>1. Combine a(0.1) + e(0.2) = 0.3. Combine b(0.2) + c(0.2) = 0.4.</li>
+                                <li>2. Combine d(0.3) + (a,e)[0.3] = 0.6.</li>
+                                <li>3. Combine (b,c)[0.4] + (d,a,e)[0.6] = 1.0 (Root).</li>
+                            </ul>
+                            <table class="algorithm-table max-w-md mx-auto mb-4">
+                                <thead>
+                                    <tr><th>Symbol</th><th>Code</th><th>Length ($l_i$)</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>b</td><td>00</td><td>2</td></tr>
+                                    <tr><td>c</td><td>01</td><td>2</td></tr>
+                                    <tr><td>d</td><td>11</td><td>2</td></tr>
+                                    <tr><td>a</td><td>100</td><td>3</td></tr>
+                                    <tr><td>e</td><td>101</td><td>3</td></tr>
+                                </tbody>
+                            </table>
+
+                            <hr class="my-4">
+                            
+                            <p class="mb-2"><strong>(b) Average Encoded Symbol Length Comparison:</strong></p>
+                            
+                            <p class="mb-2"><strong>Average Length ($L_1$) for Code 1:</strong></p>
+                            <div class="katex-display">
+                                $$L_1 = 3(0.1) + 3(0.2) + 2(0.2) + 2(0.3) + 2(0.2)$$
+                            </div>
+                            <div class="katex-display">
+                                $$L_1 = 0.3 + 0.6 + 0.4 + 0.6 + 0.4 = \mathbf{2.3}$$
+                            </div>
+                            
+                            <p class="mb-2"><strong>Average Length ($L_2$) for Code 2:</strong></p>
+                            <div class="katex-display">
+                                $$L_2 = 3(0.1) + 2(0.2) + 2(0.2) + 2(0.3) + 3(0.2)$$
+                            </div>
+                            <div class="katex-display">
+                                $$L_2 = 0.3 + 0.4 + 0.4 + 0.6 + 0.6 = \mathbf{2.3}$$
+                            </div>
+                            
+                            <p class="mb-4">Since <span class="math">L_1 = L_2 = 2.3</span>, the average encoded symbol lengths of the two optimal Huffman codes are the same.</p>
+                        </div>
+                    </details>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Render all math elements with class "math"
+            const mathElements = document.querySelectorAll('.math');
+            mathElements.forEach(element => {
+                katex.render(element.textContent, element, {
+                    throwOnError: false
+                });
+            });
+            // Render all math elements for display (use .katex-display class for automatic display mode)
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const hints = {
+                "1": "Build the correct heap first (minheap for increasing order in this worksheet style, maxheap for decreasing), then repeat: swap root with last unsorted item, shrink heap, and reheapify.",
+                "2": "For Huffman coding, repeatedly combine the two smallest frequencies, then read 0/1 codes from root to leaves. For average length, compute sum of f_i * l_i.",
+                "3": "Same heapsort workflow as Problem 1, but this array is already maxheap-friendly. Track each prune step and final sorted order for both directions.",
+                "4": "Tied frequencies can produce different optimal Huffman trees. Construct two valid trees and verify optimality by comparing weighted average code lengths."
+            };
+
+            const toggleInput = document.getElementById("toggle-all");
+            if (toggleInput) {
+                const toggleContainer = toggleInput.closest("div");
+                if (toggleContainer) {
+                    toggleContainer.remove();
+                }
+            }
+
+            const cards = document.querySelectorAll("main .bg-white.shadow-md.rounded-lg.mb-6.overflow-hidden");
+            cards.forEach((card) => {
+                const heading = card.querySelector("h3");
+                if (!heading) {
+                    return;
+                }
+
+                const match = heading.textContent.match(/Problem\s+([0-9]+(?:\.[0-9]+)?)/i);
+                if (!match) {
+                    return;
+                }
+
+                const key = match[1];
+                if (!hints[key]) {
+                    return;
+                }
+
+                const controls = document.createElement("div");
+                controls.className = "hint-controls";
+                controls.innerHTML = `
+                    <button type="button" class="hint-btn" data-problem="${key}" aria-expanded="false">Show Hint</button>
+                    <div class="hint-panel" id="hint-${key.replace(/\./g, "-")}">
+                        <p class="font-semibold text-blue-900 mb-1">Hint</p>
+                        <p class="text-gray-700">${hints[key]}</p>
+                    </div>
+                `;
+
+                const details = card.querySelector("details");
+                if (details) {
+                    card.insertBefore(controls, details);
+                } else {
+                    card.appendChild(controls);
+                }
+            });
+
+            document.addEventListener("click", function(event) {
+                const button = event.target.closest(".hint-btn");
+                if (!button) {
+                    return;
+                }
+
+                const key = button.getAttribute("data-problem");
+                if (!key) {
+                    return;
+                }
+
+                const panel = document.getElementById(`hint-${key.replace(/\./g, "-")}`);
+                if (!panel) {
+                    return;
+                }
+
+                const isOpen = panel.classList.toggle("show");
+                button.textContent = isOpen ? "Hide Hint" : "Show Hint";
+                button.setAttribute("aria-expanded", String(isOpen));
+            });
+        });
+    </script>
+</body>
+</html>

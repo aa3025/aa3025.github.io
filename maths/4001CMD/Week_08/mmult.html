@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Multiplication Demo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .matrix-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .matrix-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 15px;
+        }
+        
+        .matrix {
+            display: inline-block;
+            position: relative;
+            margin: 10px 0;
+        }
+        
+        .matrix::before, .matrix::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            width: 8px;
+            height: 100%;
+            border: 2px solid #3498db;
+        }
+        
+        .matrix::before {
+            left: -12px;
+            border-right: 0;
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .matrix::after {
+            right: -12px;
+            border-left: 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .matrix table {
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 20px;
+        }
+        
+        .matrix td {
+            width: 45px;
+            height: 45px;
+            text-align: center;
+            padding: 10px;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .matrix-header {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .highlight-row {
+            background-color: rgba(52, 152, 219, 0.2) !important;
+            position: relative;
+            z-index: 1;
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.5);
+            border-radius: 4px;
+        }
+        
+        .highlight-col {
+            background-color: rgba(52, 152, 219, 0.2) !important;
+            position: relative;
+            z-index: 1;
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.5);
+            border-radius: 4px;
+        }
+        
+        .calculation {
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            border-left: 5px solid #3498db;
+            font-size: 18px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step-controls {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            gap: 15px;
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(to bottom, #2980b9, #2573a7);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: linear-gradient(to bottom, #bdc3c7, #95a5a6);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .step-indicator {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 18px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-cell {
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        
+        .highlight {
+            background-color: rgba(241, 196, 15, 0.3) !important;
+            animation: pulse 1s;
+            border-radius: 4px;
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.5);
+            z-index: 1;
+        }
+        
+        @keyframes pulse {
+            0% { 
+                background-color: rgba(241, 196, 15, 0.1); 
+                transform: scale(1);
+            }
+            50% { 
+                background-color: rgba(241, 196, 15, 0.5); 
+                transform: scale(1.08);
+            }
+            100% { 
+                background-color: rgba(241, 196, 15, 0.3); 
+                transform: scale(1.05);
+            }
+        }
+        
+        .matrix-multiply {
+            font-size: 28px;
+            margin: 0 20px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .explanation {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(to right, #e8f4fc, #d6eaf8);
+            border-radius: 8px;
+            border-left: 5px solid #2ecc71;
+        }
+        
+        .explanation h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #3498db;
+            padding-bottom: 8px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+        }
+        
+        .dimensions {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        /* Row and column indicators */
+        .row-indicator {
+            position: absolute;
+            left: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 2px;
+            background-color: #3498db;
+            z-index: 2;
+        }
+        
+        .row-indicator::before {
+            content: "";
+            position: absolute;
+            left: -5px;
+            top: -5px;
+            width: 12px;
+            height: 12px;
+            background-color: #3498db;
+            border-radius: 50%;
+        }
+        
+        .col-indicator {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background-color: #3498db;
+            z-index: 2;
+        }
+        
+        .col-indicator::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 12px;
+            height: 12px;
+            background-color: #3498db;
+            border-radius: 50%;
+        }
+        
+        @media (max-width: 768px) {
+            .matrix-container {
+                flex-direction: column;
+            }
+            
+            .matrix-multiply {
+                margin: 15px 0;
+                transform: rotate(90deg);
+            }
+            
+            .matrix td {
+                width: 35px;
+                height: 35px;
+                padding: 8px;
+                font-size: 16px;
+            }
+            
+            .row-indicator {
+                left: -20px;
+                width: 15px;
+            }
+            
+            .col-indicator {
+                top: -20px;
+                height: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Matrix Multiplication Visual Demo</h1>
+        
+        <div class="step-indicator">
+            Step <span id="step-number">1</span> of <span id="total-steps">10</span>
+        </div>
+        
+        <div class="matrix-container">
+            <div class="matrix-wrapper">
+                <div class="matrix-header">Matrix A</div>
+                <div class="dimensions">4 × 3</div>
+                <div class="matrix">
+                    <table id="matrix-a">
+                        <tr>
+                            <td>1</td>
+                            <td>5</td>
+                            <td>9</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>6</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>7</td>
+                            <td>11</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>8</td>
+                            <td>12</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="matrix-multiply">×</div>
+            
+            <div class="matrix-wrapper">
+                <div class="matrix-header">Matrix B</div>
+                <div class="dimensions">3 × 2</div>
+                <div class="matrix">
+                    <table id="matrix-b">
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>6</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="matrix-multiply">=</div>
+            
+            <div class="matrix-wrapper">
+                <div class="matrix-header">Result</div>
+                <div class="dimensions">4 × 2</div>
+                <div class="matrix">
+                    <table id="matrix-result">
+                        <tr>
+                            <td class="result-cell">?</td>
+                            <td class="result-cell">?</td>
+                        </tr>
+                        <tr>
+                            <td class="result-cell">?</td>
+                            <td class="result-cell">?</td>
+                        </tr>
+                        <tr>
+                            <td class="result-cell">?</td>
+                            <td class="result-cell">?</td>
+                        </tr>
+                        <tr>
+                            <td class="result-cell">?</td>
+                            <td class="result-cell">?</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calculation" id="calculation">
+            <!-- Calculation details will be inserted here by JavaScript -->
+        </div>
+        
+        <div class="step-controls">
+            <button id="prev-btn" disabled>Previous</button>
+            <button id="next-btn">Next Step</button>
+            <button id="reset-btn">Reset</button>
+        </div>
+        
+        <div class="explanation">
+            <h3>How Matrix Multiplication Works</h3>
+            <p>To multiply two matrices A (m×n) and B (n×r), the number of columns in A must equal the number of rows in B.</p>
+            <p>The element at position (i,j) in the result matrix is calculated by taking the dot product of the i-th row of A and the j-th column of B.</p>
+            <p>In this example: A is 4×3 and B is 3×2, so the result will be a 4×2 matrix.</p>
+            <p><strong>Formula:</strong> C[i,j] = Σ (A[i,k] × B[k,j]) for k = 1 to n</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Matrix data
+            const matrixA = [
+                [1, 5, 9],
+                [2, 6, 10],
+                [3, 7, 11],
+                [4, 8, 12]
+            ];
+            
+            const matrixB = [
+                [1, 2],
+                [3, 4],
+                [5, 6]
+            ];
+            
+            // Calculate the actual result for reference
+            const actualResult = [];
+            for (let i = 0; i < 4; i++) {
+                actualResult[i] = [];
+                for (let j = 0; j < 2; j++) {
+                    actualResult[i][j] = 
+                        matrixA[i][0] * matrixB[0][j] + 
+                        matrixA[i][1] * matrixB[1][j] + 
+                        matrixA[i][2] * matrixB[2][j];
+                }
+            }
+            
+            // Step definitions
+            const steps = [
+                {
+                    description: "We'll multiply matrix A (4×3) by matrix B (3×2). The result will be a 4×2 matrix.",
+                    highlightA: [],
+                    highlightB: [],
+                    highlightResult: []
+                },
+                {
+                    description: "Let's calculate the element at position (1,1) of the result matrix.",
+                    highlightA: [0], // First row
+                    highlightB: [0], // First column
+                    highlightResult: [[0, 0]],
+                    calculation: "C[1,1] = (1×1) + (5×3) + (9×5) = 1 + 15 + 45 = 61"
+                },
+                {
+                    description: "Now let's calculate the element at position (1,2) of the result matrix.",
+                    highlightA: [0], // First row
+                    highlightB: [1], // Second column
+                    highlightResult: [[0, 0], [0, 1]],
+                    calculation: "C[1,2] = (1×2) + (5×4) + (9×6) = 2 + 20 + 54 = 76"
+                },
+                {
+                    description: "Let's calculate the element at position (2,1) of the result matrix.",
+                    highlightA: [1], // Second row
+                    highlightB: [0], // First column
+                    highlightResult: [[0, 0], [0, 1], [1, 0]],
+                    calculation: "C[2,1] = (2×1) + (6×3) + (10×5) = 2 + 18 + 50 = 70"
+                },
+                {
+                    description: "Now let's calculate the element at position (2,2) of the result matrix.",
+                    highlightA: [1], // Second row
+                    highlightB: [1], // Second column
+                    highlightResult: [[0, 0], [0, 1], [1, 0], [1, 1]],
+                    calculation: "C[2,2] = (2×2) + (6×4) + (10×6) = 4 + 24 + 60 = 88"
+                },
+                {
+                    description: "Let's calculate the element at position (3,1) of the result matrix.",
+                    highlightA: [2], // Third row
+                    highlightB: [0], // First column
+                    highlightResult: [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0]],
+                    calculation: "C[3,1] = (3×1) + (7×3) + (11×5) = 3 + 21 + 55 = 79"
+                },
+                {
+                    description: "Now let's calculate the element at position (3,2) of the result matrix.",
+                    highlightA: [2], // Third row
+                    highlightB: [1], // Second column
+                    highlightResult: [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1]],
+                    calculation: "C[3,2] = (3×2) + (7×4) + (11×6) = 6 + 28 + 66 = 100"
+                },
+                {
+                    description: "Let's calculate the element at position (4,1) of the result matrix.",
+                    highlightA: [3], // Fourth row
+                    highlightB: [0], // First column
+                    highlightResult: [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 0]],
+                    calculation: "C[4,1] = (4×1) + (8×3) + (12×5) = 4 + 24 + 60 = 88"
+                },
+                {
+                    description: "Now let's calculate the element at position (4,2) of the result matrix.",
+                    highlightA: [3], // Fourth row
+                    highlightB: [1], // Second column
+                    highlightResult: [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 0], [3, 1]],
+                    calculation: "C[4,2] = (4×2) + (8×4) + (12×6) = 8 + 32 + 72 = 112"
+                },
+                {
+                    description: "Matrix multiplication complete! Here's the final result.",
+                    highlightA: [],
+                    highlightB: [],
+                    highlightResult: [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 0], [3, 1]],
+                    calculation: "The product of A and B is the 4×2 matrix shown above."
+                }
+            ];
+            
+            // DOM elements
+            const stepNumberElement = document.getElementById('step-number');
+            const totalStepsElement = document.getElementById('total-steps');
+            const calculationElement = document.getElementById('calculation');
+            const prevButton = document.getElementById('prev-btn');
+            const nextButton = document.getElementById('next-btn');
+            const resetButton = document.getElementById('reset-btn');
+            const matrixAElement = document.getElementById('matrix-a');
+            const matrixBElement = document.getElementById('matrix-b');
+            const matrixResultElement = document.getElementById('matrix-result');
+            
+            // Initialize
+            let currentStep = 0;
+            totalStepsElement.textContent = steps.length;
+            
+            // Function to update the display based on current step
+            function updateDisplay() {
+                const step = steps[currentStep];
+                
+                // Update step indicator
+                stepNumberElement.textContent = currentStep + 1;
+                
+                // Update calculation text
+                calculationElement.textContent = step.description;
+                if (step.calculation) {
+                    calculationElement.innerHTML = step.description + 
+                        `<br><br><strong>Calculation:</strong> ${step.calculation}`;
+                }
+                
+                // Update matrix highlighting
+                // Reset all highlights
+                const rowsA = matrixAElement.getElementsByTagName('tr');
+                const rowsB = matrixBElement.getElementsByTagName('tr');
+                const cellsResult = matrixResultElement.getElementsByClassName('result-cell');
+                
+                // Remove existing indicators
+                const existingIndicators = document.querySelectorAll('.row-indicator, .col-indicator');
+                existingIndicators.forEach(indicator => indicator.remove());
+                
+                for (let i = 0; i < rowsA.length; i++) {
+                    const cells = rowsA[i].getElementsByTagName('td');
+                    for (let j = 0; j < cells.length; j++) {
+                        cells[j].classList.remove('highlight-row');
+                    }
+                }
+                
+                for (let i = 0; i < rowsB.length; i++) {
+                    const cells = rowsB[i].getElementsByTagName('td');
+                    for (let j = 0; j < cells.length; j++) {
+                        cells[j].classList.remove('highlight-col');
+                    }
+                }
+                
+                for (let i = 0; i < cellsResult.length; i++) {
+                    cellsResult[i].classList.remove('highlight');
+                }
+                
+                // Apply new highlights
+                step.highlightA.forEach(rowIndex => {
+                    const cells = rowsA[rowIndex].getElementsByTagName('td');
+                    for (let j = 0; j < cells.length; j++) {
+                        cells[j].classList.add('highlight-row');
+                    }
+                    
+                    // Add row indicator
+                    const firstCell = rowsA[rowIndex].getElementsByTagName('td')[0];
+                    const indicator = document.createElement('div');
+                    indicator.className = 'row-indicator';
+                    firstCell.appendChild(indicator);
+                });
+                
+                step.highlightB.forEach(colIndex => {
+                    for (let i = 0; i < rowsB.length; i++) {
+                        const cells = rowsB[i].getElementsByTagName('td');
+                        cells[colIndex].classList.add('highlight-col');
+                        
+                        // Add column indicator to first row
+                        if (i === 0) {
+                            const indicator = document.createElement('div');
+                            indicator.className = 'col-indicator';
+                            cells[colIndex].appendChild(indicator);
+                        }
+                    }
+                });
+                
+                step.highlightResult.forEach(([row, col]) => {
+                    const resultRow = matrixResultElement.getElementsByTagName('tr')[row];
+                    const resultCell = resultRow.getElementsByTagName('td')[col];
+                    resultCell.textContent = actualResult[row][col];
+                    resultCell.classList.add('highlight');
+                });
+                
+                // Update button states
+                prevButton.disabled = currentStep === 0;
+                nextButton.disabled = currentStep === steps.length - 1;
+            }
+            
+            // Event listeners
+            prevButton.addEventListener('click', function() {
+                if (currentStep > 0) {
+                    currentStep--;
+                    updateDisplay();
+                }
+            });
+            
+            nextButton.addEventListener('click', function() {
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                    updateDisplay();
+                }
+            });
+            
+            resetButton.addEventListener('click', function() {
+                currentStep = 0;
+                updateDisplay();
+            });
+            
+            // Initialize display
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>

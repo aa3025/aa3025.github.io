@@ -1,0 +1,341 @@
+Slide 0: Table of Contents and Orientation
+Amanda: Welcome to Week 6. This is a serious and foundational week, because cryptography and number theory meet directly.
+Jack: So this is where abstract math starts powering real security systems.
+Amanda: Exactly. We begin with classical ciphers: Caesar, permutation, and one-time pad.
+Amanda: Then we face the central practical issue, the key distribution problem, and motivate public key cryptography.
+Jack: After that we shift into number theory basics.
+Amanda: Right. We cover divisibility, quotient and remainder, number bases, Euclidean and extended Euclidean algorithms, and coprime integers.
+Amanda: Then we revisit gcd and lcm through prime factorization.
+Amanda: In the final part, we move from integers to rationals, then to irrationals and real numbers, and finish with approximating square root of 2.
+Jack: So the roadmap is: ciphers, core number theory tools, then number systems and approximation.
+Amanda: Perfect. Keep one theme in mind all lecture: precise definitions lead to reliable algorithms.
+
+Slide 1: Cryptography
+Amanda: Cryptography is the study of techniques for secure communication.
+Jack: Let us pin down the vocabulary first.
+Amanda: Plaintext is the original readable message. Ciphertext is the encrypted unreadable message.
+Amanda: For example, plaintext can be "I have a secret to tell you," and ciphertext can look like random letters.
+Jack: And what are the core goals?
+Amanda: Confidentiality, integrity, and authentication.
+Amanda: Confidentiality means only intended recipients can read the message.
+Amanda: Integrity means the message was not altered in transit.
+Amanda: Authentication means we can verify who sent it.
+Jack: So this is not just secret writing. It is trust and correctness in communication.
+Amanda: Exactly. Modern HTTPS is a direct everyday application.
+
+Slide 2: Caesar Cipher
+Amanda: The Caesar cipher is one of the simplest encryption methods.
+Jack: Each letter is shifted by a fixed number of positions, right?
+Amanda: Yes. If the shift is n, every letter moves n steps forward, wrapping from Z back to A.
+Amanda: Example: with shift 3, HELLO becomes KHOOR.
+Amanda: In the slide example, a shift of 8 turns "i have a secret" into "Q PIDM I AMKZMB."
+Jack: Why is this historically important but cryptographically weak?
+Amanda: Because there are only 25 nontrivial keys to try.
+Amanda: That means brute force is fast.
+Amanda: It is also vulnerable to frequency analysis, because letter statistics are preserved under shifting.
+Jack: So Caesar is great for learning, not for real security.
+Amanda: Exactly.
+
+Slide 3: Permutation Cipher
+Amanda: Now we upgrade to a permutation cipher.
+Jack: Instead of one fixed shift, each letter gets its own substitution from a full alphabet mapping.
+Amanda: Right. The key is a permutation of 26 letters.
+Amanda: That gives 26 factorial possible keys, about 4.03 times 10 to the 26.
+Jack: Enormous key space compared with Caesar.
+Amanda: Yes, so naive brute force becomes impractical.
+Amanda: But this cipher is still vulnerable to frequency analysis.
+Amanda: Common plaintext letters like E and T still tend to produce common ciphertext letters, just relabeled.
+Jack: So statistics leak structure.
+Amanda: Exactly. Large key space alone does not guarantee modern security.
+
+Slide 4: One-Time Pad Cipher
+Amanda: The one-time pad is theoretically unbreakable when used correctly.
+Jack: The phrase "when used correctly" is doing a lot of work there.
+Amanda: It is. Each plaintext symbol is combined with a truly random key symbol from a shared codebook.
+Amanda: The key must be as long as the message, truly random, used once, and then destroyed.
+Jack: That removes repeated patterns, so frequency analysis fails.
+Amanda: Correct. In theory this gives perfect secrecy.
+Amanda: But in practice, secure key generation, storage, and one-time distribution are very hard.
+Jack: So the mathematics is perfect, but logistics are painful.
+Amanda: Exactly. That practical difficulty leads to the main problem in cryptography.
+
+Slide 5: The Main Problem in Cryptography
+Amanda: Here is the central challenge: key distribution.
+Jack: Alice and Bob need a shared secret key, but Eve may be listening.
+Amanda: Right. To encrypt safely, they first need to exchange key material safely.
+Amanda: But any unsafe channel can leak the key before encryption even starts.
+Jack: Meeting in person every time does not scale.
+Amanda: Exactly. That is why symmetric encryption alone is not enough for global networks.
+Amanda: We need a way to communicate securely without pre-sharing a secret key.
+Jack: And that opens the door to public key cryptography.
+Amanda: Precisely.
+
+Slide 6: Public Key Cryptography
+Amanda: Public key cryptography uses two related keys: a public key and a private key.
+Jack: Public key is shared openly, private key stays secret.
+Amanda: Yes. Anyone can encrypt to Bob using Bob's public key.
+Amanda: Only Bob can decrypt using Bob's private key.
+Jack: So the key distribution bottleneck is reduced, because we distribute public keys, not secret ones.
+Amanda: Exactly. That is the conceptual breakthrough. The encryption key can be public, so the insecure channel is no longer a fatal obstacle.
+Jack: But if everyone can see Bob's public key, why can they not just reverse the process and recover the private key?
+Amanda: Because the system is built around a one-way computational problem. In RSA, forming the public key is easy, but reversing it would require factoring a very large composite number.
+Amanda: The slide shows a toy RSA setup to illustrate the workflow with small numbers that humans can actually follow.
+Jack: So we choose small primes, multiply them, build the public key, encrypt a message, and then decrypt it with the matching private key.
+Amanda: Right. In real deployments the same logic applies, but the numbers are enormous, which is what makes the attack computationally infeasible.
+Jack: So the security claim is not that decryption is logically impossible for an attacker. It is that it is not practically achievable.
+Amanda: Precisely. This idea powers HTTPS, digital signatures, secure email, and the broader infrastructure of modern online security.
+
+Slide 7: Divisibility
+Amanda: We now move into number theory fundamentals.
+Jack: First concept: divisibility.
+Amanda: We say y divides x, written y vertical bar x, if there exists an integer q such that x equals y times q.
+Amanda: Then y is a divisor or factor of x, and x is a multiple of y.
+Jack: Examples include 17 dividing 51, and 5 dividing 65.
+Amanda: Yes, because 51 equals 17 times 3, and 65 equals 5 times 13, so the quotient is an integer in each case.
+Amanda: Non-examples matter too. Four does not divide 10 because 10 over 4 is not an integer.
+Jack: So divisibility is a statement about exact multiplication with no remainder.
+Amanda: Exactly. That simple idea is the foundation for gcd, primes, coprimality, congruences, and later cryptographic constructions.
+Amanda: Useful quick rules help us reason efficiently: divisible by 2 if the last digit is even, by 3 if the digit sum is divisible by 3, and by 5 if the last digit is 0 or 5.
+Jack: Also every integer divides 0, because 0 equals n times 0 for any integer n.
+Amanda: Right. But 0 does not divide nonzero integers, because there is no integer q making a nonzero number equal to 0 times q.
+Amanda: Divisibility seems elementary, but it supplies the language for everything that follows.
+
+Slide 8: Quotient and Remainder
+Amanda: Next is the division algorithm.
+Amanda: For integers a and b with b positive, there exist unique integers q and r such that a equals b q plus r, with r is larger or equal to zero, but strictly less than b.
+Jack: q is call quotient, and r is the remainder.
+Amanda: The slide gives a concrete visual example. Imagine you have 27 cookies and want to pack them into boxes of 6.
+Jack: So how many complete boxes do we get?
+Amanda: We can fill exactly 4 boxes, using 24 cookies in total. That leaves 3 cookies that do not fill another box.
+Jack: So 27 equals 6 times 4 plus 3. Quotient 4, remainder 3.
+Amanda: Exactly. The remainder is 3, which is less than the box size of 6. That is the constraint: you cannot have a leftover that would fill another box, otherwise you undercounted the quotient.
+Jack: So the remainder is the honest measure of what is genuinely left over after packing as tightly as possible.
+Amanda: Right. That is the intuition behind the formal theorem.
+Amanda: Another example on the slide is 8247 equals 345 times 23 plus 312. Notice the remainder is smaller than the divisor, exactly as the theorem requires.
+Jack: Why does the condition 0 less than or equal to r less than b matter?
+Amanda: It guarantees uniqueness. Without that restriction, we could invent many different quotient-remainder pairs for the same number.
+Jack: So remainder is not arbitrary leftover, it is a carefully controlled leftover.
+Amanda: Exactly. Once the divisor is fixed, there is one correct quotient and one correct remainder.
+Amanda: This is more than bookkeeping. The Euclidean algorithm works precisely because repeated division produces these constrained remainders.
+Jack: So the structure of modular arithmetic is already hiding inside this theorem.
+Amanda: Right. Division with remainder is the basic engine behind a large part of computational number theory.
+
+Slide 9: Number Bases
+Amanda: Numbers can be written in any base, not just base 10. The base controls how many digit symbols are available and how each position is valued.
+Jack: In base 10 we use digits 0 through 9, and each position is a power of 10.
+Amanda: Right. For example, 537 in base 10 means 5 times 10 squared, plus 3 times 10 to the power 1, plus 7 times 10 to the power 0, giving 500 plus 30 plus 7.
+Jack: The same idea applies in any base. Only the powers change.
+Amanda: Exactly. Let us work through converting 537 from decimal into base 8, which is octal.
+Amanda: The method is to find which powers of 8 fit into the number. The relevant powers are 8 to the 0 which is 1, 8 to the 1 which is 8, 8 squared which is 64, and 8 cubed which is 512.
+Jack: So we start with the largest power that fits.
+Amanda: Right. 512 fits into 537 exactly once, leaving a remainder of 25. So the digit for the 8 cubed position is 1.
+Amanda: Next we ask how many times 64 fits into 25. It does not fit at all, so the digit for the 8 squared position is 0.
+Jack: Then how many times does 8 fit into 25?
+Amanda: Three times, giving 24, with a remainder of 1. So the digit for the 8 to the 1 position is 3.
+Amanda: Finally, 1 fits into 1 exactly once, so the digit for the units position is 1.
+Jack: So 537 in base 8 is 1, 0, 3, 1, written as 1031 in octal.
+Amanda: Correct. We verify by expanding: 1 times 512, plus 0 times 64, plus 3 times 8, plus 1 times 1, which gives 512 plus 24 plus 1 equals 537. It checks out.
+Jack: Now let us do a binary example. The slide converts 109 into base 2.
+Amanda: The powers of 2 we need are 64, 32, 16, 8, 4, 2, and 1, which are 2 to the 6 down to 2 to the 0.
+Amanda: 64 fits into 109 once, leaving 45. So the first digit is 1.
+Amanda: 32 fits into 45 once, leaving 13. Second digit is 1.
+Amanda: 16 does not fit into 13. Third digit is 0.
+Amanda: 8 fits into 13 once, leaving 5. Fourth digit is 1.
+Amanda: 4 fits into 5 once, leaving 1. Fifth digit is 1.
+Amanda: 2 does not fit into 1. Sixth digit is 0.
+Amanda: 1 fits into 1 once, leaving 0. Seventh digit is 1.
+Jack: So reading the digits from most significant to least significant, 109 in binary is 1101101.
+Amanda: Exactly. We can verify: 64 plus 32 plus 8 plus 4 plus 1 equals 109.
+Jack: The slide also shows going in the other direction, reading a binary number back into decimal.
+Amanda: Right. The example is 1101 in base 2. Reading the digits from left to right against the place values, we get 1 times 8, plus 1 times 4, plus 0 times 2, plus 1 times 1, which is 8 plus 4 plus 1 equals 13.
+Jack: And for octal, 47 in base 8 is 4 times 8 plus 7 times 1, which is 32 plus 7, giving 39.
+Amanda: Correct. And for hexadecimal, 2F in base 16 uses the digit F to represent 15. So 2 times 16 plus 15 equals 32 plus 15 equals 47.
+Jack: So every base uses the same positional logic. The digit values and the powers of the base are the only things that change.
+Amanda: Exactly. Binary and hexadecimal are especially important in computing. Hardware operates on bits, which are base 2 digits, and hexadecimal is a compact shorthand for binary because one hex digit encodes exactly four binary bits.
+Jack: Same quantity, different encoding. Understanding the conversion process is what lets you move fluently between them.
+
+Slide 10: Euclidean Algorithm
+Amanda: The Euclidean algorithm computes gcd, which stands for Greatest Common Divisor, efficiently by repeatedly applying one key fact: gcd of a and b equals gcd of b and the remainder when a is divided by b.
+Jack: So we never need to factorise anything. We just divide and shrink the problem.
+Amanda: Exactly. Let us walk through the example on the slide: gcd of 2406 and 654.
+Amanda: Step one. Divide 2406 by 654. That gives quotient 3 and remainder 444, because 654 times 3 is 1962 and 2406 minus 1962 is 444. So gcd of 2406 and 654 equals gcd of 654 and 444.
+Amanda: Step two. Divide 654 by 444. Quotient 1, remainder 210. So gcd of 654 and 444 equals gcd of 444 and 210.
+Amanda: Step three. Divide 444 by 210. Quotient 2, remainder 24. So gcd of 444 and 210 equals gcd of 210 and 24.
+Jack: The remainders are getting smaller each time.
+Amanda: Right. Step four. Divide 210 by 24. Quotient 8, remainder 18, because 24 times 8 is 192 and 210 minus 192 is 18. So gcd of 210 and 24 equals gcd of 24 and 18.
+Amanda: Step five. Divide 24 by 18. Quotient 1, remainder 6. So gcd of 24 and 18 equals gcd of 18 and 6.
+Amanda: Step six. Divide 18 by 6. Quotient 3, remainder 0. We have reached zero.
+Jack: So the last nonzero remainder is 6, and that is the gcd.
+Amanda: Correct. GCD of 2406 and 654 is 6.
+Jack: Why does replacing the pair with b and the remainder preserve the gcd?
+Amanda: Because any common divisor of a and b must also divide the remainder r, since r equals a minus b times q. And conversely any common divisor of b and r must also divide a. So the set of common divisors is unchanged at every step.
+Jack: And why does it terminate?
+Amanda: The remainders form a strictly decreasing sequence of nonneg integers, so they must eventually reach zero.
+
+Slide 11: Extended Euclidean Algorithm
+Amanda: The extended Euclidean algorithm goes beyond finding the gcd. It also finds integers x and y such that gcd of a and b equals a times x plus b times y. That expression is called a Bezout identity.
+Jack: So for 2406 and 654 we want to find x and y such that 2406 times x plus 654 times y equals 6.
+Amanda: Right. The method is to back-substitute through the Euclidean steps we just did, expressing each remainder in terms of the two original numbers.
+Amanda: We start from step five of the Euclidean algorithm, which told us that 6 equals 24 minus 18 times 1.
+Amanda: Now we replace 18 using step four: 18 equals 210 minus 24 times 8. Substituting gives 6 equals 24 minus the quantity 210 minus 24 times 8, times 1. That simplifies to 6 equals 24 times 9 minus 210.
+Jack: So now 6 is written in terms of 24 and 210.
+Amanda: Correct. Next we replace 24 using step three: 24 equals 444 minus 210 times 2. Substituting gives 6 equals the quantity 444 minus 210 times 2, times 9, minus 210. That simplifies to 6 equals 444 times 9 minus 210 times 19.
+Amanda: Now we replace 210 using step two: 210 equals 654 minus 444 times 1. Substituting gives 6 equals 444 times 9 minus the quantity 654 minus 444, times 19. That simplifies to 6 equals 444 times 28 minus 654 times 19.
+Amanda: Finally we replace 444 using step one: 444 equals 2406 minus 654 times 3. Substituting gives 6 equals the quantity 2406 minus 654 times 3, times 28, minus 654 times 19. That simplifies to 6 equals 2406 times 28 minus 654 times 84 minus 654 times 19, which is 6 equals 2406 times 28 minus 654 times 103.
+Jack: So x equals 28 and y equals minus 103.
+Amanda: Exactly. We can verify: 2406 times 28 is 67368, and 654 times 103 is 67362, and the difference is 6.
+Jack: Why does this matter so much for cryptography?
+Amanda: Because when gcd of a and n is 1, the coefficient x in that identity is a modular inverse of a modulo n. It satisfies a times x congruent to 1 modulo n.
+Amanda: In RSA key generation we need to solve exactly that kind of equation, specifically e times d congruent to 1 modulo phi of n, and the extended Euclidean algorithm gives d directly.
+
+Slide 12: Coprime Integers
+Amanda: Two integers are coprime if their gcd is 1, meaning they share no common prime factor.
+Jack: So 9 and 7 are coprime because gcd of 9 and 7 is 1. And 15 and 28 are coprime too.
+Amanda: Right. But 12 and 18 are not coprime because gcd of 12 and 18 is 6. They share the factors 2 and 3.
+Amanda: The key consequence of coprimality is Bezout's identity: if gcd of a and b is 1, then there exist integers m and n such that 1 equals a times m plus b times n.
+Jack: The slide has a concrete example of this with the water jug problem. You have a 9-litre jug and a 7-litre jug. How do you measure exactly 1 litre?
+Amanda: Since gcd of 9 and 7 is 1, we know by Bezout that some integer combination of 9 and 7 produces 1. We find it using the extended Euclidean algorithm.
+Amanda: Step one. 9 equals 7 times 1 plus 2. So 2 equals 9 minus 7.
+Amanda: Step two. 7 equals 2 times 3 plus 1. So 1 equals 7 minus 2 times 3.
+Amanda: Now substitute 2 from step one: 1 equals 7 minus the quantity 9 minus 7, times 3. That gives 1 equals 7 times 4 minus 9 times 3. So 1 equals 9 times minus 3 plus 7 times 4.
+Jack: Meaning x equals minus 3 and y equals 4. So fill the 7-litre jug 4 times and empty the 9-litre jug 3 times.
+Amanda: Exactly. Filling the 7-litre jug 4 times gives 28 litres total. Pouring out 3 full 9-litre jugs removes 27 litres. You are left with 1 litre.
+Jack: So the abstract Bezout equation corresponds directly to a physical sequence of pourings.
+Amanda: Precisely. Coprimality is what guarantees the target is reachable at all.
+
+Slide 13: LCM and GCD Revisited
+Amanda: Prime factorization gives us a second way to compute gcd and lcm, and it makes the underlying structure very transparent.
+Jack: The rule is: write both numbers as products of prime powers, then compare exponents prime by prime.
+Amanda: For gcd, take the minimum exponent for each prime. For lcm, take the maximum exponent.
+Amanda: Let us work through the example on the slide: 7000 and 88200.
+Amanda: First we factorise 7000. Dividing by 2 three times gives 875. Then 875 is 5 cubed times 7. So 7000 equals 2 cubed times 5 cubed times 7 to the first.
+Amanda: Now 88200. Dividing by 2 three times gives 11025. Then 11025 is 3 squared times 5 squared times 7 squared. So 88200 equals 2 cubed times 3 squared times 5 squared times 7 squared.
+Jack: Now we compare exponents for each prime: 2, 3, 5, and 7.
+Amanda: For gcd we take the minimum. Prime 2 appears with exponent 3 in both, so minimum is 3. Prime 3 appears with exponent 0 in 7000 and 2 in 88200, so minimum is 0. Prime 5 has exponents 3 and 2, so minimum is 2. Prime 7 has exponents 1 and 2, so minimum is 1.
+Amanda: That gives gcd equals 2 cubed times 3 to the 0 times 5 squared times 7, which is 8 times 1 times 25 times 7, equals 1400.
+Jack: And for lcm we take the maximum exponents: 3 for 2, then 2 for 3, then 3 for 5, then 2 for 7.
+Amanda: So lcm equals 2 cubed times 3 squared times 5 cubed times 7 squared, which is 8 times 9 times 125 times 49, equals 441000.
+Jack: Then we verify the identity: gcd times lcm should equal the product of the two original numbers.
+Amanda: Right. 1400 times 441000 is 617,400,000. And 7000 times 88200 is also 617,400,000. The identity holds.
+Jack: So gcd and lcm are genuinely dual: one picks the overlap, the other picks the union, and together they account for the full product.
+
+Slide 14: Prime Numbers
+Amanda: A prime is an integer greater than or equal to 2 with exactly two positive divisors: 1 and itself.
+Jack: Composite numbers have additional divisors.
+Amanda: Right. The slide lists small primes and non-primes to anchor the definition, because students often mistake odd numbers for primes even though 9, 15, and 21 are composite.
+Amanda: Then it introduces the Sieve of Eratosthenes for finding all primes up to a bound.
+Amanda: Mark 2 as prime, cross out its multiples, move to the next unmarked number, and repeat the process.
+Jack: Every composite number eventually gets crossed out because it has some smaller prime factor.
+Amanda: Exactly. So the numbers left unmarked at the end are precisely the primes.
+Jack: Simple idea, powerful outcome.
+Amanda: Very powerful. Prime numbers are the atomic pieces of arithmetic, and large primes are also central ingredients in modern cryptographic systems.
+
+Slide 15: Prime Factorization
+Amanda: The fundamental theorem of arithmetic states that every integer greater than 1 has a unique prime factorization, up to the order of the factors.
+Jack: So primes are the atoms of arithmetic. Every number has exactly one way to be built from them.
+Amanda: Right. Let us work through the example on the slide: factorise 2406.
+Amanda: 2406 is even, so divide by 2. That gives 1203. Is 1203 divisible by 2? No. Try 3: digit sum is 1 plus 2 plus 0 plus 3 equals 6, which is divisible by 3. So 1203 divided by 3 is 401.
+Jack: Is 401 prime?
+Amanda: We test divisibility by all primes up to the square root of 401, which is about 20. We try 2, 3, 5, 7, 11, 13, 17, 19 and none of them divide 401. So 401 is prime.
+Amanda: Therefore 2406 equals 2 times 3 times 401.
+Amanda: Similarly, 654 equals 2 times 3 times 109, and 109 can be verified prime by the same method.
+Amanda: The slide also records 7000 equals 2 cubed times 5 cubed times 7, and 88200 equals 2 cubed times 3 squared times 5 squared times 7 squared.
+Jack: Existence says every number has some factorisation. Why is uniqueness the harder and more important claim?
+Amanda: Because it says there is only one factorisation. If you start dividing in a different order, you always end up with the same set of prime factors and the same exponents. That intrinsic fingerprint is what makes prime factorization a reliable tool.
+Amanda: The proof uses Euclid's lemma: if a prime divides a product, it must divide at least one of the factors. That forces any two supposed factorisations to contain the same primes.
+Jack: And in cryptography that uniqueness is what makes large composite numbers useful as public keys.
+Amanda: Exactly. Finding that factorisation for a number hundreds of digits long is computationally hard, and that hardness is the security foundation of RSA.
+
+Slide 16: Extending Integers
+Amanda: Integers extend natural numbers by including negatives.
+Jack: That gives additive inverses, so subtraction becomes internally valid.
+Amanda: Right. We have additive identity 0 and additive inverse minus x for each x.
+Amanda: But multiplicative inverses mostly fail in integers.
+Amanda: For example, 2 times what equals 1 has no integer solution. The same issue appears for 3, 4, 5, and almost every other integer.
+Jack: Only 1 and minus 1 have multiplicative inverses in Z.
+Amanda: Exactly. So integers are closed under addition, subtraction, and multiplication, but not under division.
+Jack: And when a number system is missing an operation we want, mathematics often responds by building a larger system.
+Amanda: Precisely. That limitation motivates extending to rational numbers, where division by nonzero values becomes available.
+
+Slide 17: Rational Numbers
+Amanda: Rational numbers are numbers of the form p over q, where p and q are integers and q is not zero. The set of all rationals is written Q.
+Jack: So every integer is rational too, written as n over 1.
+Amanda: Yes. The operations work as expected: a over b plus c over d is ad plus bc over bd, and a over b times c over d is ac over bd.
+Amanda: Examples on the slide include 1 over 2, 3 over 4, the integer 2 written as 2 over 1, 0.75 written as 3 over 4, and the repeating decimal 0.333... written as 1 over 3.
+Jack: So rationals capture exact quotients. The equation 2 times x equals 1 has no integer solution, but the rational solution x equals 1 over 2 is immediate.
+Amanda: Exactly. Now the slide emphasises density, and it gives a concrete example worth walking through.
+Amanda: Take two rationals: 1 over 3 and 1 over 2. Are there any rationals strictly between them?
+Jack: You said to take the midpoint.
+Amanda: Right. The midpoint is 1 over 3 plus 1 over 2, divided by 2. The sum 1 over 3 plus 1 over 2 is 2 over 6 plus 3 over 6, which is 5 over 6. Half of that is 5 over 12.
+Jack: So 5 over 12 sits between 1 over 3 and 1 over 2. We can verify: 1 over 3 equals 4 over 12, then 5 over 12, then 1 over 2 equals 6 over 12. The order is correct.
+Amanda: Exactly. And we can repeat the process. Between 1 over 3 and 5 over 12, there is another rational. And so on, forever.
+Amanda: That is what density means: no matter how small the gap between two rationals, there are infinitely many rationals inside it.
+Jack: But despite that density, rationals do not fill the line. There are still positions no fraction reaches.
+Amanda: Right. Those positions belong to irrational numbers.
+
+Slide 18: Decimal Expansions
+Amanda: Rational numbers have decimal expansions that either terminate or repeat. Both types can be converted back to exact fractions using algebra.
+Jack: Terminating examples from the slide: 1 over 8 equals 0.125, and 117 over 40 equals 2.925.
+Amanda: Repeating examples: 1 over 3 equals 0.333..., and 3 over 11 equals 0.272727...
+Amanda: The conversion trick for purely repeating decimals is straightforward. Let x equal 0.272727... Multiply by 100 to shift the decimal by one full repeating block, giving 100x equals 27.272727... Now subtract x from both sides. The repeating tail cancels, leaving 99x equals 27, so x equals 27 over 99, which simplifies to 3 over 11.
+Jack: The slide also has a harder example with a non-repeating prefix before the repeat starts. Let us look at 0.1234343434..., where the digits 3 and 4 repeat but the 1 and 2 do not.
+Amanda: For that case we need two multiplications. First multiply by 100 to move past the non-repeating part: 100x equals 12.34343434... Then multiply by 10000 to move past one full repeating cycle: 10000x equals 1234.34343434...
+Amanda: Subtract the first from the second: 10000x minus 100x equals 1234.343434... minus 12.343434... The repeating tails cancel again, leaving 9900x equals 1222.
+Jack: So x equals 1222 over 9900.
+Amanda: Correct. Divide numerator and denominator by 2 to simplify: 611 over 4950. That is the exact fraction for 0.1234343434...
+Jack: So every repeating decimal, no matter how long the prefix or how long the repeating block, yields a linear equation with a rational solution.
+Amanda: Exactly. Repetition is the algebraic signature of rationality. A decimal that is infinite and genuinely non-repeating cannot be a fraction.
+
+Slide 19: Irrational Numbers
+Amanda: Irrational numbers cannot be written as ratio of two integers.
+Jack: Their decimals are infinite and non-repeating.
+Amanda: Exactly. The slide presents the classic proof that square root of 2 is irrational by contradiction.
+Amanda: Assume root 2 equals a over b in lowest terms, so a and b share no common factor.
+Amanda: Squaring gives a squared equals 2 b squared, which means a squared is even, so a itself must be even.
+Jack: Then a equals 2k for some integer k.
+Amanda: Right. Substitute that back in and you find b squared is also even, so b must be even as well.
+Jack: But then both a and b are divisible by 2, which contradicts the assumption that the fraction was already reduced.
+Amanda: Exactly. That contradiction proves square root of 2 is irrational.
+Amanda: The slide also lists examples like square root of 3, pi, and e, emphasizing that irrational numbers are a fundamental part of the real line, not rare exceptions.
+
+Slide 20: Real Numbers
+Amanda: Real numbers include all rationals and all irrationals.
+Jack: So every point on the continuous number line corresponds to exactly one real number.
+Amanda: Yes. Reals are complete: no gaps in the line.
+Amanda: The slide ties this to decimal expansions, including terminating, repeating, and non-repeating forms.
+Jack: Rationals are dense, irrationals fill the rest, and together they form R.
+Amanda: Exactly. The important extra idea is completeness. In the real numbers there are no missing limit points and no holes in the continuous line.
+Jack: That sounds abstract, but it is exactly what calculus and analysis need in order to work.
+Amanda: Precisely. Whenever we model measurement, motion, change, or convergence, we are relying on the real number system.
+Amanda: This is the number system used across analysis, modeling, and computation.
+
+Slide 21: Approximating Square Root of 2
+Amanda: The slide presents an iterative method for approximating root 2 using only rational arithmetic at every step.
+Amanda: Start with x1 equals 2. The update rule is: x subscript n plus 1 equals one half times x subscript n plus 2 divided by x subscript n.
+Jack: Babylonian or Newton style update.
+Amanda: Yes. Let us track the exact fractions, because the slide does.
+Amanda: x2 equals one half times 2 plus 2 over 2, which is one half times 2 plus 1, equals one half times 3, equals 3 over 2. As a decimal that is 1.5.
+Jack: Already quite close. What is x3?
+Amanda: x3 equals one half times 3 over 2 plus 2 divided by 3 over 2. Now 2 divided by 3 over 2 is 4 over 3. So we need one half of 3 over 2 plus 4 over 3. Converting to sixths: 9 over 6 plus 8 over 6 is 17 over 6. Half of that is 17 over 12, which is approximately 1.4167.
+Jack: And x4?
+Amanda: x4 equals one half times 17 over 12 plus 2 divided by 17 over 12. Now 2 divided by 17 over 12 is 24 over 17. We add 17 over 12 and 24 over 17. The common denominator is 204: that gives 289 over 204 plus 288 over 204, which is 577 over 204. Half of that is 577 over 408, approximately 1.41421568.
+Jack: Root 2 to six decimal places is 1.414214, so 577 over 408 is already accurate to five decimal places.
+Amanda: Exactly. And each step roughly doubles the number of correct digits, which is characteristic of Newton's method.
+Amanda: If the sequence converges to a limit X, then X satisfies X equals one half times X plus 2 over X. Multiply both sides by X: X squared equals one half X squared plus 1, so one half X squared equals 1, so X squared equals 2. The limit is root 2.
+Jack: So rational fractions converge to an irrational target, and the exact theory tells us what that target must be.
+Amanda: Right. That connection between iterative computation and exact mathematical truth is a recurring theme in applied mathematics.
+
+Slide 22: Summary
+Amanda: Let us summarize Week 6.
+Amanda: In cryptography, we moved from classical ciphers to the key distribution problem and public key ideas.
+Amanda: In number theory, we covered divisibility, division with remainder, base systems, gcd algorithms, coprimality, primes, and factorization.
+Amanda: In number systems, we extended from integers to rationals, then to irrationals and real numbers.
+Amanda: We closed with iterative approximation of root 2, connecting exact theory with practical computation.
+Jack: So the big takeaway is that number theory is not optional background. It is the engine behind modern cryptography.
+Amanda: Exactly. Concepts like divisibility, gcd, modular inverses, and primes are not isolated facts. They are the working parts inside secure communication systems.
+Jack: And on the number systems side, we also saw how mathematics extends a structure when the old one is not expressive enough.
+Amanda: Right. Naturals extend to integers, integers to rationals, and rationals to reals, each step solving a genuine limitation.
+Jack: So the lecture carries two linked themes: algorithms for secure computation, and careful expansion of the number systems we use to reason.
+Amanda: Precisely. Strong definitions, strong theorems, and strong algorithms all work together.
+Jack: And that is the mindset we carry into the next week.
+Amanda: Great work. End of Week 6 voiceover.

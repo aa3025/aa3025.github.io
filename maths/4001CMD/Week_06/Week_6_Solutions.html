@@ -1,0 +1,992 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial 6 Solutions - 4001CMD</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" xintegrity="sha384-KiWOvVjnN8qwKMlbsEOfOJaN8EvkycNwgTYSSi7mGv+B4v8zFAHmv/dpvR0/vGHD" crossorigin="anonymous">
+    <!-- KaTeX JS -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" xintegrity="sha384-hIoBPJpTadxHRDO82BcO1F7S4CsgNchBFeS/fV7aV+E/CmhxhZmb4fvrWjQJgKRS" crossorigin="anonymous"></script>
+    <!-- KaTeX Auto-render extension -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" xintegrity="sha384-+XBljXPPJ+bVci3gwuDRaL5D1Y4NUPGNTM8PmLHjoWsNZrKSQGzC7/0mgM9aMuzx" crossorigin="anonymous"></script>
+    <style>
+        /* Custom styles for rendered KaTeX */
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        /* Custom styles for code blocks */
+        pre {
+            background-color: #f3f4f6; /* gray-100 */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 1rem; /* p-4 */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 leading-relaxed">
+
+    <div class="max-w-4xl mx-auto p-6 sm:p-8">
+        
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Tutorial 6 Exercises & Solutions</h1>
+            <p class="text-xl text-gray-600">4001CMD - Mathematical Skills for Computing Professionals</p>
+        </header>
+
+        <!-- Toggle All Solutions -->
+        <div class="flex items-center justify-end mb-6 bg-white p-4 rounded-lg shadow-md">
+            <label for="toggle-all" class="mr-3 font-semibold text-gray-700 cursor-pointer">Show All Solutions</label>
+            <input type="checkbox" id="toggle-all" class="h-5 w-5 text-blue-600 rounded cursor-pointer focus:ring-blue-500 border-gray-300">
+        </div>
+
+        <main>
+            <!-- Section: Divisibility -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Divisibility</h2>
+
+                <!-- Problem 1 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1</h3>
+                        <p class="mb-4 text-lg">Show that if $c|a$ and $c|b$, then $c|(xa+yb)$ for any integers $x,y \in \Z$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2"><strong class="font-semibold">Step 1: Write down the definitions of divisibility.</strong></p>
+                            <p class="mb-2">The statement $c|a$ ("c divides a") means that there exists some integer $k_1$ such that $a = c \cdot k_1$.</p>
+                            <p class="mb-4">Similarly, $c|b$ means that there exists some integer $k_2$ such that $b = c \cdot k_2$.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Step 2: Substitute these definitions into the expression $xa+yb$.</strong></p>
+                            <p class="mb-4">We want to show that $xa+yb$ is also a multiple of $c$. Let's substitute the expressions for $a$ and $b$ from Step 1:</p>
+                            $$ xa + yb = x(ck_1) + y(ck_2) $$
+
+                            <p class="mb-2"><strong class="font-semibold">Step 3: Factor out the common term $c$.</strong></p>
+                            <p class="mb-4">Using the distributive property, we can factor $c$ out of both terms on the right-hand side:</p>
+                            $$ xa + yb = c(xk_1 + yk_2) $$
+
+                            <p class="mb-2"><strong class="font-semibold">Step 4: Conclude based on the definition of divisibility.</strong></p>
+                            <p class="mb-2">Let $k_3 = xk_1 + yk_2$. Since $x$, $y$, $k_1$, and $k_2$ are all integers, their products and sums must also be an integer. So, $k_3$ is an integer.</p>
+                            <p class="mb-2">We can now write the expression as:</p>
+                            $$ xa + yb = c \cdot k_3 $$
+                            <p>This is precisely the definition of $c$ dividing $xa+yb$. Therefore, we have shown that $c|(xa+yb)$.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 2 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 2</h3>
+                        <p class="mb-4 text-lg">Find the quotient $q$ and remainder $r$ when $a$ is divided by $b$ in the following two cases.</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) $a=1001$, $b = 11$</li>
+                            <li>(b) $a = 12345$, $b = 234$</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                        
+                            <strong class="font-semibold">(a) $a=1001$, $b = 11$</strong>
+                            <p class="mb-4">We perform long division for $1001 \div 11$:</p>
+                            <pre>
+   91
+  ---
+11|1001
+   -99
+   ---
+     11
+    -11
+    ---
+      0
+                            </pre>
+                            <p class="mb-4">The division is exact. This means we can write $1001 = 11 \times 91 + 0$.</p>
+                            <p class="mb-6"><strong>Quotient $q = 91$, Remainder $r = 0$.</strong></p>
+
+                            <strong class="font-semibold">(b) $a=12345$, $b = 234$</strong>
+                            <p class="mb-4">We perform long division for $12345 \div 234$:</p>
+                            <pre>
+   52
+   ----
+234|12345
+   -1170  (234 * 5)
+   -----
+     645
+    -468  (234 * 2)
+    ----
+     177
+                            </pre>
+                            <p class="mb-4">The division results in a quotient of 52 with a remainder of 177. This means we can write $12345 = 234 \times 52 + 177$.</p>
+                            <p><strong>Quotient $q = 52$, Remainder $r = 177$.</strong></p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 3 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 3</h3>
+                        <p class="mb-4 text-lg">Find the representations of $(1985)_{10}$ in (a) base 2, (b) base 5, and (c) base 11.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-4">To convert a base 10 number to another base $b$, we repeatedly divide the number by $b$ and record the remainders. The new representation is the sequence of remainders read from bottom to top.</p>
+
+                            <strong class="font-semibold">(a) Base 2 (Binary)</strong>
+                            <pre>
+1985 ÷ 2 = 992 r 1
+ 992 ÷ 2 = 496 r 0
+ 496 ÷ 2 = 248 r 0
+ 248 ÷ 2 = 124 r 0
+ 124 ÷ 2 =  62 r 0
+  62 ÷ 2 =  31 r 0
+  31 ÷ 2 =  15 r 1
+  15 ÷ 2 =   7 r 1
+   7 ÷ 2 =   3 r 1
+   3 ÷ 2 =   1 r 1
+   1 ÷ 2 =   0 r 1
+                            </pre>
+                            <p class="mb-6">Reading the remainders from bottom to top: <strong>$(11111000001)_2$</strong>.</p>
+                            
+                            <strong class="font-semibold">(b) Base 5</strong>
+                            <pre>
+1985 ÷ 5 = 397 r 0
+ 397 ÷ 5 =  79 r 2
+  79 ÷ 5 =  15 r 4
+  15 ÷ 5 =   3 r 0
+   3 ÷ 5 =   0 r 3
+                            </pre>
+                            <p class="mb-6">Reading the remainders from bottom to top: <strong>$(30420)_5$</strong>.</p>
+
+                            <strong class="font-semibold">(c) Base 11</strong>
+                            <p class="mb-2">In base 11, we need symbols for digits 0-10. We use 0-9 and let $A = 10$.</p>
+                            <pre>
+1985 ÷ 11 = 180 r 5
+ 180 ÷ 11 =  16 r 4
+  16 ÷ 11 =   1 r 5
+   1 ÷ 11 =   0 r 1
+                            </pre>
+                            <p class="mb-6">Reading the remainders from bottom to top: <strong>$(1545)_{11}$</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 4 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 4</h3>
+                        <p class="mb-4 text-lg">Find the decimal (base 10) representations of (a) $(11011101)_2$, and (b) $(4165)_7$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-4">To convert a number from base $b$ to base 10, we sum the products of each digit with $b$ raised to the power of the digit's position (starting from 0 on the right).</p>
+
+                            <strong class="font-semibold">(a) $(11011101)_2$</strong>
+                            <p class="mb-4">The positions (from right to left) are 0, 1, 2, 3, 4, 5, 6, 7.</p>
+                            $$ (11011101)_2 = 1 \cdot 2^7 + 1 \cdot 2^6 + 0 \cdot 2^5 + 1 \cdot 2^4 + 1 \cdot 2^3 + 1 \cdot 2^2 + 0 \cdot 2^1 + 1 \cdot 2^0 $$
+                            $$ = 1 \cdot 128 + 1 \cdot 64 + 0 \cdot 32 + 1 \cdot 16 + 1 \cdot 8 + 1 \cdot 4 + 0 \cdot 2 + 1 \cdot 1 $$
+                            $$ = 128 + 64 + 0 + 16 + 8 + 4 + 0 + 1 $$
+                            $$ = 221 $$
+                            <p class="mb-6">So, <strong>$(11011101)_2 = (221)_{10}$</strong>.</p>
+
+                            <strong class="font-semibold">(b) $(4165)_7$</strong>
+                            <p class="mb-4">The positions (from right to left) are 0, 1, 2, 3.</p>
+                            $$ (4165)_7 = 4 \cdot 7^3 + 1 \cdot 7^2 + 6 \cdot 7^1 + 5 \cdot 7^0 $$
+                            $$ = 4 \cdot 343 + 1 \cdot 49 + 6 \cdot 7 + 5 \cdot 1 $$
+                            $$ = 1372 + 49 + 42 + 5 $$
+                            $$ = 1468 $$
+                            <p>So, <strong>$(4165)_7 = (1468)_{10}$</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 5 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 5</h3>
+                        <p class="mb-4 text-lg">Find the $\gcd$ of 721 and 448 and express it in the form $721m + 448n$ for some $m,n \in \Z$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2"><strong class="font-semibold">Step 1: Use the Euclidean Algorithm to find the $\gcd$.</strong></p>
+                            <p class="mb-4">We repeatedly apply the division algorithm $a = bq + r$ until the remainder is 0. The $\gcd$ is the last non-zero remainder.</p>
+                            <pre>
+(1)  721 = 1 × 448 + 273
+(2)  448 = 1 × 273 + 175
+(3)  273 = 1 × 175 + 98
+(4)  175 = 1 ×  98 + 77
+(5)   98 = 1 ×  77 + 21
+(6)   77 = 3 ×  21 + 14
+(7)   21 = 1 ×  14 + 7
+(8)   14 = 2 ×   7 + 0
+                            </pre>
+                            <p class="mb-4">The last non-zero remainder is 7. Therefore, <strong>$\gcd(721, 448) = 7$</strong>.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Step 2: Work backwards (Extended Euclidean Algorithm) to express 7 as a linear combination.</strong></p>
+                            <p class="mb-4">We start from equation (7) and substitute remainders from the equations above it.</p>
+                            <pre>
+<span class="font-bold">7 = 21 - 1 × 14</span>                 (from 7)
+  = 21 - 1 × (77 - 3 × 21)     (sub 14 from 6)
+  = 1 × 21 - 1 × 77 + 3 × 21
+  = <span class="font-bold">4 × 21 - 1 × 77</span>
+  = 4 × (98 - 1 × 77) - 1 × 77     (sub 21 from 5)
+  = 4 × 98 - 4 × 77 - 1 × 77
+  = <span class="font-bold">4 × 98 - 5 × 77</span>
+  = 4 × 98 - 5 × (175 - 1 × 98)     (sub 77 from 4)
+  = 4 × 98 - 5 × 175 + 5 × 98
+  = <span class="font-bold">9 × 98 - 5 × 175</span>
+  = 9 × (273 - 1 × 175) - 5 × 175 (sub 98 from 3)
+  = 9 × 273 - 9 × 175 - 5 × 175
+  = <span class="font-bold">9 × 273 - 14 × 175</span>
+  = 9 × 273 - 14 × (448 - 1 × 273) (sub 175 from 2)
+  = 9 × 273 - 14 × 448 + 14 × 273
+  = <span class="font-bold">23 × 273 - 14 × 448</span>
+  = 23 × (721 - 1 × 448) - 14 × 448 (sub 273 from 1)
+  = 23 × 721 - 23 × 448 - 14 × 448
+  = <span class="font-bold">23 × 721 - 37 × 448</span>
+                            </pre>
+                            
+                            <p class="mb-2"><strong class="font-semibold">Step 3: Identify $m$ and $n$.</strong></p>
+                            <p class="mb-4">We have successfully expressed 7 in the form $721m + 448n$:</p>
+                            $$ 7 = 721 \cdot (23) + 448 \cdot (-37) $$
+                            <p>Thus, <strong>$m = 23$</strong> and <strong>$n = -37$</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 6 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 6</h3>
+                        <p class="mb-4 text-lg">Find integers $x$ and $y$ satisfying $966x + 686y = 70$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">This is a linear Diophantine equation. We first find $\gcd(966, 686)$ using the Euclidean Algorithm. Solutions exist if and only if the $\gcd$ divides 70.</p>
+                            <p class="mb-2"><strong class="font-semibold">Step 1: Find $\gcd(966, 686)$.</strong></p>
+                            <pre>
+(1)  966 = 1 × 686 + 280
+(2)  686 = 2 × 280 + 126
+(3)  280 = 2 × 126 + 28
+(4)  126 = 4 ×  28 + 14
+(5)   28 = 2 ×  14 + 0
+                            </pre>
+                            <p class="mb-4">The $\gcd(966, 686) = 14$. Since $14$ divides $70$ (specifically, $70 = 5 \times 14$), solutions exist.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Step 2: Work backwards to solve $966m + 686n = 14$.</strong></p>
+                            <pre>
+<span class="font-bold">14 = 126 - 4 × 28</span>                 (from 4)
+   = 126 - 4 × (280 - 2 × 126)     (sub 28 from 3)
+   = 1 × 126 - 4 × 280 + 8 × 126
+   = <span class="font-bold">9 × 126 - 4 × 280</span>
+   = 9 × (686 - 2 × 280) - 4 × 280 (sub 126 from 2)
+   = 9 × 686 - 18 × 280 - 4 × 280
+   = <span class="font-bold">9 × 686 - 22 × 280</span>
+   = 9 × 686 - 22 × (966 - 1 × 686) (sub 280 from 1)
+   = 9 × 686 - 22 × 966 + 22 × 686
+   = <span class="font-bold">31 × 686 - 22 × 966</span>
+                            </pre>
+                            <p class="mb-4">So, we have $966(-22) + 686(31) = 14$. This gives us a solution $(m, n) = (-22, 31)$ for the equation equal to 14.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Step 3: Scale the solution to match the target value of 70.</strong></p>
+                            <p class="mb-4">We want the right-hand side to be $70$. We multiply our entire equation by $70 / 14 = 5$.</p>
+                            $$ 5 \times ( 966(-22) + 686(31) ) = 5 \times 14 $$
+                            $$ 966(-22 \times 5) + 686(31 \times 5) = 70 $$
+                            $$ 966(-110) + 686(155) = 70 $$
+                            <p>One pair of integers satisfying the equation is <strong>$x = -110$</strong> and <strong>$y = 155$</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Section: Primes -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Primes and prime factorization</h2>
+
+                <!-- Problem 7 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 7</h3>
+                        <p class="mb-4 text-lg">Find all the primes $p$ in the range $100 \leq p \leq 120$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-4">We need to check the integers from 100 to 120. A number $n$ is prime if it is not divisible by any prime $p \le \sqrt{n}$. For this range, $\sqrt{120} \approx 10.95$. So we only need to check for divisibility by the primes $2, 3, 5, 7$.</p>
+                            <ul class="list-disc list-inside mb-4">
+                                <li><strong>100:</strong> Divisible by 2, 5. Not prime.</li>
+                                <li><strong>101:</strong> Not by 2 (odd). Sum of digits = 2 (not by 3). Not by 5. $101 \div 7 = 14$ r 3. <strong>Prime.</strong></li>
+                                <li><strong>102:</strong> Divisible by 2. Not prime.</li>
+                                <li><strong>103:</strong> Not by 2. Sum of digits = 4 (not by 3). Not by 5. $103 \div 7 = 14$ r 5. <strong>Prime.</strong></li>
+                                <li><strong>104:</strong> Divisible by 2. Not prime.</li>
+                                <li><strong>105:</strong> Divisible by 5. Not prime.</li>
+                                <li><strong>106:</strong> Divisible by 2. Not prime.</li>
+                                <li><strong>107:</strong> Not by 2. Sum of digits = 8 (not by 3). Not by 5. $107 \div 7 = 15$ r 2. <strong>Prime.</strong></li>
+                                <li><strong>108:</strong> Divisible by 2. Not prime.</li>
+                                <li><strong>109:</strong> Not by 2. Sum of digits = 10 (not by 3). Not by 5. $109 \div 7 = 15$ r 4. <strong>Prime.</strong></li>
+                                <li><strong>110:</strong> Divisible by 2, 5. Not prime.</li>
+                                <li><strong>111:</strong> Sum of digits = 3. Divisible by 3. Not prime.</li>
+                                <li><strong>112:</strong> Divisible by 2. Not prime.</li>
+                                <li><strong>113:</strong> Not by 2. Sum of digits = 5 (not by 3). Not by 5. $113 \div 7 = 16$ r 1. <strong>Prime.</strong></li>
+                                <li><strong>114:</strong> Divisible by 2. Not prime.</li>
+                                <li><strong>115:</strong> Divisible by 5. Not prime.</li>
+                                <li><strong>116:</strong> Divisible by 2. Not prime.</li>
+                                <li><strong>117:</strong> Sum of digits = 9. Divisible by 3. Not prime.</li>
+                                <li><strong>118:</strong> Divisible by 2. Not prime.</li>
+                                <li><strong>119:</strong> $119 \div 7 = 17$. Divisible by 7. Not prime.</li>
+                                <li><strong>120:</strong> Divisible by 2, 5. Not prime.</li>
+                            </ul>
+                            <p>The primes in the range are: <strong>101, 103, 107, 109, 113</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 8 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 8</h3>
+                        <p class="mb-4 text-lg">Find the prime factorizations of 201, 1001, and 201000.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <strong class="font-semibold">201:</strong>
+                            <ul class="list-disc list-inside mb-4">
+                                <li>Sum of digits is $2+0+1 = 3$, so it's divisible by 3.</li>
+                                <li>$201 \div 3 = 67$.</li>
+                                <li>Is 67 prime? $\sqrt{67} \approx 8.1$. Primes to check: 2, 3, 5, 7.</li>
+                                <li>67 is not div by 2, 3, 5. $67 \div 7 = 9$ r 4. Yes, 67 is prime.</li>
+                                <li><strong>$201 = 3 \times 67$</strong></li>
+                            </ul>
+
+                            <strong class="font-semibold">1001:</strong>
+                            <ul class="list-disc list-inside mb-4">
+                                <li>Not div by 2, 3 (sum=2), 5. Try 7.</li>
+                                <li>$1001 \div 7 = 143$.</li>
+                                <li>Now factor 143. $\sqrt{143} \approx 11.9$. Primes to check: 7, 11.</li>
+                                <li>$143 \div 7 = 20$ r 3.</li>
+                                <li>$143 \div 11 = 13$.</li>
+                                <li>13 is prime.</li>
+                                <li><strong>$1001 = 7 \times 11 \times 13$</strong></li>
+                            </ul>
+
+                            <strong class="font-semibold">201000:</strong>
+                            <ul class="list-disc list-inside mb-4">
+                                <li>We can split this: $201000 = 201 \times 1000$.</li>
+                                <li>From above, $201 = 3 \times 67$.</li>
+                                <li>$1000 = 10^3 = (2 \times 5)^3 = 2^3 \times 5^3$.</li>
+                                <li>Combining these:</li>
+                                <li><strong>$201000 = 2^3 \times 3 \times 5^3 \times 67$</strong></li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 9 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 9</h3>
+                        <p class="mb-4 text-lg">Show that if $n \geq 2$ and $n$ is not a prime, then there is a prime $p$ such that $p | n$ and $p^2 \leq n$. Hence show that if $467$ were not a prime, then it would have a prime divisor $p \leq 19$. Deduce that 467 is prime.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <p class="mb-2"><strong class="font-semibold">Part 1: Show $p|n$ and $p^2 \le n$.</strong></p>
+                            <p class="mb-2">If $n \ge 2$ is not prime, it is composite. By definition, this means $n$ can be written as a product of two integers $n = a \cdot b$, where $1 < a \le b < n$.</p>
+                            <p class="mb-2">We must have $a \le \sqrt{n}$. Why? If $a > \sqrt{n}$, then $b$ (which is $\ge a$) would also be $> \sqrt{n}$. This would mean $a \cdot b > \sqrt{n} \cdot \sqrt{n} = n$. This contradicts $n = ab$. Therefore, the smallest factor $a$ must be less than or equal to $\sqrt{n}$.</p>
+                            <p class="mb-2">Since $a > 1$, by the Fundamental Theorem of Arithmetic, $a$ must have at least one prime divisor, let's call it $p$.</p>
+                            <p class="mb-2">Since $p$ divides $a$, we have $p \le a$.</p>
+                            <p class="mb-2">Since $p|a$ and $a|n$, it follows that $p|n$.</p>
+                            <p class="mb-4">Combining our inequalities: $p \le a \le \sqrt{n}$. This gives us $p \le \sqrt{n}$, and squaring both sides gives $p^2 \le n$.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Part 2: Show $p \le 19$ for $n=467$.</strong></p>
+                            <p class="mb-2">If 467 were not prime, by Part 1, it must have a prime divisor $p$ such that $p^2 \le 467$.</p>
+                            <p class="mb-2">Taking the square root: $p \le \sqrt{467}$.</p>
+                            <p class="mb-4">$\sqrt{467} \approx 21.61$. The primes less than or equal to 21.61 are: 2, 3, 5, 7, 11, 13, 17, 19. The largest of these is 19. Thus, any prime factor $p$ must be $p \le 19$.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Part 3: Deduce 467 is prime.</strong></p>
+                            <p class="mb-4">We only need to check for divisibility by $p \in \{2, 3, 5, 7, 11, 13, 17, 19\}$.</p>
+                            <ul class="list-disc list-inside mb-4">
+                                <li><strong>2:</strong> No (467 is odd).</li>
+                                <li><strong>3:</strong> No (sum of digits $4+6+7=17$, not div by 3).</li>
+                                <li><strong>5:</strong> No (doesn't end in 0 or 5).</li>
+                                <li><strong>7:</strong> $467 \div 7 = 66$ r 5. No.</li>
+                                <li><strong>11:</strong> $467 \div 11 = 42$ r 5. No.</li>
+                                <li><strong>13:</strong> $467 \div 13 = 35$ r 12. No.</li>
+                                <li><strong>17:</strong> $467 \div 17 = 27$ r 8. No.</li>
+                                <li><strong>19:</strong> $467 \div 19 = 24$ r 11. No.</li>
+                            </ul>
+                            <p>Since 467 is not divisible by any prime $p \le \sqrt{467}$, it cannot be composite. Therefore, <strong>467 is prime</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 10 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 10</h3>
+                        <p class="mb-4 text-lg">Suppose that we wish to test whether the number 123456791 is a prime, by checking all the possible prime divisors up to a certain number $X$. On the basis of Problem 9, what value of $X$ (approximately) is sufficient?</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">Based on Problem 9, if the number $n = 123456791$ is composite, it must have a prime divisor $p$ such that $p^2 \le n$.</p>
+                            <p class="mb-2">This means we only need to check for prime divisors $p$ up to $\sqrt{n}$.</p>
+                            <p class="mb-2">So, the sufficient value for $X$ is $\sqrt{123456791}$.</p>
+                            <p class="mb-4">Calculating this value: $\sqrt{123456791} \approx 11111.11...$</p>
+                            <p>Therefore, it is sufficient to check all prime numbers $p \le 11111$. An approximate value for $X$ is <strong>11,111</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Section: Rational Numbers -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Rational numbers</h2>
+
+                <!-- Problem 11 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 11</h3>
+                        <p class="mb-4 text-lg">Write down 9 rational numbers lying strictly between 17/100 and 4/25.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2"><strong class="font-semibold">Step 1: Find a common denominator for the two fractions.</strong></p>
+                            <p class="mb-2">The first fraction is $17/100$.</p>
+                            <p class="mb-2">The second fraction is $4/25$. To get a denominator of 100, we multiply the numerator and denominator by 4: $4/25 = (4 \times 4) / (25 \times 4) = 16/100$.</p>
+                            <p class="mb-4">The problem is asking for 9 rational numbers strictly between $16/100$ and $17/100$. (Note: $17/100$ is the larger number).</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Step 2: Find an equivalent "gap" with more integers.</strong></p>
+                            <p class="mb-2">Right now, there are no integers between 16 and 17. To find numbers in between, we can multiply the numerator and denominator of both fractions by a number, for example, 10.</p>
+                            <p class="mb-2">Start: $16/100 = 160/1000$</p>
+                            <p class="mb-4">End: $17/100 = 170/1000$</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Step 3: List 9 numbers in this new gap.</strong></p>
+                            <p class="mb-4">We need numbers strictly between $160/1000$ and $170/1000$. We can simply pick the 9 integers between 160 and 170 for our numerators:</p>
+                            <p><strong>$161/1000, 162/1000, 163/1000, 164/1000, 165/1000, 166/1000, 167/1000, 168/1000, 169/1000$</strong></p>
+                            <p>(In decimal form, these are $0.161, 0.162, \dots, 0.169$, which are all between $0.16$ and $0.17$).</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 12 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 12</h3>
+                        <p class="mb-4 text-lg">Express the following repeating decimals as fractions:</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) $0.32\overline{1}$</li>
+                            <li>(b) $0.56\overline{78}$</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <strong class="font-semibold">(a) $0.32\overline{1}$</strong>
+                            <p class="mb-2">Let $x = 0.32\overline{1} = 0.321111...$</p>
+                            <p class="mb-2">Multiply $x$ by 100 to move the non-repeating part to the left of the decimal: $100x = 32.\overline{1} = 32.1111...$</p>
+                            <p class="mb-2">Multiply $x$ by 1000 to move one repeating block to the left: $1000x = 321.\overline{1} = 321.1111...$</p>
+                            <p class="mb-2">Now, subtract the two new equations to cancel the repeating tail:</p>
+                            <pre>
+ 1000x = 321.111...
+ - 100x =  32.111...
+ -----------------
+  900x = 289
+                            </pre>
+                            <p class="mb-6">Solving for $x$: <strong>$x = 289/900$</strong>.</p>
+
+                            <strong class="font-semibold">(b) $0.56\overline{78}$</strong>
+                            <p class="mb-2">Let $x = 0.56\overline{78} = 0.56787878...$</p>
+                            <p class="mb-2">Multiply $x$ by 100 to move the non-repeating part left: $100x = 56.\overline{78} = 56.787878...$</p>
+                            <p class="mb-2">The repeating block has 2 digits. Multiply $100x$ by $10^2 = 100$ (or $x$ by $10000$) to move one repeating block left: $10000x = 5678.\overline{78} = 5678.787878...$</p>
+                            <p class="mb-2">Subtract the two new equations:</p>
+                            <pre>
+ 10000x = 5678.7878...
+ -  100x =   56.7878...
+ ---------------------
+  9900x = 5622
+                            </pre>
+                            <p class="mb-4">Solving for $x$: $x = 5622/9900$. We can simplify this fraction. Both are divisible by 2: $2811/4950$. Sum of digits of 2811 is 12 (div by 3). Sum of digits of 4950 is 18 (div by 3). $2811 \div 3 = 937$. $4950 \div 3 = 1650$.</p>
+                            <p><strong>$x = 937/1650$</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 13 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 13</h3>
+                        <p class="mb-4 text-lg">Using the same method as in Problem 12, find the fraction represented by $0.0\overline{9}$. Write down another decimal representing that same fraction. (Note that this kind of situation is the only situation where a decimal expansion is not unique.)</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">Let $x = 0.0\overline{9} = 0.09999...$</p>
+                            <p class="mb-2">Multiply by 10 to move the non-repeating part left: $10x = 0.\overline{9} = 0.9999...$</p>
+                            <p class="mb-2">Multiply by 100 to move one repeating block left: $100x = 9.\overline{9} = 9.9999...$</p>
+                            <p class="mb-2">Subtract the two new equations:</p>
+                            <pre>
+ 100x = 9.999...
+ - 10x = 0.999...
+ ----------------
+   90x = 9
+                            </pre>
+                            <p class="mb-4">Solving for $x$: $x = 9/90$.</p>
+                            <p class="mb-4">This fraction simplifies to <strong>$1/10$</strong>.</p>
+                            <p>Another decimal representation for the fraction $1/10$ is, of course, <strong>$0.1$</strong>.</p>
+                            <p>This shows that $0.1 = 0.0\overline{9}$.</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Section: Additional Problems -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Additional problems</h2>
+
+                <!-- Problem 14 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 14</h3>
+                        <p class="mb-4 text-lg">Show that if there are integers $m,n$ such that $mu + nv = 1$, then $\gcd(u,v) = 1$. (<b>Hint: Use contradiction.</b>)</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">We are given that $mu + nv = 1$ for some integers $m, n, u, v$.</p>
+                            <p class="mb-2">Let $d = \gcd(u,v)$. We want to show $d=1$.</p>
+                            <p class="mb-2"><strong class="font-semibold">Step 1: Assume for contradiction that $d > 1$.</strong></p>
+                            <p class="mb-4">By the definition of the greatest common divisor, $d$ must divide both $u$ and $v$.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">Step 2: Use the result from Problem 1.</strong></p>
+                            <p class="mb-2">In Problem 1, we showed that if a number $d$ divides $u$ and $v$, then it must divide any linear combination $mu + nv$.</p>
+                            <p class="mb-4">Therefore, $d | (mu + nv)$.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Step 3: Reach the contradiction.</strong></p>
+                            <p class="mb-2">From the problem statement, we know that $mu + nv = 1$.</p>
+                            <p class="mb-2">Substituting this into our finding from Step 2, we get $d | 1$.</p>
+                            <p class="mb-2">The only positive integer that divides 1 is 1 itself. This means $d$ must be 1.</p>
+                            <p class="mb-4">This contradicts our assumption that $d > 1$.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Step 4: Conclude.</strong></p>
+                            <p class="mb-2">Our assumption led to a contradiction, so the assumption must be false. Therefore, $d$ cannot be greater than 1.</p>
+                            <p>Since $d$ must be a positive integer, we conclude that <strong>$d = \gcd(u,v) = 1$</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 15 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 15</h3>
+                        <p class="mb-4 text-lg">Let $a$ and $b$ be positive integers and let $d = \gcd(a,b)$. Prove that there are integers $x$ and $y$ which satisfy the equation $ax + by = c$ if and only if $d|c$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-4">This is an "if and only if" proof, so we must prove two separate directions.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Direction 1: (Forward) $\implies$</strong></p>
+                            <p class="mb-2">Assume that integers $x$ and $y$ exist such that $ax + by = c$. We must show that $d|c$.</p>
+                            <ol class="list-decimal list-inside ml-4 mb-4">
+                                <li>Let $d = \gcd(a,b)$. By definition, $d|a$ and $d|b$.</li>
+                                <li>From Problem 1, we know that if $d$ divides $a$ and $b$, it must divide any linear combination $ax+by$.</li>
+                                <li>Therefore, $d | (ax + by)$.</li>
+                                <li>Since we assumed $ax + by = c$, we can substitute $c$ to get $d|c$.</li>
+                            </ol>
+                            <p class="mb-4">This completes the first direction.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Direction 2: (Backward) $\impliedby$</strong></p>
+                            <p class="mb-2">Assume that $d|c$. We must show that integers $x$ and $y$ exist such that $ax + by = c$.</p>
+                            <ol class="list-decimal list-inside ml-4 mb-4">
+                                <li>By Bézout's Identity (which is what the Extended Euclidean Algorithm finds), we know that there exist integers $m$ and $n$ such that $am + bn = d$.</li>
+                                <li>We are given that $d|c$. By definition, this means there is some integer $k$ such that $c = d \cdot k$.</li>
+                                <li>Take the equation from step 1 and multiply the entire thing by $k$:</li>
+                                $$ k(am + bn) = k(d) $$
+                                <li>Distribute $k$ on the left and substitute $c$ on the right:</li>
+                                $$ a(km) + b(kn) = c $$
+                                <li>Now, we can choose our integers $x$ and $y$. Let $x = km$ and $y = kn$. Since $k$, $m$, and $n$ are all integers, $x$ and $y$ are also integers.</li>
+                                <li>We have found integers $x = km$ and $y = kn$ that satisfy $ax + by = c$.</li>
+                            </ol>
+                            <p class="mb-4">This completes the second direction.</p>
+                            <p>Since we have proven both directions, the statement is true.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 16 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 16 (Challenge)</h3>
+                        <p class="mb-4 text-lg">Let $H$ be the set $\{4n + 1 : n \in \N \cup \{0\}\} = \{1, 5, 9, 13, \ldots\}$.</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li class="mb-2">(a) Show that $H$ is \emph{closed under multiplication}.</li>
+                            <li class="mb-2">(b) An $H$-\emph{prime} is a member of $H$ (other than 1) not divisible by any member of $H$ other than 1 and itself. Find three distinct $H$-primes $a,b,c \in H$ such that $441 = ab = c^2$.</li>
+                            <li class="mb-2">(c) Is it true that every element of $H$ has a factorization into $H$-primes? Is it true that it is <b>unique</b>?</li>
+                            <li class="mb-2">(d) Explain why the proof for unique prime factorization in $\Z$ does not work here.</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(a) Closure under multiplication</strong></p>
+                            <p class="mb-2">Let $h_1$ and $h_2$ be two members of $H$. Then $h_1 = 4n + 1$ and $h_2 = 4m + 1$ for some non-negative integers $n, m$.</p>
+                            <p class="mb-2">Their product is:</p>
+                            $$ h_1 h_2 = (4n + 1)(4m + 1) = 16nm + 4n + 4m + 1 $$
+                            <p class="mb-2">We can factor out a 4:</p>
+                            $$ h_1 h_2 = 4(4nm + n + m) + 1 $$
+                            <p class="mb-4">Let $k = 4nm + n + m$. Since $n$ and $m$ are integers, $k$ is also an integer. The product is of the form $4k+1$, which is the definition of a member of $H$. Thus, $H$ is closed under multiplication.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">(b) H-primes and 441</strong></p>
+                            <p class="mb-2">First, $441 = 4(110) + 1$, so $441 \in H$.</p>
+                            <p class="mb-2">Let's find the regular prime factorization of 441 in $\Z$: $441 = 21^2 = (3 \times 7)^2 = 3^2 \times 7^2 = 9 \times 49$.</p>
+                            <p class="mb-2">Now let's check the H-primality of the factors $9, 49, 21$:</p>
+                            <ul class="list-disc list-inside mb-2">
+                                <li>Is $9 \in H$? $9 = 4(2) + 1$. Yes. Is it H-prime? Smallest H-number (not 1) is 5. $5 \times 5 = 25 > 9$. So 9 cannot be factored by H-numbers. <strong>9 is H-prime.</strong></li>
+                                <li>Is $49 \in H$? $49 = 4(12) + 1$. Yes. Is it H-prime? $5 \times 5 = 25 \in H$. $5 \times 9 = 45 \in H$. $9 \times 9 = 81 \in H$. No product of H-numbers (other than 1 × 49) makes 49. <strong>49 is H-prime.</strong></li>
+                                <li>Is $21 \in H$? $21 = 4(5) + 1$. Yes. Is it H-prime? $5 \times 5 = 25 > 21$. <strong>21 is H-prime.</strong></li>
+                            </ul>
+                            <p class="mb-2">We need $a, b, c$ such that $441 = ab = c^2$.</p>
+                            <p class="mb-2">From our factorization: $441 = 9 \times 49$ and $441 = 21^2$.</p>
+                            <p class="mb-4">We can choose <strong>$a=9$</strong>, <strong>$b=49$</strong>, and <strong>$c=21$</strong>. All are distinct H-primes.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(c) Factorization and Uniqueness</strong></p>
+                            <p class="mb-2"><strong>Yes</strong>, it is true that every element has a factorization into H-primes (by a similar argument to standard prime factorization; you can always break it down until you can't anymore).</p>
+                            <p class="mb-4"><strong>No</strong>, it is not true that the factorization is unique. As we just showed, $441$ has two different factorizations into H-primes: $441 = 9 \times 49$ and $441 = 21 \times 21$.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(d) Why the proof of uniqueness fails</strong></p>
+                            <p class="mb-2">The standard proof of unique prime factorization in $\Z$ relies on a critical property called <strong>Euclid's Lemma</strong>, which states: "If a prime $p$ divides a product $ab$, then $p$ must divide $a$ or $p$ must divide $b$."</p>
+                            <p class="mb-2">Let's test this lemma for our H-primes.</p>
+                            <p class="mb-2">Let the H-prime be $p_H = 21$. Let the product be $ab = 9 \times 49 = 441$.</p>
+                            <p class="mb-2">Our H-prime $21$ certainly divides $441$ (since $441 = 21 \times 21$).</p>
+                            <p class="mb-2">But does $21$ divide $9$? No (in $\Z$).</p>
+                            <p class="mb-2">And does $21$ divide $49$? No (in $\Z$).</p>
+                            <p class="mb-4">Euclid's Lemma fails in the set $H$. The H-prime $21$ divides the product $9 \times 49$, but it does not divide either $9$ or $49$. Because this key lemma fails, the entire proof of unique factorization collapses.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 17 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 17</h3>
+                        <p class="mb-4 text-lg">For which natural numbers $k$ in the range $1 \leq k \leq 100$ is it true that $\sqrt k$ is a rational number? Based on this answer, make a conjecture: does there exist a natural number $k \in \N$ for which $\sqrt k$ is a non-integer rational number?</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">A key theorem in number theory states that for any integer $k$, $\sqrt{k}$ is either an integer or it is irrational. It can never be a non-integer fraction.</p>
+                            <p class="mb-2">Therefore, $\sqrt{k}$ is rational if and only if $\sqrt{k}$ is an integer.</p>
+                            <p class="mb-2">$\sqrt{k}$ is an integer if and only if $k$ is a perfect square.</p>
+                            <p class="mb-4">We need to find all perfect squares $k$ in the range $1 \leq k \leq 100$.</p>
+                            <ul class="list-disc list-inside mb-4">
+                                <li>$1^2 = 1$</li>
+                                <li>$2^2 = 4$</li>
+                                <li>$3^2 = 9$</li>
+                                <li>$4^2 = 16$</li>
+                                <li>$5^2 = 25$</li>
+                                <li>$6^2 = 36$</li>
+                                <li>$7^2 = 49$</li>
+                                <li>$8^2 = 64$</li>
+                                <li>$9^2 = 81$</li>
+                                <li>$10^2 = 100$</li>
+                            </ul>
+                            <p class="mb-4">The set of such numbers is <strong>$\{1, 4, 9, 16, 25, 36, 49, 64, 81, 100\}$</strong>.</p>
+                            <p class="mb-2"><strong class="font-semibold">Conjecture:</strong></p>
+                            <p>Based on this, we conjecture: <strong>No, there does not exist a natural number $k$ for which $\sqrt{k}$ is a non-integer rational number.</strong></p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 18 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 18</h3>
+                        <p class="mb-4 text-lg">Suppose that $m^2 = kn^2$, where $k,m,n$ are all natural numbers. If the prime factorization of $m$ is $p_1^{e_1} p_2^{e_2} \cdots p_r^{e_r}$, what does the unique factorization tell us about the prime factorizations of $k$ and $n$? Deduce that the conjecture suggested by Problem 17 is correct.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">We are given $m^2 = kn^2$. Let's rearrange this to $k = m^2 / n^2 = (m/n)^2$. The problem is equivalent to proving that if $\sqrt{k} = m/n$ (a rational number), then $k$ must be a perfect square (which implies $\sqrt{k}$ is an integer).</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">Step 1: Analyze the prime factorization of $m^2$ and $n^2$.</strong></p>
+                            <p class="mb-2">Let the prime factorization of $m$ be $m = p_1^{e_1} p_2^{e_2} \cdots p_r^{e_r}$.</p>
+                            <p class="mb-2">Then the prime factorization of $m^2$ is $m^2 = (p_1^{e_1} \cdots p_r^{e_r})^2 = p_1^{2e_1} p_2^{2e_2} \cdots p_r^{2e_r}$.</p>
+                            <p class="mb-2">Notice that <strong>all exponents in the prime factorization of $m^2$ are even numbers.</strong></p>
+                            <p class="mb-2">Similarly, let $n = p_1^{f_1} p_2^{f_2} \cdots p_r^{f_r}$ (using the same set of primes, where $f_i$ can be 0). Then $n^2 = p_1^{2f_1} p_2^{2f_2} \cdots p_r^{2f_r}$. All exponents are also even.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">Step 2: Analyze the prime factorization of $k$.</strong></p>
+                            <p class="mb-2">From $m^2 = kn^2$, we have $k = m^2 / n^2$.</p>
+                            <p class="mb-2">Using the factorizations from Step 1:</p>
+                            $$ k = \frac{p_1^{2e_1} p_2^{2e_2} \cdots p_r^{e_r}}{p_1^{2f_1} p_2^{2f_2} \cdots p_r^{2f_r}} $$
+                            $$ k = p_1^{2e_1 - 2f_1} p_2^{2e_2 - 2f_2} \cdots p_r^{2e_r - 2f_r} $$
+                            $$ k = p_1^{2(e_1 - f_1)} p_2^{2(e_2 - f_2)} \cdots p_r^{2(e_r - f_r)} $$
+                            
+                            <p class="mb-2"><strong class="font-semibold">Step 3: Draw a conclusion about $k$.</strong></p>
+                            <p class="mb-2">By the uniqueness of prime factorizations, this must be the prime factorization of $k$.</p>
+                            <p class="mb-2">Look at every exponent in the factorization of $k$: $2(e_1 - f_1)$, $2(e_2 - f_2)$, etc. They are all, by definition, <strong>even numbers</strong>.</p>
+                            <p class="mb-2">A number whose prime factorization contains only even exponents is a perfect square. We can see this by letting $j = p_1^{e_1 - f_1} p_2^{e_2 - f_2} \cdots p_r^{e_r - f_r}$. Then $k = j^2$.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">Step 4: Deduce the conjecture is correct.</strong></p>
+                            <p class="mb-2">We started by assuming $\sqrt{k}$ is rational, i.e., $\sqrt{k} = m/n$. This led to $m^2 = kn^2$.</p>
+                            <p class="mb-2">Our analysis showed that this equality implies $k$ must be a perfect square (e.g., $k = j^2$ for some integer $j$).</p>
+                            <p class="mb-2">If $k$ is a perfect square, then $\sqrt{k} = \sqrt{j^2} = j$, which is an integer.</p>
+                            <p class="mb-4">Therefore, if $\sqrt{k}$ is rational, it must be an integer. It cannot be a non-integer rational number. The conjecture from Problem 17 is correct.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 19 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 19</h3>
+                        <p class="mb-4 text-lg">When $m = 7$ and $n=5$, we have $m^2 - 2n^2 = -1$. Show that if $p_{i+1}$ and $q_{i+1}$ are defined in terms of $p_i$ and $q_i$ by the equations</p>
+                        $$ p_{i+1} = p_i^2 + 2q_i^2 \quad \textrm{and} \quad q_{i+1} = 2p_i q_i $$
+                        <p class="mt-4 text-lg">then $p_{i+1}^2 - 2q_{i+1}^2 = \left(p_i^2 - 2q_i^2\right)^2$. Hence show that there are infinitely many distinct pairs of natural numbers $x,y$ such that $x^2 - 2y^2 = 1$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2"><strong class="font-semibold">Part 1: Prove the identity.</strong></p>
+                            <p class="mb-2">We start with the left-hand side (LHS), $p_{i+1}^2 - 2q_{i+1}^2$, and substitute the definitions of $p_{i+1}$ and $q_{i+1}$.</p>
+                            $$ \text{LHS} = (p_i^2 + 2q_i^2)^2 - 2(2p_i q_i)^2 $$
+                            <p class="mb-2">Expand the terms:</p>
+                            $$ \text{LHS} = (p_i^4 + 4p_i^2 q_i^2 + 4q_i^4) - 2(4p_i^2 q_i^2) $$
+                            $$ \text{LHS} = p_i^4 + 4p_i^2 q_i^2 + 4q_i^4 - 8p_i^2 q_i^2 $$
+                            <p class="mb-4">Combine the middle terms:</p>
+                            $$ \text{LHS} = p_i^4 - 4p_i^2 q_i^2 + 4q_i^4 $$
+                            <p class="mb-2">Now let's expand the right-hand side (RHS), $(p_i^2 - 2q_i^2)^2$:</p>
+                            $$ \text{RHS} = (p_i^2)^2 - 2(p_i^2)(2q_i^2) + (2q_i^2)^2 $$
+                            $$ \text{RHS} = p_i^4 - 4p_i^2 q_i^2 + 4q_i^4 $$
+                            <p class="mb-4">Since LHS = RHS, the identity $p_{i+1}^2 - 2q_{i+1}^2 = (p_i^2 - 2q_i^2)^2$ is proven.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">Part 2: Show infinitely many solutions to $x^2 - 2y^2 = 1$.</strong></p>
+                            <p class="mb-2">We are given a starting pair $(p_1, q_1) = (7, 5)$ for which $p_1^2 - 2q_1^2 = 7^2 - 2(5^2) = 49 - 50 = -1$.</p>
+                            <p class="mb-2">Let's use the recurrence to find the next pair, $(p_2, q_2)$:</p>
+                            <p class="mb-2">$p_2 = p_1^2 + 2q_1^2 = 7^2 + 2(5^2) = 49 + 50 = 99$.</p>
+                            <p class="mb-2">$q_2 = 2p_1 q_1 = 2(7)(5) = 70$.</p>
+                            <p class="mb-2">Now let's check the value of $p_2^2 - 2q_2^2$ using our identity:</p>
+                            $$ p_2^2 - 2q_2^2 = (p_1^2 - 2q_1^2)^2 = (-1)^2 = 1 $$
+                            <p class="mb-4">So, <strong>$(x, y) = (99, 70)$ is a solution</strong> to $x^2 - 2y^2 = 1$.</p>
+                            <p class="mb-2">Now, let's find the next pair, $(p_3, q_3)$, from $(p_2, q_2) = (99, 70)$.</p>
+                            <p class="mb-2">$p_3 = 99^2 + 2(70^2) = 9801 + 2(4900) = 9801 + 9800 = 19601$.</p>
+                            <p class="mb-2">$q_3 = 2(99)(70) = 13860$.</p>
+                            <p class="mb-2">Let's check $p_3^2 - 2q_3^2$ using the identity:</p>
+                            $$ p_3^2 - 2q_3^2 = (p_2^2 - 2q_2^2)^2 = (1)^2 = 1 $$
+                            <p class="mb-4">So, <strong>$(x, y) = (19601, 13860)$ is another solution</strong>.</p>
+                            <p class="mb-2">Since $p_{i+1}$ and $q_{i+1}$ are defined by sums and products of positive numbers, the sequences $(p_i)$ and $(q_i)$ are strictly increasing for $i \ge 2$.</p>
+                            <p>This process can be repeated infinitely, generating a new, larger, distinct pair $(p_{i+1}, q_{i+1})$ from any pair $(p_i, q_i)$ that satisfies $p_i^2 - 2q_i^2 = 1$. Thus, there are infinitely many distinct pairs.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 20 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 20</h3>
+                        <ol class="list-decimal list-inside ml-4 text-lg">
+                            <li class="mb-2">(a) Let $k \in \N$. Show that the numbers defined recursively by 
+                                $$ x_1 = k, \quad x_{n+1} = \frac 1 2 \left(x_n + \frac k{x_n}\right) \quad (n \geq 1) $$
+                                approach $\sqrt k$. (You may assume that there exists some $X \in \R$ so that $x_n$ approaches $X$.)
+                            </li>
+                            <li class="mb-2">(b) Use part (a) to approximate $\sqrt 3$ and $\sqrt 5$ to six decimal places.</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            
+                            <p class="mb-2"><strong class="font-semibold">(a) Show the limit is $\sqrt{k}$.</strong></p>
+                            <p class="mb-2">We are given the recurrence $x_{n+1} = \frac 1 2 \left(x_n + \frac k{x_n}\right)$ and we assume that $x_n$ approaches a limit $X$.</p>
+                            <p class="mb-2">This means that as $n \to \infty$, both $x_n \to X$ and $x_{n+1} \to X$. We can substitute $X$ for both $x_n$ and $x_{n+1}$ in the equation to find the value of the limit:</p>
+                            $$ X = \frac 1 2 \left(X + \frac k{X}\right) $$
+                            <p class="mb-2">Now, we solve for $X$:</p>
+                            $$ 2X = X + \frac k{X} $$
+                            $$ 2X - X = \frac k{X} $$
+                            $$ X = \frac k{X} $$
+                            $$ X^2 = k $$
+                            $$ X = \pm \sqrt{k} $$
+                            <p class="mb-4">Since $x_1 = k$ is a positive number, and the recurrence $x_{n+1}$ is an average of two positive terms ($x_n$ and $k/x_n$), all terms $x_n$ will be positive. Therefore, their limit $X$ must be non-negative. This rules out the negative root.</p>
+                            <p class="mb-4">Thus, the limit $X$ must be $\sqrt{k}$.</p>
+
+                            <p class="mb-2"><strong class="font-semibold">(b) Approximate $\sqrt{3}$ and $\sqrt{5}$.</strong></p>
+                            <p class="mb-2"><strong>For $\sqrt{3}$:</strong> Let $k=3$ and $x_1 = 3$ (or $x_1=1.7$). Let's start with $x_1 = 2$.</p>
+                            <p class="mb-2">$x_1 = 2$</p>
+                            <p class="mb-2">$x_2 = 0.5(x_1 + 3/x_1) = 0.5(2 + 3/2) = 0.5(3.5) = 1.75$</p>
+                            <p class="mb-2">$x_3 = 0.5(x_2 + 3/x_2) = 0.5(1.75 + 3/1.75) \approx 0.5(1.75 + 1.71428571) \approx 1.73214286$</p>
+                            <p class="mb-2">$x_4 = 0.5(x_3 + 3/x_3) = 0.5(1.73214286 + 3/1.73214286) \approx 0.5(1.73214286 + 1.73195880) \approx 1.73205083$</p>
+                            <p class="mb-2">$x_5 = 0.5(x_4 + 3/x_4) = 0.5(1.73205083 + 3/1.73205083) \approx 0.5(1.73205083 + 1.73205078) \approx 1.73205081$</p>
+                            <p class="mb-4">The value is stable to many places. $\sqrt{3} \approx$ <strong>1.732051</strong>.</p>
+                            
+                            <p class="mb-2"><strong>For $\sqrt{5}$:</strong> Let $k=5$ and $x_1 = 2$.</p>
+                            <p class="mb-2">$x_1 = 2$</p>
+                            <p class="mb-2">$x_2 = 0.5(x_1 + 5/x_1) = 0.5(2 + 5/2) = 0.5(4.5) = 2.25$</p>
+                            <p class="mb-2">$x_3 = 0.5(x_2 + 5/x_2) = 0.5(2.25 + 5/2.25) \approx 0.5(2.25 + 2.22222222) \approx 2.23611111$</p>
+                            <p class="mb-2">$x_4 = 0.5(x_3 + 5/x_3) = 0.5(2.23611111 + 5/2.23611111) \approx 0.5(2.23611111 + 2.23602484) \approx 2.23606798$</p>
+                            <p class="mb-2">$x_5 = 0.5(x_4 + 5/x_4) = 0.5(2.23606798 + 5/2.23606798) \approx 0.5(2.23606798 + 2.23606797) \approx 2.23606798$</p>
+                            <p class="mb-4">The value is stable. $\sqrt{5} \approx$ <strong>2.236068</strong>.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 21 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 21</h3>
+                        <p class="mb-4 text-lg">In class, we showed that the sequence $(x_n)$ recursively defined by 
+                        $$ x_1 = 2, \quad x_{n+1} = \frac 12 \left(x_n + \frac 2{x_n}\right) $$
+                        approaches $\sqrt 2$. These terms $x_n$ are all rational numbers: $x_n = p_n/q_n$. Show that
+                        $$ p_n^2 - 2q_n^2 = 1 \quad \textrm{for all } n \geq 2. $$</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">This proof is best done by induction.</p>
+                            <p class="mb-2"><strong class="font-semibold">Step 1: Find the recurrence for $p_n$ and $q_n$.</strong></p>
+                            <p class="mb-2">We have $x_n = p_n/q_n$. Let's substitute this into the recurrence for $x_{n+1}$.</p>
+                            $$ x_{n+1} = \frac{p_{n+1}}{q_{n+1}} = \frac 1 2 \left(\frac{p_n}{q_n} + \frac{2}{p_n/q_n}\right) $$
+                            $$ \frac{p_{n+1}}{q_{n+1}} = \frac 1 2 \left(\frac{p_n}{q_n} + \frac{2q_n}{p_n}\right) $$
+                            <p class="mb-2">Find a common denominator on the right side:</p>
+                            $$ \frac{p_{n+1}}{q_{n+1}} = \frac 1 2 \left(\frac{p_n^2 + 2q_n^2}{p_n q_n}\right) $$
+                            $$ \frac{p_{n+1}}{q_{n+1}} = \frac{p_n^2 + 2q_n^2}{2p_n q_n} $$
+                            <p class="mb-4">This gives us a recurrence relation for the numerator and denominator: $p_{n+1} = p_n^2 + 2q_n^2$ and $q_{n+1} = 2p_n q_n$. (Note: this is the exact same recurrence as Problem 19!)</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">Step 2: Establish the Base Case ($n=2$).</strong></p>
+                            <p class="mb-2">$n=1$: $x_1 = 2 = 2/1$. So, $p_1 = 2$ and $q_1 = 1$.</p>
+                            <p class="mb-2">$p_1^2 - 2q_1^2 = 2^2 - 2(1^2) = 4 - 2 = 2$. (This is not 1, which is fine, the property starts at $n=2$).</p>
+                            <p class="mb-2">$n=2$: We find $x_2$ from $x_1$.</p>
+                            $$ x_2 = \frac 1 2 \left(x_1 + \frac 2{x_1}\right) = \frac 1 2 \left(2 + \frac 2 2\right) = \frac 1 2 (2 + 1) = \frac 3 2 $$
+                            <p class="mb-2">So, $p_2 = 3$ and $q_2 = 2$.</p>
+                            <p class="mb-4">Let's check the property for $n=2$: $p_2^2 - 2q_2^2 = 3^2 - 2(2^2) = 9 - 2(4) = 9 - 8 = 1$.</p>
+                            <p class="mb-4">The base case holds. The property is true for $n=2$.</p>
+                            
+                            <p class="mb-2"><strong class="font-semibold">Step 3: Inductive Step.</strong></p>
+                            <p class="mb-2">Assume the property is true for $n=k$, where $k \ge 2$. That is, assume $p_k^2 - 2q_k^2 = 1$.</p>
+                            <p class="mb-2">We must show it is true for $n=k+1$. We need to show that $p_{k+1}^2 - 2q_{k+1}^2 = 1$.</p>
+                            <p class="mb-2">From Problem 19, we already proved the identity:</p>
+                            $$ p_{n+1}^2 - 2q_{n+1}^2 = (p_n^2 - 2q_n^2)^2 $$
+                            <p class="mb-2">Let $n=k$. This identity tells us:</p>
+                            $$ p_{k+1}^2 - 2q_{k+1}^2 = (p_k^2 - 2q_k^2)^2 $$
+                            <p class="mb-2">From our inductive assumption, we know $p_k^2 - 2q_k^2 = 1$.</p>
+                            <p class="mb-4">Substitute this into the equation:</p>
+                            $$ p_{k+1}^2 - 2q_{k+1}^2 = (1)^2 = 1 $$
+                            <p class="mb-4">This is exactly what we needed to show. By induction, the statement $p_n^2 - 2q_n^2 = 1$ is true for all $n \geq 2$.</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- KaTeX Auto-render script initialization -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                // options
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '\\[', right: '\\]', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false}
+                ]
+            });
+        });
+    </script>
+
+    <!-- Toggle All Solutions Script -->
+    <script>
+        document.getElementById('toggle-all').addEventListener('change', function() {
+            const areVisible = this.checked;
+            const allDetails = document.querySelectorAll('main details');
+            allDetails.forEach(detail => {
+                detail.open = areVisible;
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+

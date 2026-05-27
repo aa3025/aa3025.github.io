@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial 7 Solutions - 4001CMD</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX CSS (Using CDN to ensure loading) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" xintegrity="sha384-KiWOvVjnN8qwKMlbsEOfOJaN8EvkycNwgTYSSi7mGv+B4v8zFAHmv/dpvR0/vGHD" crossorigin="anonymous">
+    <!-- KaTeX JS (Using CDN to ensure loading) -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" xintegrity="sha384-hIoBPJpTadxHRDO82BcO1F7S4CsgNchBFeS/fV7aV+E/CmhxhZmb4fvrWjQJgKRS" crossorigin="anonymous"></script>
+    <!-- KaTeX Auto-render extension (Using CDN to ensure loading) -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" xintegrity="sha384-+XBljXPPJ+bVci3gwuDRaL5D1Y4NUPGNTM8PmLHjoWsNZrKSQGzC7/0mgM9aMuzx" crossorigin="anonymous"></script>
+    <style>
+        /* Custom styles for rendered KaTeX */
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+            text-align: left;
+        }
+        /* Custom styles for code blocks */
+        pre {
+            background-color: #f3f4f6; /* gray-100 */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 1rem; /* p-4 */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+        .font-sans {
+            font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        
+        /* Hide solutions */
+        details {
+            display: none !important;
+        }
+        
+        #toggle-all, [for="toggle-all"] {
+            display: none !important;
+        }
+        
+        /* Hide solutions */
+        details {
+            display: none !important;
+        }
+        
+        #toggle-all, [for="toggle-all"] {
+            display: none !important;
+        }
+
+        .hint-controls {
+            border-top: 1px solid #e5e7eb;
+            background-color: #f8fafc;
+            padding: 1rem 1.5rem;
+        }
+
+        .hint-btn {
+            background-color: #1d4ed8;
+            color: #ffffff;
+            border: 0;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .hint-btn:hover {
+            background-color: #1e40af;
+        }
+
+        .hint-panel {
+            margin-top: 0.75rem;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            display: none;
+        }
+
+        .hint-panel.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 leading-relaxed">
+
+    <div class="max-w-4xl mx-auto p-6 sm:p-8">
+
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Tutorial 7 Exercises & Solutions</h1>
+            <p class="text-xl text-gray-600">4001CMD - Mathematical Skills for Computing Professionals</p>
+        </header>
+
+        <!-- Toggle All Solutions -->
+        <div class="flex items-center justify-end mb-6 bg-white p-4 rounded-lg shadow-md">
+            <label for="toggle-all" class="mr-3 font-semibold text-gray-700 cursor-pointer">Show All Solutions</label>
+            <input type="checkbox" id="toggle-all" class="h-5 w-5 text-blue-600 rounded cursor-pointer focus:ring-blue-500 border-gray-300">
+        </div>
+
+        <main>
+            <!-- Section: Modular Arithmetic -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">Modular Arithmetic</h2>
+
+                <!-- Problem 1.1 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1.1: Verification</h3>
+                        <p class="mb-2 text-lg">(a) Verify $1,234,567 \times 90,123 \equiv 1 \pmod{10}$.</p>
+                        <p class="mb-4 text-lg">(b) Verify $2468 \times 13,579 \equiv -3 \pmod{25}$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+
+                            <p class="mb-2"><b>(a) Modulo 10</b></p>
+                            <p class="mb-4">We only need the last digit of each number:</p>
+                            $$1,234,567 \equiv 7 \pmod{10} \quad \text{and} \quad 90,123 \equiv 3 \pmod{10}$$
+                            <p class="mb-4">Multiplying the remainders:</p>
+                            $$1,234,567 \times 90,123 \equiv 7 \times 3 \equiv 21 \equiv 1 \pmod{10}$$
+
+                            <p class="mb-2"><b>(b) Modulo 25</b></p>
+                            <p class="mb-4">We find the remainders modulo 25:</p>
+                            $$\begin{aligned} 2468 &= 2450 + 18 \equiv 18 \pmod{25} \\ 13,579 &= 13,575 + 4 \equiv 4 \pmod{25}\end{aligned}$$
+                            <p class="mb-4">Since $18 \equiv -7 \pmod{25}$ (because $18 - (-7) = 25$):</p>
+                            $$\begin{aligned} 2468 \times 13,579 &\equiv 18 \times 4 \pmod{25} \\ &\equiv 72 \pmod{25} \\ &\equiv 72 - 3(25) \equiv 72 - 75 \equiv -3 \pmod{25} \end{aligned}$$
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 1.2 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1.2: Modular Inverses</h3>
+                        <p class="mb-2 text-lg">Find the inverses of the following:</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li>(a) $2$ in $\mathbb{Z}_{11}$</li>
+                            <li>(b) $7$ in $\mathbb{Z}_{15}$</li>
+                            <li>(c) $7$ in $\mathbb{Z}_{16}$</li>
+                            <li>(d) $5$ in $\mathbb{Z}_{13}$</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-4">We are looking for a number $b$ such that $a \times b \equiv 1 \pmod{m}$.</p>
+                            <p class="mb-2"><b>(a) $2$ in $\mathbb{Z}_{11}$</b></p>
+                            $$2 \times 6 = 12 \equiv 1 \pmod{11} \implies 2^{-1} = 6$$
+
+                            <p class="mb-2"><b>(b) $7$ in $\mathbb{Z}_{15}$</b></p>
+                            $$7 \times 13 = 91 \equiv 6 \times 15 + 1 \equiv 1 \pmod{15} \implies 7^{-1} = 13$$
+
+                            <p class="mb-2"><b>(c) $7$ in $\mathbb{Z}_{16}$</b></p>
+                            $$7 \times 7 = 49 \equiv 3 \times 16 + 1 \equiv 1 \pmod{16} \implies 7^{-1} = 7$$
+
+                            <p class="mb-2"><b>(d) $5$ in $\mathbb{Z}_{13}$</b></p>
+                            $$5 \times 8 = 40 \equiv 3 \times 13 + 1 \equiv 1 \pmod{13} \implies 5^{-1} = 8$$
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 1.3 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1.3: Method of Squaring</h3>
+                        <p class="mb-2 text-lg">Calculate each of the following powers using the method of squaring.</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li>(a) $15^{16} \pmod{17}$</li>
+                            <li>(b) $75^{45} \pmod{103}$</li>
+                            <li>(c) $13245^{74} \pmod{24179}$</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+
+                            <p class="mb-2"><b>(a) $15^{16} \pmod{17}$</b></p>
+                            <p class="mb-4">Using the method of squaring:</p>
+                            <pre>
+15² ≡ 225 ≡ 4 (mod 17)
+15⁴ ≡ 4² ≡ 16 ≡ -1 (mod 17)
+15⁸ ≡ (-1)² ≡ 1 (mod 17)
+15¹⁶ ≡ 1² ≡ 1 (mod 17)
+                            </pre>
+                            <p class="mb-4">Final Answer: $\mathbf{1}$</p>
+
+                            <p class="mb-2"><b>(b) $75^{45} \pmod{103}$</b> ($45 = 32 + 8 + 4 + 1$)</p>
+                            <p class="mb-4">Calculate powers of 75 modulo 103:</p>
+                            <pre>
+75² ≡ 63 (mod 103)
+75⁴ ≡ 55 (mod 103)
+75⁸ ≡ 38 (mod 103)
+75¹⁶ ≡ 2 (mod 103)
+75³² ≡ 4 (mod 103)
+
+Combine powers: 75⁴⁵ = 75³² x 75⁸ x 75⁴ x 75¹
+
+75³² x 75⁸ ≡ 4 x 38 ≡ 49 (mod 103)
+75⁴ x 75¹ ≡ 55 x 75 ≡ 5 (mod 103)
+
+75⁴⁵ ≡ 49 x 5 ≡ 39 (mod 103)
+                            </pre>
+                            <p class="mb-4">Final Answer: $\mathbf{39}$</p>
+
+                            <p class="mb-2"><b>(c) $13245^{74} \pmod{24179}$</b> ($74 = 64 + 8 + 2$)</p>
+                            <p class="mb-4">Calculate powers modulo 24179:</p>
+                            <pre>
+13245² ≡ 11380 (mod 24179)
+13245⁴ ≡ 1676 (mod 24179)
+13245⁸ ≡ 4212 (mod 24179)
+13245¹⁶ ≡ 17737 (mod 24179)
+13245³² ≡ 8200 (mod 24179)
+13245⁶⁴ ≡ 22380 (mod 24179)
+
+Combine the necessary powers: 13245⁷⁴ = 13245⁶⁴ x 13245⁸ x 13245²
+
+13245⁸ x 13245² ≡ 4212 x 11380 ≡ 9782 (mod 24179)
+
+13245⁷⁴ ≡ 13245⁶⁴ x 9782 (mod 24179)
+13245⁷⁴ ≡ 22380 x 9782 ≡ 4494 (mod 24179)
+                            </pre>
+                            <p class="mb-4">Final Answer: $\mathbf{4494}$</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 1.4 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1.4: Fermat's Little Theorem</h3>
+                        <p class="mb-2 text-lg">(a) Calculate $29^{25} \pmod{11}$.</p>
+                        <p class="mb-4 text-lg">(b) Calculate $1^{10}+2^{20}+3^{30}+4^{40}+5^{50}+6^{60} \pmod{11}$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-4">Fermat's Little Theorem (FLT) states that if $p$ is a prime that does not divide $a$, then $a^{p-1} \equiv 1 \pmod{p}$. Here, $p=11$, so $a^{10} \equiv 1 \pmod{11}$ for $a \not\equiv 0 \pmod{11}$.</p>
+
+                            <p class="mb-2"><b>(a) $29^{25} \pmod{11}$</b></p>
+                            <p class="mb-2">First, reduce the base: $29 = 33 - 4$, so $29 \equiv -4 \pmod{11}$.</p>
+                            $$\begin{aligned} 29^{25} &\equiv (-4)^{25} \pmod{11} \\ &\equiv (-4)^{10} \times (-4)^{10} \times (-4)^{5} \pmod{11} \\ &\equiv 1 \times 1 \times (-4)^5 \pmod{11} \\ &\equiv -4^5 \pmod{11} \\ &\equiv -2^{10} \pmod{11} \end{aligned}$$
+                            <p class="mb-4">By FLT, $2^{10} \equiv 1 \pmod{11}$, so:</p>
+                            $$29^{25} \equiv -(1) \equiv -1 \equiv 10 \pmod{11}$$
+                            <p class="mb-4">Final Answer: $\mathbf{10}$</p>
+
+                            <p class="mb-2"><b>(b) Sum of Powers Modulo 11</b></p>
+                            <p class="mb-4">We use FLT: $a^{10} \equiv 1 \pmod{11}$ for $a \in \{1, 2, \dots, 6\}$.</p>
+                            $$\begin{aligned} &\quad 1^{10}+2^{20}+3^{30}+4^{40}+5^{50}+6^{60} \pmod{11} \\ &\equiv 1^{10} + (2^{10})^2 + (3^{10})^3 + (4^{10})^4 + (5^{10})^5 + (6^{10})^6 \pmod{11} \\ &\equiv 1 + 1^2 + 1^3 + 1^4 + 1^5 + 1^6 \pmod{11} \\ &\equiv 1 + 1 + 1 + 1 + 1 + 1 \pmod{11} \\ &\equiv 6 \pmod{11} \end{aligned}$$
+                            <p>Final Answer: $\mathbf{6}$</p>
+                        </div>
+                    </details>
+                </div>
+
+            </section>
+
+            <!-- Section: RSA Encryption -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-semibold border-b border-gray-300 pb-2 mb-6">RSA Encryption</h2>
+
+                <!-- Problem 1.5 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1.5: Key Generation</h3>
+                        <p class="mb-4 text-lg">Use primes $p=17$ and $q=19$. Find encryption exponent $e$ and decryption exponent $d$.</p>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2"><b>Step 1: Compute $n$ and $z$</b></p>
+                            $$\begin{aligned} n &= p \times q = 17 \times 19 = 323 \\ z &= (p-1)(q-1) = 16 \times 18 = 288 \end{aligned}$$
+
+                            <p class="mb-2"><b>Step 2: Choose Public Exponent $e$</b></p>
+                            <p class="mb-4">We need $e$ such that $\gcd(e, z) = \gcd(e, 288) = 1$. The prime factorization of $288$ is $2^5 \times 3^2$. We can choose any prime not equal to 2 or 3. The solution chooses $\mathbf{e=5}$.</p>
+
+                            <p class="mb-2"><b>Step 3: Find Private Exponent $d$ (EEA)</b></p>
+                            <p class="mb-4">We need $d$ such that $5d \equiv 1 \pmod{288}$, meaning $5d + 288k = 1$ for some integers $d, k$. We use the Euclidean Algorithm on (288, 5):</p>
+                            <pre>
+288 = 5(57) + 3   (1)
+  5 = 3(1) + 2    (2)
+  3 = 2(1) + 1    (3)
+  2 = 1(2) + 0
+                            </pre>
+                            <p class="mb-4">Work backwards from (3) to express $\gcd(288, 5)=1$ as a linear combination:</p>
+                            <pre>
+1 = 3 - 2(1)               (from 3)
+1 = 3 - (5 - 3)            (sub 2 from 2)
+1 = 2(3) - 5
+1 = 2(288 - 5(57)) - 5     (sub 3 from 1)
+1 = 2(288) - 114(5) - 5
+1 = 2(288) - 115(5)
+                            </pre>
+                            <p class="mb-4">We have $1 = (-115)(5) + (2)(288)$. To make the coefficient of $e=5$ positive, we use the identity $1 = (-115 + 288)(5) + (2 - 5)(288) = 173(5) - 3(288)$.</p>
+                            
+                            <p class="mb-4">So, $5d \equiv 1 \pmod{288}$ when $d=173$.</p>
+                            <p class="mb-2"><b>Keys:</b></p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Encryption exponent $e = \mathbf{5}$</li>
+                                <li>Decryption exponent $d = \mathbf{173}$</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 1.6 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1.6: RSA Practice</h3>
+                        <p class="mb-2 text-lg">Primes: $p=13, q=17$. Encryption exponent $e=11$.</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li>(a) Verify $e=11$ works.</li>
+                            <li>(b) Encrypt $m_1=52$ and $m_2=103$.</li>
+                            <li>(c) Verify $d=35$ works as decryption exponent.</li>
+                            <li>(d) Decrypt the results from (b) using $d=35$.</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">First, compute: $n = 13 \times 17 = 221$. $z = (13-1)(17-1) = 12 \times 16 = 192$.</p>
+
+                            <p class="mb-2"><b>(a) Verify $e=11$</b></p>
+                            <p class="mb-4">We check $\gcd(e, z) = \gcd(11, 192)$. Since $192 = 2^6 \times 3$, and 11 is not a factor of 192, $\gcd(11, 192) = 1$. The exponent $e=11$ is valid.</p>
+
+                            <p class="mb-2"><b>(b) Encrypt 52 and 103 ($e=11, n=221$)</b></p>
+                            <p class="mb-2">For $m_1=52$:</p>
+                            $$52^2 = 2704 = 12 \times 221 + 52 \equiv 52 \pmod{221}$$
+                            <p class="mb-4">Since $52^2 \equiv 52 \pmod{221}$, any higher power is also $52 \pmod{221}$ (i.e., $52^k \equiv 52 \pmod{221}$ for $k \ge 1$).</p>
+                            $$\mathbf{c_1 = 52^{11} \equiv 52 \pmod{221}}$$
+
+                            <p class="mb-2">For $m_2=103$:</p>
+                            $$103^2 = 10609 = 48 \times 221 + 1 \equiv 1 \pmod{221}$$
+                            <p class="mb-4">Since $103^2 \equiv 1 \pmod{221}$, we can use this to simplify $103^{11} = 103^{10} \times 103 = (103^2)^5 \times 103$.</p>
+                            $$\mathbf{c_2 = 103^{11} \equiv (1)^5 \times 103 \equiv 103 \pmod{221}}$$
+
+                            <p class="mb-2"><b>(c) Verify $d=35$</b></p>
+                            <p class="mb-4">We check $d \times e \equiv 1 \pmod{z}$, or $35 \times 11 \equiv 1 \pmod{192}$.</p>
+                            $$35 \times 11 = 385$$
+                            $$385 = 2 \times 192 + 1 \equiv 1 \pmod{192}$$
+                            <p>Yes, $d=35$ works as the decryption exponent.</p>
+
+                            <p class="mb-2"><b>(d) Decrypt $c_1=52$ and $c_2=103$</b></p>
+                            <p class="mb-2">For $c_1=52$, using the fact that $52^2 \equiv 52 \pmod{221}$:</p>
+                            $$m_1 \equiv 52^{35} \equiv 52 \pmod{221} \quad \text{(recovers 52)}$$
+                            <p class="mb-2">For $c_2=103$, using the fact that $103^2 \equiv 1 \pmod{221}$:</p>
+                            $$m_2 \equiv 103^{35} \equiv 103^{34} \times 103 \equiv (103^2)^{17} \times 103 \equiv 1^{17} \times 103 \equiv 103 \pmod{221} \quad \text{(recovers 103)}$$
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Problem 1.7 -->
+                <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Problem 1.7: Larger RSA Case Study</h3>
+                        <p class="mb-2 text-lg">Primes $p=59, q=101$. Encryption exponent $e=41$.</p>
+                        <ol class="list-decimal list-inside ml-4">
+                            <li>(a) Verify $e=41$ is valid.</li>
+                            <li>(b) Find decryption exponent $d$.</li>
+                            <li>(c) Encrypt $m=584$.</li>
+                            <li>(d) Decrypt $c=250$.</li>
+                        </ol>
+                    </div>
+                    <details class="bg-blue-50 border-t border-gray-200">
+                        <summary class="p-4 cursor-pointer font-semibold text-gray-700 hover:bg-blue-100">
+                            View Solution
+                        </summary>
+                        <div class="p-6 text-gray-800 border-t border-gray-200">
+                            <h4 class="font-bold text-lg mb-3">Solution & Explanation</h4>
+                            <p class="mb-2">First, compute: $n = 59 \times 101 = 5959$. $z = (59-1)(101-1) = 58 \times 100 = 5800$.</p>
+
+                            <p class="mb-2"><b>(a) Verify $e=41$</b></p>
+                            <p class="mb-4">We check $\gcd(e, z) = \gcd(41, 5800)$. The prime factorization of $z=5800$ is $2^3 \times 5^2 \times 29$. Since $e=41$ is a prime number and 41 does not appear in the prime factorization of 5800, $\gcd(41, 5800) = 1$. The exponent is <b>valid</b>.</p>
+
+                            <p class="mb-2"><b>(b) Find Decryption Exponent $d$ (EEA on 5800, 41)</b></p>
+                            <p class="mb-2">We solve $41d \equiv 1 \pmod{5800}$.</p>
+                            <pre>
+Euclidean Steps:
+(1)  5800 = 141(41) + 19
+(2)    41 = 2(19) + 3
+(3)    19 = 6(3) + 1
+(4)     3 = 3(1) + 0
+
+Backward Substitution:
+1 = 19 - 6(3)
+1 = 19 - 6(41 - 2(19))
+1 = 13(19) - 6(41)
+1 = 13(5800 - 141(41)) - 6(41)
+1 = 13(5800) - 1833(41) - 6(41)
+1 = 13(5800) - 1839(41)
+                            </pre>
+                            <p class="mb-4">We have $1 = (-1839)(41) + (13)(5800)$. To get a positive $d$, we use $d \equiv -1839 \pmod{5800}$:</p>
+                            $$d = -1839 + 5800 = 3961$$
+                            <p class="mb-4">The decryption exponent is $\mathbf{d = 3961}$.</p>
+
+                            <p class="mb-2"><b>(c) Encrypt $m=584$ (Public Key: (5959, 41))</b></p>
+                            <p class="mb-2">We calculate $584^{41} \pmod{5959}$ using squaring ($41 = 32 + 8 + 1$).</p>
+                            <pre>
+584² ≡ 1393 (mod 5959)
+584⁴ ≡ 1676 (mod 5959)
+584⁸ ≡ 1066 (mod 5959)
+584¹⁶ ≡ 4146 (mod 5959)
+584³² ≡ 3560 (mod 5959)
+
+584⁴¹ = 584³² x 584⁸ x 584¹
+
+584⁸ x 584 ≡ 1066 x 584 ≡ 2848 (mod 5959)
+
+584⁴¹ ≡ 3560 x 2848 ≡ 2621 (mod 5959)
+</pre>
+                            <p class="mb-4">The encrypted message is $\mathbf{c = 2621}$.</p>
+
+                            <p class="mb-2"><b>(d) Decrypt $c=250$ (Private Exponent: $d=3961$)</b></p>
+                            <p class="mb-2">We calculate $250^{3961} \pmod{5959}$. The binary expansion of $3961$ is $2048 + 1024 + 512 + 256 + 64 + 32 + 16 + 8 + 1$.</p>
+                            <pre>
+250¹ ≡ 250 (mod 5959)
+250² ≡ 2910 (mod 5959)
+250⁴ ≡ 361 (mod 5959)
+250⁸ ≡ 5182 (mod 5959)
+250¹⁶ ≡ 1870 (mod 5959)
+250³² ≡ 4926 (mod 5959)
+250⁶⁴ ≡ 428 (mod 5959)
+250¹²⁸ ≡ 4414 (mod 5959)
+250²⁵⁶ ≡ 3398 (mod 5959)
+250⁵¹² ≡ 3821 (mod 5959)
+250¹⁰²⁴ ≡ 491 (mod 5959)
+250²⁰⁴⁸ ≡ 2721 (mod 5959)
+
+Intermediate products:
+250²⁰⁴⁸ x 250¹⁰²⁴ ≡ 2721 x 491 ≡ 1195 (mod 5959)
+250⁵¹² x 250²⁵⁶ ≡ 3821 x 3398 ≡ 5056 (mod 5959)
+250⁶⁴ x 250³² ≡ 428 x 4926 ≡ 4801 (mod 5959)
+250¹⁶ x 250⁸ x 250¹ ≡ 1870 x 5182 x 250 ≡ 1006 x 250 (mod 5959)
+
+Further combination:
+1195 x 5056 ≡ 5453 (mod 5959)
+4801 x 1006 ≡ 3016 (mod 5959)
+5453 x 3016 ≡ 5367 (mod 5959)
+5367 x 250 ≡ 975 (mod 5959)
+                            </pre>
+                            <p class="mb-4">The decrypted number is $\mathbf{m = 975}$.</p>
+                        </div>
+                    </details>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- KaTeX Auto-render script initialization -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                // options
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '\\[', right: '\\]', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false}
+                ]
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const hints = {
+                "1.1": "Reduce each factor first (last digit for mod 10, and remainders mod 25), then multiply small remainders. For part (b), rewriting 18 as -7 can make the last reduction faster.",
+                "1.2": "For each part, search for b such that a*b is congruent to 1 modulo m. If no such b exists, check whether gcd(a,m) equals 1 first.",
+                "1.3": "Use repeated squaring and write the exponent in binary/sum-of-powers form. Keep reducing modulo at every multiplication to avoid huge numbers.",
+                "1.4": "Since 11 is prime, use a^10 congruent 1 modulo 11 whenever 11 does not divide a. First reduce bases modulo 11, then split exponents into multiples of 10 plus remainder.",
+                "1.5": "RSA setup steps: compute n = pq and z = (p-1)(q-1), choose e coprime to z, then find d as the modular inverse of e modulo z using the extended Euclidean algorithm.",
+                "1.6": "Work in order: (a) verify gcd(e,z)=1, (b) encrypt with c congruent m^e modulo n, (c) verify de congruent 1 modulo z, (d) decrypt with m congruent c^d modulo n. Reuse any useful congruences you discover in part (b).",
+                "1.7": "Follow the full RSA pipeline again: compute n and z, verify e, solve 41d congruent 1 modulo 5800, then use fast modular exponentiation for encryption/decryption." 
+            };
+
+            const toggleInput = document.getElementById("toggle-all");
+            if (toggleInput) {
+                const toggleContainer = toggleInput.closest("div");
+                if (toggleContainer) {
+                    toggleContainer.remove();
+                }
+            }
+
+            const cards = document.querySelectorAll("main .bg-white.shadow-md.rounded-lg.mb-6.overflow-hidden");
+            cards.forEach((card) => {
+                const heading = card.querySelector("h3");
+                if (!heading) {
+                    return;
+                }
+
+                const match = heading.textContent.match(/Problem\s+([0-9]+(?:\.[0-9]+)?)/i);
+                if (!match) {
+                    return;
+                }
+
+                const key = match[1];
+                if (!hints[key]) {
+                    return;
+                }
+
+                const controls = document.createElement("div");
+                controls.className = "hint-controls";
+                controls.innerHTML = `
+                    <button type="button" class="hint-btn" data-problem="${key}" aria-expanded="false">Show Hint</button>
+                    <div class="hint-panel" id="hint-${key.replace(/\./g, "-")}">
+                        <p class="font-semibold text-blue-900 mb-1">Hint</p>
+                        <p class="text-gray-700">${hints[key]}</p>
+                    </div>
+                `;
+
+                const details = card.querySelector("details");
+                if (details) {
+                    card.insertBefore(controls, details);
+                } else {
+                    card.appendChild(controls);
+                }
+            });
+
+            document.addEventListener("click", function(event) {
+                const button = event.target.closest(".hint-btn");
+                if (!button) {
+                    return;
+                }
+
+                const key = button.getAttribute("data-problem");
+                if (!key) {
+                    return;
+                }
+
+                const panel = document.getElementById(`hint-${key.replace(/\./g, "-")}`);
+                if (!panel) {
+                    return;
+                }
+
+                const isOpen = panel.classList.toggle("show");
+                button.textContent = isOpen ? "Hide Hint" : "Show Hint";
+                button.setAttribute("aria-expanded", String(isOpen));
+            });
+        });
+    </script>
+
+</body>
+</html>

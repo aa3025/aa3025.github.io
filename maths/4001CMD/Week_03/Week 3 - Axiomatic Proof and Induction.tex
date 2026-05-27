@@ -1,0 +1,1040 @@
+\documentclass[11pt,aspectratio=1610,handout]{beamer}
+%\documentclass[11pt,aspectratio=1610]{beamer}
+
+\input{../../preamble12}
+
+\title{4001CMD: Mathematical Skills for Computing Professionals}
+\subtitle{Lecture 3 - Axioms of Number Theory}
+\date{September 30, 2025}
+
+% Let's get started
+
+\begin{document}
+	
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+
+\hypersetup{linkcolor=blue}
+\begin{frame}{Outline of this week}
+\begin{spacing}{1.5}
+	\begin{columns}[t]
+		\begin{column}{15mm}
+			~
+		\end{column}
+		\begin{column}{.5\textwidth}
+			\tableofcontents[sections={1-7}]
+		\end{column}
+		\begin{column}{.5\textwidth}
+			\tableofcontents[sections={8-14}]
+		\end{column}
+	\end{columns}
+
+	\end{spacing}
+\end{frame}
+\hypersetup{linkcolor=mygray}	
+
+
+	
+\section{Proofs}
+
+\begin{frame}[fragile]{A challenge}
+		\textbf{Problem.} {\color{green!45!black} \textbf{Come up with an algorithm (i.e., a procedure) called \texttt{sumto} for a computer to calculate the sum of the first $N$ integers}:} \p
+		\begin{itemize}
+			%\item SUMTO[1] returns 1
+			\item \verb|sumto[5]| returns 15 because $15 = 1 + 2 + 3 + 4 + 5$ \p
+			\item \verb|sumto[100]| returns...? \p
+		\end{itemize}
+		Assume your computer can do \textbf{only the following:} \p
+		\begin{itemize}
+			\item Add, subtract, and multiply a defined finite sequence of numbers \p
+			\begin{itemize}
+				\item So $1+2 $ and $1 + 2 + 3 + 4 + 5$ are computable, but $1 + 2 + \cdots + 100$ is not; all 100 numbers would have to be written out. \p
+			\end{itemize}
+			\item Divide any pair of integers \textbf{if their quotient is an integer}\p
+			\begin{itemize}
+				\item So $4 \div 2 = 2$ is possible, but $4 \div 3$ would return an error. \p 
+			\end{itemize}
+			\item Assign a value to a variable, and modify that value \p
+			\begin{itemize}
+				\item So you can tell the computer $k == 1$, and then say $k == k+2$, meaning now the value of $k$ is equal to 3, or $k == i+1$, whatever $i$ is (``$==$'' means ``is declared to be'') \p
+			\end{itemize}
+			\item Determine the truth value of a statement, and make a decision based on that truth value. \p
+			\begin{itemize}
+				\item So you can tell the computer, ``If $k \leq 100$, do X.''\p
+			\end{itemize}
+		\end{itemize}
+\end{frame}
+	
+\begin{frame}[fragile]{One strategy}
+		\begin{itemize} 
+			\item Example of a code that would execute this command: 
+		\end{itemize}
+		\begin{code}{0.5}{Sum of N natural numbers}
+		  let sumto[N]:
+		     \{
+		       s == 0;
+		       i == 0;
+		       while[i <= N]:
+		       \{
+		          i == i + 1;
+		          s == s + i;		          
+		       \}
+		       return s;
+		     \}\end{code}
+		\vspace{-1mm}\p
+		\begin{itemize}
+			\item Here, a \verb|while| loop will keep adding integers to the final output, \verb|s|, until it's done this \verb|N| times. 
+			\item One problem: the bigger \verb|N| is, the longer this will take. 
+		\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Another strategy}
+		\begin{itemize}
+			\item Here's another code that will do the same thing: \p
+		\end{itemize}
+		
+\begin{code}{0.5}{Sum of N natural numbers, v1}
+	let sumto[N]:
+	\{
+		p = N*(N+1);
+		s = p/2;
+		return s;
+	\}
+\end{code}
+	
+
+    \vspace{-1mm}\p
+	\begin{itemize}
+		\item Why does this work?
+	
+	\item \textbf{Claim.} The sum of the first $N$ integers is equal to: 
+	
+	
+%	\begin{tikzpicture}
+%		\node[draw,rounded corners, fill=blue!20, thick, inner sep=1em, blur shadow={shadow blur steps=5}] at (0,0) {$1 + 2 + 3 + \cdots + N = \frac{N(N+1)}$};
+%	\end{tikzpicture}
+\begin{center}
+	\begin{tikzpicture}
+	\node[draw,rounded corners, fill=blue!5, thick, blur shadow={shadow blur steps=5},inner sep=1em] at (0,0) {$1 + 2 + 3 + \cdots + N = \frac{N(N+1)}{2}$};
+\end{tikzpicture}
+\end{center}
+	
+%	\[
+%	1 + 2 + 3 + \cdots + N = \frac{N(N+1)}{2}
+%	\]\p
+	\p
+	\item Can we proove ths claim? 
+   \end{itemize}
+
+\end{frame}
+
+%\begin{frame}{The dangers of ``proof'' by examples:}
+%	\begin{center}
+%	\includegraphics[scale=0.3]{polya} \\
+%	\small{George P\'olya, circa 1973}
+%	\end{center} 
+%	\begin{itemize} 
+%	\item \textbf{P\'olya's Conjecture} (1919): For any $n > 0$, the set of numbers less than or equal to $n$ with an odd number of prime factors is larger than the set of numbers less than or equal to $n$ with an even number of prime factors. 
+%	\item 1958: C. Brian Haselgrove showed that this is \emph{false!!!} 
+%	\begin{itemize}
+%		\item Haselgrove's counterexample: $n \approx 1.845 \times 10^{361}$
+%	\end{itemize}
+%	\item 1980: Minoru Tanaka found the smallest counterexample: $n = 906,488,079$
+%	\item \textbf{The point:} Just because a statement is true for \emph{many} numbers \textbf{does not mean it is true for all of them.} 
+%	\end{itemize}
+%\end{frame}
+
+\begin{frame}{Why study proofs?}\p
+	\begin{itemize}\itemsep4mm
+		\item Proofs can be used to help us show that \textbf{two programs do the same thing}. This is especially important if one of them is much faster than the other. \p
+		\item Proofs are a good exercise in \textbf{logical reasoning}, which is important in every area of science outside mathematics---\textit{especially computer science.} Studying proofs can make us better thinkers and scientists. \p
+		\item We want to make computers better at decision-making, which requires \emph{logical deduction}. We should be very familiar with how that decision process works for ourselves before we try "teaching" it to computers. \p
+		\item In order to prove anything, we need to agree on certain premises:  -- \textbf{\emph{axioms}}.\p
+		\item An \textbf{axiom} in mathematics is a statement that is considered to be true without a formal \textbf{proof}. 
+	\end{itemize}
+\end{frame}
+
+
+
+
+\section{Axioms of Algebra}
+
+\begin{frame}{The axioms of algebra}	
+		\hspace{-5mm} For this module, we will assume \textbf{eleven axioms of number theory}. First \textbf{nine} of them:\p
+	\vspace{0mm}
+	\renewcommand{\arraystretch}{1.35}
+\begin{block}{Here are the first nine axioms}
+	\begin{tabular}{l|l}
+	\textbf{1. Additive closure}	&  \p ~$\forall a,b \in \N$, $a+b \in \N$. \p \\
+		\hline 
+	\textbf{2. Multiplicative closure}	&  \p ~$\forall a,b \in \N$, $a b \in \N$.\p \\
+		\hline
+	\textbf{3. Additive commutativity}	&  \p ~$\forall a,b \in \N$, $a+b = b+a$.\p \\
+		\hline
+	\textbf{4. Additive associativity}	&  \p ~$\forall a,b,c \in \N$, $a+(b+c) = (a+b)+c$.\p \\
+		\hline
+	\textbf{5. Multiplicative commutativity}	&  \p ~$\forall a,b \in \N$, $a b = b a$.\p \\
+		\hline
+	\textbf{6. Multiplicative associativity}	&   \p ~$\forall a,b,c \in \N$, $a(bc) = (ab)c$.\p \\
+		\hline
+	\textbf{7. Multiplicative identity}	&  \p ~$\forall a \in \N$, $1 a = a$.\p \\
+		\hline
+	\textbf{8. Multiplicative cancellation}	& \p  ~$\forall a, b \in \N$, if $\exists z \in \N$ such that $a z = b z$, then $a=b$.\p \\
+	\hline
+	\textbf{9. Left Distributivity}	&  \p ~$\forall a,b,c \in \N$, $a(b+c) = ab + ac$. 
+	\end{tabular}
+\end{block}		
+	\renewcommand{\arraystretch}{1}
+	
+	
+\end{frame}
+
+%\begin{frame}{The axioms of algebra (continued)}
+%	\begin{enumerate}
+%		\setcounter{enumi}{6}
+%		
+%		\item For all $a \in \N$, $1 a = a$. 
+%		\item For all $a, b \in \N$, if there exists a $z \in \N$ such that $a z = b z$, then $a=b$. 
+%		\item For all $a,b,c \in \N$, $a(b+c) = ab + ac$. 
+%	\end{enumerate}
+%\end{frame}
+
+\section{Definitions}
+
+
+\begin{frame}{Definitions}
+	\begin{itemize}\itemsep2mm
+		\item In addition to the axioms, we can also introduce \textbf{definitions}. (Unlike theorems, a definition can always be declared, even if it's silly.) \p
+		
+		\item \textbf{Disclaimer:} Strictly speaking, we should have defined addition and multiplication before setting out the axioms above. We've only said we're allowed to do them, but didn't say what they meant. There is a different set of axioms called the \emph{Peano axioms} that actually define what addition and multiplication are, and the axioms listed above \emph{follow from} the Peano axioms as theorems. But that's one degree more abstract than we need. 
+	\end{itemize} \p
+	\vspace{2mm}
+	
+	
+	\begin{definition}[Multiple]
+		Let $m, n \in \N$. We say that $m$ is a \emph{multiple} of $n$ if there exists a natural number $r$ such that $m = r~n$. 
+		\begin{center}
+			$m$ is a multiple of $n \quad \Leftrightarrow \quad \exists r \in \N$ such that  $m = r ~n$. 
+		\end{center}
+	\end{definition}
+	
+	
+\end{frame}
+
+
+\section{Proving theorems}
+
+
+
+\begin{frame}{Proving theorems}
+	\textbf{Theorem.} If $a, b \in \N$ are multiples of $n$, then for all $x, y \in \N$, $xa + yb$ is a multiple of $n$. 
+	\newline\newline 
+	\emph{Proof.} By definition of ``multiples'', there exist an $r \in \N$ and an $s \in \N$ such that 
+	\begin{equation}
+		a = rn \quad \textrm{and} \quad b = sn
+	\end{equation}
+	It follows that: 
+	\begin{align*}
+		xa + yb &= x(rn) + y(sn) \quad \textrm{by (1)} \\
+		&= (xr)n + (ys)n \quad \textrm{by axiom ?} \\
+		&= n(xr) + n(ys) \quad \textrm{by axiom ?} \\
+		&= n(xr + ys) \quad \textrm{by axiom ?} \\
+		&= (xr + ys) n \quad \textrm{by axiom ?}. %\numberthis
+	\end{align*}
+	By axioms 1 and 2, $xr + ys \in \N$. By (2), $xa + yb$ is a multiple of $n$. \qed
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Proving theorems}
+	\textbf{Theorem.} If $a, b \in \N$ are multiples of $n$, then for all $x, y \in \N$, $xa + yb$ is a multiple of $n$. 
+	\newline\newline 
+		\emph{Proof.} By definition of ``multiples'', there exist an $r \in \N$ and an $s \in \N$ such that 
+		\begin{equation}
+		a = rn \quad \textrm{and} \quad b = sn
+		\end{equation}
+		It follows that: 
+		\begin{align*}
+		xa + yb &= x(rn) + y(sn) \quad \textrm{by (1)} \\
+		&= (xr)n + (ys)n \quad \textrm{by axiom 6} \\
+		&= n(xr) + n(ys) \quad \textrm{by axiom 5} \\
+		&= n(xr + ys) \quad \textrm{by axiom 9} \\
+		&= (xr + ys) n \quad \textrm{by axiom 5}. %\numberthis
+		\end{align*}
+		By axioms 1 and 2, $xr + ys \in \N$. By (2), $xa + yb$ is a multiple of $n$. \qed
+\end{frame}
+
+\section{The relation $<$}
+
+\begin{frame}{The relation $<$}
+	\vspace{-15mm}\p
+	
+	\begin{itemize}\itemsep5mm
+		\item Why do we know $5 < 7$? What does this mean, in terms of the axioms? 
+		\begin{itemize}\itemsep2mm
+			\item Well, $5 + 2 = 7$. In other words, \emph{there exists an} $x \in \N$ \emph{such that} $5 + x= 7$. 
+			\item Notice that this is written \emph{in terms of our axioms.}
+		\end{itemize}
+	\end{itemize}
+	
+	\vspace{5mm} \p
+	
+	\textbf{Definition.} For any $m, n \in \N$, the statement $m < n$ means that there exists an $x \in \N$ such that $m + x= n$: 
+	\[
+	m < n \quad \Leftrightarrow \quad \exists x \in \N \textrm{ s.t. } m + x = n
+	\] \p
+	\textbf{Theorem.} If $a < b$ and $b < c$, then $a < c$. 
+\end{frame}
+
+\begin{frame}{Properties of $<$}
+	\textbf{Theorem.} If $a < b$ and $b < c$, then $a < c$. \p
+	\newline\newline
+	\textit{Proof.} According to the definition, there exist $x,y \in \N$ such that $a + x= b $ and $b + y = c $.  \p It follows that: 
+	\[
+	a + (x + y) = (a+x) + y = b + y = c
+	\]  \p
+	where the first equation follows from axiom 4 (associativity).  \p Since $y + x \in \N$ by axiom 1, $a < c$ by definition of $<$. \qed
+	\begin{itemize}
+		\item We introduce the next axiom of $\N$ (which does not follow from the definition of $<$ and the preceding axioms): 
+	\end{itemize}  \p
+	\textbf{Axiom 10:}
+	
+	%\begin{enumerate}
+	\setcounter{enumi}{9}
+	
+		\mybox{For all $m, n \in \N$, exactly one of the following three statements is true: $m = n$, $m < n$, or $n < m$.}  \p
+	
+	%\end{enumerate}
+	\begin{itemize}
+		\item Going forward, we will let $>$, $\leq$, and $\geq$ mean the usual things. 
+	\end{itemize}
+\end{frame}
+
+\section{Proving universal statements}
+	\begin{frame}{Proving ``for all'' statements}
+		\begin{itemize}
+			\item How do we prove that a statement is true \emph{for all} $n \in \N$?  \p
+			\begin{itemize}
+				\item \textbf{Counterexamples don't work}: the fact that a statement is true for \emph{some} $n$ doesn't mean it's true for \emph{all} $n$.  \p
+			\end{itemize}
+			\item The strategy might be different depending on the statement. 
+			\item Our final axiom can help us:  \p
+		\end{itemize}
+		\textbf{Axiom 11:} 
+		\mybox{Suppose that $P(n)$ is a statement about $n$ with the following properties:  \newline 
+			$\quad$ (a) $P(1)$ is true. \newline 
+			$\quad$ (b) For all $k$: If $P(k)$ is true, then $P(k+1)$ is true. \newline 
+			Then $P(n)$ is true for all $n \in \N$.}  
+		\p
+		\begin{itemize}
+			\item This is known as the \textbf{principle of mathematical induction}. \p
+			\begin{itemize}
+				\item Suppose I have a line of dominoes.  \p
+				\item If the $k$th domino falls, then the $(k+1)$th domino will fall.  \p
+				\item I'll knock down the 1st domino $\rightarrow$ all dominoes will fall. 
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	
+	
+	
+	\begin{frame}{Example}
+		\textbf{Problem.} Prove that for all $n \in \N$, $n^3 + 5n$ is a multiple of 6. \p
+		\newline\newline
+		\emph{Proof.} We use induction to prove this universal statement: \p
+		\begin{itemize}
+			\item \textbf{Step 1:} We check if it's true for $n=1$. \p
+			\[
+			1^3 + 5(1) = 1 + 5 = 6 \p
+			\]
+			So $n^3 + 5n$ is a multiple of 6 when $n=1$. \p
+			\item \textbf{Step 2:} Suppose $k^3 + 5k$ is a multiple of 6 for some $k$.\p  Then there exists an $m \in \N$ such that: 
+			\[
+			k^3 + 5k = 6m
+			\]\p
+			Substituting $n=k+1$ into the expression $n^3 + 5n$ gives us: 
+			\begin{align*}
+			(k+1)^3 + 5(k+1) &= \p k^3 + 3k^2 + 3k + 1 + 5k + 5 \\\p
+			&= \left(k^3 + 5k\right) + \left( 3k^2 + 3k + 6\right) \\ \p
+			&= 6m + 3\left(k^2 + k + 2\right) 
+			\end{align*}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Example (continued)}
+		\begin{itemize}
+			\item So we've shown that if $k^3 + 5k = 6m$, then: 
+			\begin{equation}
+			(k+1)^3 + 5(k+1) = 6m + 3\left(k^2 + k + 2\right)
+			\end{equation}\p
+			Is $3\left(k^2 + k + 2\right)$ a multiple of 6? \p
+			\begin{itemize}
+				\item If $k$ is even, then $k^2 + k$ is even, so $k^2 + k + 2$ is a multiple of 2, so $3(k^2 + k + 2)$ is a multiple of 6. 
+				\item If $k$ is odd, then $k^2 + k$ is even, so once again, $3(k^2 + k + 2)$ is a multiple of 6. 
+			\end{itemize} \p
+			So $3(k^2 + k + 2) = 6r$ for some $r \in \N$. So (1) implies:
+			\[
+			(k+1)^3 + 5(k+1) = 6m + 6r = 6(m+r)
+			\]\p
+			so $(k+1)^3 + 5(k+1)$ is a multiple of 6, \emph{if} $k^3 + 5k$ is a multiple of 6. \p
+			\item Since we showed that $k^3 + 5k$ is a mulitple of 6 when $k=1$, it follows that $k^3 + 5k$ is a multiple of 6 when $k=2$... and so when $k=3$... and so when $k=4$... and so on. \p So, using \textbf{induction}, $n^3 + 5n$ is a multiple of 6 for all $n \in \N$. \qed
+		\end{itemize}
+	\end{frame}
+
+
+\section{Back to beginning}
+
+	\begin{frame}{Where we started} \p
+		\textbf{Problem.} Use mathematical induction to prove that for all $N \in \N$, the sum of the first $N$ integers is
+		\[
+		1 + 2 + 3 + \cdots + N = \frac{N(N+1)}{2}.
+		\] \p
+		\textbf{Solution.}\p
+		\begin{itemize}
+			\item \textbf{Step 1.} (Check the \textbf{base case}) $N = 1$: This holds since $1 = \dfrac{1(1+1)}{2}$. \p
+			\item \textbf{Step 2.} (\textbf{Inductive hypothesis}) \textbf{Assume} it holds for $N = k\in \N$. \p
+			\item \textbf{Step 3.} (\textbf{Inductive step})	\textbf{Prove} that statement holds for $N=k+1$ integers, \p we get: 
+		\end{itemize}
+		\begin{align*}
+		1 + 2 + \cdots + k + (k+1) 
+		&= \frac{k(k+1)}{2} + (k+1) = \frac{k^2 + k + 2(k+1)}{2} \\ 
+		&= \frac{k^2 + 3k + 2}{2}= \frac{(k+1)(k+2)}{2}
+		\end{align*}\p
+		\begin{itemize}
+			\item This is the claim for $N=k+1$. By induction, the formula holds for all $N$. 
+		\end{itemize}
+	\end{frame}
+
+
+\section{Gauss's Formula}
+
+	\begin{frame}{But where did it come from??}
+		\begin{tabular}{l}  
+			\begin{tabular}{l}
+				\includegraphics[scale=0.3]{gauss}
+				
+			\end{tabular} 
+			\begin{tabular}{r}
+				\parbox{0.5\linewidth}{
+					\begin{itemize}
+						\item The formula $1 + 2 + \cdots + N = N(N+1)/2$ was discovered by Karl Friedrich Gauss in the 1780s---\emph{when he was a child.} \p
+						\item Asked to sum the numbers from 1 to 100, Gauss noticed that they came in pairs: \p
+					\end{itemize}}
+				\end{tabular}
+			\end{tabular}
+			%		\includegraphics[scale=0.2]{gauss}
+			%		\begin{itemize}
+			%			\item The formula $1 + 2 + \cdots + N = N(N+1)/2$ was discovered by Karl Friedrich Gauss in the 1780s---\emph{when he was a child.} 
+			%			\item Asked to sum the numbers from 1 to 100, Gauss noticed that they came in pairs: 
+			%		\end{itemize}
+			%\flushleft
+			\begin{center}\begin{tabular}{ccccccccccccc}
+				1 & + & 2 & + & 3 & + & $\cdots$  & + & 99 & + & 100 & = & S \\
+				100 & + & 99 & + & 98 & + & $\cdots$  & + & 2 & + & 1 & = & S \\
+				\hline
+				101 & + & 101 & + & 101 & + & $\cdots$ & + & 101 & + & 101 &  = & 2S
+			\end{tabular}\end{center}
+			\begin{itemize}
+				\item There are 100 of these pairs, so:
+				\[
+				2S = 100(101) \quad \then \quad \boxed{S = \frac{100(101)}{2}.}
+				\]
+			\end{itemize}
+		\end{frame}
+		
+		\begin{frame}{Summation notation}
+			\begin{itemize}
+				\item This result can be written even more concisely using the \emph{summation notation:}
+				\[
+				\sum_{r=1}^N r = \frac{N(N+1)}{2}.
+				\]
+				\item The rather imposing looking symbol on the left is the Greek letter \emph{sigma}, and for us it means ``sum'' (since $\sum$ in Greek makes the ``S'' sound). 
+				\item The left side simply means, ``Take the sum of all numbers of the form $r$, where $r$ goes from 1 to $N$''. In other words, sum the first $N$ integers: 
+				\[
+				\sum_{r=1}^5 r = 1 + 2 + 3 + 4 + 5 \quad\quad
+				\sum_{r=1}^{100} r= 1 + 2 + \cdots + 99 + 100
+				\]
+				\[
+				\sum_{r=1}^N r= 1 + 2 + \cdots + N
+				\]
+			\end{itemize}
+		\end{frame}
+		
+		\begin{frame}{Example: Summation}
+			\begin{itemize}
+				\item Here's another example: 
+			\end{itemize}
+			\vspace{-0.1in}
+			\begin{align*}
+			\sum_{r=1}^5 &(4r+3) \\
+			&= (4(1) + 3) + (4(2)+3) + (4(3) + 3) + (4(4) + 3) + (4(5) + 3) \\
+			&= 7 + 11 + 15 + 19 + 23 \\
+			&= 75
+			\end{align*}
+			\vspace{-0.2in}
+			\begin{itemize}
+				\item If we do this with \emph{any} number of terms (say $n$), the formula looks like: 
+			\end{itemize}
+			\vspace{-0.1in}
+			\begin{align*}
+			\sum_{r=1}^n (4r + 3) &= (4(1) + 3) + (4(2) + 3) + \cdots + (4n + 3) \\
+			&= 7 + 11 + \cdots + (4n+3)
+			\end{align*}
+		\end{frame}
+		
+		\begin{frame}{Example: Summation}
+			\begin{itemize}
+				\item Actually calculating the value of a summation is \emph{hard.} There is not a general strategy for doing it. You need to be creative. 
+				\item Sometimes, though, there are formulas for their value.
+			\end{itemize}
+			\vspace{2mm}\p
+			
+			\textbf{Problem.} Show that for all $n \in \N$, 
+			\[
+			\sum_{r=1}^n (4r + 3) = 2n^2 + 5n.
+			\]
+			\begin{itemize}
+				\item What is this equation saying? It says that if you add up all numbers $4r + 3$, where $r = 1, \ldots, n$, then the final sum will be equal to $2n^2 + 5n$. 
+				\item Example: We saw $\displaystyle \sum_{n=1}^5 (4r + 3) = 75$. And in fact, $2(5)^2 + 5(5) = 50 + 25 = 75$. 
+			\end{itemize}
+		\end{frame}
+		
+		\begin{frame}{Verifying a summation formula}
+			\vspace{-15mm}
+			
+			\begin{itemize}
+				\item \emph{Discovering} the formula $\displaystyle \sum_{r=1}^n(4r+3) = 2n^2 + 5n$ is hard. 
+				\item But \emph{proving} the formula (once you know the formula) is much easier, using... \emph{induction!!}
+			\end{itemize}\p
+			
+			
+			\vspace{10mm}
+			\textbf{Theorem.} For all $n \in \N$, $\displaystyle \sum_{r=1}^n (4r+3) = 2n^2 + 5n$. 
+			\newline \newline\p 
+			\emph{Proof}. \textbf{Step 1.} For $n=1$, we have $\sum_{r=1}^1 (4r + 3) = 4(1) + 3 = 7$, and $2(1)^2 + 5(1) = 7$. 
+		\end{frame}
+		
+		\begin{frame}{Verifying a summation formula (cont)}
+			\textbf{Step 2.} Suppose $\displaystyle \sum_{r=1}^k (4r+3) = 2k^2 + 5k$, for some $k$. \p We want to show: 
+			\begin{equation*}
+			\sum_{r=1}^{k+1} (4r+3) = 2(k+1)^2 + 5(k+1)
+			\end{equation*}
+			\p
+			
+			When we sum up to $k+1$, we get: 
+			\begin{eqnarray}
+			\hspace{-0.1in}\sum_{r=1}^{k+1} (4r + 3) &= \underbrace{(4(1) + 3) + (4(2) + 3) + \cdots + (4k + 3)}_{\sum_{r=1}^k (4r + 3) = 2k^2+5k} + (4(k+1) + 3) \nonumber\\
+			&= \left(\sum_{r=1}^k(4r + 3)\right) + (4(k+1)+3) \nonumber \\
+			&= 2k^2 + 5k + 4k + 7
+			\end{eqnarray}
+		\end{frame}
+		
+		\begin{frame}{Verifying a summation formula (cont)}
+			We have shown: 
+			\begin{equation}
+			\sum_{r=1}^{k+1} (4r+3) = 2k^2 + 5k + 4k + 7
+			\end{equation}
+			We want to show: 
+			\begin{equation}
+			\sum_{r=1}^{k+1}(4r+3) = 2(k+1)^2 + 5(k+1)
+			\end{equation}
+			Expanding the right side of (3) (the equation we \emph{want}), we get: 
+			\begin{align*}
+			2(k+1)^2 + 5(k+1) &= 2(k^2 + 2k + 1) + 5(k+1) \\
+			&= 2k^2 + 4k + 5k + 2 + 5
+			\end{align*}
+			This is equal to the right hand side of (2), the equation we \emph{know!}
+		\end{frame}
+		
+		\begin{frame}{Verifying a summation formula (conclusion)}
+			Strictly speaking, this isn't the end of the proof, because we haven't derived the target equation 
+			\begin{equation}\sum_{r=1}^{k+1}(4r+3) = 2(k+1)^2 + 5(k+1)
+			\end{equation}
+			\vspace{0in} from what we \emph{know}. But now we can. If $\displaystyle \sum_{r=1}^k(4r+3) = 2k^2 + 5k$: 
+			\begin{align*}
+			\sum_{r=1}^{k+1}(4r+3) &= 2k^2 + 5k + 4k + 7 \quad \textrm{by equation (2)} \\
+			&= 2k^2 + 4k + 2 + 5k + 5 \quad \textrm{by commutativity} \\
+			&= 2(k^2 + 2k + 1) + 5(k+1) \quad \textrm{by distributivity} \\
+			&= 2(k+1)^2 + 5(k+1) \quad \textrm{because $(k+1)^2 = k^2 + 2k + 1$}
+			\end{align*}
+			This proves (4), finishing Step 2 of the induction. \qed
+		\end{frame}
+		
+		\begin{frame}{Looking for a summation formula}
+			\textbf{Problem.} Find and prove a formula for the following sum:
+			\[
+			\sum_{r=1}^n r^3 = 1^3 + 2^3 + \cdots + n^3.
+			\]\p
+			\textbf{Solution.} Let's look at the first few sums: \p
+			\begin{align*}
+			S_1 &= 1 = 1^2 \\ 
+			S_2 &= 9 = 3^2 = (1 + 2)^2 \\ 
+			S_3 &= 36 = 6^2 = (1 + 2+3)^2 \\ 
+			S_4 &= 100 = 10^2 = (1 + 2 + 3 + 4)^2 \\ 
+			S_5 &= 225 = 15^2 = (1 + 2 + 3 + 4 + 5)^2 \\ 
+			S_6 &= 441 = 21^2 = (1+2+3+4+5+6)^2 
+			\end{align*}
+			\p
+			
+			 The first few sums are all perfect squares---specifically, they're $1^2$, $3^2$, $6^2$, $10^2$, $15^2$, $21^2$... all perfect squares of the sum of the first $n$ integers.
+			%\emph{Hint:} Compute the sum first for $n=1,2,3,4,5$. Do you notice anything about the numbers? 
+			%\vspace{3in}
+		\end{frame}
+		
+%		\begin{frame}{Conjecturing a summation formula}
+%			The first few sums are all perfect squares---specifically, they're $1^2$, $3^2$, $6^2$, $10^2$, $15^2$, $21^2$... all perfect squares of the sum of the first $n$ integers: 
+%			\begin{align*}
+%			S_1 &= 1 = 1^2 \\
+%			S_2 &= 9 = 3^2 = (1 + 2)^2 \\
+%			S_3 &= 36 = 6^2 = (1 + 2+3)^2 \\
+%			S_4 &= 100 = 10^2 = (1 + 2 + 3 + 4)^2 \\
+%			S_5 &= 225 = 15^2 = (1 + 2 + 3 + 4 + 5)^2 \\
+%			S_6 &= 441 = 21^2 = (1+2+3+4+5+6)^2
+%			\end{align*}
+%			We saw previously that the sum of the first $n$ integers is $\dfrac{n(n+1)}2$. So, we might conjecture: 
+%			\[
+%			S_n = \sum_{r=1}^n r^3 = \left(\frac{n(n+1)}{2}\right)^2
+%			\]
+%		\end{frame}
+%		
+		\begin{frame}{Proving a summation formula: step 1}
+			We saw previously that the sum of the first $n$ integers is $\dfrac{n(n+1)}2$. So, we might conjecture: 
+			\[
+			S_n = \sum_{r=1}^n r^3 = \left(\frac{n(n+1)}{2}\right)^2
+			\]\p
+			We can prove this conjecture by induction. \p
+			\newline\newline
+			\textbf{Theorem.} $\displaystyle \sum_{r=1}^n r^3 = \left(\frac{n(n+1)}2\right)^2$\p
+			\newline\newline \p
+			\textit{Proof.} \textbf{Step 1.} For $n=1$, 
+			\[
+			\sum_{r=1}^1 r^3 = 1, \quad \textrm{and} \quad \left( \frac{1(1+1)}{2}\right)^2 = 1.
+			\]
+		\end{frame}
+		
+		\begin{frame}{Proving a summation formula: step 2}
+			\textbf{Step 2 \& 3.} Suppose $\displaystyle \sum_{r=1}^k r^3 = \left( \frac{k(k+1)}{2}\right)^2 = \frac{k^2(k+1)^2}{4}$. \p It follows that for $k+1$, we have: 
+			\begin{align*}
+			\sum_{r=1}^{k+1} r^3 &= \sum_{r=1}^k r^3 + (k+1)^3 \\
+			&= \frac{k^2(k+1)^2}{4} + (k+1)^3 \\
+			&= (k+1)^2 \left( \frac{k^2}{4} + (k+1)\right) \\
+			%&= (k+1)^2 \left( \frac{k^2 + 4k + 4}{4}\right) \\
+			&= (k+1)^2\frac{(k+2)^2}{4} \\
+			&= \left( \frac{(k+1)(k+2)}{2}\right)^2
+			\end{align*}
+			This is the formula for $n=k+1$. By induction, the conjecture follows. \qed
+		\end{frame}
+
+
+\section{Recursion}
+		
+\begin{frame}{A challenge}
+	\begin{itemize}
+		\item Suppose we have natural numbers $a_0, a_1, a_2, \ldots$ for which:
+		\[
+		a_0 = 1, \qquad a_n = na_{n-1} \: \forall n \geq 1
+		\] \p
+		
+		\item \textbf{Challenge.} Find $a_6$. \p 
+		\item \textbf{Solution.} We can use the formula to do it step by step: \vspace{-1mm}
+		\begin{align*}
+		a_1 &= 1a_0 = 1 \\
+		a_2 &= 2a_1 = 2 \times 1 \\
+		a_3 &= 3a_2 = 3\times2\times 1 \\
+		a_4 &= 4a_3 = 4\times3\times2\times1 \\
+		a_5 &= 5a_4 = 5\times4\times3\times2\times1 \\
+		a_6 &= 6a_5 = 6\times 5 \times 4\times3\times2\times1 = \boxed{6! = 720}
+		\end{align*}\p 
+		\item Alternatively, we can work our way backwards: \p 
+	\end{itemize}
+%	\begin{align*}
+	{\small $a_6 = 6a_5 = 6\times 5a_4 = 6\times5\times4a_3 = 6\times5\times4\times3a_2 
+	= 6\times5\times4\times3\times2a_1 = 6\times5\times4\times3\times2\times1a_0 = \boxed{6! = 720}$}
+%	\end{align*}
+	%\vspace{3in}
+\end{frame}
+
+\begin{frame}[fragile]{Factorial programs}
+	\begin{itemize} 
+		\item You may have noticed that $a_6 = 6!$, and more generally, $a_n = n!$. Officially, this is how the factorial is defined: \p
+		$$		1! = 1, \qquad n! = (n-1)! \times n.$$
+		\item There are at least two ways of writing this program for a computer. Here's how you do it with a loop: \p
+	%\begin{semiverbatim}
+	\vspace{-7mm}\begin{code}{.5}{Factorial}
+		let factorial[N]:
+		\{
+		p == 0;
+		i == 1;
+		while[i <= N]:
+		\{
+		p == p * i;
+		i == i + 1;
+		\}
+		return p;
+		\}\end{code}
+\end{itemize}
+	%\end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive programming}
+	\begin{itemize}
+		\item And here's how you do it with recursion: 
+	
+	\item\begin{code}{.5}{Factorial with recursion}
+		let factorial[N]:
+		\{
+		if[N == 0]:
+		\{
+		return 1;
+		\}
+		else:
+		\{
+		return N * factorial[N-1];
+		\}
+		\}
+	\end{code}
+
+
+		\item That's right: in most programming languages, \emph{you can call a program in the middle of writing it.} This is \emph{recursive programming.} 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Recursion in growth}
+	\begin{itemize}
+		\item In a future courses, you'll learn more about recursive programming. First, we should understand how recursion works. \p
+		
+		\item A common occurrence of recursion in the ``real world'' is \emph{exponential growth}. \p Suppose you are growing a bacterial colony in a lab. Say you start with 1000 bacteria. Each day, the number of bacteria in your colony double. \p If $P_n$ is the population on day $n$, we could model its population recursively (say the first day is day 0): 
+		\[
+		P_0 = 1000, \qquad P_n = 2P_{n-1}.
+		\] \p
+		\item You might note that a non-recursive formula for $P_n$ is $P_n = 1000 \times 2^{n}$. \p But $2^n$ is can be defined recursively as well: \p
+		\[
+		2^0 = 1, \qquad 2^n = 2 \times 2^{n-1}
+		\]
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Recursive sequences}
+	\begin{itemize}
+		\item A \emph{recursive sequence} is a sequence of numbers $\{p_0, p_1, p_2, \ldots\}$ for which some initial number of the $a_n$'s are known, and the other $p_n$'s are defined \emph{in terms of previous $p_n$'s}. \p 
+		\item Summation is a type of recursion as well: say $\{a_1, a_2, a_3, \ldots\}$ is a sequence of numbers. \p
+		\[
+		\sum_{r=1}^1 a_r = a_1, \qquad \sum_{r=1}^n a_r = a_{n} + \sum_{r=1}^{n-1} a_r
+		\] \p
+		\item \textbf{Famous example:} Let $\{f_1, f_2, f_3, \ldots\}$ be defined recursively like so: 
+		\[
+		f_1 = 1, \qquad f_2 = 1, \qquad f_n = f_{n-1} + f_{n-2}  \quad \forall n \geq 3. 
+		\]
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Fibonacci sequence}
+	\begin{itemize}
+		\item This sequence is known as the \emph{Fibonacci sequence}, created by taking the sum of the previous two numbers:
+		\[
+		\begin{array}{ccccccccccccc}
+		1 & 1 & 2 & 3 & 5 & 8 & 13 & 21 & 34 & 55 & 89 & 144 & \cdots
+		\end{array}
+		\]\p 
+		\item This sequence appears frequently in nature (many plant stems will have 3, 5, or 8 leaves on them, for instance), and in number theory. \p
+		\item \textbf{Problem:} What is the 100th Fibonacci number $f_{100}$? \p
+		\item \textbf{Answer:} It turns out that the $n$th Fibonacci number $f_n$ is: \p
+		\[
+		f_n = \frac{\Phi^n - (-\Phi)^{-n}}{\sqrt 5}
+		\] \p
+		where $\Phi = \dfrac{1 + \sqrt 5}{2} \approx 1.61803...$ is the \emph{golden ratio!} \p (root of $x^2-x-1=0$). \p 
+		
+		So for example, 
+		\[
+		f_{100} = \frac{\Phi^{100} - (-\Phi)^{-100}}{\sqrt 5} = 354,224,848,179,261,915,075
+		\]
+	\end{itemize}
+\end{frame}
+
+\section{Induction}
+
+
+\begin{frame}{More on induction}
+	\begin{itemize}
+		\item Consider the statement : 
+		\[
+		n^2 > 7n+1~~~~ (n \in \N)
+		\]
+		\vspace{-0.2in}\p
+		\begin{itemize}
+			\item Is this statement true for \emph{all} $n$? 
+			\item Is this statement true for \emph{some} $n$? 
+			\item For which $n$ is this statement true? How can you prove this? 
+		\end{itemize}\p
+	\end{itemize}		
+	\vspace{0in}
+	\hspace{0cm}\fbox{\parbox{\textwidth}{\small		
+			\textbf{Solution.} \vspace{-2mm}
+			\begin{itemize}\itemsep0mm
+				\item Are there some $n$, for which it is false?\p
+				\item Are there some $n$ for which it is true? \p
+				\item Are there any intervals for $n$ when the statement is true and where it is false? \p
+			\end{itemize} 
+	\vspace{3cm}	
+	}}
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{More on induction}
+	\begin{itemize}
+		\item Consider the statement: 
+		\[
+		n^2 > 7n+1~~~~ (n \in \N)
+		\]
+		\vspace{-0.2in}
+		\begin{itemize}
+			\item Is this statement true for \emph{all} $n$? 
+			\item Is this statement true for \emph{some} $n$? 
+			\item For which $n$ is this statement true? How can you prove this? 
+		\end{itemize}\p
+		\end{itemize}		
+		\vspace{0in}
+\hspace{0cm}\fbox{\parbox{\textwidth}{\small		
+		\textbf{Solution.} \vspace{-2mm}
+				\begin{itemize}\itemsep0mm
+				\item It's not true for all $n$: for $n=1$, it's false.\p
+				\item There are some $n$ for which it is true: for example, when $n=10$, this becomes $100 > 71$, which is true. \p
+				\item By direct computation, we can see that the statement is false if $1 \leq n \leq 7$. But it does hold for $n=8$, for then the statement becomes $64 > 57$. \p
+				\item If the statement is true for $n=k$, $k \geq 8$, then for $n=k+1$: \p
+				\begin{align*}
+				(k+1)^2 &= k^2 + 2k + 1 > 7k + 1 + 2k + 1 \\\p
+				&= 7(k+1) + k + 2 > 7(k+1) + 1
+				\end{align*}
+				since $k+2 > 1$.  By induction, $n^2 > 7n+1$ for all $n \geq 8$.
+			\end{itemize}}}
+	%\end{itemize}
+\end{frame}
+
+\begin{frame}{A new spin on induction}
+	\textbf{Theorem.} For all $n \geq 8$, $n^2 > 7n + 1$. 
+	\newline\newline
+	\emph{Proof.} We note that the statement is true for $n=8$: 
+	\[
+	8^2 = 64 > 7(8) + 1 = 57
+	\]
+	Suppose statement is true for some $n=k \geq 8$. We want to show: 
+	\[
+	(k+1)^2 > 7(k+1) + 1
+	\]
+	For $n=k+1$: 
+	\begin{align*}
+	(k+1)^2 &= k^2 + 2k + 1 \quad \textrm{by algebra}\\
+	&> 7k+1+2k+1 \quad \textrm{by induction hypothesis $k^2 > 7k+1$} \\
+	&= 7k + 7 - 7 + 1+2k+1 \quad \textrm{by algebra, adding 0} \\
+	&= 7(k+1) + 2k - 5 \quad \textrm{by algebra, distributivity} \\
+	&> 7(k+1) + 1 \quad \textrm{because $2k-5 \geq 16 - 5 > 1$ since $k \geq 8$}
+	\end{align*}
+	The result follows. \qed
+\end{frame}
+
+\begin{frame}{Induction with a new start}
+	\begin{itemize}
+		\item Notice that we didn't prove that the statement is true for $n=1$; we proved it true for $n=8$. Is this allowed? \p
+		\item Yes: first of all, the claim was made for $n \geq 8$, not all $n \geq 1$. We proved the statement for $n=8$, and every successive integer. \p
+		\item Second of all, the claim was:
+		\[
+		\forall n \geq 8: \quad n^2 > 7n+1 \quad \longleftrightarrow \quad \forall n \geq r: \quad P(n)
+		\]\p 
+		This is equivalent to: 
+		\[
+		\forall n \geq 1: \quad (n+7)^2 > 7(n+7)+1 \quad \longleftarrow \quad \forall n \geq 1: \quad P(n+r-1)
+		\] \p
+		If we say that $Q(n)$ is the statement $P(n+r-1)$, then proving that $Q(n)$ is true for all $n\geq 1$ is equivalent to proving that $P(n)$ is true for all $n \geq r$. 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Induction with recursion}
+	\begin{itemize}
+		\item Variations on induction also work very well for proving statements about recursive sequences. \p
+		\item \textbf{Example.} Suppose $u_n$ is a sequence in $\N$ defined by 
+		\[
+		u_1 = 1, \qquad u_2 = 5, \qquad u_{n+1} = 5u_n - 6u_{n-1} \quad \forall n \geq 2. 
+		\] \p
+		Prove that $\forall n \in \N, u_n = 3^n - 2^n$. 
+	\end{itemize}
+	\vspace{3in}
+\end{frame}
+
+\begin{frame}{A more complicated base case}
+	\emph{Proof.} \p \textbf{Step 1}: We need to prove that the statement is true for both $n=1$ and $n=2$, because the \emph{inductive step} (step 2) will require us to use \emph{previous two steps} (i.e., assume that it's true for both $n=k$ and $n=k-1$ before proving it for $n=k+1$).
+	\[
+	u_1 = 1 = 3^1 - 2^1, \quad u_2 = 5 = 3^2 - 2^2
+	\] \p
+	So the base case is true. \p
+	\newline \textbf{Step 2}: Suppose the claim holds for $n=k$ and $n=k-1$. For $n=k+1$, we have: \p
+	\begin{align*}
+	u_{k+1} &= 5u_k - 6u_{k-1} \\
+	&= 5(3^k - 2^k) - 6(3^{k-1} - 2^{k-1}) \\
+	&= 3^{k-1}((5\times 3)-6) - 2^{k-1}((5\times 2) - 6) \\
+	&= 9 \times 3^{k-1} - 4 \times 2^{k-1} \\
+	&= 3^{k+1} - 2^{k+1}
+	\end{align*}\p
+	So $u_n = 3^n - 2^n$ for all $n$. \qed
+\end{frame}
+
+\begin{frame}{What was different?} \p
+	\begin{itemize}\itemsep5mm
+		\item Note that in proving the induction step---that is, showing that the $n=k+1$ case can be deduced from previous steps---we needed to assume that the statement held for \emph{both $n=k$ and $n=k-1$}. \p
+		
+		\item There's nothing wrong with this, \emph{if we know we can do it the first time.} If we only proved the base case for $n=1$, and not $n=2$, could we \emph{deduce} $n=2$ from $n=1$? \p
+		\begin{itemize}
+			\item \textbf{No.} The recursive definition requires knowledge of the past \emph{two} numbers. 
+			\item However, we can deduce the $n=3$ case from the $n=1$ and $n=2$ cases. So $n=1$ and $n=2$ each must be in our base case. 
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+
+\section{Greatest and least members}
+
+\begin{frame}{Greatest and least members of sets}
+	\begin{itemize}
+		\item Suppose $X \subseteq \N$. A number $g \in X$ is the \emph{greatest member of $X$} (or the \emph{maximum} of $X$) if: 
+		\[
+		\forall n \in X, n \leq g.
+		\] \p
+		\item A number $\ell \in X$ is the \emph{least member of $X$} (or the \emph{minimum} of $X$) if: 
+		\[
+		\forall n \in X, n \geq \ell. 
+		\]\p
+		\item Is the following statement true or false? 
+		\begin{center}
+			\hspace{-0.2in}	For every subset $X \subseteq \N$, there exists a greatest member $g \in X$. 
+		\end{center}\p 
+		\item \textbf{False.} Easiest counterexample: $X = \N$ has no greatest member. 
+		\item What about this statement? 
+		\begin{center}
+			For every subset $X \subseteq \N$, there exists a least member $\ell \in X$.
+		\end{center}\p 
+		\item \textbf{True.} But how do you prove it? 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Example: Greatest and least members}
+	\textbf{Exercise.} Find the least and the greatest members of the set $X = \{n \in \N: n^2 + 2n < 60\}$, if they exist. 
+	 \p
+
+	\begin{itemize}
+		\item For this exercise, we could begin by trying to list out all of the natural numbers in the set. We see that $1,2,3,4,5,6 \in X$, but $7 \not\in X$. In other words, 
+		\[
+		\{1,2,3,4,5,6\} \subseteq X.
+		\]\p 
+		\item Does there exist a number $n > 7$ such that $n \in X$? 
+		\begin{itemize}
+			\item \textbf{No:} $\forall n > 7$, $n \not\in X$. (\emph{This requires proof!!!})
+		\end{itemize} \p
+		\item So, $X = \{1,2,3,4,5,6\}$. 
+		item The greatest member is 6. The least member is 1. 
+	\end{itemize}
+\end{frame}
+
+
+\section{The Well-Ordering Principle}
+
+\begin{frame}{The Well-Ordering Principle}
+			\begin{itemize}
+				\item In set theory, the fact that every subset of $\N$ has a least element is known as the \emph{well-ordering principle.} 
+		\end{itemize}
+	\textbf{Lemma.} For every $n \in \N$, $n \geq 1$; i.e., 1 is a least element of $\N$. 
+	\newline\newline \p
+	\textbf{Theorem.} (The Well-Ordering Principle.) Every non-empty subset $X \subseteq \N$ has a least element. 
+	\newline\newline \p
+	\textit{Proof.} We use mathematical induction to prove the following statement: 
+	\begin{equation}
+	\textrm{$\forall n \in \N$: if $X\subseteq \N$ contains $n$, then $X$ has a least element.}\label{eq:wop}
+	\end{equation} 
+	%		\begin{equation}
+	%		\textrm{then $X$ has a least element.}
+	%		\end{equation}
+\p	This statement is equivalent to what we're trying to prove: 
+	\begin{itemize}
+		\item If every non-empty $X \subseteq \N$ has a least element, then for all $n \in \N$, if $X$ is a subset containing $n$, then $X$ is nonempty, and thus has a least element. \p
+		\item Conversely, if (\ref{eq:wop}) is true, then if $X \subseteq \N$ is nonempty, $X$ contains an $n \in X$, so by (1), $X$ has a least element. 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Proving Well-Ordering Principle with \emph{strong induction}}
+	\setcounter{equation}{0}
+	\vspace{-0.3in}
+	\begin{equation}
+	\textrm{$\forall n \in \N$: if $X\subseteq \N$ contains $n$, then $X$ has a least element.}
+	\end{equation}
+%	\vspace{-0.3in}
+	\begin{itemize} 
+		\item \textbf{Step 1.} We prove the statement for $n=1$. If $1 \in X \subseteq \N$, then by the Lemma, $n \geq 1$ for all $n\in \N$, so if $n \in X$, $n \geq 1$. So 1 is a least element of $X$. \p
+		\item \textbf{Step 2.} Suppose that we have proven the conditional statement in (1) \emph{for all} $n = 1, \ldots, k$, for some $k$. (This is known as \emph{strong induction}, though it's really equivalent to the induction we learned.) \p
+		\item Consider $n=k+1$. Suppose $k+1 \in X$ for some $X \subseteq \N$. \p
+		\item Either $k+1$ is a least element of $X$, or it is not. \p
+		\begin{itemize}
+			\item If $k+1$ is a least element of $X$, we are done. \p
+			\item If $k+1$ is \emph{not} a least element of $X$, then there exists an $\ell \in X$ such that $\ell < k+1$. \p
+			\item But by our assumption (1), since $1 \leq \ell \leq k$ and we assume (1) is true for all numbers from 1 to $k$, $X$ has a least element. \p
+		\end{itemize}
+		\item So if $k+1 \in X$, then $X$ has a least element. \qed
+	\end{itemize} 
+\end{frame}
+
+
+
+\section{Strong Induction}
+
+\begin{frame}{A note on ``strong induction''}
+	\begin{itemize}
+		\item The principle of induction that we started with was: 
+		\begin{center}
+			If $P(1)$ is true, and if for every $k \in \N$ we have $P(k)$ implies $P(k+1)$, then $P(n)$ is true $\forall n \in \N$. 
+		\end{center}\p 
+		\item In symbolic logic, this could be written as: 
+		\[
+		\bigg( P(1) \wedge \forall k \in \N :\big( P(k) \Rightarrow P(k+1)\big)\bigg) \Rightarrow \forall n \in \N: P(n)
+		\] \p
+		\item To prove Well-Ordering Principle, we used ``strong induction'':
+		\begin{center}
+			If $P(1)$ is true, and if for every $k \in \N$, $P(k+1)$ holds if $P(\ell)$ holds for every $\ell = 1, \ldots, k$, then $P(n)$ is true $\forall n \in \N$. 
+		\end{center} \p
+		\item A lot of layers to unpack! Perhaps it's easier to parse if we write it in symbolic logic: 
+		\[
+		\bigg( P(1) \wedge \forall k \in \N: \big[ \big( \forall \ell \in \{\ell \in \N : \ell \leq k\}: P(\ell)\big) \Rightarrow P(k+1)\big]\bigg) 
+		\]
+		\[\Rightarrow \forall n \in \N: P(n)
+		\]
+	\end{itemize}
+\end{frame}
+
+
+\section{Summary}
+
+\begin{frame}{Summary: Proofs about $\N$}
+	\begin{itemize}
+		\item Proofs about $\N$ are derived from the eleven axioms of arithmetic in $\N$, definitions such as ``mulitple of'', and and other results derived from the axioms previously. \p 
+		
+		\item The eleventh axiom is \emph{induction}, which states that $P(n)$ is true for all $n$ if $P(1)$ is true, and if $P(k) \Rightarrow P(k+1)$ is true. \p
+		
+		\item The summation notation $\sum$ can be used as a kind of ``for-loop'' in mathematics. The expression $\displaystyle \sum_{r=1}^n a_r$ tells us to sum terms $a_r$ from $r=1$ to $r=n$.  \p
+		%		\[
+		%		\sum_{r=1}^n = a_1 + a_2 + a_3 + \cdots + a_n
+		%		\]
+		\item Recursive sequences are sequences $a_n$ that are defined in terms of previous entries in the sequence. \p
+		
+		\item Discovering explicit formulas for sums and recursive sequences can be difficult. Proving them is often more straightforward, using induction. \p
+		
+		\item The induction procedure sometimes needs to be tweaked to adapt to certain cases. 
+	\end{itemize}
+\end{frame}
+
+\end{document}
