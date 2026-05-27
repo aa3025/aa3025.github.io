@@ -1,134 +1,359 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="en-GB"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4001CMD: Mathematics for Computing Professionals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
 
-<title>Coventry University | Service Interruption</title>
-<style type="text/css">
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        }
 
-body { background-color: white; margin: 25px; padding: 0px; color: black; font-family: sans-serif;}
-h1 { background-color: grey; color: black; font-size: 32px; margin: 0px; padding: 8px; text-align: center; height: 40px;}
-h2 { background-color: white; color: black; margin: 0px; text-align: center; text-decoration: none; font-size: 16px; padding: 0px 12px}
-div { background-color: grey; width: 100%; text-align: justify; margin: 4px; padding: 0px;}
+        .card-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
 
-p { padding: 5px 10px 5px 10px; background-color: grey; margin: 0px; border: 0px; float: center; color: black;}
-a { padding: 3px;}	a:link,a:visited { text-decoration: none; color: yellow;}	a:hover { background-color: yellow; color: black;}
+        .card-shadow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
 
+        .gradient-text {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-#txtaddr { background-color: grey; color: black; float: left; width: 200px; text-align: left; margin: 3px; padding: 2px; border-left: none; font-size: 14px;}
-#txtaddr::first-line { background-color: grey; color: gold; width: 200px; font-size: 20px;}
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -17px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 2px solid white;
+        }
 
-#itsokay { color: chartreuse; text-decoration: none; font-size: 16px;}
-
-
-</style>
+        .sidebar-link.active {
+            color: #2563eb;
+            background-color: #eff6ff;
+            border-right: 4px solid #2563eb;
+        }
+    </style>
 </head>
-  <body>
-    <h1>Coventry University | Service Interruption</h1>
-    <div>
-      <p>Sorry, we have not been able to connect you to the service you were looking for.</p>
-      <p>It is expected that this is a temporary disruption and our engineers will be working to resume normal service.</p>
-      <p>Please accept our apologies for any inconvenience that this disruption may have caused. Please return and access the service later today.</p>
-    <p id="itsokay">Please note that all events, tutorials, lectures and examinations will continue to run as scheduled.</p>
-<p>
-If you are not a student or member of staff and would like to talk to us about this issue, please contact us via our <a href="https://www.coventry.ac.uk/life-on-campus/student-life/social-media-hub/" target="blank"> social media accounts</a>.
-</p>
-<p>
-Members of staff and students will be able to find out more information via our <a href="https://help.coventry.ac.uk/portal/">Help and Support Portal</a> or by
-visiting one of our Digital Service Centres on campus.
-</p>
-<!--    <p>For more information and to contact us about this disruption, please check <a href="https://twitter.com/digiservice_cu" target="blank">Digital Services on twitter</a> and <a href="https://twitter.com/#!/covcampus" target="blank"> Coventry University on twitter</a>.<br> If you are looking for specific help and guidance with our sites and services, see the wayfinder app and information portal which can be found at <a href="https://wayfinder.coventry.ac.uk/" target="_blank">wayfinder.coventry.ac.uk</a>. </p>
--->
-    </div>
-          <h2>Coventry University | Our Contact Details</h2>
-    <div>
-      <br>
-      <p id="txtaddr">
-        <font color="blue">Coventry University</font><br>
-        Priory Street<br>
-        Coventry<br>
-        CV1 5FB<br>
-        United Kingdom<br>
-        <br>
-        Tel: +44 (0)24 7765 7688<br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-      </p>
-      <p id="txtaddr">
-        <font color="rebeccapurple">Coventry University London</font><br>
-        University House<br>
-        109-117 Middlesex Street<br>
-        London<br>
-        E1 7JF<br>
-        United Kingdom<br>
-        <br>
-        Tel: +44 (0)20 7247 3666<br>
-        <br>
-        <br>
-        <br>
-        <br>
-      </p>
-      <p id="txtaddr"><font color="gold">
-        CU London (Dagenham)</font><br>
-        Rainham Road North<br>
-        Dagenham<br>
-        RM10 7BN<br>
-        United Kingdom<br>
-        <br>
-        <font style="color: gold;">(Greenwich)</font><br>
-        6 Mitre Passage<br>
-        Greenwich<br>
-        SE10 0ER<br>
-        United Kingdom<br>
-        <br>
-        Tel: +44 (0)20 3873 0700
-      </p>
-      <p id="txtaddr">
-        <font color="gold">CU Coventry</font><br>
-        8 Mile Lane<br>
-        Coventry<br>
-        CV1 2TU<br>
-        United Kingdom<br>
-        <br>
-        Tel: +44 (0)24 7765 8787<br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-      </p>
-      <p id="txtaddr">
-        <font color="gold">CU Scarborough</font><br>
-        Ashburn Road<br>
-        Off Valley Road<br>
-        Scarborough<br>
-        YO11 2JW<br>
-        United Kingdom<br>
-        <br>
-        Tel: +44 (0)1723 336700<br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-      </p>
-      <p id="txtaddr">
-        <font color="blue">Coventry University Wroclaw</font><br>
-        Centrum Poludnie Budynek D<br>
-        Powstańców Śląskich 17<br>
-        53-332 Wroclaw<br>
-        Poland<br>
-        <br>
-        Tel: +48 71 748 85 55<br>
-        <br>
-        <br>
-        <br>
-        <br>
-      </p>
-      <br clear="all">
-      &nbsp;
-    </div>
-  
-</body></html>
+<body class="bg-gray-50 text-gray-900 leading-relaxed">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-blue-600 text-white font-bold p-1.5 rounded text-sm">4001CMD</span>
+                    <span class="hidden md:block font-semibold text-gray-700">Mathematics for Computing Professionals</span>
+                </div>
+                <div class="flex space-x-6 text-sm font-medium">
+                    <a href="#description" class="text-gray-600 hover:text-blue-600">Description</a>
+                    <a href="#topics" class="text-gray-600 hover:text-blue-600">Syllabus</a>
+                    <a href="#assessment" class="text-gray-600 hover:text-blue-600">Assessment</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-24 pb-12 bg-white border-b border-gray-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+                Welcome to <span class="gradient-text">Discrete Mathematics</span>
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Master the fundamental mathematical skills required for a successful career in software engineering and computer science.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row gap-12">
+        
+        <!-- Sidebar -->
+        <aside class="hidden md:block w-64 shrink-0 h-fit sticky top-24">
+            <div class="space-y-1">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest px-4 mb-3">Quick Navigation</h3>
+                <a href="#description" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">Module Description</a>
+                <a href="#success" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">How to Succeed</a>
+                <a href="#delivery" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">Module Delivery</a>
+                <a href="#topics" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">Weekly Topics</a>
+                <a href="#assessment" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">Assessment Info</a>
+                <a href="#resources" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">Resources & Reading</a>
+            </div>
+
+            <a href="https://sigma.coventry.ac.uk" target="_blank" rel="noopener noreferrer" class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100 block hover:bg-blue-100 transition-colors">
+                <h4 class="text-blue-800 font-semibold text-sm mb-1">Sigma Centre</h4>
+                <p class="text-blue-600 text-xs">Drop-in math support located in the Library (Ground Floor).</p>
+            </a>
+        </aside>
+
+        <!-- Content Area -->
+        <div class="flex-1 space-y-16">
+            
+            <!-- Description Section -->
+            <section id="description" class="scroll-mt-24">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i class="fas fa-info-circle"></i></div>
+                    <h2 class="text-2xl font-bold text-gray-900">Module Description</h2>
+                </div>
+                <div class="bg-white p-8 rounded-2xl border border-gray-100 card-shadow text-gray-700 space-y-4">
+                    <p>
+                        This module provides an introduction to discrete mathematics, a broad subject with myriad applications to computer science. Mastering these topics prepares you for advanced computing modules and technical career challenges.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <div class="p-4 border border-gray-50 bg-gray-50/50 rounded-xl">
+                            <h4 class="font-bold text-blue-900 mb-2">Phase 1: Foundations</h4>
+                            <p class="text-sm">Symbolic logic, set theory, and axiomatic proof—vital for demonstrating software and hardware reliability.</p>
+                        </div>
+                        <div class="p-4 border border-gray-50 bg-gray-50/50 rounded-xl">
+                            <h4 class="font-bold text-blue-900 mb-2">Phase 2: Applications</h4>
+                            <p class="text-sm">Number theory (RSA Cryptography), Graph theory (Networks), and Analysis of Algorithms.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How to Succeed Section -->
+            <section id="success" class="scroll-mt-24">
+                <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-8 rounded-2xl text-white shadow-xl relative overflow-hidden">
+                    <i class="fas fa-lightbulb absolute -bottom-4 -right-4 text-8xl text-white/10"></i>
+                    <h2 class="text-2xl font-bold mb-4">How to Succeed</h2>
+                    <p class="text-blue-100 italic mb-6">
+                        "Math is a skill... not a trait that some people have and others don't."
+                    </p>
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div class="flex space-x-3">
+                            <i class="fas fa-check-circle text-blue-300 mt-1"></i>
+                            <p class="text-sm">Engage with uncertainty. If you struggle, it just means there's a specific topic you haven't mastered yet.</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <i class="fas fa-check-circle text-blue-300 mt-1"></i>
+                            <p class="text-sm">Communication is key. Explaining concepts to colleagues is the best way to master new material.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module Delivery -->
+            <section id="delivery" class="scroll-mt-24">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="p-2 bg-green-100 text-green-600 rounded-lg"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <h2 class="text-2xl font-bold text-gray-900">Module Delivery</h2>
+                </div>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white p-6 rounded-xl border border-gray-100 text-center">
+                        <span class="block text-3xl font-bold text-blue-600 mb-1">6h</span>
+                        <span class="text-xs uppercase text-gray-400 font-bold tracking-widest">Weekly Contact Time</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-100 text-center">
+                        <span class="block text-3xl font-bold text-blue-600 mb-1">2+1</span>
+                        <span class="text-xs uppercase text-gray-400 font-bold tracking-widest">Lectures & Tutorials</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-100 text-center">
+                        <span class="block text-3xl font-bold text-blue-600 mb-1">80%</span>
+                        <span class="text-xs uppercase text-gray-400 font-bold tracking-widest">Learned in Tutorials</span>
+                    </div>
+                </div>
+                <div class="mt-6 text-gray-600 text-sm bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p><i class="fas fa-info-circle mr-2"></i> Tutorial sessions involve active learning. Attempt problems <strong>before</strong> attending. Solutions are usually posted 1-week later.</p>
+                </div>
+            </section>
+
+            <!-- Topics Section -->
+            <section id="topics" class="scroll-mt-24">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="p-2 bg-purple-100 text-purple-600 rounded-lg"><i class="fas fa-list-ol"></i></div>
+                    <h2 class="text-2xl font-bold text-gray-900">Weekly Topics</h2>
+                </div>
+                <div class="relative ml-4 border-l-2 border-gray-100 pl-8 space-y-8">
+                    <div class="timeline-item relative">
+                        <span class="text-xs font-bold text-blue-500 uppercase">Week 1-3</span>
+                        <h4 class="font-bold text-gray-900">Logic & Proofs</h4>
+                        <p class="text-sm text-gray-500">Sets, Symbolic Logic, Inference Laws, Axiomatic Proof, and Induction.</p>
+                    </div>
+                    <div class="timeline-item relative">
+                        <span class="text-xs font-bold text-blue-500 uppercase">Week 4-5</span>
+                        <h4 class="font-bold text-gray-900">Functions & Combinatorics</h4>
+                        <p class="text-sm text-gray-500">Cardinality and counting principles.</p>
+                    </div>
+                    <div class="timeline-item relative">
+                        <span class="text-xs font-bold text-blue-500 uppercase">Week 6-7</span>
+                        <h4 class="font-bold text-gray-900 text-blue-600">Number Theory & RSA</h4>
+                        <p class="text-sm text-gray-500">Modular arithmetic and its application in cryptography.</p>
+                    </div>
+                    <div class="timeline-item relative">
+                        <span class="text-xs font-bold text-blue-500 uppercase">Week 8-10</span>
+                        <h4 class="font-bold text-gray-900">Graphs & Algorithms</h4>
+                        <p class="text-sm text-gray-500">Traversal, Searching, Heapsort, and Huffman Encoding.</p>
+                    </div>
+                    <div class="timeline-item relative">
+                        <span class="text-xs font-bold text-blue-500 uppercase">Week 11-12</span>
+                        <h4 class="font-bold text-gray-900">Complexity & Error Correction</h4>
+                        <p class="text-sm text-gray-500">Humming Codes, Bin Packing, and final Revision.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Assessment Section -->
+            <section id="assessment" class="scroll-mt-24">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="p-2 bg-red-100 text-red-600 rounded-lg"><i class="fas fa-tasks"></i></div>
+                    <h2 class="text-2xl font-bold text-gray-900">Assessment Breakdown</h2>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Core Assignment -->
+                    <div class="bg-white rounded-2xl border border-gray-100 card-shadow overflow-hidden">
+                        <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                            <h3 class="font-bold text-gray-800">I. Core Assignment</h3>
+                            <span class="px-2 py-1 bg-gray-200 text-gray-700 text-xs font-bold rounded">Pass / Fail</span>
+                        </div>
+                        <div class="p-6">
+                            <ul class="space-y-3 text-sm text-gray-600">
+                                <li><i class="fas fa-check text-green-500 mr-2"></i> Online test (Inspera) available from Week 6.</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i> Up to <strong>3 attempts</strong> allowed.</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i> 25 questions in 1.5 hours per attempt.</li>
+                                <li><i class="fas fa-star text-yellow-500 mr-2"></i> <strong>Pass Mark: 20/25</strong>.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Applied Core Assignment -->
+                    <div class="bg-white rounded-2xl border border-gray-100 card-shadow overflow-hidden">
+                        <div class="bg-blue-50 px-6 py-4 border-b border-blue-100 flex justify-between items-center">
+                            <h3 class="font-bold text-blue-900">II. Applied Core Assignment (Portfolio)</h3>
+                            <span class="px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded">100% Mark</span>
+                        </div>
+                        <div class="p-6">
+                            <ul class="space-y-3 text-sm text-gray-600">
+                                <li><i class="fas fa-check text-blue-500 mr-2"></i> Given out in Week 9, Deadline in Week 12.</li>
+                                <li><i class="fas fa-check text-blue-500 mr-2"></i> Single-attempt individual project/portfolio.</li>
+                                <li><i class="fas fa-check text-blue-500 mr-2"></i> No time limit (can pause/resume).</li>
+                                <li><i class="fas fa-info-circle text-blue-500 mr-2"></i> Determines your final module grade.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resources -->
+            <section id="resources" class="scroll-mt-24 pb-24">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="p-2 bg-yellow-100 text-yellow-600 rounded-lg"><i class="fas fa-book"></i></div>
+                    <h2 class="text-2xl font-bold text-gray-900">Resources & Support</h2>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-gray-100 card-shadow md:col-span-1">
+                        <h4 class="font-bold mb-2">Essential Book</h4>
+                        <p class="text-sm text-gray-600 mb-4"><em>Discrete Mathematics, Global Edition</em> by Richard Johnsonbaugh</p>
+                        <a href="#" class="text-blue-600 text-sm font-semibold hover:underline">Access Library Online →</a>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-100 card-shadow md:col-span-2">
+                        <h4 class="font-bold mb-4">Module Team (contact via Aula)</h4>
+                        <div class="space-y-4">
+                            <!-- Team Member 1 -->
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-400 text-xs">AP</div>
+                                <div>
+                                    <p class="text-sm font-bold">Alex Pedcenko</p>
+                                    <p class="text-xs text-gray-500">Module Leader (Semester 1), Lectures, Tutorials</p>
+                                </div>
+                            </div>
+                            <!-- Team Member 2 -->
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-400 text-xs">TY</div>
+                                <div>
+                                    <p class="text-sm font-bold">Taras Yavorskyi</p>
+                                    <p class="text-xs text-gray-500">Lecturer and Tutorial Lead</p>
+                                </div>
+                            </div>
+                            <!-- Team Member 3 -->
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-400 text-xs">FB</div>
+                                <div>
+                                    <p class="text-sm font-bold">Frank Bierbrauer</p>
+                                    <p class="text-xs text-gray-500">Lecturer and Tutorial Lead</p>
+                                </div>
+                            </div>
+                            <!-- Team Member 4 -->
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-400 text-xs">KS</div>
+                                <div>
+                                    <p class="text-sm font-bold">Katerina Stamou</p>
+                                    <p class="text-xs text-gray-500">Module Leader (Semester 3)Lecturer and Tutorial Lead</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <h4 class="font-bold text-blue-900">Interactive Weekly Materials</h4>
+                        <p class="text-sm text-blue-700">Go to the weekly audio lectures and quizzes for all teaching weeks.</p>
+                    </div>
+                    <a href="../index.html" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors">Open Weekly Materials</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm">4001CMD: Mathematics for Computing Professionals</p>
+            <p class="text-xs mt-2">© 2025-2026 Academic Resources. For official dates, please consult the Aula/VLE Platform.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll for anchors
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Intersection Observer for active sidebar links
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    document.querySelectorAll('.sidebar-link').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('section[id]').forEach((section) => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
