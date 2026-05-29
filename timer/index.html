@@ -1,1 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maths and Logic Games Timer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1 id="pageTitle">Maths and Logic Games Timer</h1>
+        <p id="pageSubtitle">All categories run together. The next ending category appears in the centre.</p>
+      </div>
+      <div class="controls">
+        <button id="startBtn" class="btn btn-primary">Start</button>
+        <button id="stopBtn" class="btn btn-secondary" disabled>Stop</button>
+        <button id="resetBtn" class="btn btn-secondary">Reset</button>
+        <button id="overrideBtn" class="btn btn-secondary">Override</button>
+        <button id="testAlertBtn" class="btn btn-secondary">Test Alert</button>
+        <button id="langToggleBtn" class="btn btn-secondary">FR</button>
+      </div>
+    </header>
 
+    <main class="main-panel">
+      <section class="focus-panel">
+        <div class="focus-card" id="focusCard">
+          <div id="focusLabel" class="focus-label">Next Category Ending</div>
+          <div id="focusCategories" class="focus-categories">--</div>
+          <div id="focusTime" class="focus-time">00:00:00</div>
+          <div class="elapsed-panel">
+            <div id="elapsedLabel" class="elapsed-title">Elapsed Since Start</div>
+            <div id="elapsedTime" class="elapsed-time">00:00:00</div>
+            <div class="elapsed-control hidden">
+              <input id="elapsedInput" class="elapsed-input" type="text" placeholder="hh:mm:ss" aria-label="Elapsed time override" />
+              <button id="applyElapsedBtn" class="btn btn-secondary">Apply</button>
+            </div>
+          </div>
+          <div id="alertText" class="alert-text" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="list-panel">
+        <h2>Category Status</h2>
+        <div id="categoryList" class="category-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
