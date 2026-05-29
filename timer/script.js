@@ -31,6 +31,7 @@ const alertText = document.getElementById('alertText');
 let timerInterval = null;
 let soundInterval = null;
 let audioContext = null;
+let startTime = null;
 let isRunning = false;
 let isAlertActive = false;
 let activeAlertNames = [];
@@ -206,9 +207,12 @@ function applyElapsedOverride() {
   }
 
   elapsedSeconds = overrideValue;
+  if (isRunning) {
+    startTime = Date.now() - elapsedSeconds * 1000;
+  }
   updateElapsedDisplay();
   updateStateFromElapsed();
-  evaluateFinishedCategories({ silent: true });
+  evaluateFinishedCategories();
   renderCategoryCards();
   renderFocusPanel();
   elapsedControl.classList.remove('active');
@@ -479,8 +483,22 @@ function testAlertSound() {
   }, 1000);
 }
 
+function syncElapsed() {
+  if (!isRunning || startTime === null) return;
+  elapsedSeconds = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+  updateElapsedDisplay();
+  updateStateFromElapsed();
+  evaluateFinishedCategories();
+  renderCategoryCards();
+  renderFocusPanel();
+}
+
 function tick() {
-  elapsedSeconds += 1;
+  if (startTime !== null) {
+    elapsedSeconds = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+  } else {
+    elapsedSeconds += 1;
+  }
   updateElapsedDisplay();
   updateStateFromElapsed();
 
@@ -490,7 +508,7 @@ function tick() {
 
   if (state.every((category) => category.finished)) {
     stopTimer();
-    alertText.textContent = 'All categories are complete.';
+    alertText.textContent = t('alertAllDone');
   }
 }
 
@@ -499,6 +517,7 @@ async function startTimer() {
   if (state.every((category) => category.finished)) {
     resetState();
   }
+  startTime = Date.now() - elapsedSeconds * 1000;
   // Prime the AudioContext from within this user-gesture handler so it
   // starts in a running state and is ready when the first alert fires.
   await ensureAudioContext();
@@ -538,6 +557,7 @@ function resetState() {
   }
   isRunning = false;
   isAlertActive = false;
+  startTime = null;
   elapsedSeconds = 0;
   alertedCategories.clear();
   state = originalData.map((item) => ({ ...item }));
@@ -580,6 +600,10 @@ langToggleBtn.addEventListener('click', () => {
 });
 
 testAlertBtn.addEventListener('click', testAlertSound);
+window.addEventListener('focus', syncElapsed);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) syncElapsed();
+});
 
 resetState();
 applyTranslations();
