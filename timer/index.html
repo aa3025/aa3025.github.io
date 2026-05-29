@@ -9,6 +9,13 @@
 <body>
   <div class="app-shell">
     <header class="app-header">
+      <div class="header-top">
+        <label class="config-switch">
+          <input id="configToggle" type="checkbox" />
+          <span class="switch-slider"></span>
+          <span class="switch-label">Use new config</span>
+        </label>
+      </div>
       <div>
         <h1 id="pageTitle">Maths and Logic Games Timer</h1>
         <p id="pageSubtitle">All categories run together. The next ending category appears in the centre.</p>
@@ -48,6 +55,51 @@
     </main>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    (function () {
+      const storageKey = 'timerUseNewConfig';
+      const configToggle = document.getElementById('configToggle');
+      const useNewConfig = localStorage.getItem(storageKey) === 'true';
+      configToggle.checked = useNewConfig;
+
+      configToggle.addEventListener('change', () => {
+        localStorage.setItem(storageKey, configToggle.checked);
+        const newConfigFile = configToggle.checked ? 'config_new.js' : 'config.js';
+        const existingConfigScript = document.getElementById('configScript');
+        if (existingConfigScript) {
+          existingConfigScript.remove();
+        }
+
+        const replacementConfigScript = document.createElement('script');
+        replacementConfigScript.id = 'configScript';
+        replacementConfigScript.src = newConfigFile;
+        replacementConfigScript.onload = function () {
+          if (window.applyLoadedConfig) {
+            window.applyLoadedConfig();
+          }
+        };
+        document.body.appendChild(replacementConfigScript);
+      });
+
+      const configFile = useNewConfig ? 'config_new.js' : 'config.js';
+      const configScript = document.createElement('script');
+      let configLoadedOnce = false;
+      configScript.id = 'configScript';
+      configScript.src = configFile;
+      configScript.onload = function () {
+        if (!configLoadedOnce) {
+          configLoadedOnce = true;
+          const mainScript = document.createElement('script');
+          mainScript.src = 'script.js';
+          document.body.appendChild(mainScript);
+          return;
+        }
+        if (window.applyLoadedConfig) {
+          window.applyLoadedConfig();
+        }
+      };
+      document.body.appendChild(configScript);
+    })();
+  </script>
 </body>
 </html>

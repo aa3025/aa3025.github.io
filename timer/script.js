@@ -1,14 +1,3 @@
-const categories = [
-  { name: 'CE', problems: 5, durationMinutes: 60 },
-  { name: 'CM', problems: 8, durationMinutes: 90 },
-  { name: 'C1', problems: 11, durationMinutes: 120 },
-  { name: 'C2', problems: 14, durationMinutes: 180 },
-  { name: 'L1', problems: 16, durationMinutes: 180 },
-  { name: 'L2', problems: 18, durationMinutes: 180 },
-  { name: 'GP', problems: 16, durationMinutes: 180 },
-  { name: 'HC', problems: 18, durationMinutes: 180 },
-];
-
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
 const resetBtn = document.getElementById('resetBtn');
@@ -39,6 +28,10 @@ let alertedCategories = new Set();
 let elapsedSeconds = 0;
 let currentLang = 'en';
 
+let categories = window.timerConfigCategories || [];
+let originalData = [];
+let state = [];
+
 const translations = {
   en: {
     pageTitle: 'Maths and Logic Games Timer',
@@ -63,7 +56,7 @@ const translations = {
     statusRunning: 'Running',
     statusStopped: 'Stopped',
     statusReady: 'Ready',
-    categoriesMeta: '{count} categories · 180 min',
+    categoriesMeta: '{count} categories · {duration} min',
     problemsMeta: '{count} problems · {duration} min',
     alertSoundTest: 'Alert sound test playing...',
     alertComplete: 'Alert test complete.',
@@ -97,7 +90,7 @@ const translations = {
     statusRunning: 'En cours',
     statusStopped: 'Arrêté',
     statusReady: 'Prêt',
-    categoriesMeta: '{count} catégories · 180 min',
+    categoriesMeta: '{count} catégories · {duration} min',
     problemsMeta: '{count} problèmes · {duration} min',
     alertSoundTest: 'Test du son d’alerte en cours...',
     alertComplete: 'Test d’alerte terminé.',
@@ -131,14 +124,6 @@ function applyTranslations() {
   document.querySelector('section.list-panel h2').textContent = t('categoryStatus');
 }
 
-const originalData = categories.map((category) => ({
-  ...category,
-  remainingSeconds: category.durationMinutes * 60,
-  finished: false,
-}));
-
-let state = originalData.map((item) => ({ ...item }));
-
 function formatTime(seconds) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -155,8 +140,35 @@ function updateElapsedDisplay() {
 function updateStateFromElapsed() {
   state.forEach((category) => {
     category.remainingSeconds = Math.max(0, category.durationMinutes * 60 - elapsedSeconds);
+    category.finished = category.remainingSeconds <= 0;
   });
 }
+
+function applyLoadedConfig() {
+  categories = window.timerConfigCategories || [];
+  const wasRunning = isRunning;
+  const previousElapsed = elapsedSeconds;
+
+  originalData = categories.map((category) => ({
+    ...category,
+    remainingSeconds: category.durationMinutes * 60,
+    finished: false,
+  }));
+  state = originalData.map((item) => ({ ...item }));
+
+  elapsedSeconds = previousElapsed;
+  if (wasRunning) {
+    startTime = Date.now() - elapsedSeconds * 1000;
+  }
+
+  updateStateFromElapsed();
+  evaluateFinishedCategories({ silent: true });
+  renderCategoryCards();
+  renderFocusPanel();
+  updateElapsedDisplay();
+}
+
+window.applyLoadedConfig = applyLoadedConfig;
 
 function parseElapsedInput(value) {
   const parts = value.trim().split(':').map((segment) => segment.trim());
@@ -229,25 +241,47 @@ function applyElapsedOverride() {
 function renderCategoryCards() {
   categoryList.innerHTML = '';
 
-  const grouped180 = state.filter((category) => category.durationMinutes === 180);
-  const individualCategories = state
-    .filter((category) => category.durationMinutes !== 180)
+  const groups = state.reduce((map, category) => {
+    const key = category.durationMinutes;
+    if (!map.has(key)) {
+      map.set(key, []);
+    }
+    map.get(key).push(category);
+    return map;
+  }, new Map());
+
+  const groupedCategories = Array.from(groups.values())
+    .map((group) => ({
+      categories: group,
+      remainingSeconds: group[0].remainingSeconds,
+    }))
     .sort((a, b) => a.remainingSeconds - b.remainingSeconds);
 
-  individualCategories.forEach((category) => {
+  groupedCategories.forEach(({ categories: group, remainingSeconds }) => {
+    const groupFinished = group.every((category) => category.finished);
     const card = document.createElement('div');
-    card.className = `category-card${category.finished ? ' finished' : ''}`;
+    card.className = `category-card${groupFinished ? ' finished' : ''}`;
 
     const details = document.createElement('div');
     details.className = 'category-details';
 
     const name = document.createElement('p');
     name.className = 'category-name';
-    name.textContent = category.name;
+    name.textContent = group.length > 1 ? group.map((category) => category.name).join(' • ') : group[0].name;
 
     const meta = document.createElement('p');
     meta.className = 'category-meta';
-    meta.textContent = t('problemsMeta', { count: category.problems, duration: category.durationMinutes });
+    if (group.length > 1) {
+      meta.textContent = t('categoriesMeta', {
+        count: group.length,
+        duration: group[0].durationMinutes,
+      });
+    } else {
+      meta.textContent = t('problemsMeta', {
+        count: group[0].problems,
+        duration: group[0].durationMinutes,
+      });
+    }
 
     details.appendChild(name);
     details.appendChild(meta);
@@ -257,15 +291,15 @@ function renderCategoryCards() {
 
     const time = document.createElement('p');
     time.className = 'category-time';
-    time.textContent = formatTime(category.remainingSeconds);
+    time.textContent = formatTime(remainingSeconds);
 
     const status = document.createElement('p');
     status.className = 'category-status';
-    if (category.finished) {
+    if (groupFinished) {
       status.textContent = t('statusFinished');
     } else if (isRunning) {
       status.textContent = t('statusRunning');
-    } else if (category.remainingSeconds < category.durationMinutes * 60) {
+    } else if (remainingSeconds < group[0].durationMinutes * 60) {
       status.textContent = t('statusStopped');
     } else {
       status.textContent = t('statusReady');
@@ -278,53 +312,6 @@ function renderCategoryCards() {
     card.appendChild(info);
     categoryList.appendChild(card);
   });
-
-  if (grouped180.length) {
-    const groupFinished = grouped180.every((category) => category.finished);
-    const groupRemaining = grouped180[0].remainingSeconds;
-    const card = document.createElement('div');
-    card.className = `category-card${groupFinished ? ' finished' : ''}`;
-
-    const details = document.createElement('div');
-    details.className = 'category-details';
-
-    const name = document.createElement('p');
-    name.className = 'category-name';
-    name.textContent = grouped180.map((category) => category.name).join(' • ');
-
-    const meta = document.createElement('p');
-    meta.className = 'category-meta';
-    meta.textContent = t('categoriesMeta', { count: grouped180.length });
-
-    details.appendChild(name);
-    details.appendChild(meta);
-
-    const info = document.createElement('div');
-    info.style.textAlign = 'right';
-
-    const time = document.createElement('p');
-    time.className = 'category-time';
-    time.textContent = formatTime(groupRemaining);
-
-    const status = document.createElement('p');
-    status.className = 'category-status';
-    if (groupFinished) {
-      status.textContent = t('statusFinished');
-    } else if (isRunning) {
-      status.textContent = t('statusRunning');
-    } else if (elapsedSeconds > 0) {
-      status.textContent = t('statusStopped');
-    } else {
-      status.textContent = t('statusReady');
-    }
-
-    info.appendChild(time);
-    info.appendChild(status);
-
-    card.appendChild(details);
-    card.appendChild(info);
-    categoryList.appendChild(card);
-  }
 }
 
 function getNextEndingCategories() {
@@ -560,6 +547,11 @@ function resetState() {
   startTime = null;
   elapsedSeconds = 0;
   alertedCategories.clear();
+  originalData = categories.map((category) => ({
+    ...category,
+    remainingSeconds: category.durationMinutes * 60,
+    finished: false,
+  }));
   state = originalData.map((item) => ({ ...item }));
   updateStateFromElapsed();
   updateElapsedDisplay();
@@ -606,6 +598,3 @@ document.addEventListener('visibilitychange', () => {
 });
 
 resetState();
-applyTranslations();
-renderCategoryCards();
-renderFocusPanel();
