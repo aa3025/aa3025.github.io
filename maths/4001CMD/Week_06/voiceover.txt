@@ -338,4 +338,10 @@ Amanda: Right. Naturals extend to integers, integers to rationals, and rationals
 Jack: So the lecture carries two linked themes: algorithms for secure computation, and careful expansion of the number systems we use to reason.
 Amanda: Precisely. Strong definitions, strong theorems, and strong algorithms all work together.
 Jack: And that is the mindset we carry into the next week.
-Amanda: Great work. End of Week 6 voiceover.
+Amanda: Great work.
+
+Slide 23: Tutorial Exercises
+Amanda: Finally, the last slide provides a link to the weekly tutorial exercises.
+Jack: Practicing these exercises will help reinforce all the number theory, divisibility, and cryptography concepts we discussed.
+Amanda: Yes, you can click the button to open the Tutorial 6 Exercises in a new tab. Good luck with the practice!
+Jack: Thanks, Amanda. This is the end of the Week 6 lecture.
