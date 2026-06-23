@@ -341,7 +341,7 @@ Jack: And that is the mindset we carry into the next week.
 Amanda: Great work.
 
 Slide 23: Tutorial Exercises
-Amanda: Finally, the last slide provides a link to the weekly tutorial exercises.
-Jack: Practicing these exercises will help reinforce all the number theory, divisibility, and cryptography concepts we discussed.
-Amanda: Yes, you can click the button to open the Tutorial 6 Exercises in a new tab. Good luck with the practice!
+Amanda: Finally, check the links to both the Week 6 tutorial exercises and the quiz!
+Jack: Practicing these exercises and taking the quiz will help reinforce all the number theory, divisibility, and cryptography concepts we discussed.
+Amanda: Yes, you can click the buttons to open the Tutorial 6 Exercises or take the Quiz in a new tab. Good luck with the practice!
 Jack: Thanks, Amanda. This is the end of the Week 6 lecture.
