@@ -809,6 +809,11 @@ const BOOKS_DATA = [
         "src": "book_5/audios/JH5n-tHZALE4"
       },
       {
+        "number": 9,
+        "name": "Chapter 9",
+        "src": "book_5/audios/JH5n-tHZALE5"
+      },
+      {
         "number": 10,
         "name": "Chapter 10",
         "src": "book_5/audios/JH5n-tHZALExgg"
