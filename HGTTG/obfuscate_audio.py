@@ -20,7 +20,7 @@ def generate_random_string(length=12):
 
 def main():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    tts_agent_dir = os.path.abspath(os.path.join(base_dir, "..", "TTS_agent"))
+    tts_agent_dir = os.path.abspath(os.path.join(base_dir, "..", "..", "TTS_agent"))
     
     if not os.path.exists(tts_agent_dir):
         print(f"Error: TTS_agent directory not found at {tts_agent_dir}")
