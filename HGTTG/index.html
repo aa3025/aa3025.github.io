@@ -651,6 +651,7 @@
         let BOOKS_DATA = [];
         let currentBook = null;
         let currentObjectURL = null;
+        const lastSelectedChapters = {};
 
         function _0x3b8a() {
             const obs = [251, 170, 186, 54, 25, 0, 206, 82, 188, 14, 227, 163, 147, 116, 115, 144];
@@ -758,7 +759,15 @@
 
         // Select active book
         function selectBook(book) {
+            // Save current selection for the old book
+            if (currentBook) {
+                lastSelectedChapters[currentBook.id] = currentChapterIndex;
+            }
+
             currentBook = book;
+            
+            // Restore selection or default to 0
+            currentChapterIndex = lastSelectedChapters[book.id] !== undefined ? lastSelectedChapters[book.id] : 0;
 
             // Update active state in sidebar
             document.querySelectorAll('.book-card').forEach(card => {
