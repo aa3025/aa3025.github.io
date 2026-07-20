@@ -641,11 +641,10 @@
         </div>
     </div>
 
-    <!-- Load generated static metadata -->
-    <script src="books_data.js"></script>
     <script>
         // Core Audio State
         const audio = new Audio();
+        let BOOKS_DATA = [];
         let currentBook = null;
         let currentObjectURL = null;
 
@@ -677,8 +676,33 @@
         const autoplayCheckbox = document.getElementById('autoplay-checkbox');
 
         // Initial setup
-        function init() {
-            if (typeof BOOKS_DATA === 'undefined' || !BOOKS_DATA.length) {
+        async function init() {
+            try {
+                const response = await fetch('books_data.dat');
+                if (!response.ok) throw new Error("Metadata file not found");
+                const base64Text = await response.text();
+                
+                const binaryString = atob(base64Text.trim());
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                const key = _0x3b8a();
+                const decryptedBytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    decryptedBytes[i] = bytes[i] ^ key[i % key.length];
+                }
+                
+                const jsonText = new TextDecoder("utf-8").decode(decryptedBytes);
+                BOOKS_DATA = JSON.parse(jsonText);
+            } catch (err) {
+                console.error("Failed to load or decrypt books metadata:", err);
+                return;
+            }
+
+            if (!BOOKS_DATA || !BOOKS_DATA.length) {
                 console.error("BOOKS_DATA is missing or empty.");
                 return;
             }
