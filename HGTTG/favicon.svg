@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Premium radial glow gradient -->
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00f2fe" stop-opacity="1" />
+      <stop offset="100%" stop-color="#4facfe" stop-opacity="0.2" />
+    </radialGradient>
+    <!-- Futuristic neon gradient for headphones/planet -->
+    <linearGradient id="neonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff3366" />
+      <stop offset="50%" stop-color="#9b51e0" />
+      <stop offset="100%" stop-color="#00f2fe" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background container -->
+  <rect width="512" height="512" rx="128" fill="#050508" />
+
+  <!-- Outer space-dust ambient glow -->
+  <circle cx="256" cy="256" r="180" fill="url(#glow)" filter="blur(20px)" opacity="0.6" />
+
+  <!-- The Planet / Audio Dial -->
+  <circle cx="256" cy="256" r="110" fill="none" stroke="url(#neonGrad)" stroke-width="12" />
+  
+  <!-- Outer orbital ring representing a vinyl groove / orbit -->
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="10 15" opacity="0.3" />
+
+  <!-- Headphones Arc -->
+  <path d="M 120 256 A 136 136 0 0 1 392 256" fill="none" stroke="url(#neonGrad)" stroke-width="24" stroke-linecap="round" />
+
+  <!-- Headphone ear cushions (Left and Right) -->
+  <rect x="96" y="220" width="40" height="80" rx="20" fill="url(#neonGrad)" />
+  <rect x="376" y="220" width="40" height="80" rx="20" fill="url(#neonGrad)" />
+
+  <!-- Stylized audio waves inside the planet -->
+  <g fill="#00f2fe">
+    <rect x="200" y="226" width="12" height="60" rx="6" />
+    <rect x="224" y="196" width="12" height="120" rx="6" />
+    <rect x="248" y="176" width="12" height="160" rx="6" fill="#ff3366" />
+    <rect x="272" y="206" width="12" height="100" rx="6" />
+    <rect x="296" y="236" width="12" height="40" rx="6" />
+  </g>
+</svg>
