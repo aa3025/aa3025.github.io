@@ -572,6 +572,7 @@
             <div class="active-book-header">
                 <div class="active-book-subtitle" id="active-book-num">Book 1</div>
                 <h1 class="active-book-title" id="active-book-title">The Hitchhiker's Guide to the Galaxy</h1>
+                <div class="active-book-status" id="active-book-status" style="font-size: 0.75rem; color: #ff3366; font-weight: 600; margin-top: 0.25rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; text-transform: uppercase;"></div>
             </div>
 
             <div class="chapter-list" id="chapters-list">
@@ -765,6 +766,13 @@
             // Update main window headers
             activeBookNumEl.textContent = `Book ${book.id}`;
             activeBookTitleEl.textContent = book.title;
+            
+            const activeBookStatusEl = document.getElementById('active-book-status');
+            if (book.id === 6) {
+                activeBookStatusEl.textContent = 'Publicly unavailable';
+            } else {
+                activeBookStatusEl.textContent = '';
+            }
 
             // Render active chapters
             renderChapters(book);
