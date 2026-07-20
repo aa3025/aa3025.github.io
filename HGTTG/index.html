@@ -817,7 +817,7 @@
                     <div class="chapter-index">${chap.number}</div>
                     <div class="chapter-name">${chap.name}</div>
                     <div>${statusBadge}</div>
-                    <div class="chapter-duration">${hasAudio ? '--:--' : 'N/A'}</div>
+                    <div class="chapter-duration">${hasAudio ? (chap.duration ? formatTime(chap.duration) : '--:--') : 'N/A'}</div>
                 `;
 
                 if (hasAudio) {
