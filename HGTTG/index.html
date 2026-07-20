@@ -622,6 +622,15 @@
         // Core Audio State
         const audio = new Audio();
         let currentBook = null;
+        let currentObjectURL = null;
+
+        function getDecryptionKey() {
+            // OBFUSCATED_KEY_START
+            const obs = [];
+            const mask = 0;
+            // OBFUSCATED_KEY_END
+            return obs.map(b => b ^ mask);
+        }
         let currentChapterIndex = -1;
         let isScrubbing = false;
 
@@ -755,7 +764,7 @@
         }
 
         // Play selected chapter
-        function playChapter(book, index, chapter) {
+        async function playChapter(book, index, chapter) {
             if (currentBook && currentBook.id === book.id && currentChapterIndex === index) {
                 togglePlayPause();
                 return;
@@ -764,24 +773,62 @@
             currentBook = book;
             currentChapterIndex = index;
 
-            audio.src = chapter.src;
-            audio.load();
-            audio.play().then(() => {
-                updateUIState();
-            }).catch(err => {
-                console.error("Audio playback error:", err);
-            });
-
-            // Update persistent player labels
-            playerTrackNameEl.textContent = chapter.name;
-            playerTrackBookEl.textContent = book.title;
-
-            // Enable player controls
-            btnPlayPause.disabled = false;
-            timelineSlider.disabled = false;
-
             // Sync visual active rows
             syncActiveRow();
+
+            try {
+                // Show loading state
+                playerTrackNameEl.textContent = "Loading & Decrypting...";
+                playerTrackBookEl.textContent = book.title;
+                btnPlayPause.disabled = true;
+
+                // Fetch the obfuscated Base64 file
+                const response = await fetch(chapter.src);
+                if (!response.ok) throw new Error("Failed to load audio file");
+                const base64Text = await response.text();
+
+                // Decode base64 to binary data
+                const binaryString = atob(base64Text.trim());
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                // De-obfuscate using the key
+                const key = getDecryptionKey();
+                const decryptedBytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    decryptedBytes[i] = bytes[i] ^ key[i % key.length];
+                }
+
+                // Create object URL
+                if (currentObjectURL) {
+                    URL.revokeObjectURL(currentObjectURL);
+                }
+                const blob = new Blob([decryptedBytes], { type: 'audio/mp3' });
+                currentObjectURL = URL.createObjectURL(blob);
+
+                audio.src = currentObjectURL;
+                audio.load();
+                audio.play().then(() => {
+                    updateUIState();
+                }).catch(err => {
+                    console.error("Audio playback error:", err);
+                });
+
+                // Update persistent player labels
+                playerTrackNameEl.textContent = chapter.name;
+                playerTrackBookEl.textContent = book.title;
+
+                // Enable player controls
+                btnPlayPause.disabled = false;
+                timelineSlider.disabled = false;
+
+            } catch (err) {
+                console.error("Decryption / Playback error:", err);
+                playerTrackNameEl.textContent = "Playback Error";
+            }
         }
 
         // Play/Pause toggler
