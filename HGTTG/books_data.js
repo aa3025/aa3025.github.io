@@ -774,6 +774,11 @@ const BOOKS_DATA = [
         "src": "book_5/audios/chapter_1.mp3"
       },
       {
+        "number": 3,
+        "name": "Chapter 3",
+        "src": "book_5/audios/chapter_3.mp3"
+      },
+      {
         "number": 10,
         "name": "Chapter 10",
         "src": "book_5/audios/chapter_10.mp3"
@@ -787,6 +792,11 @@ const BOOKS_DATA = [
         "number": 13,
         "name": "Chapter 13",
         "src": "book_5/audios/chapter_13.mp3"
+      },
+      {
+        "number": 16,
+        "name": "Chapter 16",
+        "src": "book_5/audios/chapter_16.mp3"
       }
     ]
   },

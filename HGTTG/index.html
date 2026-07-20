@@ -532,8 +532,15 @@
 
     <header>
         <div class="logo-section">
-            <div class="logo-icon">Milliways</div>
-            <div class="badge">Audio System</div>
+            <div style="display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="logo-icon">Milliways</div>
+                    <div class="badge">Audio System</div>
+                </div>
+                <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.25rem; max-width: 350px; line-height: 1.3; font-weight: 300; letter-spacing: 0.2px;">
+                    This is not the official voicing of Douglas Adams' books. It was created as a recreational project using AI TTS.
+                </div>
+            </div>
         </div>
         <div class="dont-panic">DON'T PANIC</div>
     </header>
@@ -834,7 +841,10 @@
         // Handle Audio end (Autoplay Next)
         function handleTrackEnded() {
             if (autoplayCheckbox.checked) {
-                playNext();
+                // Pause 2 seconds before playing next track
+                setTimeout(() => {
+                    playNext();
+                }, 2000);
             } else {
                 updateUIState();
             }
