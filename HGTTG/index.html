@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hitchhiker's Guide - Audiobook Player</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Orbitron:wght@500;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050508;
+            --surface-color: rgba(18, 18, 28, 0.5);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary-glow: #00f2fe;
+            --secondary-glow: #4facfe;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --active-glow: rgba(0, 242, 254, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(79, 172, 254, 0.05) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(0, 242, 254, 0.05) 0px, transparent 50%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath fill-rule='evenodd' d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm1-61c3.108 0 5.627-2.519 5.627-5.627 0-3.108-2.519-5.627-5.627-5.627S29.373 20.265 29.373 23.373c0 3.108 2.519 5.627 5.627 5.627zm33 8c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM14 62c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm64-3c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'/%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Navigation Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2.5rem;
+            background: rgba(5, 5, 8, 0.4);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            z-index: 10;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .badge {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: var(--primary-glow);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
+        }
+
+        .dont-panic {
+            font-family: 'Orbitron', sans-serif;
+            color: #ff3366;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+            border: 2px solid #ff3366;
+            padding: 0.35rem 0.85rem;
+            border-radius: 4px;
+            animation: pulse-border 2s infinite alternate;
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 5px rgba(255, 51, 102, 0.2); border-color: rgba(255, 51, 102, 0.6); }
+            100% { box-shadow: 0 0 15px rgba(255, 51, 102, 0.6); border-color: rgba(255, 51, 102, 1); }
+        }
+
+        /* App Body Layout */
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Sidebar: Books Selection */
+        .sidebar {
+            width: 320px;
+            background: rgba(10, 10, 18, 0.3);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .book-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-glow), var(--secondary-glow));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .book-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 242, 254, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.05);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .book-card.active {
+            border-color: rgba(0, 242, 254, 0.5);
+            background: rgba(0, 242, 254, 0.03);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.08);
+        }
+
+        .book-card.active::before {
+            opacity: 1;
+        }
+
+        .book-number {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .book-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-main);
+        }
+
+        .book-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Main Workspace: Chapter List */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, rgba(0, 242, 254, 0.02), transparent 40%);
+            overflow-y: auto;
+            padding: 2.5rem;
+        }
+
+        .active-book-header {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .active-book-subtitle {
+            font-size: 0.9rem;
+            color: var(--primary-glow);
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .active-book-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        /* Chapters Layout Grid/List */
+        .chapter-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 6rem; /* Ensure space for player */
+        }
+
+        .chapter-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 100px 80px;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chapter-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateX(4px);
+        }
+
+        .chapter-row.active {
+            background: var(--active-glow);
+            border-color: rgba(0, 242, 254, 0.4);
+        }
+
+        .chapter-index {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .chapter-row.active .chapter-index {
+            color: var(--primary-glow);
+        }
+
+        .chapter-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .chapter-status-badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+
+        .status-ready {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .chapter-duration {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        /* Bottom Player Dashboard */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: rgba(10, 10, 18, 0.7);
+            border-top: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            display: grid;
+            grid-template-columns: 320px 1fr 320px;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        /* Player Left: Current Track Meta */
+        .player-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .player-track-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #ffffff;
+        }
+
+        .player-track-album {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Player Center: Controls & Timeline */
+        .player-controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .player-buttons {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            color: #ffffff;
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-play-pause {
+            background: #ffffff;
+            color: var(--bg-color);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .btn-play-pause:hover {
+            transform: scale(1.05);
+            background: var(--primary-glow);
+            box-shadow: 0 0 20px var(--primary-glow);
+            color: var(--bg-color);
+        }
+
+        .btn-play-pause svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .btn-nav svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Timeline Slider styling */
+        .timeline-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .time-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            width: 45px;
+            text-align: center;
+        }
+
+        .slider-bar {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .slider-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            transition: transform 0.1s ease;
+        }
+
+        .slider-bar::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+            background: var(--primary-glow);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        /* Player Right: Volume and Autoplay Settings */
+        .player-settings {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1.5rem;
+        }
+
+        .autoplay-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .autoplay-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .autoplay-toggle input[type="checkbox"] {
+            display: none;
+        }
+
+        .toggle-switch {
+            width: 36px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            position: relative;
+            transition: background 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .autoplay-toggle input[type="checkbox"]:checked + .toggle-switch {
+            background: var(--primary-glow);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
+
+        .autoplay-toggle input[type="checkbox"]:checked + .toggle-switch::after {
+            transform: translateX(16px);
+            background: var(--bg-color);
+        }
+
+        /* Volume controls */
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .volume-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--text-muted);
+        }
+
+        .volume-slider {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-section">
+            <div class="logo-icon">Milliways</div>
+            <div class="badge">Audio System</div>
+        </div>
+        <div class="dont-panic">DON'T PANIC</div>
+    </header>
+
+    <div class="app-container">
+        <!-- Sidebar containing list of books -->
+        <div class="sidebar" id="books-list">
+            <div class="sidebar-title">Library</div>
+            <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Main section showing chapters -->
+        <main>
+            <div class="active-book-header">
+                <div class="active-book-subtitle" id="active-book-num">Book 1</div>
+                <h1 class="active-book-title" id="active-book-title">The Hitchhiker's Guide to the Galaxy</h1>
+            </div>
+
+            <div class="chapter-list" id="chapters-list">
+                <!-- Rendered dynamically -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Persistent Bottom Playback Dashboard -->
+    <div class="player-bar">
+        <!-- Left details -->
+        <div class="player-meta">
+            <div class="player-track-title" id="player-track-name">Not Playing</div>
+            <div class="player-track-album" id="player-track-book">Select a chapter to begin</div>
+        </div>
+
+        <!-- Center Controls -->
+        <div class="player-controls-container">
+            <div class="player-buttons">
+                <!-- Prev Button -->
+                <button class="btn btn-nav" id="btn-prev" disabled>
+                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6L18 18V6z"/></svg>
+                </button>
+                <!-- Play/Pause Button -->
+                <button class="btn btn-play-pause" id="btn-play-pause" disabled>
+                    <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <!-- Next Button -->
+                <button class="btn btn-nav" id="btn-next" disabled>
+                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6zm9-12v12h2V6z"/></svg>
+                </button>
+            </div>
+            <!-- Time Scrubbing -->
+            <div class="timeline-container">
+                <span class="time-label" id="current-time">0:00</span>
+                <input type="range" class="slider-bar" id="timeline-slider" value="0" min="0" max="100" disabled>
+                <span class="time-label" id="total-time">0:00</span>
+            </div>
+        </div>
+
+        <!-- Right Settings -->
+        <div class="player-settings">
+            <!-- Autoplay Toggle -->
+            <label class="autoplay-toggle">
+                <span class="autoplay-label">Autoplay Next</span>
+                <input type="checkbox" id="autoplay-checkbox" checked>
+                <div class="toggle-switch"></div>
+            </label>
+            <!-- Volume Slider -->
+            <div class="volume-container">
+                <div class="volume-icon">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </div>
+                <input type="range" class="slider-bar volume-slider" id="volume-slider" value="80" min="0" max="100">
+            </div>
+        </div>
+    </div>
+
+    <!-- Load generated static metadata -->
+    <script src="books_data.js"></script>
+    <script>
+        // Core Audio State
+        const audio = new Audio();
+        let currentBook = null;
+        let currentChapterIndex = -1;
+        let isScrubbing = false;
+
+        // Cache elements
+        const booksListEl = document.getElementById('books-list');
+        const chaptersListEl = document.getElementById('chapters-list');
+        const activeBookNumEl = document.getElementById('active-book-num');
+        const activeBookTitleEl = document.getElementById('active-book-title');
+
+        const playerTrackNameEl = document.getElementById('player-track-name');
+        const playerTrackBookEl = document.getElementById('player-track-book');
+        const btnPlayPause = document.getElementById('btn-play-pause');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const timelineSlider = document.getElementById('timeline-slider');
+        const currentTimeLabel = document.getElementById('current-time');
+        const totalTimeLabel = document.getElementById('total-time');
+        const volumeSlider = document.getElementById('volume-slider');
+        const autoplayCheckbox = document.getElementById('autoplay-checkbox');
+
+        // Initial setup
+        function init() {
+            if (typeof BOOKS_DATA === 'undefined' || !BOOKS_DATA.length) {
+                console.error("BOOKS_DATA is missing or empty.");
+                return;
+            }
+
+            renderLibrary();
+            selectBook(BOOKS_DATA[0]);
+
+            // Audio event listeners
+            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('durationchange', setDuration);
+            audio.addEventListener('ended', handleTrackEnded);
+
+            // Controls listeners
+            btnPlayPause.addEventListener('click', togglePlayPause);
+            btnPrev.addEventListener('click', playPrevious);
+            btnNext.addEventListener('click', playNext);
+            volumeSlider.addEventListener('input', changeVolume);
+
+            // Timeline scrubbing
+            timelineSlider.addEventListener('mousedown', () => isScrubbing = true);
+            timelineSlider.addEventListener('mouseup', seekAudio);
+            timelineSlider.addEventListener('input', () => {
+                currentTimeLabel.textContent = formatTime((timelineSlider.value / 100) * audio.duration || 0);
+            });
+        }
+
+        // Render book cards in sidebar
+        function renderLibrary() {
+            // Keep the title header and just render the dynamic cards below
+            const header = booksListEl.querySelector('.sidebar-title');
+            booksListEl.innerHTML = '';
+            booksListEl.appendChild(header);
+
+            BOOKS_DATA.forEach(book => {
+                const card = document.createElement('div');
+                card.className = `book-card ${currentBook && currentBook.id === book.id ? 'active' : ''}`;
+                card.dataset.id = book.id;
+                card.innerHTML = `
+                    <div class="book-number">Book ${book.id}</div>
+                    <div class="book-title">${book.title}</div>
+                    <div class="book-meta">
+                        <span>Chapters: ${book.chapters.length}</span>
+                    </div>
+                `;
+                card.addEventListener('click', () => selectBook(book));
+                booksListEl.appendChild(card);
+            });
+        }
+
+        // Select active book
+        function selectBook(book) {
+            currentBook = book;
+            
+            // Update active state in sidebar
+            document.querySelectorAll('.book-card').forEach(card => {
+                card.classList.toggle('active', parseInt(card.dataset.id) === book.id);
+            });
+
+            // Update main window headers
+            activeBookNumEl.textContent = `Book ${book.id}`;
+            activeBookTitleEl.textContent = book.title;
+
+            // Render active chapters
+            renderChapters(book);
+        }
+
+        // Render chapters in active book list
+        function renderChapters(book) {
+            chaptersListEl.innerHTML = '';
+
+            if (book.chapters.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.style.padding = '2rem';
+                emptyMsg.style.color = 'var(--text-muted)';
+                emptyMsg.style.fontStyle = 'italic';
+                emptyMsg.textContent = 'No audio tracks found in this book\'s audios/ directory.';
+                chaptersListEl.appendChild(emptyMsg);
+                return;
+            }
+
+            book.chapters.forEach((chap, idx) => {
+                const row = document.createElement('div');
+                const isCurrent = (currentBook.id === book.id && currentChapterIndex === idx && !audio.paused);
+                row.className = `chapter-row ${isCurrent ? 'active' : ''}`;
+                
+                const hasAudio = !!chap.src;
+                const statusBadge = hasAudio 
+                    ? `<span class="chapter-status-badge status-ready">Ready</span>` 
+                    : `<span class="chapter-status-badge status-pending">TTS Pending</span>`;
+
+                row.innerHTML = `
+                    <div class="chapter-index">${chap.number}</div>
+                    <div class="chapter-name">${chap.name}</div>
+                    <div>${statusBadge}</div>
+                    <div class="chapter-duration">${hasAudio ? '--:--' : 'N/A'}</div>
+                `;
+
+                if (hasAudio) {
+                    row.addEventListener('click', () => playChapter(book, idx, chap));
+                } else {
+                    row.style.cursor = 'not-allowed';
+                    row.style.opacity = '0.5';
+                }
+                chaptersListEl.appendChild(row);
+            });
+        }
+
+        // Play selected chapter
+        function playChapter(book, index, chapter) {
+            if (currentBook && currentBook.id === book.id && currentChapterIndex === index) {
+                togglePlayPause();
+                return;
+            }
+
+            currentBook = book;
+            currentChapterIndex = index;
+
+            audio.src = chapter.src;
+            audio.load();
+            audio.play().then(() => {
+                updateUIState();
+            }).catch(err => {
+                console.error("Audio playback error:", err);
+            });
+
+            // Update persistent player labels
+            playerTrackNameEl.textContent = chapter.name;
+            playerTrackBookEl.textContent = book.title;
+
+            // Enable player controls
+            btnPlayPause.disabled = false;
+            timelineSlider.disabled = false;
+
+            // Sync visual active rows
+            syncActiveRow();
+        }
+
+        // Play/Pause toggler
+        function togglePlayPause() {
+            if (audio.paused) {
+                audio.play().then(() => updateUIState());
+            } else {
+                audio.pause();
+                updateUIState();
+            }
+        }
+
+        // Update main play/pause states
+        function updateUIState() {
+            if (audio.paused) {
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+            } else {
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+            }
+            btnPrev.disabled = currentChapterIndex <= 0;
+            btnNext.disabled = currentChapterIndex >= currentBook.chapters.length - 1 || currentChapterIndex === -1;
+            syncActiveRow();
+        }
+
+        // Highlight the currently playing chapter list row
+        function syncActiveRow() {
+            document.querySelectorAll('.chapter-row').forEach((row, idx) => {
+                const isCurrent = (currentChapterIndex === idx);
+                row.classList.toggle('active', isCurrent);
+            });
+        }
+
+        // Play Previous Chapter
+        function playPrevious() {
+            if (currentChapterIndex > 0) {
+                const prevIdx = currentChapterIndex - 1;
+                const prevChap = currentBook.chapters[prevIdx];
+                if (prevChap && prevChap.src) {
+                    playChapter(currentBook, prevIdx, prevChap);
+                }
+            }
+        }
+
+        // Play Next Chapter
+        function playNext() {
+            if (currentChapterIndex < currentBook.chapters.length - 1) {
+                const nextIdx = currentChapterIndex + 1;
+                const nextChap = currentBook.chapters[nextIdx];
+                if (nextChap && nextChap.src) {
+                    playChapter(currentBook, nextIdx, nextChap);
+                }
+            }
+        }
+
+        // Handle Audio end (Autoplay Next)
+        function handleTrackEnded() {
+            if (autoplayCheckbox.checked) {
+                playNext();
+            } else {
+                updateUIState();
+            }
+        }
+
+        // Time updates on scrubber
+        function updateProgress() {
+            if (isScrubbing) return;
+            const pct = (audio.currentTime / audio.duration) * 100 || 0;
+            timelineSlider.value = pct;
+            currentTimeLabel.textContent = formatTime(audio.currentTime);
+        }
+
+        function setDuration() {
+            totalTimeLabel.textContent = formatTime(audio.duration || 0);
+        }
+
+        // Seek timeline position
+        function seekAudio() {
+            isScrubbing = false;
+            const targetTime = (timelineSlider.value / 100) * audio.duration;
+            audio.currentTime = targetTime;
+        }
+
+        // Volume adjustments
+        function changeVolume() {
+            audio.volume = volumeSlider.value / 100;
+        }
+
+        // Format raw seconds to MM:SS
+        function formatTime(secs) {
+            if (isNaN(secs)) return "0:00";
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
