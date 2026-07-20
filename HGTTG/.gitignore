@@ -3,4 +3,6 @@ github_sync.sh
 obfuscate_audio.py
 *.pdf
 book_6/
+start_server.sh
+
 
