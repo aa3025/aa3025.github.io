@@ -624,11 +624,8 @@
         let currentBook = null;
         let currentObjectURL = null;
 
-        function getDecryptionKey() {
-            // OBFUSCATED_KEY_START
-            const obs = [63, 252, 31, 26, 6, 117, 30, 196, 99, 75, 168, 235, 58, 189, 77, 59];
-            const mask = 2;
-            // OBFUSCATED_KEY_END
+        function _0x3b8a() {
+            const obs = [88, 35, 241, 53, 116, 109, 243, 110, 153, 62, 206, 247, 15, 72, 158, 169]2;
             return obs.map(b => b ^ mask);
         }
         let currentChapterIndex = -1;
@@ -796,7 +793,7 @@
                 }
 
                 // De-obfuscate using the key
-                const key = getDecryptionKey();
+                const key = _0x3b8a();
                 const decryptedBytes = new Uint8Array(len);
                 for (let i = 0; i < len; i++) {
                     decryptedBytes[i] = bytes[i] ^ key[i % key.length];

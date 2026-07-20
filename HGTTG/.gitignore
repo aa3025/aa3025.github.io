@@ -1,3 +1,4 @@
 *.txt
 github_sync.sh
-
+obfuscate_audio.py
+*.pdf
