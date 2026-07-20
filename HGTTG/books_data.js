@@ -597,6 +597,11 @@ const BOOKS_DATA = [
         "src": "book_4/audios/chapter_8.mp3"
       },
       {
+        "number": 9,
+        "name": "Chapter 9",
+        "src": "book_4/audios/chapter_9.mp3"
+      },
+      {
         "number": 10,
         "name": "Chapter 10",
         "src": "book_4/audios/chapter_10.mp3"
@@ -637,14 +642,54 @@ const BOOKS_DATA = [
         "src": "book_4/audios/chapter_17.mp3"
       },
       {
+        "number": 18,
+        "name": "Chapter 18",
+        "src": "book_4/audios/chapter_18.mp3"
+      },
+      {
         "number": 19,
         "name": "Chapter 19",
         "src": "book_4/audios/chapter_19.mp3"
       },
       {
+        "number": 20,
+        "name": "Chapter 20",
+        "src": "book_4/audios/chapter_20.mp3"
+      },
+      {
+        "number": 21,
+        "name": "Chapter 21",
+        "src": "book_4/audios/chapter_21.mp3"
+      },
+      {
+        "number": 22,
+        "name": "Chapter 22",
+        "src": "book_4/audios/chapter_22.mp3"
+      },
+      {
+        "number": 23,
+        "name": "Chapter 23",
+        "src": "book_4/audios/chapter_23.mp3"
+      },
+      {
+        "number": 24,
+        "name": "Chapter 24",
+        "src": "book_4/audios/chapter_24.mp3"
+      },
+      {
         "number": 25,
         "name": "Chapter 25",
         "src": "book_4/audios/chapter_25.mp3"
+      },
+      {
+        "number": 26,
+        "name": "Chapter 26",
+        "src": "book_4/audios/chapter_26.mp3"
+      },
+      {
+        "number": 27,
+        "name": "Chapter 27",
+        "src": "book_4/audios/chapter_27.mp3"
       },
       {
         "number": 28,
@@ -657,9 +702,44 @@ const BOOKS_DATA = [
         "src": "book_4/audios/chapter_29.mp3"
       },
       {
+        "number": 30,
+        "name": "Chapter 30",
+        "src": "book_4/audios/chapter_30.mp3"
+      },
+      {
         "number": 31,
         "name": "Chapter 31",
         "src": "book_4/audios/chapter_31.mp3"
+      },
+      {
+        "number": 32,
+        "name": "Chapter 32",
+        "src": "book_4/audios/chapter_32.mp3"
+      },
+      {
+        "number": 33,
+        "name": "Chapter 33",
+        "src": "book_4/audios/chapter_33.mp3"
+      },
+      {
+        "number": 34,
+        "name": "Chapter 34",
+        "src": "book_4/audios/chapter_34.mp3"
+      },
+      {
+        "number": 35,
+        "name": "Chapter 35",
+        "src": "book_4/audios/chapter_35.mp3"
+      },
+      {
+        "number": 36,
+        "name": "Chapter 36",
+        "src": "book_4/audios/chapter_36.mp3"
+      },
+      {
+        "number": 37,
+        "name": "Chapter 37",
+        "src": "book_4/audios/chapter_37.mp3"
       },
       {
         "number": 38,
@@ -682,7 +762,33 @@ const BOOKS_DATA = [
     "id": 5,
     "title": "Mostly Harmless",
     "folder": "book_5",
-    "chapters": []
+    "chapters": [
+      {
+        "number": 0,
+        "name": "Chapter 0",
+        "src": "book_5/audios/chapter_0.mp3"
+      },
+      {
+        "number": 1,
+        "name": "Chapter 1",
+        "src": "book_5/audios/chapter_1.mp3"
+      },
+      {
+        "number": 10,
+        "name": "Chapter 10",
+        "src": "book_5/audios/chapter_10.mp3"
+      },
+      {
+        "number": 11,
+        "name": "Chapter 11",
+        "src": "book_5/audios/chapter_11.mp3"
+      },
+      {
+        "number": 13,
+        "name": "Chapter 13",
+        "src": "book_5/audios/chapter_13.mp3"
+      }
+    ]
   },
   {
     "id": 6,
