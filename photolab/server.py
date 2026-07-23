@@ -4,6 +4,7 @@ import base64
 import sys
 
 PORT = 8000
+REQUIRE_AUTH = False
 USERNAME = "user"
 PASSWORD = "photolab335"  # Change this to your desired password!
 
@@ -15,6 +16,10 @@ class BasicAuthHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        if not REQUIRE_AUTH:
+            super().do_GET()
+            return
+            
         auth_header = self.headers.get('Authorization')
         expected_auth = 'Basic ' + base64.b64encode(f"{USERNAME}:{PASSWORD}".encode()).decode()
         
@@ -35,11 +40,14 @@ if __name__ == '__main__':
         except ValueError:
             pass
             
-    print(f"Starting password-protected server on http://localhost:{port}")
-    print(f"Credentials: {USERNAME} / {PASSWORD}")
+    if REQUIRE_AUTH:
+        print(f"Starting password-protected server on http://localhost:{port}")
+        print(f"Credentials: {USERNAME} / {PASSWORD}")
+    else:
+        print(f"Starting server on http://localhost:{port} (Auth Disabled)")
     
     server_address = ('', port)
-    httpd = http.server.HTTPServer(server_address, BasicAuthHandler)
+    httpd = http.server.ThreadingHTTPServer(server_address, BasicAuthHandler)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

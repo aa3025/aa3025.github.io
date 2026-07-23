@@ -260,8 +260,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             background-color: var(--overlay-bg);
             z-index: 1000;
             display: flex;
@@ -276,6 +276,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             opacity: 1;
             pointer-events: auto;
             visibility: visible;
+        }
+        
+        body.lightbox-open .contact-sheet {
+            display: none !important;
         }
 
         /* Inverted background color for logo */
@@ -745,9 +749,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <button class="btn" id="btn-fullscreen" title="Toggle Fullscreen (F)">
                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
-            <button class="btn" id="btn-play" title="Play Slideshow (Space)" style="background: var(--accent-color); color: #000;">
+            <button class="btn" id="btn-play" title="Play Slideshow (Space)" style="background: var(--accent-color); color: #000; position: relative;">
                 <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                <svg id="progress-ring" class="hidden" style="position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; transform: translate(-50%, -50%) rotate(-90deg); pointer-events: none;" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r="18" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="3" />
+                    <circle id="progress-circle" cx="20" cy="20" r="18" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="3" stroke-dasharray="113.1" stroke-dashoffset="113.1" />
+                </svg>
             </button>
             <button class="btn btn-close" id="btn-close" style="display: none;" title="Close (Esc)">
                 <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
@@ -795,6 +803,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         const btnFullscreen = document.getElementById('btn-fullscreen');
         const playIcon = document.getElementById('play-icon');
         const pauseIcon = document.getElementById('pause-icon');
+        const progressRing = document.getElementById('progress-ring');
+        const progressCircle = document.getElementById('progress-circle');
         const projectorScrub = document.getElementById('projector-scrub');
 
 
@@ -965,6 +975,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             lightbox.classList.add('active');
             lightbox.focus();
             navigateTo(index, true);
+            document.body.classList.add('lightbox-open');
             document.body.style.overflow = 'hidden';
             
             setTimeout(updateProjectorPosition, 50);
@@ -978,6 +989,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             
             lightbox.classList.remove('active');
             stopSlideshow();
+            document.body.classList.remove('lightbox-open');
             document.body.style.overflow = '';
         }
 
@@ -1068,6 +1080,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             isSlideshowPlaying = true;
             playIcon.classList.add('hidden');
             pauseIcon.classList.remove('hidden');
+            progressRing.classList.remove('hidden');
             resetSlideshowTimer();
         }
 
@@ -1075,6 +1088,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             isSlideshowPlaying = false;
             playIcon.classList.remove('hidden');
             pauseIcon.classList.add('hidden');
+            progressRing.classList.add('hidden');
             if (slideshowInterval) {
                 clearInterval(slideshowInterval);
                 slideshowInterval = null;
@@ -1083,6 +1097,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         function resetSlideshowTimer() {
             if (slideshowInterval) clearInterval(slideshowInterval);
+            
+            if (isSlideshowPlaying) {
+                // Reset to empty without transition
+                progressCircle.style.transition = 'none';
+                progressCircle.style.strokeDashoffset = '113.1px';
+                
+                // Use setTimeout to ensure the browser applies the reset before starting the animation
+                setTimeout(() => {
+                    if (isSlideshowPlaying) {
+                        progressCircle.style.transition = 'stroke-dashoffset ' + SLIDESHOW_DURATION + 'ms linear';
+                        progressCircle.style.strokeDashoffset = '0px';
+                    }
+                }, 20);
+            }
+            
             slideshowInterval = setInterval(() => navigateTo(currentIndex + 1, true), SLIDESHOW_DURATION);
         }
 
@@ -1307,7 +1336,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         const shutterAudioB64 = "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";
         let shutterAudio = new Audio('data:audio/mp3;base64,' + shutterAudioB64);
-        let isSoundMuted = false;
+        let isSoundMuted = true;
 
         function playShutterSound() {
             console.log("playShutterSound called. isSoundMuted:", isSoundMuted);
@@ -1387,7 +1416,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
         }
         btnSoundToggle.addEventListener('click', toggleSound);
-        btnSoundToggle.style.color = 'var(--accent-color)'; // Default ON
+        // Default is muted (true), so show the off icon initially
+        iconSoundOn.style.display = 'none';
+        iconSoundOff.style.display = 'block';
+        btnSoundToggle.style.color = '';
     </script>
 </body>
 </html>
