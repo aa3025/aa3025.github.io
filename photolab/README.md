@@ -29,11 +29,13 @@ To deploy or update the gallery with your own photos:
    - Inject the image metadata directly into `index.html`.
 
 3. **Test Locally**:
-   You can run the included Python server to test the gallery locally before deploying:
+   **No local web server is required!** Because the gallery is completely self-contained and uses standard relative file paths, you can simply double-click `index.html` to open it directly from your hard drive in any web browser. 
+   
+   *(Optional)* If you prefer to test it over your local network (e.g. to test on an iPad or phone), you can run the included Python server:
    ```bash
    python3 server.py
    ```
-   Open `http://localhost:8000` in your browser.
+   Then open `http://localhost:8000` (or your computer's IP address) in your browser.
 
 4. **Publish**:
    Because the entire application runs natively in the browser without any backend, simply push the contents of this folder to any static web host (like GitHub Pages)!
