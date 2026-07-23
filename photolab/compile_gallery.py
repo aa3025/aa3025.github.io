@@ -752,8 +752,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             
             <div class="projector-viewport">
                 <div class="projector-strip" id="projector-strip">
-                    <div class="vp-sprockets-top"></div>
-                    <div class="vp-sprockets-bottom"></div>
                 </div>
             </div>
 
