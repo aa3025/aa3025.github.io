@@ -1,0 +1,1512 @@
+#!/usr/bin/env python3
+import os
+import sys
+import base64
+from io import BytesIO
+from PIL import Image
+
+# Configuration
+TARGET_WIDTH = 3840
+TARGET_HEIGHT = 2160
+WEBP_QUALITY = 82
+OUTPUT_FILE = "gallery.html"
+
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIGHTBOX</title>
+    <style>
+        :root {
+            --bg-color: #e5e5e5;
+            --film-black: #000;
+            --film-border: #16171c;
+            --text-color: #111827;
+            --text-muted: #4b5563;
+            --accent-color: #d97706; /* Retro Amber */
+            --accent-hover: #b45309;
+            --overlay-bg: #e5e5e5;
+            --control-bg: rgba(0, 0, 0, 0.08);
+            --control-hover: rgba(0, 0, 0, 0.15);
+            --monospace-font: "Courier New", Courier, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            padding: 2rem 0;
+            overflow-x: hidden;
+        }
+
+        header {
+            width: 100%;
+            max-width: 98vw;
+            margin: 0 auto 3rem auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--logo-color, #000);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Contact Sheet Mode (Tile Mode) */
+        .contact-sheet {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+            width: 100%;
+            max-width: 98vw;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .film-row {
+            display: flex;
+            flex-direction: column;
+            background: var(--film-black);
+            border-top: 1px solid var(--film-border);
+            border-bottom: 1px solid var(--film-border);
+            padding: 0;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Sprocket holes style */
+        .sprockets-top,
+        .sprockets-bottom {
+            height: 28px;
+            background-color: var(--film-black);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><rect x="7" y="6" width="14" height="16" rx="3" ry="3" fill="%23e5e5e5"/></svg>');
+            background-repeat: repeat-x;
+            background-size: 28px 28px;
+        }
+
+        .film-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.2rem 1.5rem;
+            color: var(--accent-color);
+            font-family: var(--monospace-font);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .film-frames {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0.5rem 1.5rem;
+            gap: 1rem;
+            justify-content: flex-start;
+        }
+
+        .film-frame-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            /* Flex basis calculated dynamically to center images nicely on desktop */
+            flex: 0 0 calc((100% - (var(--cols) - 1) * 1rem) / var(--cols));
+        }
+
+        .film-frame {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/2;
+            background: #000;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .loading-placeholder {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #666;
+            font-size: 0.8rem;
+            font-family: var(--monospace-font);
+            gap: 0.8rem;
+            z-index: 0;
+            background: #111;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .film-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.9) invert(1);
+            /* Default to Negative mode */
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s, opacity 0.5s;
+            opacity: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .film-frame img.loaded {
+            opacity: 1;
+        }
+
+        .film-frame:hover img {
+            transform: scale(1.03);
+            filter: brightness(1.05) invert(0); /* Positive on hover */
+        }
+
+        /* Positive Gallery overrides */
+        .positive-gallery .film-frame img {
+            filter: brightness(0.9) invert(0);
+        }
+        .positive-gallery .film-frame:hover img {
+            filter: brightness(1.05) invert(1); /* Negative on hover */
+        }
+
+        /* Grayscale overrides for default (Negative) gallery */
+        .grayscale-mode .film-frame img {
+            filter: brightness(0.9) grayscale(100%) invert(1);
+        }
+        .grayscale-mode .film-frame:hover img {
+            filter: brightness(1.05) grayscale(100%) invert(0); /* Positive on hover */
+        }
+
+        /* Grayscale overrides for Positive gallery */
+        .positive-gallery.grayscale-mode .film-frame img {
+            filter: brightness(0.9) grayscale(100%) invert(0);
+        }
+        .positive-gallery.grayscale-mode .film-frame:hover img {
+            filter: brightness(1.05) grayscale(100%) invert(1); /* Negative on hover */
+        }
+
+        .frame-label {
+            font-family: var(--monospace-font);
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* Lightbox / Slideshow (Continuous Filmstrip Mode) */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--overlay-bg);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden; /* Hide all interactive children when inactive */
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(20px);
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        .lightbox-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 55px 2rem 10px 2rem; /* Shift down to avoid sprockets */
+            background: transparent;
+            z-index: 1020;
+            pointer-events: none;
+        }
+
+        .lightbox-header * {
+            pointer-events: auto;
+        }
+
+        /* Inverted background color for logo */
+        .lightbox-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--logo-color, #000);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lightbox-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .projector-viewport {
+            width: 100%;
+            height: var(--film-h);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            position: relative;
+            --film-h: calc(100vh - 260px);
+            --sprocket-h: calc(var(--film-h) * 0.085);
+            --sprocket-pitch: calc(var(--film-h) * 0.13);
+            background-color: var(--film-black);
+        }
+
+        .projector-strip {
+            display: flex;
+            --film-h: calc(100vh - 260px);
+            --sprocket-h: calc(var(--film-h) * 0.085);
+            --sprocket-pitch: calc(var(--film-h) * 0.13);
+            --leader-h: 22px;
+            height: var(--film-h);
+            width: max-content;
+            transition: transform 0.65s cubic-bezier(0.19, 1, 0.22, 1);
+            will-change: transform;
+            padding: 0;
+            position: relative;
+        }
+
+        .projector-strip.rewinding {
+            transition: transform 8.0s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .projector-frame {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        .projector-film-container {
+            display: inline-flex;
+            flex-direction: column;
+            background-color: var(--film-black);
+            /* padding = sprocket band + narrow leader where meta text sits */
+            padding-top: calc(var(--sprocket-h) + var(--leader-h));
+            padding-bottom: calc(var(--sprocket-h) + var(--leader-h));
+            padding-left: 10px;
+            padding-right: 10px;
+            height: 100%;
+            justify-content: center;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .projector-film-container img {
+            display: block;
+            max-height: 100%;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0.08; /* Dimmed left-right images only */
+            filter: invert(1); /* Default to Negative on sides */
+            transition: opacity 0.45s ease, filter 1.5s ease-in-out;
+        }
+
+        .grayscale-mode .projector-film-container img {
+            filter: grayscale(100%) invert(1) contrast(1.05);
+        }
+
+        .projector-frame.active img {
+            opacity: 1;
+            filter: invert(0); /* Positive in the center */
+        }
+
+        .grayscale-mode .projector-frame.active img {
+            filter: grayscale(100%) invert(0) contrast(1.05);
+        }
+
+        /* Negative Slideshow overrides */
+        .negative-slideshow .projector-film-container img {
+            filter: invert(0) !important; /* Positive on sides */
+        }
+
+        .negative-slideshow.grayscale-mode .projector-film-container img {
+            filter: grayscale(100%) invert(0) contrast(1.05) !important;
+        }
+
+        .negative-slideshow .projector-frame.active img {
+            filter: invert(1) !important; /* Negative in the center */
+        }
+
+        .negative-slideshow.grayscale-mode .projector-frame.active img {
+            filter: grayscale(100%) invert(1) contrast(1.05) !important;
+        }
+
+        .proj-sprockets-top,
+        .proj-sprockets-bottom {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: var(--sprocket-h);
+            background-color: var(--film-black);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="31" y="20" width="38" height="60" rx="8" ry="8" fill="%23e5e5e5"/></svg>');
+            background-repeat: repeat-x;
+            background-size: var(--sprocket-pitch) var(--sprocket-h);
+            background-position: left center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .proj-sprockets-top {
+            top: 0;
+        }
+
+        .proj-sprockets-bottom {
+            bottom: 0;
+        }.vp-sprockets-top, .vp-sprockets-bottom { display: none; }
+
+        /* Meta text sits in the leader gap between sprocket and image */
+        .proj-meta-top, .proj-meta-bottom {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            color: var(--accent-color);
+            font-family: var(--monospace-font);
+            font-size: calc(var(--film-h) * 0.018);
+            letter-spacing: 2px;
+            opacity: 0.65;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        .proj-meta-top    { top: calc(var(--sprocket-h) + 2px); }
+        .proj-meta-bottom { bottom: calc(var(--sprocket-h) + 2px); }
+
+        .grayscale-mode .filmstrip img {
+            filter: grayscale(100%);
+        }
+
+        /* Controls */
+        .btn {
+            background: var(--control-bg);
+            border: none;
+            color: var(--text-color);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            background: var(--control-hover);
+            transform: scale(1.05);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-large {
+            width: 56px;
+            height: 56px;
+            background: rgba(17, 18, 21, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1010;
+        }
+
+        .nav-prev { left: 2rem; }
+        .nav-next { right: 2rem; }
+
+        .lightbox-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            z-index: 1010;
+        }
+
+        /* Bottom Controls Footer */
+        .lightbox-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 5px 2rem 15px 2rem; /* Lowered footer */
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1020;
+            pointer-events: none;
+        }
+
+        .lightbox-footer * {
+            pointer-events: auto;
+        }
+
+        .slideshow-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+            max-width: 600px;
+        }
+
+        .slideshow-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: var(--accent-color);
+            transition: width 0.1s linear;
+        }
+
+        .footer-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Tiny Filmstrip index indicator */
+        .filmstrip {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            max-width: 800px;
+            padding: 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
+        }
+
+        .filmstrip-item {
+            height: 30px;
+            width: 45px;
+            object-fit: cover;
+            border-radius: 2px;
+            opacity: 0.4;
+            cursor: pointer;
+            transition: opacity 0.2s, border-color 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .filmstrip-item:hover {
+            opacity: 0.7;
+        }
+
+        .filmstrip-item.active {
+            opacity: 1;
+            border-color: var(--accent-color);
+        }
+
+        /* Icons */
+        .btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (orientation: portrait) {
+            .projector-frame {
+                width: 100vw !important;
+                padding: 0 !important;
+            }
+            .projector-film-container {
+                width: 100% !important;
+            }
+            .projector-film-container img {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                max-height: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-btn {
+                display: none;
+            }
+            .projector-film-container img {
+                max-height: calc(100vh - 200px);
+                max-width: calc(100vw - 32px); /* Limit width on mobile view to avoid overflow */
+                width: auto;
+                height: auto;
+            }
+            .proj-meta-top, .proj-meta-bottom {
+                left: 10px;
+                right: 10px;
+                font-size: 0.65rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .film-header {
+                font-size: 0.55rem;
+                padding: 0.1rem 0.5rem;
+                letter-spacing: 1px;
+            }
+            .frame-label {
+                font-size: 0.55rem;
+            }
+            .sprockets-top, .sprockets-bottom {
+                height: 16px;
+                background-size: 16px 16px;
+                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="4" y="3" width="8" height="10" rx="1.5" ry="1.5" fill="%232b2e3a"/></svg>');
+            }
+            .film-frames {
+                padding: 0.25rem 0.5rem;
+                gap: 0.4rem;
+            }
+            .film-frame-container {
+                flex: 0 0 calc((100% - (var(--cols) - 1) * 0.4rem) / var(--cols)) !important;
+            }
+            .projector-film-container {
+                padding: 24px 0 !important;
+            }
+            .proj-sprockets-top, .proj-sprockets-bottom {
+                height: 16px !important;
+                background-size: 16px 16px !important;
+                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="4" y="3" width="8" height="10" rx="1.5" ry="1.5" fill="%232b2e3a"/></svg>') !important;
+            }
+            .proj-sprockets-top { top: 3px !important; }
+            .proj-sprockets-bottom { bottom: 3px !important; }
+            .proj-meta-top { top: 16px !important; }
+            .proj-meta-bottom { bottom: 16px !important; }
+            .proj-meta-top, .proj-meta-bottom {
+                font-size: 0.55rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px;">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            PHOTOLAB
+        </h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <!-- Brightness Slider -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 1rem; color: var(--text-color);" title="Adjust Backlight">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <input type="range" class="brightness-slider" min="10" max="255" value="28" style="width: 80px; cursor: pointer;">
+            </div>
+            <button class="btn" id="btn-toggle-bw" title="Toggle Black & White (B)" style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550;">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z"/></svg>
+                B&W Mode
+            </button>
+            <button class="btn" id="btn-toggle-neg" title="Toggle Negative Mode (N)" style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550;">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z" transform="rotate(90, 12, 12)"/></svg>
+                Negative Mode
+            </button>
+            <button class="btn" id="btn-start-slideshow" title="Start Slideshow" style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550; background: var(--accent-color); color: #000;">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M8 5v14l11-7z"/></svg>
+                Play Slideshow
+            </button>
+            <div class="stats" id="photo-stats">0 Photos</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="contact-sheet" id="contact-sheet"></div>
+    </main>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" tabindex="0">
+        <div class="lightbox-header">
+            <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                <div class="lightbox-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px;">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                    PHOTOLAB
+                </div>
+            </div>
+            <div class="lightbox-controls">
+                <!-- Brightness Slider (Slideshow View) -->
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.5rem; color: var(--text-color);" title="Adjust Backlight">
+                    <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <input type="range" class="brightness-slider" min="10" max="255" value="229" style="width: 70px; cursor: pointer;">
+                </div>
+                <button class="btn btn-sound-toggle" title="Toggle Sound (M)" style="border-radius: 9999px; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                    <svg id="icon-sound-on" viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    <svg id="icon-sound-off" viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor; display: none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                </button>
+                <button class="btn btn-bw-toggle" title="Toggle Black & White (B)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z"/></svg>
+                </button>
+                <button class="btn btn-neg-toggle" title="Toggle Negative Mode (N)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z" transform="rotate(90, 12, 12)"/></svg>
+                </button>
+                <button class="btn" id="btn-fullscreen" title="Toggle Fullscreen (F)">
+                    <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                </button>
+                <button class="btn" id="btn-close" title="Close (Esc)">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="lightbox-main" id="lightbox-main">
+            <button class="btn btn-large nav-btn nav-prev" id="btn-prev" title="Previous (Left Arrow)">
+                <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            </button>
+            
+            <div class="projector-viewport">
+                <div class="projector-strip" id="projector-strip">
+                    <div class="vp-sprockets-top"></div>
+                    <div class="vp-sprockets-bottom"></div>
+                </div>
+            </div>
+
+            <button class="btn btn-large nav-btn nav-next" id="btn-next" title="Next (Right Arrow)">
+                <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </button>
+        </div>
+
+        <div class="lightbox-footer">
+            <div class="slideshow-bar">
+                <div class="slideshow-progress" id="slideshow-progress"></div>
+            </div>
+            
+            <div class="footer-controls">
+                <button class="btn" id="btn-play" title="Play Slideshow (Space)">
+                    <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                
+                <div class="filmstrip" id="filmstrip"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const IMAGES = __IMAGE_DATA_JSON__;
+
+        const contactSheet = document.getElementById('contact-sheet');
+        const stats = document.getElementById('photo-stats');
+        const lightbox = document.getElementById('lightbox');
+        const projectorStrip = document.getElementById('projector-strip');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const filmstrip = document.getElementById('filmstrip');
+        
+        const btnClose = document.getElementById('btn-close');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnPlay = document.getElementById('btn-play');
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const slideshowProgress = document.getElementById('slideshow-progress');
+
+        let currentIndex = 0;
+        let isSlideshowPlaying = false;
+        let slideshowInterval = null;
+        const SLIDESHOW_DURATION = 5000;
+        let slideshowStartTime = 0;
+        let slideshowAnimationIdx = null;
+
+        stats.textContent = `${IMAGES.length} Frames`;
+
+        // Dynamic rendering on window resize
+        let lastFramesPerRow = 0;
+        
+        const lazyImageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                    }
+                    observer.unobserve(img);
+                }
+            });
+        }, { rootMargin: '300px 0px' });
+
+        function renderContactSheet() {
+            const containerWidth = contactSheet.clientWidth || window.innerWidth;
+            // Target frame size is roughly 280px.
+            const targetFrameWidth = 280; 
+            let framesPerRow = Math.floor(containerWidth / targetFrameWidth);
+            if (framesPerRow < 3) framesPerRow = 3; // Force at least 3 slides per row on mobile
+
+            // Only redraw if the column count actually changes
+            if (framesPerRow === lastFramesPerRow) return;
+            lastFramesPerRow = framesPerRow;
+
+            contactSheet.innerHTML = '';
+            let globalFrameIdx = 0;
+
+            for (let i = 0; i < IMAGES.length; i += framesPerRow) {
+                const rowImages = IMAGES.slice(i, i + framesPerRow);
+                
+                // Add CSS variable to row for dynamic width calculation
+                const row = document.createElement('div');
+                row.className = 'film-row';
+                row.style.setProperty('--cols', framesPerRow);
+
+                const topSprockets = document.createElement('div');
+                topSprockets.className = 'sprockets-top';
+
+                const filmHeader = document.createElement('div');
+                filmHeader.className = 'film-header';
+                filmHeader.innerHTML = `<span class="film-brand-text">KODAK PORTRA 400</span><span>▶ ❚❘❘❙❚❙❙❘❘❙ &nbsp; DX &nbsp; 400-36</span><span class="process-text">PROCESS C-41</span>`;
+
+                const framesContainer = document.createElement('div');
+                framesContainer.className = 'film-frames';
+
+                rowImages.forEach((img) => {
+                    const currentIdx = globalFrameIdx++;
+
+                    const frameContainer = document.createElement('div');
+                    frameContainer.className = 'film-frame-container';
+
+                    const frame = document.createElement('div');
+                    frame.className = 'film-frame';
+                    const clickIdx = currentIdx;
+                    frame.addEventListener('click', () => openLightbox(clickIdx));
+
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'loading-placeholder';
+                    placeholder.innerHTML = '<div class="spinner"></div><div>PROCESSING...</div>';
+                    frame.appendChild(placeholder);
+
+                    const image = document.createElement('img');
+                    image.dataset.src = img.data ? `data:image/webp;base64,${img.data}` : (img.thumb || img.name);
+                    image.alt = img.name;
+                    image.onload = () => image.classList.add('loaded');
+                    lazyImageObserver.observe(image);
+
+                    frame.appendChild(image);
+                    frameContainer.appendChild(frame);
+
+                    const label = document.createElement('div');
+                    label.className = 'frame-label';
+                    const num = Math.floor(currentIdx / 2) + 1;
+                    const suffix = currentIdx % 2 === 0 ? '' : 'A';
+                    label.textContent = `${num}${suffix}`;
+                    frameContainer.appendChild(label);
+
+                    framesContainer.appendChild(frameContainer);
+                });
+
+                const bottomSprockets = document.createElement('div');
+                bottomSprockets.className = 'sprockets-bottom';
+
+                row.appendChild(topSprockets);
+                row.appendChild(filmHeader);
+                row.appendChild(framesContainer);
+                row.appendChild(bottomSprockets);
+                contactSheet.appendChild(row);
+            }
+        }
+
+        // Render on load
+        renderContactSheet();
+
+        // Debounced resize listener
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                renderContactSheet();
+                updateProjectorPosition();
+            }, 100);
+        });
+
+        // Render Projector Reel (Horizontal slide list in Lightbox)
+        IMAGES.forEach((img, idx) => {
+            const frame = document.createElement('div');
+            frame.className = 'projector-frame';
+            frame.addEventListener('click', () => {
+                if (idx !== currentIndex) {
+                    navigateTo(idx, true);
+                }
+            });
+
+            const filmContainer = document.createElement('div');
+            filmContainer.className = 'projector-film-container';
+
+            const sprocketsTop = document.createElement('div');
+            sprocketsTop.className = 'proj-sprockets-top';
+
+            const sprocketsBottom = document.createElement('div');
+            sprocketsBottom.className = 'proj-sprockets-bottom';
+
+            const num = Math.floor(idx / 2) + 1;
+            const suffix = idx % 2 === 0 ? '' : 'A';
+            
+            // Meta overlays
+            const metaTop = document.createElement('div');
+            metaTop.className = 'proj-meta-top';
+            metaTop.innerHTML = `<span class="film-brand-text">KODAK PORTRA 400</span><span> &nbsp;&bull;&nbsp; FRAME ${idx + 1}/${IMAGES.length}</span><span>▶ ❚❘❘❙❚❙❙❘❘❙ &nbsp; DX &nbsp; 400-36</span>`;
+
+            const metaBottom = document.createElement('div');
+            metaBottom.className = 'proj-meta-bottom';
+            metaBottom.innerHTML = `<span>▶ ${num}${suffix}</span><span class="process-text">PROCESS C-41 &nbsp;&bull;&nbsp; ROLL_01</span>`;
+
+            const image = document.createElement('img');
+            image.src = img.data ? `data:image/webp;base64,${img.data}` : img.name;
+            image.alt = img.name;
+            image.loading = 'lazy';
+            image.onload = () => {
+                if (idx === currentIndex) {
+                    updateProjectorPosition();
+                }
+            };
+            
+            filmContainer.appendChild(sprocketsTop);
+            filmContainer.appendChild(metaTop);
+            filmContainer.appendChild(image);
+            filmContainer.appendChild(metaBottom);
+            filmContainer.appendChild(sprocketsBottom);
+            
+            frame.appendChild(filmContainer);
+            projectorStrip.appendChild(frame);
+
+            // Render Filmstrip Thumbnail Bar
+            const thumb = document.createElement('img');
+            thumb.className = 'filmstrip-item';
+            thumb.src = img.data ? `data:image/webp;base64,${img.data}` : (img.thumb || img.name);
+            thumb.alt = img.name;
+            thumb.loading = 'lazy';
+            thumb.addEventListener('click', () => navigateTo(idx, true));
+            filmstrip.appendChild(thumb);
+        });
+
+        function openLightbox(index) {
+            lightbox.classList.add('active');
+            lightbox.focus();
+            navigateTo(index, true);
+            document.body.style.overflow = 'hidden';
+            
+            // Trigger recalculation in case layout resized
+            setTimeout(updateProjectorPosition, 50);
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+            stopSlideshow();
+        }
+
+        function updateProjectorPosition() {
+            const activeFrame = projectorStrip.children[currentIndex];
+            if (!activeFrame) return;
+
+            const viewportWidth = document.querySelector('.projector-viewport').clientWidth;
+            const frameWidth = activeFrame.clientWidth;
+            
+            // Calculate translation to perfectly center the active frame
+            const leftOffset = activeFrame.offsetLeft;
+            const translateX = (viewportWidth / 2) - leftOffset - (frameWidth / 2);
+
+            projectorStrip.style.transform = `translateX(${translateX}px)`;
+
+            // Update Next button icon
+            const nextIconPath = btnNext.querySelector('path');
+            if (currentIndex === IMAGES.length - 1) {
+                // Rewind icon
+                nextIconPath.setAttribute('d', 'M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z');
+                btnNext.title = "Rewind to Start (Right Arrow)";
+            } else {
+                // Next icon
+                nextIconPath.setAttribute('d', 'M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z');
+                btnNext.title = "Next (Right Arrow)";
+            }
+        }
+
+        function navigateTo(index, isManual = false) {
+            let isRewinding = false;
+            if (currentIndex === IMAGES.length - 1 && index >= IMAGES.length) {
+                isRewinding = true;
+            } else if (currentIndex === IMAGES.length - 1 && index === 0 && isManual) {
+                isRewinding = true;
+            }
+
+            if (index < 0) index = IMAGES.length - 1;
+            if (index >= IMAGES.length) index = 0;
+
+            if (isRewinding) {
+                projectorStrip.classList.add('rewinding');
+                playRewindSound();
+                setTimeout(() => {
+                    projectorStrip.classList.remove('rewinding');
+                }, 8000); // Wait for rewind CSS to finish
+            } else {
+                projectorStrip.classList.remove('rewinding');
+                if (isManual) playShutterSound();
+            }
+
+            currentIndex = index;
+            
+            // Display filename clean (without path)
+            const cleanName = IMAGES[currentIndex].name.split('/').pop();
+            lightboxTitle.textContent = cleanName;
+
+            // Highlight thumbnail strip
+            const thumbs = filmstrip.children;
+            for (let i = 0; i < thumbs.length; i++) {
+                thumbs[i].classList.toggle('active', i === currentIndex);
+            }
+
+            // Scroll thumbnail into view
+            const activeThumb = thumbs[currentIndex];
+            if (activeThumb) {
+                activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+
+            // Update frame active classes
+            const frames = projectorStrip.children;
+            for (let i = 0; i < frames.length; i++) {
+                frames[i].classList.toggle('active', i === currentIndex);
+            }
+
+            updateProjectorPosition();
+
+            if (isSlideshowPlaying) {
+                resetSlideshowTimer();
+            }
+        }
+
+        window.addEventListener('resize', updateProjectorPosition);
+
+        function nextImage() {
+            navigateTo(currentIndex + 1, true);
+        }
+
+        function prevImage() {
+            navigateTo(currentIndex - 1, true);
+        }
+
+        function toggleSlideshow() {
+            if (isSlideshowPlaying) {
+                stopSlideshow();
+            } else {
+                startSlideshow();
+            }
+        }
+
+        function startSlideshow() {
+            isSlideshowPlaying = true;
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.remove('hidden');
+            resetSlideshowTimer();
+        }
+
+        function stopSlideshow() {
+            isSlideshowPlaying = false;
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+            if (slideshowInterval) {
+                clearInterval(slideshowInterval);
+                slideshowInterval = null;
+            }
+            cancelAnimationFrame(slideshowAnimationIdx);
+            slideshowProgress.style.width = '0%';
+        }
+
+        function resetSlideshowTimer() {
+            if (slideshowInterval) clearInterval(slideshowInterval);
+            slideshowProgress.style.width = '0%';
+            
+            slideshowStartTime = Date.now();
+            
+            slideshowInterval = setInterval(() => {
+                navigateTo(currentIndex + 1, true);
+            }, SLIDESHOW_DURATION);
+
+            animateProgressBar();
+        }
+
+        function animateProgressBar() {
+            if (!isSlideshowPlaying) return;
+            const elapsed = Date.now() - slideshowStartTime;
+            const pct = Math.min((elapsed / SLIDESHOW_DURATION) * 100, 100);
+            slideshowProgress.style.width = `${pct}%`;
+            
+            if (elapsed < SLIDESHOW_DURATION) {
+                slideshowAnimationIdx = requestAnimationFrame(animateProgressBar);
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                lightbox.requestFullscreen()
+                    .then(() => {
+                        if (screen.orientation && screen.orientation.lock) {
+                            screen.orientation.lock('landscape').catch(err => {
+                                console.log("Orientation lock failed/not supported:", err);
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                    });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                if (screen.orientation && screen.orientation.unlock) {
+                    screen.orientation.unlock();
+                }
+            }
+            setTimeout(updateProjectorPosition, 150);
+        });
+
+        btnClose.addEventListener('click', closeLightbox);
+        btnPrev.addEventListener('click', prevImage);
+        btnNext.addEventListener('click', nextImage);
+        btnPlay.addEventListener('click', toggleSlideshow);
+        btnFullscreen.addEventListener('click', toggleFullscreen);
+
+        // B&W Toggle functionality
+        const btnToggleBw = document.getElementById('btn-toggle-bw');
+        const btnLightboxBw = document.querySelector('.btn-bw-toggle');
+        
+        function toggleBwMode() {
+            document.body.classList.toggle('grayscale-mode');
+            const isGrayscale = document.body.classList.contains('grayscale-mode');
+            btnToggleBw.style.color = isGrayscale ? 'var(--accent-color)' : '';
+            btnLightboxBw.style.color = isGrayscale ? 'var(--accent-color)' : '';
+
+            // Update process labels dynamically
+            const processTexts = document.querySelectorAll('.process-text');
+            processTexts.forEach(el => {
+                if (isGrayscale) {
+                    el.innerHTML = el.innerHTML.replace('PROCESS C-41', 'PROCESS D-76');
+                } else {
+                    el.innerHTML = el.innerHTML.replace('PROCESS D-76', 'PROCESS C-41');
+                }
+            });
+
+            // Update film brand labels dynamically
+            const brandTexts = document.querySelectorAll('.film-brand-text');
+            brandTexts.forEach(el => {
+                if (isGrayscale) {
+                    el.innerHTML = el.innerHTML.replace('KODAK PORTRA 400', 'KODAK TRI-X 400');
+                } else {
+                    el.innerHTML = el.innerHTML.replace('KODAK TRI-X 400', 'KODAK PORTRA 400');
+                }
+            });
+        }
+
+        btnToggleBw.addEventListener('click', toggleBwMode);
+        btnLightboxBw.addEventListener('click', toggleBwMode);
+
+        // Make BW mode default on load
+        toggleBwMode();
+
+        // Negative Mode Toggle functionality
+        const btnToggleNeg = document.getElementById('btn-toggle-neg');
+        const btnLightboxNeg = document.querySelector('.btn-neg-toggle');
+
+        let isGalleryNegative = true;
+        let isSlideshowNegative = false;
+
+        btnToggleNeg.style.color = 'var(--accent-color)';
+
+        function toggleGalleryNeg() {
+            isGalleryNegative = !isGalleryNegative;
+            document.body.classList.toggle('positive-gallery', !isGalleryNegative);
+            btnToggleNeg.style.color = isGalleryNegative ? 'var(--accent-color)' : '';
+        }
+
+        function toggleSlideshowNeg() {
+            isSlideshowNegative = !isSlideshowNegative;
+            document.body.classList.toggle('negative-slideshow', isSlideshowNegative);
+            btnLightboxNeg.style.color = isSlideshowNegative ? 'var(--accent-color)' : '';
+        }
+
+        btnToggleNeg.addEventListener('click', toggleGalleryNeg);
+        btnLightboxNeg.addEventListener('click', toggleSlideshowNeg);
+
+        // Global key bindings
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'b' || e.key === 'B') {
+                toggleBwMode();
+            }
+            if (e.key === 'm' || e.key === 'M') {
+                toggleSound();
+            }
+            if (e.key === 'n' || e.key === 'N') {
+                if (lightbox.classList.contains('active')) {
+                    toggleSlideshowNeg();
+                } else {
+                    toggleGalleryNeg();
+                }
+            }
+        });
+
+        const btnStartSlideshow = document.getElementById('btn-start-slideshow');
+        btnStartSlideshow.addEventListener('click', () => {
+            openLightbox(0);
+            startSlideshow();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            
+            switch(e.key) {
+                case 'ArrowRight':
+                    nextImage();
+                    break;
+                case 'ArrowLeft':
+                    prevImage();
+                    break;
+                case 'Escape':
+                    closeLightbox();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    toggleSlideshow();
+                    break;
+                case 'f':
+                case 'F':
+                    toggleFullscreen();
+                    break;
+                case 'b':
+                case 'B':
+                    toggleBwMode();
+                    break;
+                case 'n':
+                case 'N':
+                    toggleSlideshowNeg();
+                    break;
+            }
+        });
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        lightbox.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        lightbox.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            if (touchEndX < touchStartX - swipeThreshold) {
+                nextImage();
+            }
+            if (touchEndX > touchStartX + swipeThreshold) {
+                prevImage();
+            }
+        }
+
+        // Brightness Backlight Slider
+        const brightnessSliders = document.querySelectorAll('.brightness-slider');
+        brightnessSliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const val = parseInt(e.target.value, 10);
+                
+                // Sync all sliders
+                brightnessSliders.forEach(s => {
+                    if (s !== e.target) s.value = val;
+                });
+
+                const hex = '#' + val.toString(16).padStart(2, '0').repeat(3);
+                const invVal = 255 - val;
+                const invHex = '#' + invVal.toString(16).padStart(2, '0').repeat(3);
+                const isLight = val > 127;
+
+                document.documentElement.style.setProperty('--bg-color', hex);
+                document.documentElement.style.setProperty('--overlay-bg', hex);
+                document.documentElement.style.setProperty('--logo-color', invHex);
+                document.documentElement.style.setProperty('--text-color', isLight ? '#111827' : '#f3f4f6');
+            document.documentElement.style.setProperty('--text-muted', isLight ? '#4b5563' : '#9ca3af');
+            document.documentElement.style.setProperty('--control-bg', isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.05)');
+            document.documentElement.style.setProperty('--control-hover', isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.12)');
+
+            let styleEl = document.getElementById('dynamic-sprockets');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'dynamic-sprockets';
+                document.head.appendChild(styleEl);
+            }
+            styleEl.textContent = `
+                .sprockets-top, .sprockets-bottom {
+                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><rect x="7" y="6" width="14" height="16" rx="3" ry="3" fill="%23${hex.substring(1)}"/></svg>');
+                }
+                .proj-sprockets-top, .proj-sprockets-bottom {
+                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="31" y="20" width="38" height="60" rx="8" ry="8" fill="%23${hex.substring(1)}"/></svg>');
+                }
+            `;
+            });
+        });
+
+        // Apply default value on load
+        if (brightnessSliders.length > 0) {
+            brightnessSliders[0].dispatchEvent(new Event('input'));
+        }
+
+        // Sound Engine
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        const shutterAudioB64 = "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYyLjEyLjEwMgAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAUAAAI+gAiIiIiLi4uLi46Ojo6OkVFRUVFUVFRUVFdXV1dXWhoaGhodHR0dHR/f39/f4uLi4uLl5eXl5eioqKioq6urq6uurq6urrFxcXFxdHR0dHR3d3d3d3o6Ojo6PT09PT0//////8AAAAATGF2YzYyLjI4AAAAAAAAAAAAAAAAJALeAAAAAAAACPoIy7e7AAAAAAAAAAAAAAAAAAAAAP/7EGQAAABPANAdAAAMAAAGUKAAAQSsmWAYJoAAAAAdQwIwABBAAAP//w/o+CHn/62BZ8wIhD7FhJicgrobHuS6TEQeQyyR+abS6iS5uYf/rWfLFXfu8jlNIH5X5gqGlkNRnG3ELRZn//sSZAoAAOET2QYFIAAMwAbAwIAAAyA7bhgRgAApARtDBAAAbVhOIFzFk9QeDcIKM4YiCpS0t7vbz7Ir2EpEtQtmDRobCAsJl2hUUc0iHE+Y1jTCIDvcfqWLdPaq/Rw1IYBLytLgAUzS//sQZAYAAMIfWwYIQAIO4IbAwwAAApQzaBgRAAgtABtDAgAApqUhFdUKX8VZ/6BcmZOgLp8FU1rTMrWz9f7F//97te4edqRhpW76v6nMqx/+8P+UUELnCAj9P/q8h+78okeRHPUHgk7/+xJkBIAApQtZBgRAAA9AFvXAgAACjFl0GCEAAD2AWwMEAAA+pAugwZX1NcIvbJgDAwAADUIHhUtsSmvT+hf/zfCe3yMyA/nsihju8uBhhv2ypYSaQE1HHBFKHZ6ia/2/Z0X8q8r3dO7/+xBkAwAAphNcBgRAAA3AVtDBAAACeE9mGBGAAAAAHcMAAABgLVWZ3hVLVlnuc3hVtiQTtFiGNOvdf9Ozu7dWj9F/6Q/R6FKtNXROBnzNbyJHootV/vgAAAd3eIrbZnISQsUOHwsPf//7EmQJgAESGVkuBQAADYBWwMGAAAJcK14YEQAAN4BbAwIAAKcbPXMtHJNgs4WW4fhlGg2hiixYsB0yKk9H/+q53cpezZ4KQexQ0RNcli5uGtHfUxweaHpRgwIM9Rav//6Vd3/rR6lgjv/7EGQDgACrDFiGBEAADQAWwMCAAAKkO2ucMQAAOABcJ4AABAlk5CVkDKRpll5Mc6ZyBllECpMciUUwNK3P/XgNJIUoAAAV//UiaL10bZD8d00f+aiZAAOAAGqi6f//2BNOlcB97Uo9//sSZAKDEHMN3KAgEBgN4BbWBCIBAYw3bICIMCAwAFwkAIwE3CLRqqS/ogA9ACQYAAzaOuxXT/9W++OoFlrYL/R7IGFI4+HSqgQAY54rf1f//6RyAA22gIU3GsIMx4ExIAAKuVq9ej7///sQZAqDEFEE3KAAECgMIBbmACIBAchTYgAE5wAvABwkEYAE+s1y/5QKO7fVW6FUd3EpMCCMwwvq2aO9X+haqpBHJGAt6hRGmmHK8B2q9QACGBAAC0+r2G/+vTABdpAFhSFZ6OV/AP//+xJkFAMQeQ1aICEocAxABvkAIAEB0DNugIBggC0AXGQRiAT/3yg4BmDkdKl/+7+K1SXvLv4HV9rybPrkEAuLEz27Qyvqw3yBv0BbJX6cBSM18iAgEAEH3WvfoR///zL8nfK+xFUQJ0f/+xBkG4MQXw1ZAAExwAggBqAEIwABrDVpFCKAADIAW6aAAASHDYrlCdl8yRW/Q3MwgwFEhVCJVf0K9n8H7K8IjOHcUCo+A6VDmtFb1pq66gxBbzJ9Qwepz2u1v//+qgKCB+4s8AsNf//7EmQmgACrD9oGBEAACsA20MGAAALAMXIYEYAANYCbQwYAAP33nUnnDQgAQAB4LFKP///c/vFABsLahyxa0KmRp16Kv/1hE0BHlLI/7G///ooAe/VIf/7o5FWplyNd+MIAaggAUboeZf/7EGQnAXB4AN4vAAAADYAG1uGAAQHcAXCACEAALIAagBAAAEl/1Cii1lH3bf1rMkd3pr6gVPACwNa15RX//6eiDEgkZEAAA7pmqAnOO37lggCAAHqc5afd/9XQO7/xQuhomp/ETwpY//sSZC2DEHgAWaABGcIK4Ab4BGMBAbQDXoAAACgxAFwkEYwEvWIJhh8GVzjv7f/rHYz9IuUYJTFCzqfZ+hGgAAMAAu95Af///91YJHX3yBC7XlQ7Kdi/9aoyLADA7ZZMp//9dQk5Otjm//sQZDYDUHkA1uAhEAgLwAbmCCMBAbAFSgGAQAAqgBsEEIgCYuIJWVFf1AIEBHXIrTV///+kfbo9csjSlmHZT//6oKSDQbDiQK5xlV3Uj1WRdRUwwLU2yldoUYnuo/ukgCKACgAGPfb/+xJkPo8QagFRgEEQAA1gBwkAQgEBxCVAA4BmgCqAXGQBhARcd//9j/WEKBAmiw3T9WDSKEbs/WAJhtAOOUNp7v7KaAwhMlQ0a3460JiSF2Kf9ggDicwmz39f/+LlKeagRQM6ZXax3An/+xBkRw+wXwpPASARoArgFtUEIAEBkCk6BIBGQD0A2kAwgADU6wBFgYhKKt1n//9KCYADYsFoAADDrvrX3U/6itQJCABVAyBhbi3/+aCBE3FhN4VjrVKVgDACAvqqTEFNRTMuMTAwqv/7EmRPjxByCk2BIRDQDeAW+QACAQHIKzQEjKDALoAbFBCMBKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGRXDzB5CkyBgRiwCkAWsQAjAAG0KTIHjEEAKoBboACMBKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sSZGAHMIcAUehBCAwLoAbFDCMBAUgO2Ae9ICgWAFmgEYAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq";
+        let shutterAudio = new Audio('data:audio/mp3;base64,' + shutterAudioB64);
+        let isSoundMuted = false;
+
+        function playShutterSound() {
+            if (isSoundMuted) return;
+            shutterAudio.cloneNode(true).play().catch(e => console.log('Audio play failed:', e));
+        }
+
+        function playRewindSound() {
+            if (isSoundMuted) return;
+            initAudio();
+            
+            const dur = 8.0;
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + dur * 0.8);
+            osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + dur);
+            
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.1);
+            gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + dur - 0.1);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + dur);
+            
+            const bufferSize = audioCtx.sampleRate * dur;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            
+            const noiseFilter = audioCtx.createBiquadFilter();
+            noiseFilter.type = 'bandpass';
+            noiseFilter.frequency.value = 4000;
+            
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(0, audioCtx.currentTime);
+            noiseGain.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 0.1);
+            noiseGain.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + dur - 0.1);
+            noiseGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
+            
+            noise.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+            
+            noise.start(audioCtx.currentTime);
+            noise.stop(audioCtx.currentTime + dur);
+        }
+
+        const btnSoundToggle = document.querySelector('.btn-sound-toggle');
+        const iconSoundOn = document.getElementById('icon-sound-on');
+        const iconSoundOff = document.getElementById('icon-sound-off');
+
+        function toggleSound() {
+            isSoundMuted = !isSoundMuted;
+            if (isSoundMuted) {
+                iconSoundOn.style.display = 'none';
+                iconSoundOff.style.display = 'block';
+                btnSoundToggle.style.color = '';
+            } else {
+                iconSoundOn.style.display = 'block';
+                iconSoundOff.style.display = 'none';
+                btnSoundToggle.style.color = 'var(--accent-color)';
+                initAudio();
+            }
+        }
+        btnSoundToggle.addEventListener('click', toggleSound);
+        btnSoundToggle.style.color = 'var(--accent-color)'; // Default ON
+    </script>
+</body>
+</html>
+"""
+
+def get_images():
+    extensions = {".jpg", ".jpeg", ".png"}
+    files = []
+    # Search photos directory instead of the current directory
+    if os.path.exists("photos"):
+        for f in os.listdir("photos"):
+            if os.path.isfile(os.path.join("photos", f)):
+                ext = os.path.splitext(f)[1].lower()
+                if ext in extensions:
+                    files.append(f)
+    return sorted(files)
+
+THUMB_DIR = "thumbnails"
+THUMB_SIZE = (400, 300)
+THUMB_QUALITY = 80
+
+def generate_thumbnail(filename):
+    os.makedirs(THUMB_DIR, exist_ok=True)
+    base, _ = os.path.splitext(filename)
+    thumb_path = os.path.join(THUMB_DIR, f"{base}.webp")
+    
+    if os.path.exists(thumb_path):
+        return thumb_path
+        
+    try:
+        filepath = os.path.join("photos", filename)
+        with Image.open(filepath) as img:
+            try:
+                from PIL import ImageOps
+                img = ImageOps.exif_transpose(img)
+            except Exception:
+                pass
+            
+            img.thumbnail(THUMB_SIZE, Image.Resampling.LANCZOS)
+            img.save(thumb_path, format="WEBP", quality=THUMB_QUALITY)
+            return thumb_path
+    except Exception as e:
+        print(f"Error generating thumbnail for {filename}: {e}", file=sys.stderr)
+        return None
+
+def main():
+    print("Scanning 'photos' directory for JPG/PNG images...")
+    images = get_images()
+    if not images:
+        print("No JPG/PNG images found in the 'photos' directory.")
+        sys.exit(1)
+        
+    print(f"Found {len(images)} images.")
+    index_data_list = []
+    
+    for idx, f in enumerate(images):
+        print(f"[{idx+1}/{len(images)}] Processing {f}...")
+        thumb_path = generate_thumbnail(f)
+        if thumb_path:
+            index_data_list.append({
+                "name": f"photos/{f}",
+                "thumb": thumb_path
+            })
+            
+    print(f"Successfully processed {len(index_data_list)} images.")
+    
+    import json
+    
+    # Write index.html (lightweight relative file-loader version)
+    index_json_str = json.dumps(index_data_list)
+    index_html = HTML_TEMPLATE.replace("__IMAGE_DATA_JSON__", index_json_str)
+    with open("index.html", "w", encoding="utf-8") as out:
+        out.write(index_html)
+    print("Index written successfully to index.html!")
+    print(f"File size: {os.path.getsize('index.html') / 1024:.2f} KB")
+
+if __name__ == "__main__":
+    main()
