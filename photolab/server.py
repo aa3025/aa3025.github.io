@@ -3,7 +3,7 @@ import http.server
 import base64
 import sys
 
-PORT = 8080
+PORT = 8000
 USERNAME = "user"
 PASSWORD = "photolab335"  # Change this to your desired password!
 

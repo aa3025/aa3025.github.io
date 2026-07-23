@@ -46,19 +46,42 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             padding: 2rem 0;
             overflow-x: hidden;
         }
+        
+        html:fullscreen {
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+        html:-webkit-full-screen {
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
 
         header {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 98vw;
-            margin: 0 auto 3rem auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 1rem;
+            padding: 20px 2rem 10px 2rem;
+            z-index: 1050;
+            pointer-events: none;
+            background: transparent;
+            transition: background 0.3s;
+            transform: translateZ(0);
+        }
+        header * {
+            pointer-events: auto;
+        }
+
+        header.scrolled {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--logo-color, #000);
             text-transform: uppercase;
@@ -86,7 +109,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             width: 100%;
             max-width: 98vw;
             margin: 0 auto;
-            padding: 0 1rem;
+            padding: 80px 1rem 0 1rem;
         }
 
         .film-row {
@@ -247,31 +270,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             pointer-events: none;
             visibility: hidden; /* Hide all interactive children when inactive */
             transition: opacity 0.3s ease, visibility 0.3s ease;
-            backdrop-filter: blur(20px);
         }
 
         .lightbox.active {
             opacity: 1;
             pointer-events: auto;
             visibility: visible;
-        }
-
-        .lightbox-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 55px 2rem 10px 2rem; /* Shift down to avoid sprockets */
-            background: transparent;
-            z-index: 1020;
-            pointer-events: none;
-        }
-
-        .lightbox-header * {
-            pointer-events: auto;
         }
 
         /* Inverted background color for logo */
@@ -295,6 +299,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             position: relative;
             overflow: hidden;
             width: 100%;
+            padding-top: 60px; /* Space for fixed header */
         }
 
         .projector-viewport {
@@ -304,7 +309,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             display: flex;
             align-items: center;
             position: relative;
-            --film-h: calc(100vh - 260px);
+            --film-h: calc(100vh - 160px);
             --sprocket-h: calc(var(--film-h) * 0.085);
             --sprocket-pitch: calc(var(--film-h) * 0.13);
             background-color: var(--film-black);
@@ -312,7 +317,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         .projector-strip {
             display: flex;
-            --film-h: calc(100vh - 260px);
+            --film-h: calc(100vh - 160px);
             --sprocket-h: calc(var(--film-h) * 0.085);
             --sprocket-pitch: calc(var(--film-h) * 0.13);
             --leader-h: 22px;
@@ -357,9 +362,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .projector-film-container img {
             display: block;
             max-height: 100%;
-            max-width: 100%;
+            max-width: 100vw;
             width: auto;
-            height: auto;
+            height: 100%;
             object-fit: contain;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             opacity: 0.08; /* Dimmed left-right images only */
@@ -464,6 +469,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             transform: scale(1.05);
         }
 
+        .lightbox-controls .btn {
+            padding: 7px 11px;
+            font-size: 0.85rem;
+        }
+
+        .lightbox-controls .btn svg {
+            width: 15px;
+            height: 15px;
+        }
+
         .btn:active {
             transform: scale(0.95);
         }
@@ -508,28 +523,65 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             pointer-events: none;
         }
 
-        .lightbox-footer * {
-            pointer-events: auto;
-        }
-
-        .slideshow-bar {
-            width: 100%;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.1);
+        .brightness-slider {
+            -webkit-appearance: none;
+            width: 70px;
+            height: 4px;
+            background: rgba(128, 128, 128, 0.5);
             border-radius: 2px;
-            position: relative;
-            overflow: hidden;
-            max-width: 600px;
+            outline: none;
+            cursor: pointer;
+        }
+        .brightness-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--text-color);
+            border-radius: 50%;
+        }
+        .brightness-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: var(--text-color);
+            border-radius: 50%;
+            border: none;
         }
 
-        .slideshow-progress {
+        .projector-scrub {
+            width: 100%;
+            height: 12px;
+            background: rgba(128, 128, 128, 0.2);
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
-            height: 100%;
-            width: 0%;
+            z-index: 1050;
+            -webkit-appearance: none;
+            outline: none;
+            cursor: pointer;
+            margin: 0;
+            padding: 0;
+        }
+        .projector-scrub::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 60px;
+            height: 12px;
             background: var(--accent-color);
-            transition: width 0.1s linear;
+            border-radius: 0;
+            transition: background 0.2s;
+        }
+        .projector-scrub::-moz-range-thumb {
+            width: 60px;
+            height: 12px;
+            background: var(--accent-color);
+            border-radius: 0;
+            border: none;
+            transition: background 0.2s;
+        }
+        .projector-scrub:hover::-webkit-slider-thumb {
+            background: var(--accent-hover);
+        }
+        .projector-scrub:hover::-moz-range-thumb {
+            background: var(--accent-hover);
         }
 
         .footer-controls {
@@ -653,18 +705,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <header>
-        <h1 style="display: flex; align-items: center; gap: 0.5rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px;">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                <circle cx="12" cy="13" r="4"></circle>
-            </svg>
-            PHOTOLAB
-        </h1>
+    <header id="main-header">
         <div style="display: flex; align-items: center; gap: 1rem;">
-            <!-- Brightness Slider -->
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 1rem; color: var(--text-color);" title="Adjust Backlight">
-                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <h1 style="display: flex; align-items: center; gap: 0.5rem; margin: 0; color: var(--logo-color, #000); font-size: 1.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px;">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                PHOTOLAB
+            </h1>
+            <div class="stats" id="photo-stats">0 Frames</div>
+            <div class="lightbox-title" id="lightbox-title" style="display: none;"></div>
+        </div>
+        <div class="lightbox-controls">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.5rem; color: var(--text-color);" title="Adjust Backlight">
+                <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="5"></circle>
                     <line x1="12" y1="1" x2="12" y2="3"></line>
                     <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -675,21 +730,28 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                 </svg>
-                <input type="range" class="brightness-slider" min="10" max="255" value="28" style="width: 80px; cursor: pointer;">
+                <input type="range" class="brightness-slider" min="10" max="255" value="229" style="width: 70px; cursor: pointer;">
             </div>
-            <button class="btn" id="btn-toggle-bw" title="Toggle Black & White (B)" style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550;">
-                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z"/></svg>
-                B&W Mode
+            <button class="btn btn-sound-toggle" title="Toggle Sound (M)" style="border-radius: 9999px; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <svg id="icon-sound-on" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                <svg id="icon-sound-off" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor; display: none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.11-.31 2.15-.81 3.09-1.45l2.64 2.64 1.27-1.27L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
             </button>
-            <button class="btn" id="btn-toggle-neg" title="Toggle Negative Mode (N)" style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550;">
-                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z" transform="rotate(90, 12, 12)"/></svg>
-                Negative Mode
+            <button class="btn btn-bw-toggle" title="Toggle Black & White (B)">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z"/></svg>
             </button>
-            <button class="btn" id="btn-start-slideshow" title="Start Slideshow" style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550; background: var(--accent-color); color: #000;">
-                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M8 5v14l11-7z"/></svg>
-                Play Slideshow
+            <button class="btn btn-neg-toggle" title="Toggle Negative Mode (N)">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z" transform="rotate(90, 12, 12)"/></svg>
             </button>
-            <div class="stats" id="photo-stats">0 Photos</div>
+            <button class="btn" id="btn-fullscreen" title="Toggle Fullscreen (F)">
+                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+            <button class="btn" id="btn-play" title="Play Slideshow (Space)" style="background: var(--accent-color); color: #000;">
+                <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <button class="btn btn-close" id="btn-close" style="display: none;" title="Close (Esc)">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
         </div>
     </header>
 
@@ -699,51 +761,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     <!-- Lightbox -->
     <div class="lightbox" id="lightbox" tabindex="0">
-        <div class="lightbox-header">
-            <div style="display: flex; flex-direction: column; gap: 0.2rem;">
-                <div class="lightbox-logo">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px;">
-                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                        <circle cx="12" cy="13" r="4"></circle>
-                    </svg>
-                    PHOTOLAB
-                </div>
-                <div class="lightbox-title" id="lightbox-title"></div>
-            </div>
-            <div class="lightbox-controls">
-                <!-- Brightness Slider (Slideshow View) -->
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.5rem; color: var(--text-color);" title="Adjust Backlight">
-                    <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
-                    <input type="range" class="brightness-slider" min="10" max="255" value="229" style="width: 70px; cursor: pointer;">
-                </div>
-                <button class="btn btn-sound-toggle" title="Toggle Sound (M)" style="border-radius: 9999px; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                    <svg id="icon-sound-on" viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                    <svg id="icon-sound-off" viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor; display: none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
-                </button>
-                <button class="btn btn-bw-toggle" title="Toggle Black & White (B)">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z"/></svg>
-                </button>
-                <button class="btn btn-neg-toggle" title="Toggle Negative Mode (N)">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z" transform="rotate(90, 12, 12)"/></svg>
-                </button>
-                <button class="btn" id="btn-fullscreen" title="Toggle Fullscreen (F)">
-                    <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                </button>
-                <button class="btn" id="btn-close" title="Close (Esc)">
-                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                </button>
-            </div>
-        </div>
 
         <div class="lightbox-main" id="lightbox-main">
             <button class="btn btn-large nav-btn nav-prev" id="btn-prev" title="Previous (Left Arrow)">
@@ -758,21 +775,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <button class="btn btn-large nav-btn nav-next" id="btn-next" title="Next (Right Arrow)">
                 <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
             </button>
-        </div>
-
-        <div class="lightbox-footer">
-            <div class="slideshow-bar">
-                <div class="slideshow-progress" id="slideshow-progress"></div>
-            </div>
-            
-            <div class="footer-controls">
-                <button class="btn" id="btn-play" title="Play Slideshow (Space)">
-                    <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                </button>
-                
-                <div class="filmstrip" id="filmstrip"></div>
-            </div>
+            <input type="range" id="projector-scrub" class="projector-scrub" min="0" max="100" value="0" step="1">
         </div>
     </div>
 
@@ -784,7 +787,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         const lightbox = document.getElementById('lightbox');
         const projectorStrip = document.getElementById('projector-strip');
         const lightboxTitle = document.getElementById('lightbox-title');
-        const filmstrip = document.getElementById('filmstrip');
         
         const btnClose = document.getElementById('btn-close');
         const btnPrev = document.getElementById('btn-prev');
@@ -793,14 +795,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         const btnFullscreen = document.getElementById('btn-fullscreen');
         const playIcon = document.getElementById('play-icon');
         const pauseIcon = document.getElementById('pause-icon');
-        const slideshowProgress = document.getElementById('slideshow-progress');
+        const projectorScrub = document.getElementById('projector-scrub');
+
 
         let currentIndex = 0;
         let isSlideshowPlaying = false;
         let slideshowInterval = null;
         const SLIDESHOW_DURATION = 5000;
-        let slideshowStartTime = 0;
-        let slideshowAnimationIdx = null;
 
         stats.textContent = `${IMAGES.length} Frames`;
 
@@ -822,12 +823,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         function renderContactSheet() {
             const containerWidth = contactSheet.clientWidth || window.innerWidth;
-            // Target frame size is roughly 280px.
             const targetFrameWidth = 280; 
             let framesPerRow = Math.floor(containerWidth / targetFrameWidth);
-            if (framesPerRow < 3) framesPerRow = 3; // Force at least 3 slides per row on mobile
+            if (framesPerRow < 3) framesPerRow = 3; 
 
-            // Only redraw if the column count actually changes
             if (framesPerRow === lastFramesPerRow) return;
             lastFramesPerRow = framesPerRow;
 
@@ -837,7 +836,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             for (let i = 0; i < IMAGES.length; i += framesPerRow) {
                 const rowImages = IMAGES.slice(i, i + framesPerRow);
                 
-                // Add CSS variable to row for dynamic width calculation
                 const row = document.createElement('div');
                 row.className = 'film-row';
                 row.style.setProperty('--cols', framesPerRow);
@@ -898,10 +896,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
         }
 
-        // Render on load
         renderContactSheet();
 
-        // Debounced resize listener
         let resizeTimeout;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
@@ -911,7 +907,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }, 100);
         });
 
-        // Render Projector Reel (Horizontal slide list in Lightbox)
         IMAGES.forEach((img, idx) => {
             const frame = document.createElement('div');
             frame.className = 'projector-frame';
@@ -933,7 +928,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             const num = Math.floor(idx / 2) + 1;
             const suffix = idx % 2 === 0 ? '' : 'A';
             
-            // Meta overlays
             const metaTop = document.createElement('div');
             metaTop.className = 'proj-meta-top';
             metaTop.innerHTML = `<span class="film-brand-text">KODAK PORTRA 400</span><span> &nbsp;&bull;&nbsp; FRAME ${idx + 1}/${IMAGES.length}</span><span>▶ ❚❘❘❙❚❙❙❘❘❙ &nbsp; DX &nbsp; 400-36</span>`;
@@ -960,31 +954,31 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             
             frame.appendChild(filmContainer);
             projectorStrip.appendChild(frame);
-
-            // Render Filmstrip Thumbnail Bar
-            const thumb = document.createElement('img');
-            thumb.className = 'filmstrip-item';
-            thumb.src = img.data ? `data:image/webp;base64,${img.data}` : (img.thumb || img.name);
-            thumb.alt = img.name;
-            thumb.loading = 'lazy';
-            thumb.addEventListener('click', () => navigateTo(idx, true));
-            filmstrip.appendChild(thumb);
         });
 
         function openLightbox(index) {
+            stats.style.display = 'none';
+            lightboxTitle.style.display = 'block';
+            btnClose.style.display = 'block';
+            document.getElementById('main-header').style.background = 'transparent';
+            
             lightbox.classList.add('active');
             lightbox.focus();
             navigateTo(index, true);
             document.body.style.overflow = 'hidden';
             
-            // Trigger recalculation in case layout resized
             setTimeout(updateProjectorPosition, 50);
         }
 
         function closeLightbox() {
+            stats.style.display = 'block';
+            lightboxTitle.style.display = 'none';
+            btnClose.style.display = 'none';
+            document.getElementById('main-header').style.background = 'transparent';
+            
             lightbox.classList.remove('active');
-            document.body.style.overflow = '';
             stopSlideshow();
+            document.body.style.overflow = '';
         }
 
         function updateProjectorPosition() {
@@ -994,26 +988,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             const viewportWidth = document.querySelector('.projector-viewport').clientWidth;
             const frameWidth = activeFrame.clientWidth;
             
-            // Calculate translation to perfectly center the active frame
             const leftOffset = activeFrame.offsetLeft;
             const translateX = (viewportWidth / 2) - leftOffset - (frameWidth / 2);
 
             projectorStrip.style.transform = `translateX(${translateX}px)`;
 
-            // Update Next button icon
             const nextIconPath = btnNext.querySelector('path');
             if (currentIndex === IMAGES.length - 1) {
-                // Rewind icon
                 nextIconPath.setAttribute('d', 'M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z');
                 btnNext.title = "Rewind to Start (Right Arrow)";
             } else {
-                // Next icon
                 nextIconPath.setAttribute('d', 'M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z');
                 btnNext.title = "Next (Right Arrow)";
             }
         }
 
-        function navigateTo(index, isManual = false) {
+        function navigateTo(index, isManual = false, isScrubbing = false) {
             let isRewinding = false;
             if (currentIndex === IMAGES.length - 1 && index >= IMAGES.length) {
                 isRewinding = true;
@@ -1029,54 +1019,44 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 playRewindSound();
                 setTimeout(() => {
                     projectorStrip.classList.remove('rewinding');
-                }, 8000); // Wait for rewind CSS to finish
+                }, 8000);
             } else {
                 projectorStrip.classList.remove('rewinding');
-                if (isManual) playShutterSound();
+                if (isManual && !isScrubbing) playShutterSound();
             }
 
             currentIndex = index;
-            
-            // Display filename clean (without path)
             const cleanName = IMAGES[currentIndex].name.split('/').pop();
             lightboxTitle.textContent = cleanName;
 
-            // Highlight thumbnail strip
-            const thumbs = filmstrip.children;
-            for (let i = 0; i < thumbs.length; i++) {
-                thumbs[i].classList.toggle('active', i === currentIndex);
-            }
+            projectorScrub.max = IMAGES.length - 1;
+            projectorScrub.value = currentIndex;
 
-            // Scroll thumbnail into view
-            const activeThumb = thumbs[currentIndex];
-            if (activeThumb) {
-                activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
-
-            // Update frame active classes
             const frames = projectorStrip.children;
             for (let i = 0; i < frames.length; i++) {
                 frames[i].classList.toggle('active', i === currentIndex);
             }
 
             updateProjectorPosition();
-
-            if (isSlideshowPlaying) {
-                resetSlideshowTimer();
-            }
+            if (isSlideshowPlaying) resetSlideshowTimer();
         }
+
+        projectorScrub.addEventListener('input', (e) => {
+            const index = parseInt(e.target.value, 10);
+            if (index !== currentIndex) navigateTo(index, true, true);
+        });
 
         window.addEventListener('resize', updateProjectorPosition);
 
-        function nextImage() {
-            navigateTo(currentIndex + 1, true);
-        }
-
-        function prevImage() {
-            navigateTo(currentIndex - 1, true);
-        }
+        function nextImage() { navigateTo(currentIndex + 1, true); }
+        function prevImage() { navigateTo(currentIndex - 1, true); }
 
         function toggleSlideshow() {
+            if (!lightbox.classList.contains('active')) {
+                openLightbox(0);
+                startSlideshow();
+                return;
+            }
             if (isSlideshowPlaying) {
                 stopSlideshow();
             } else {
@@ -1099,60 +1079,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 clearInterval(slideshowInterval);
                 slideshowInterval = null;
             }
-            cancelAnimationFrame(slideshowAnimationIdx);
-            slideshowProgress.style.width = '0%';
         }
 
         function resetSlideshowTimer() {
             if (slideshowInterval) clearInterval(slideshowInterval);
-            slideshowProgress.style.width = '0%';
-            
-            slideshowStartTime = Date.now();
-            
-            slideshowInterval = setInterval(() => {
-                navigateTo(currentIndex + 1, true);
-            }, SLIDESHOW_DURATION);
-
-            animateProgressBar();
-        }
-
-        function animateProgressBar() {
-            if (!isSlideshowPlaying) return;
-            const elapsed = Date.now() - slideshowStartTime;
-            const pct = Math.min((elapsed / SLIDESHOW_DURATION) * 100, 100);
-            slideshowProgress.style.width = `${pct}%`;
-            
-            if (elapsed < SLIDESHOW_DURATION) {
-                slideshowAnimationIdx = requestAnimationFrame(animateProgressBar);
-            }
+            slideshowInterval = setInterval(() => navigateTo(currentIndex + 1, true), SLIDESHOW_DURATION);
         }
 
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
-                lightbox.requestFullscreen()
-                    .then(() => {
-                        if (screen.orientation && screen.orientation.lock) {
-                            screen.orientation.lock('landscape').catch(err => {
-                                console.log("Orientation lock failed/not supported:", err);
-                            });
-                        }
-                    })
-                    .catch(err => {
-                        console.error(`Error attempting to enable fullscreen: ${err.message}`);
-                    });
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
             } else {
                 document.exitFullscreen();
             }
         }
 
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                if (screen.orientation && screen.orientation.unlock) {
-                    screen.orientation.unlock();
-                }
-            }
-            setTimeout(updateProjectorPosition, 150);
-        });
+        document.addEventListener('fullscreenchange', () => setTimeout(updateProjectorPosition, 150));
 
         btnClose.addEventListener('click', closeLightbox);
         btnPrev.addEventListener('click', prevImage);
@@ -1160,17 +1104,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         btnPlay.addEventListener('click', toggleSlideshow);
         btnFullscreen.addEventListener('click', toggleFullscreen);
 
-        // B&W Toggle functionality
-        const btnToggleBw = document.getElementById('btn-toggle-bw');
         const btnLightboxBw = document.querySelector('.btn-bw-toggle');
-        
         function toggleBwMode() {
             document.body.classList.toggle('grayscale-mode');
             const isGrayscale = document.body.classList.contains('grayscale-mode');
-            btnToggleBw.style.color = isGrayscale ? 'var(--accent-color)' : '';
             btnLightboxBw.style.color = isGrayscale ? 'var(--accent-color)' : '';
 
-            // Update process labels dynamically
             const processTexts = document.querySelectorAll('.process-text');
             processTexts.forEach(el => {
                 if (isGrayscale) {
@@ -1180,7 +1119,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 }
             });
 
-            // Update film brand labels dynamically
             const brandTexts = document.querySelectorAll('.film-brand-text');
             brandTexts.forEach(el => {
                 if (isGrayscale) {
@@ -1191,25 +1129,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             });
         }
 
-        btnToggleBw.addEventListener('click', toggleBwMode);
         btnLightboxBw.addEventListener('click', toggleBwMode);
-
-        // Make BW mode default on load
         toggleBwMode();
 
-        // Negative Mode Toggle functionality
-        const btnToggleNeg = document.getElementById('btn-toggle-neg');
         const btnLightboxNeg = document.querySelector('.btn-neg-toggle');
-
         let isGalleryNegative = true;
         let isSlideshowNegative = false;
 
-        btnToggleNeg.style.color = 'var(--accent-color)';
+        btnLightboxNeg.addEventListener('click', () => {
+            if (lightbox.classList.contains('active')) {
+                toggleSlideshowNeg();
+            } else {
+                toggleGalleryNeg();
+            }
+        });
 
         function toggleGalleryNeg() {
             isGalleryNegative = !isGalleryNegative;
             document.body.classList.toggle('positive-gallery', !isGalleryNegative);
-            btnToggleNeg.style.color = isGalleryNegative ? 'var(--accent-color)' : '';
         }
 
         function toggleSlideshowNeg() {
@@ -1218,8 +1155,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             btnLightboxNeg.style.color = isSlideshowNegative ? 'var(--accent-color)' : '';
         }
 
-        btnToggleNeg.addEventListener('click', toggleGalleryNeg);
-        btnLightboxNeg.addEventListener('click', toggleSlideshowNeg);
+
 
         // Global key bindings
         document.addEventListener('keydown', (e) => {
@@ -1236,13 +1172,25 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     toggleGalleryNeg();
                 }
             }
+            if (!lightbox.classList.contains('active')) {
+                if (e.key === 'ArrowDown') {
+                    window.scrollBy({ top: window.innerHeight * 0.3, behavior: 'smooth' });
+                    e.preventDefault();
+                } else if (e.key === 'ArrowUp') {
+                    window.scrollBy({ top: -window.innerHeight * 0.3, behavior: 'smooth' });
+                    e.preventDefault();
+                }
+            }
         });
 
-        const btnStartSlideshow = document.getElementById('btn-start-slideshow');
-        btnStartSlideshow.addEventListener('click', () => {
-            openLightbox(0);
-            startSlideshow();
+        // Mouse wheel fluid scroll support for fullscreen gallery
+        window.addEventListener('wheel', (e) => {
+            if (!lightbox.classList.contains('active') && document.fullscreenElement) {
+                window.scrollBy({ top: e.deltaY, behavior: 'auto' });
+            }
         });
+
+        // Removed duplicate btnStartSlideshow listener
 
         document.addEventListener('keydown', (e) => {
             if (!lightbox.classList.contains('active')) return;
@@ -1328,12 +1276,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 styleEl.id = 'dynamic-sprockets';
                 document.head.appendChild(styleEl);
             }
+            const svg1 = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><rect x="7" y="6" width="14" height="16" rx="3" ry="3" fill="#${hex.substring(1)}"/></svg>`;
+            const svg2 = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="31" y="20" width="38" height="60" rx="8" ry="8" fill="#${hex.substring(1)}"/></svg>`;
             styleEl.textContent = `
                 .sprockets-top, .sprockets-bottom {
-                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><rect x="7" y="6" width="14" height="16" rx="3" ry="3" fill="%23${hex.substring(1)}"/></svg>');
+                    background-image: url('data:image/svg+xml;base64,${btoa(svg1)}');
                 }
                 .proj-sprockets-top, .proj-sprockets-bottom {
-                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="31" y="20" width="38" height="60" rx="8" ry="8" fill="%23${hex.substring(1)}"/></svg>');
+                    background-image: url('data:image/svg+xml;base64,${btoa(svg2)}');
                 }
             `;
             });
@@ -1360,8 +1310,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         let isSoundMuted = false;
 
         function playShutterSound() {
+            console.log("playShutterSound called. isSoundMuted:", isSoundMuted);
             if (isSoundMuted) return;
-            shutterAudio.cloneNode(true).play().catch(e => console.log('Audio play failed:', e));
+            let clonedAudio = shutterAudio.cloneNode(true);
+            clonedAudio.play().then(() => {
+                console.log("Audio played successfully.");
+            }).catch(e => {
+                console.error('Audio play failed:', e);
+                alert("Audio failed to play: " + e.message);
+            });
         }
 
         function playRewindSound() {
