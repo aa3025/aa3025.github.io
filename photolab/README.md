@@ -1,5 +1,7 @@
 # Photolab Single-File Gallery
 
+**Live Demo:** [https://aa3025.github.io/photolab/](https://aa3025.github.io/photolab/)
+
 A highly stylized, fully client-side single-page photo gallery designed to emulate the look and feel of a physical darkroom contact sheet and film projector.
 
 ## Features
