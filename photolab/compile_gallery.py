@@ -371,7 +371,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             height: 100%;
             object-fit: contain;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            opacity: 0.08; /* Dimmed left-right images only */
+            opacity: 0.25; /* Dimmed left-right images only */
             filter: invert(1); /* Default to Negative on sides */
             transition: opacity 0.45s ease, filter 1.5s ease-in-out;
         }
@@ -619,7 +619,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
 
         .filmstrip-item:hover {
-            opacity: 0.7;
+            opacity: 0.8;
         }
 
         .filmstrip-item.active {
