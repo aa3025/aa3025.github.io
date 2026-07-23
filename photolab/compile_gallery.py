@@ -188,6 +188,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             z-index: 0;
             background: #111;
         }
+        .progress-bar-container {
+            width: 80%;
+            height: 2px;
+            background: #333;
+            border-radius: 1px;
+            overflow: hidden;
+            margin-top: 5px;
+            display: none;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--kodak-yellow);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
 
         .spinner {
             width: 24px;
@@ -816,13 +831,82 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         // Dynamic rendering on window resize
         let lastFramesPerRow = 0;
         
+        const imageLoadQueue = [];
+        let activeLoads = 0;
+        const MAX_CONCURRENT_LOADS = 4;
+
+        function processImageLoadQueue() {
+            while (activeLoads < MAX_CONCURRENT_LOADS && imageLoadQueue.length > 0) {
+                activeLoads++;
+                const { img, placeholder, url } = imageLoadQueue.shift();
+                
+                if (url.startsWith('data:')) {
+                    img.onload = () => {
+                        img.classList.add('loaded');
+                        activeLoads--;
+                        processImageLoadQueue();
+                    };
+                    img.src = url;
+                    continue;
+                }
+
+                const progressContainer = placeholder.querySelector('.progress-bar-container');
+                const progressBar = placeholder.querySelector('.progress-bar');
+                const progressText = placeholder.querySelector('.progress-text');
+                const spinner = placeholder.querySelector('.spinner');
+                
+                if (progressContainer) progressContainer.style.display = 'block';
+                if (progressText) progressText.textContent = 'LOADING...';
+                if (spinner) spinner.style.display = 'none';
+                
+                if (progressBar) {
+                    progressBar.style.transition = 'width 1s ease-out';
+                    progressBar.style.width = '80%'; 
+                }
+                
+                img.onload = () => {
+                    if (progressBar) {
+                        progressBar.style.transition = 'width 0.1s ease-out';
+                        progressBar.style.width = '100%';
+                    }
+                    if (progressText) progressText.textContent = 'DONE';
+                    
+                    img.classList.add('loaded');
+                    activeLoads--;
+                    processImageLoadQueue();
+                };
+                
+                img.onerror = () => {
+                    activeLoads--;
+                    processImageLoadQueue();
+                };
+                
+                img.src = url;
+                
+                if (img.complete) {
+                    img.onload = null;
+                    img.onerror = null;
+                    if (progressContainer) progressContainer.style.display = 'none';
+                    if (progressText) progressText.style.display = 'none';
+                    img.classList.add('loaded');
+                    activeLoads--;
+                }
+            }
+        }
+
         const lazyImageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const img = entry.target;
                     if (img.dataset.src) {
-                        img.src = img.dataset.src;
+                        const placeholder = img.parentElement.querySelector('.loading-placeholder');
+                        imageLoadQueue.push({
+                            img: img,
+                            placeholder: placeholder,
+                            url: img.dataset.src
+                        });
                         img.removeAttribute('data-src');
+                        processImageLoadQueue();
                     }
                     observer.unobserve(img);
                 }
@@ -871,13 +955,18 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
                     const placeholder = document.createElement('div');
                     placeholder.className = 'loading-placeholder';
-                    placeholder.innerHTML = '<div class="spinner"></div><div>PROCESSING...</div>';
+                    placeholder.innerHTML = `
+                        <div class="spinner"></div>
+                        <div class="progress-text">WAITING...</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar"></div>
+                        </div>
+                    `;
                     frame.appendChild(placeholder);
 
                     const image = document.createElement('img');
                     image.dataset.src = img.data ? `data:image/webp;base64,${img.data}` : (img.thumb || img.name);
                     image.alt = img.name;
-                    image.onload = () => image.classList.add('loaded');
                     lazyImageObserver.observe(image);
 
                     frame.appendChild(image);
