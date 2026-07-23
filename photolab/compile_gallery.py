@@ -719,7 +719,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 PHOTOLAB
             </h1>
             <div class="stats" id="photo-stats">0 Frames</div>
-            <div class="lightbox-title" id="lightbox-title" style="display: none;"></div>
         </div>
         <div class="lightbox-controls">
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.5rem; color: var(--text-color);" title="Adjust Backlight">
@@ -794,7 +793,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         const stats = document.getElementById('photo-stats');
         const lightbox = document.getElementById('lightbox');
         const projectorStrip = document.getElementById('projector-strip');
-        const lightboxTitle = document.getElementById('lightbox-title');
         
         const btnClose = document.getElementById('btn-close');
         const btnPrev = document.getElementById('btn-prev');
@@ -944,7 +942,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
             const metaBottom = document.createElement('div');
             metaBottom.className = 'proj-meta-bottom';
-            metaBottom.innerHTML = `<span>▶ ${num}${suffix}</span><span class="process-text">PROCESS C-41 &nbsp;&bull;&nbsp; ROLL_01</span>`;
+            const cleanName = img.name.split('/').pop();
+            metaBottom.innerHTML = `<span>▶ ${idx + 1} &nbsp;&bull;&nbsp; ${cleanName}</span><span class="process-text">PROCESS C-41 &nbsp;&bull;&nbsp; ROLL_01</span>`;
 
             const image = document.createElement('img');
             image.src = img.data ? `data:image/webp;base64,${img.data}` : img.name;
@@ -968,7 +967,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         function openLightbox(index) {
             stats.style.display = 'none';
-            lightboxTitle.style.display = 'block';
             btnClose.style.display = 'block';
             document.getElementById('main-header').style.background = 'transparent';
             
@@ -983,7 +981,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         function closeLightbox() {
             stats.style.display = 'block';
-            lightboxTitle.style.display = 'none';
             btnClose.style.display = 'none';
             document.getElementById('main-header').style.background = 'transparent';
             
@@ -1038,8 +1035,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
 
             currentIndex = index;
-            const cleanName = IMAGES[currentIndex].name.split('/').pop();
-            lightboxTitle.textContent = cleanName;
 
             projectorScrub.max = IMAGES.length - 1;
             projectorScrub.value = currentIndex;
