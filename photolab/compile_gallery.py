@@ -708,6 +708,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     </svg>
                     PHOTOLAB
                 </div>
+                <div class="lightbox-title" id="lightbox-title"></div>
             </div>
             <div class="lightbox-controls">
                 <!-- Brightness Slider (Slideshow View) -->
