@@ -949,7 +949,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             image.alt = img.name;
             image.loading = 'lazy';
             image.onload = () => {
-                if (idx === currentIndex) {
+                if (lightbox.classList.contains('active')) {
                     updateProjectorPosition();
                 }
             };
