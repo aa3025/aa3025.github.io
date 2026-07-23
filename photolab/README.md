@@ -2,6 +2,9 @@
 
 **Live Demo:** [https://aa3025.github.io/photolab/](https://aa3025.github.io/photolab/)
 
+**Video Overview:**
+[![Photolab Video Demo](https://img.youtube.com/vi/rA8I23ijN0s/hqdefault.jpg)](https://www.youtube.com/watch?v=rA8I23ijN0s)
+
 A highly stylized, fully client-side single-page photo gallery designed to emulate the look and feel of a physical darkroom contact sheet and film projector.
 
 ## Features
