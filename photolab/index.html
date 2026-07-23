@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHOTOLAB</title>
+    <title>LIGHTBOX</title>
     <style>
         :root {
             --bg-color: #e5e5e5;
@@ -12,8 +11,7 @@
             --film-border: #16171c;
             --text-color: #111827;
             --text-muted: #4b5563;
-            --accent-color: #d97706;
-            /* Retro Amber */
+            --accent-color: #d97706; /* Retro Amber */
             --accent-hover: #b45309;
             --overlay-bg: #e5e5e5;
             --control-bg: rgba(0, 0, 0, 0.08);
@@ -142,10 +140,7 @@
 
         .loading-placeholder {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -161,16 +156,14 @@
         .spinner {
             width: 24px;
             height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(255,255,255,0.1);
             border-top-color: var(--accent-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         .film-frame img {
@@ -191,38 +184,31 @@
 
         .film-frame:hover img {
             transform: scale(1.03);
-            filter: brightness(1.05) invert(0);
-            /* Positive on hover */
+            filter: brightness(1.05) invert(0); /* Positive on hover */
         }
 
         /* Positive Gallery overrides */
         .positive-gallery .film-frame img {
             filter: brightness(0.9) invert(0);
         }
-
         .positive-gallery .film-frame:hover img {
-            filter: brightness(1.05) invert(1);
-            /* Negative on hover */
+            filter: brightness(1.05) invert(1); /* Negative on hover */
         }
 
         /* Grayscale overrides for default (Negative) gallery */
         .grayscale-mode .film-frame img {
             filter: brightness(0.9) grayscale(100%) invert(1);
         }
-
         .grayscale-mode .film-frame:hover img {
-            filter: brightness(1.05) grayscale(100%) invert(0);
-            /* Positive on hover */
+            filter: brightness(1.05) grayscale(100%) invert(0); /* Positive on hover */
         }
 
         /* Grayscale overrides for Positive gallery */
         .positive-gallery.grayscale-mode .film-frame img {
             filter: brightness(0.9) grayscale(100%) invert(0);
         }
-
         .positive-gallery.grayscale-mode .film-frame:hover img {
-            filter: brightness(1.05) grayscale(100%) invert(1);
-            /* Negative on hover */
+            filter: brightness(1.05) grayscale(100%) invert(1); /* Negative on hover */
         }
 
         .frame-label {
@@ -246,8 +232,7 @@
             flex-direction: column;
             opacity: 0;
             pointer-events: none;
-            visibility: hidden;
-            /* Hide all interactive children when inactive */
+            visibility: hidden; /* Hide all interactive children when inactive */
             transition: opacity 0.3s ease, visibility 0.3s ease;
             backdrop-filter: blur(20px);
         }
@@ -266,8 +251,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 55px 2rem 10px 2rem;
-            /* Shift down to avoid sprockets */
+            padding: 55px 2rem 10px 2rem; /* Shift down to avoid sprockets */
             background: transparent;
             z-index: 1020;
             pointer-events: none;
@@ -275,18 +259,6 @@
 
         .lightbox-header * {
             pointer-events: auto;
-        }
-
-        .lightbox-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-color);
-            font-family: var(--monospace-font);
-            letter-spacing: 1px;
-            max-width: 60%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         /* Inverted background color for logo */
@@ -377,11 +349,9 @@
             height: auto;
             object-fit: contain;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            opacity: 0.2;
-            /* Dimmed left-right images only */
-            filter: invert(1);
-            /* Default to Negative on sides */
-            transition: opacity 0.6s ease, filter 1.2s ease-in-out;
+            opacity: 0.08; /* Dimmed left-right images only */
+            filter: invert(1); /* Default to Negative on sides */
+            transition: opacity 0.45s ease, filter 1.5s ease-in-out;
         }
 
         .grayscale-mode .projector-film-container img {
@@ -390,8 +360,7 @@
 
         .projector-frame.active img {
             opacity: 1;
-            filter: invert(0);
-            /* Positive in the center */
+            filter: invert(0); /* Positive in the center */
         }
 
         .grayscale-mode .projector-frame.active img {
@@ -400,8 +369,7 @@
 
         /* Negative Slideshow overrides */
         .negative-slideshow .projector-film-container img {
-            filter: invert(0) !important;
-            /* Positive on sides */
+            filter: invert(0) !important; /* Positive on sides */
         }
 
         .negative-slideshow.grayscale-mode .projector-film-container img {
@@ -409,8 +377,7 @@
         }
 
         .negative-slideshow .projector-frame.active img {
-            filter: invert(1) !important;
-            /* Negative in the center */
+            filter: invert(1) !important; /* Negative in the center */
         }
 
         .negative-slideshow.grayscale-mode .projector-frame.active img {
@@ -438,16 +405,10 @@
 
         .proj-sprockets-bottom {
             bottom: 0;
-        }
-
-        .vp-sprockets-top,
-        .vp-sprockets-bottom {
-            display: none;
-        }
+        }.vp-sprockets-top, .vp-sprockets-bottom { display: none; }
 
         /* Meta text sits in the leader gap between sprocket and image */
-        .proj-meta-top,
-        .proj-meta-bottom {
+        .proj-meta-top, .proj-meta-bottom {
             position: absolute;
             left: 20px;
             right: 20px;
@@ -462,15 +423,8 @@
             z-index: 10;
             white-space: nowrap;
         }
-
-        /* sit inside the leader strip, just below/above the sprocket band */
-        .proj-meta-top {
-            top: calc(var(--sprocket-h) + 2px);
-        }
-
-        .proj-meta-bottom {
-            bottom: calc(var(--sprocket-h) + 2px);
-        }
+        .proj-meta-top    { top: calc(var(--sprocket-h) + 2px); }
+        .proj-meta-bottom { bottom: calc(var(--sprocket-h) + 2px); }
 
         .grayscale-mode .filmstrip img {
             filter: grayscale(100%);
@@ -515,13 +469,8 @@
             z-index: 1010;
         }
 
-        .nav-prev {
-            left: 2rem;
-        }
-
-        .nav-next {
-            right: 2rem;
-        }
+        .nav-prev { left: 2rem; }
+        .nav-next { right: 2rem; }
 
         .lightbox-controls {
             display: flex;
@@ -536,8 +485,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 5px 2rem 15px 2rem;
-            /* Lowered footer */
+            padding: 5px 2rem 15px 2rem; /* Lowered footer */
             background: transparent;
             display: flex;
             flex-direction: column;
@@ -617,20 +565,16 @@
             fill: currentColor;
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
         @media (orientation: portrait) {
             .projector-frame {
                 width: 100vw !important;
                 padding: 0 !important;
             }
-
             .projector-film-container {
                 width: 100% !important;
             }
-
             .projector-film-container img {
                 width: 100% !important;
                 max-width: 100% !important;
@@ -643,17 +587,13 @@
             .nav-btn {
                 display: none;
             }
-
             .projector-film-container img {
                 max-height: calc(100vh - 200px);
-                max-width: calc(100vw - 32px);
-                /* Limit width on mobile view to avoid overflow */
+                max-width: calc(100vw - 32px); /* Limit width on mobile view to avoid overflow */
                 width: auto;
                 height: auto;
             }
-
-            .proj-meta-top,
-            .proj-meta-bottom {
+            .proj-meta-top, .proj-meta-bottom {
                 left: 10px;
                 right: 10px;
                 font-size: 0.65rem;
@@ -666,65 +606,42 @@
                 padding: 0.1rem 0.5rem;
                 letter-spacing: 1px;
             }
-
             .frame-label {
                 font-size: 0.55rem;
             }
-
-            .sprockets-top,
-            .sprockets-bottom {
+            .sprockets-top, .sprockets-bottom {
                 height: 16px;
                 background-size: 16px 16px;
                 background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="4" y="3" width="8" height="10" rx="1.5" ry="1.5" fill="%232b2e3a"/></svg>');
             }
-
             .film-frames {
                 padding: 0.25rem 0.5rem;
                 gap: 0.4rem;
             }
-
             .film-frame-container {
                 flex: 0 0 calc((100% - (var(--cols) - 1) * 0.4rem) / var(--cols)) !important;
             }
-
             .projector-film-container {
                 padding: 24px 0 !important;
             }
-
-            .proj-sprockets-top,
-            .proj-sprockets-bottom {
+            .proj-sprockets-top, .proj-sprockets-bottom {
                 height: 16px !important;
                 background-size: 16px 16px !important;
                 background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="4" y="3" width="8" height="10" rx="1.5" ry="1.5" fill="%232b2e3a"/></svg>') !important;
             }
-
-            .proj-sprockets-top {
-                top: 3px !important;
-            }
-
-            .proj-sprockets-bottom {
-                bottom: 3px !important;
-            }
-
-            .proj-meta-top {
-                top: 16px !important;
-            }
-
-            .proj-meta-bottom {
-                bottom: 16px !important;
-            }
-
-            .proj-meta-top,
-            .proj-meta-bottom {
+            .proj-sprockets-top { top: 3px !important; }
+            .proj-sprockets-bottom { bottom: 3px !important; }
+            .proj-meta-top { top: 16px !important; }
+            .proj-meta-bottom { bottom: 16px !important; }
+            .proj-meta-top, .proj-meta-bottom {
                 font-size: 0.55rem !important;
             }
         }
     </style>
 </head>
-
 <body>
     <header>
-        <h1>
+        <h1 style="display: flex; align-items: center; gap: 0.5rem;">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px;">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                 <circle cx="12" cy="13" r="4"></circle>
@@ -733,10 +650,8 @@
         </h1>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <!-- Brightness Slider -->
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 1rem; color: var(--text-color);"
-                title="Adjust Backlight">
-                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 1rem; color: var(--text-color);" title="Adjust Backlight">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="5"></circle>
                     <line x1="12" y1="1" x2="12" y2="3"></line>
                     <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -747,31 +662,18 @@
                     <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                 </svg>
-                <input type="range" class="brightness-slider" min="10" max="255" value="64"
-                    style="width: 80px; cursor: pointer;">
+                <input type="range" class="brightness-slider" min="10" max="255" value="28" style="width: 80px; cursor: pointer;">
             </div>
-            <button class="btn" id="btn-toggle-bw" title="Toggle Black & White (B)"
-                style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550;">
-                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-                    <path
-                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z" />
-                </svg>
+            <button class="btn" id="btn-toggle-bw" title="Toggle Black & White (B)" style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550;">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z"/></svg>
                 B&W Mode
             </button>
-            <button class="btn" id="btn-toggle-neg" title="Toggle Negative Mode (N)"
-                style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550;">
-                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-                    <path
-                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z"
-                        transform="rotate(90, 12, 12)" />
-                </svg>
+            <button class="btn" id="btn-toggle-neg" title="Toggle Negative Mode (N)" style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550;">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z" transform="rotate(90, 12, 12)"/></svg>
                 Negative Mode
             </button>
-            <button class="btn" id="btn-start-slideshow" title="Start Slideshow"
-                style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550; background: var(--accent-color); color: #000;">
-                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-                    <path d="M8 5v14l11-7z" />
-                </svg>
+            <button class="btn" id="btn-start-slideshow" title="Start Slideshow" style="border-radius: 9999px; width: auto; padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; font-size: 0.9rem; font-weight: 550; background: var(--accent-color); color: #000;">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M8 5v14l11-7z"/></svg>
                 Play Slideshow
             </button>
             <div class="stats" id="photo-stats">0 Photos</div>
@@ -796,10 +698,8 @@
             </div>
             <div class="lightbox-controls">
                 <!-- Brightness Slider (Slideshow View) -->
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.5rem; color: var(--text-color);"
-                    title="Adjust Backlight">
-                    <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.5rem; color: var(--text-color);" title="Adjust Backlight">
+                    <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
                         <line x1="12" y1="1" x2="12" y2="3"></line>
                         <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -810,55 +710,41 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                    <input type="range" class="brightness-slider" min="10" max="255" value="229"
-                        style="width: 70px; cursor: pointer;">
+                    <input type="range" class="brightness-slider" min="10" max="255" value="229" style="width: 70px; cursor: pointer;">
                 </div>
                 <button class="btn btn-sound-toggle" title="Toggle Sound (M)" style="border-radius: 9999px; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
                     <svg id="icon-sound-on" viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                     <svg id="icon-sound-off" viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor; display: none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
                 </button>
                 <button class="btn btn-bw-toggle" title="Toggle Black & White (B)">
-                    <svg viewBox="0 0 24 24">
-                        <path
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z" />
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z"/></svg>
                 </button>
                 <button class="btn btn-neg-toggle" title="Toggle Negative Mode (N)">
-                    <svg viewBox="0 0 24 24">
-                        <path
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z"
-                            transform="rotate(90, 12, 12)" />
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.31 0 6-2.69 6-6s-2.69-6-6-6z" transform="rotate(90, 12, 12)"/></svg>
                 </button>
                 <button class="btn" id="btn-fullscreen" title="Toggle Fullscreen (F)">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                 </button>
                 <button class="btn" id="btn-close" title="Close (Esc)">
-                    <svg viewBox="0 0 24 24">
-                        <path
-                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
             </div>
         </div>
 
         <div class="lightbox-main" id="lightbox-main">
             <button class="btn btn-large nav-btn nav-prev" id="btn-prev" title="Previous (Left Arrow)">
-                <svg viewBox="0 0 24 24">
-                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
             </button>
-
+            
             <div class="projector-viewport">
-                <div class="projector-strip" id="projector-strip"></div>
+                <div class="projector-strip" id="projector-strip">
+                    <div class="vp-sprockets-top"></div>
+                    <div class="vp-sprockets-bottom"></div>
+                </div>
             </div>
 
             <button class="btn btn-large nav-btn nav-next" id="btn-next" title="Next (Right Arrow)">
-                <svg viewBox="0 0 24 24">
-                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
             </button>
         </div>
 
@@ -866,32 +752,28 @@
             <div class="slideshow-bar">
                 <div class="slideshow-progress" id="slideshow-progress"></div>
             </div>
-
+            
             <div class="footer-controls">
                 <button class="btn" id="btn-play" title="Play Slideshow (Space)">
-                    <svg id="play-icon" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                    </svg>
-                    <svg id="pause-icon" class="hidden" viewBox="0 0 24 24">
-                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                    </svg>
+                    <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                 </button>
-
+                
                 <div class="filmstrip" id="filmstrip"></div>
             </div>
         </div>
     </div>
 
     <script>
-        const IMAGES = [{ "name": "photos/20260721_120947.jpg", "thumb": "thumbnails/20260721_120947.webp" }, { "name": "photos/20260721_121136.jpg", "thumb": "thumbnails/20260721_121136.webp" }, { "name": "photos/20260721_141138(0).jpg", "thumb": "thumbnails/20260721_141138(0).webp" }, { "name": "photos/20260721_141138.jpg", "thumb": "thumbnails/20260721_141138.webp" }, { "name": "photos/20260721_141140.jpg", "thumb": "thumbnails/20260721_141140.webp" }, { "name": "photos/20260721_141142.jpg", "thumb": "thumbnails/20260721_141142.webp" }, { "name": "photos/IMG_1542.jpg", "thumb": "thumbnails/IMG_1542.webp" }, { "name": "photos/PXL_20260721_081742252.jpg", "thumb": "thumbnails/PXL_20260721_081742252.webp" }, { "name": "photos/PXL_20260721_081756884.jpg", "thumb": "thumbnails/PXL_20260721_081756884.webp" }, { "name": "photos/PXL_20260721_081918895.jpg", "thumb": "thumbnails/PXL_20260721_081918895.webp" }, { "name": "photos/PXL_20260721_081956246.jpg", "thumb": "thumbnails/PXL_20260721_081956246.webp" }, { "name": "photos/PXL_20260721_081959270.jpg", "thumb": "thumbnails/PXL_20260721_081959270.webp" }, { "name": "photos/PXL_20260721_082026282.jpg", "thumb": "thumbnails/PXL_20260721_082026282.webp" }, { "name": "photos/PXL_20260721_082028695.jpg", "thumb": "thumbnails/PXL_20260721_082028695.webp" }, { "name": "photos/PXL_20260721_082034232.jpg", "thumb": "thumbnails/PXL_20260721_082034232.webp" }, { "name": "photos/PXL_20260721_082040037.jpg", "thumb": "thumbnails/PXL_20260721_082040037.webp" }, { "name": "photos/PXL_20260721_082041622.jpg", "thumb": "thumbnails/PXL_20260721_082041622.webp" }, { "name": "photos/PXL_20260721_082141918.jpg", "thumb": "thumbnails/PXL_20260721_082141918.webp" }, { "name": "photos/PXL_20260721_082151571.jpg", "thumb": "thumbnails/PXL_20260721_082151571.webp" }, { "name": "photos/PXL_20260721_082155116.jpg", "thumb": "thumbnails/PXL_20260721_082155116.webp" }, { "name": "photos/PXL_20260721_102416353.jpg", "thumb": "thumbnails/PXL_20260721_102416353.webp" }, { "name": "photos/PXL_20260721_102424397.jpg", "thumb": "thumbnails/PXL_20260721_102424397.webp" }, { "name": "photos/PXL_20260721_103123066.jpg", "thumb": "thumbnails/PXL_20260721_103123066.webp" }, { "name": "photos/PXL_20260721_103143131.jpg", "thumb": "thumbnails/PXL_20260721_103143131.webp" }, { "name": "photos/PXL_20260721_142552065.jpg", "thumb": "thumbnails/PXL_20260721_142552065.webp" }, { "name": "photos/RX_07759.jpg", "thumb": "thumbnails/RX_07759.webp" }, { "name": "photos/RX_07761.jpg", "thumb": "thumbnails/RX_07761.webp" }, { "name": "photos/RX_07762.jpg", "thumb": "thumbnails/RX_07762.webp" }, { "name": "photos/RX_07763.jpg", "thumb": "thumbnails/RX_07763.webp" }, { "name": "photos/RX_07765.jpg", "thumb": "thumbnails/RX_07765.webp" }, { "name": "photos/RX_07766.jpg", "thumb": "thumbnails/RX_07766.webp" }, { "name": "photos/RX_07767.jpg", "thumb": "thumbnails/RX_07767.webp" }, { "name": "photos/RX_07768.jpg", "thumb": "thumbnails/RX_07768.webp" }, { "name": "photos/RX_07769.jpg", "thumb": "thumbnails/RX_07769.webp" }, { "name": "photos/RX_07770.jpg", "thumb": "thumbnails/RX_07770.webp" }, { "name": "photos/RX_07771.jpg", "thumb": "thumbnails/RX_07771.webp" }, { "name": "photos/RX_07773.jpg", "thumb": "thumbnails/RX_07773.webp" }, { "name": "photos/RX_07776.jpg", "thumb": "thumbnails/RX_07776.webp" }, { "name": "photos/RX_07792.jpg", "thumb": "thumbnails/RX_07792.webp" }, { "name": "photos/RX_07793.jpg", "thumb": "thumbnails/RX_07793.webp" }, { "name": "photos/RX_07794.jpg", "thumb": "thumbnails/RX_07794.webp" }, { "name": "photos/RX_07807.jpg", "thumb": "thumbnails/RX_07807.webp" }, { "name": "photos/RX_07808.jpg", "thumb": "thumbnails/RX_07808.webp" }, { "name": "photos/RX_07819.jpg", "thumb": "thumbnails/RX_07819.webp" }, { "name": "photos/RX_07831.jpg", "thumb": "thumbnails/RX_07831.webp" }, { "name": "photos/RX_07835.jpg", "thumb": "thumbnails/RX_07835.webp" }, { "name": "photos/RX_07836.jpg", "thumb": "thumbnails/RX_07836.webp" }, { "name": "photos/RX_07838.jpg", "thumb": "thumbnails/RX_07838.webp" }, { "name": "photos/RX_07840.jpg", "thumb": "thumbnails/RX_07840.webp" }, { "name": "photos/RX_07843.jpg", "thumb": "thumbnails/RX_07843.webp" }, { "name": "photos/RX_07848.jpg", "thumb": "thumbnails/RX_07848.webp" }, { "name": "photos/RX_07856.jpg", "thumb": "thumbnails/RX_07856.webp" }, { "name": "photos/RX_07858.jpg", "thumb": "thumbnails/RX_07858.webp" }, { "name": "photos/RX_07866.jpg", "thumb": "thumbnails/RX_07866.webp" }, { "name": "photos/RX_07873.jpg", "thumb": "thumbnails/RX_07873.webp" }, { "name": "photos/RX_07875.jpg", "thumb": "thumbnails/RX_07875.webp" }, { "name": "photos/RX_07877.jpg", "thumb": "thumbnails/RX_07877.webp" }, { "name": "photos/RX_07881.jpg", "thumb": "thumbnails/RX_07881.webp" }, { "name": "photos/RX_07883.jpg", "thumb": "thumbnails/RX_07883.webp" }, { "name": "photos/RX_07887.jpg", "thumb": "thumbnails/RX_07887.webp" }, { "name": "photos/RX_07896.jpg", "thumb": "thumbnails/RX_07896.webp" }, { "name": "photos/RX_07898.jpg", "thumb": "thumbnails/RX_07898.webp" }, { "name": "photos/RX_07900.jpg", "thumb": "thumbnails/RX_07900.webp" }, { "name": "photos/RX_07903.jpg", "thumb": "thumbnails/RX_07903.webp" }, { "name": "photos/RX_07906.jpg", "thumb": "thumbnails/RX_07906.webp" }, { "name": "photos/RX_07907.jpg", "thumb": "thumbnails/RX_07907.webp" }, { "name": "photos/RX_07908.jpg", "thumb": "thumbnails/RX_07908.webp" }, { "name": "photos/RX_07910.jpg", "thumb": "thumbnails/RX_07910.webp" }, { "name": "photos/RX_07912.jpg", "thumb": "thumbnails/RX_07912.webp" }, { "name": "photos/RX_07914.jpg", "thumb": "thumbnails/RX_07914.webp" }, { "name": "photos/RX_07917.jpg", "thumb": "thumbnails/RX_07917.webp" }, { "name": "photos/RX_07920.jpg", "thumb": "thumbnails/RX_07920.webp" }, { "name": "photos/RX_07930.jpg", "thumb": "thumbnails/RX_07930.webp" }, { "name": "photos/RX_07934.jpg", "thumb": "thumbnails/RX_07934.webp" }, { "name": "photos/RX_07938.jpg", "thumb": "thumbnails/RX_07938.webp" }, { "name": "photos/RX_07945.jpg", "thumb": "thumbnails/RX_07945.webp" }, { "name": "photos/RX_07947.jpg", "thumb": "thumbnails/RX_07947.webp" }, { "name": "photos/RX_07953.jpg", "thumb": "thumbnails/RX_07953.webp" }, { "name": "photos/RX_07954.jpg", "thumb": "thumbnails/RX_07954.webp" }, { "name": "photos/RX_07956.jpg", "thumb": "thumbnails/RX_07956.webp" }, { "name": "photos/RX_07962.jpg", "thumb": "thumbnails/RX_07962.webp" }, { "name": "photos/RX_07963.jpg", "thumb": "thumbnails/RX_07963.webp" }, { "name": "photos/RX_07967.jpg", "thumb": "thumbnails/RX_07967.webp" }, { "name": "photos/RX_07969.jpg", "thumb": "thumbnails/RX_07969.webp" }, { "name": "photos/RX_07970.jpg", "thumb": "thumbnails/RX_07970.webp" }, { "name": "photos/RX_07975.jpg", "thumb": "thumbnails/RX_07975.webp" }, { "name": "photos/RX_07977.jpg", "thumb": "thumbnails/RX_07977.webp" }, { "name": "photos/RX_07982.jpg", "thumb": "thumbnails/RX_07982.webp" }, { "name": "photos/RX_07983.jpg", "thumb": "thumbnails/RX_07983.webp" }, { "name": "photos/RX_07987.jpg", "thumb": "thumbnails/RX_07987.webp" }, { "name": "photos/RX_07988.jpg", "thumb": "thumbnails/RX_07988.webp" }, { "name": "photos/RX_07992.jpg", "thumb": "thumbnails/RX_07992.webp" }, { "name": "photos/RX_07993.jpg", "thumb": "thumbnails/RX_07993.webp" }, { "name": "photos/RX_08017.jpg", "thumb": "thumbnails/RX_08017.webp" }, { "name": "photos/RX_08018.jpg", "thumb": "thumbnails/RX_08018.webp" }, { "name": "photos/RX_08039.jpg", "thumb": "thumbnails/RX_08039.webp" }, { "name": "photos/RX_08044.jpg", "thumb": "thumbnails/RX_08044.webp" }, { "name": "photos/RX_08060.jpg", "thumb": "thumbnails/RX_08060.webp" }, { "name": "photos/RX_08080.jpg", "thumb": "thumbnails/RX_08080.webp" }, { "name": "photos/RX_08097.jpg", "thumb": "thumbnails/RX_08097.webp" }, { "name": "photos/RX_08098.jpg", "thumb": "thumbnails/RX_08098.webp" }, { "name": "photos/RX_08102.jpg", "thumb": "thumbnails/RX_08102.webp" }, { "name": "photos/RX_08118.jpg", "thumb": "thumbnails/RX_08118.webp" }, { "name": "photos/RX_08119.jpg", "thumb": "thumbnails/RX_08119.webp" }, { "name": "photos/RX_08122.jpg", "thumb": "thumbnails/RX_08122.webp" }];
+        const IMAGES = [{"name": "photos/DSC_7854.jpg", "thumb": "thumbnails/DSC_7854.webp"}, {"name": "photos/DSC_7855.jpg", "thumb": "thumbnails/DSC_7855.webp"}, {"name": "photos/DSC_7856.jpg", "thumb": "thumbnails/DSC_7856.webp"}, {"name": "photos/DSC_7858.jpg", "thumb": "thumbnails/DSC_7858.webp"}, {"name": "photos/DSC_7859.jpg", "thumb": "thumbnails/DSC_7859.webp"}, {"name": "photos/DSC_7861.jpg", "thumb": "thumbnails/DSC_7861.webp"}, {"name": "photos/DSC_7862.jpg", "thumb": "thumbnails/DSC_7862.webp"}, {"name": "photos/DSC_7865.jpg", "thumb": "thumbnails/DSC_7865.webp"}, {"name": "photos/DSC_7868.jpg", "thumb": "thumbnails/DSC_7868.webp"}, {"name": "photos/DSC_7869.jpg", "thumb": "thumbnails/DSC_7869.webp"}, {"name": "photos/DSC_7870.jpg", "thumb": "thumbnails/DSC_7870.webp"}, {"name": "photos/DSC_7877.jpg", "thumb": "thumbnails/DSC_7877.webp"}, {"name": "photos/DSC_7881.jpg", "thumb": "thumbnails/DSC_7881.webp"}, {"name": "photos/DSC_7883.jpg", "thumb": "thumbnails/DSC_7883.webp"}, {"name": "photos/DSC_7884.jpg", "thumb": "thumbnails/DSC_7884.webp"}, {"name": "photos/DSC_7890.jpg", "thumb": "thumbnails/DSC_7890.webp"}, {"name": "photos/DSC_7891.jpg", "thumb": "thumbnails/DSC_7891.webp"}, {"name": "photos/DSC_7893.jpg", "thumb": "thumbnails/DSC_7893.webp"}, {"name": "photos/DSC_7896.jpg", "thumb": "thumbnails/DSC_7896.webp"}, {"name": "photos/DSC_7897.jpg", "thumb": "thumbnails/DSC_7897.webp"}, {"name": "photos/DSC_7898.jpg", "thumb": "thumbnails/DSC_7898.webp"}, {"name": "photos/DSC_7899.jpg", "thumb": "thumbnails/DSC_7899.webp"}, {"name": "photos/DSC_7901.jpg", "thumb": "thumbnails/DSC_7901.webp"}, {"name": "photos/DSC_7908.jpg", "thumb": "thumbnails/DSC_7908.webp"}, {"name": "photos/DSC_7910.jpg", "thumb": "thumbnails/DSC_7910.webp"}, {"name": "photos/DSC_7911.jpg", "thumb": "thumbnails/DSC_7911.webp"}, {"name": "photos/DSC_7912.jpg", "thumb": "thumbnails/DSC_7912.webp"}, {"name": "photos/DSC_7913.jpg", "thumb": "thumbnails/DSC_7913.webp"}, {"name": "photos/DSC_7914.jpg", "thumb": "thumbnails/DSC_7914.webp"}, {"name": "photos/DSC_7915.jpg", "thumb": "thumbnails/DSC_7915.webp"}, {"name": "photos/DSC_7920.jpg", "thumb": "thumbnails/DSC_7920.webp"}, {"name": "photos/DSC_7921.jpg", "thumb": "thumbnails/DSC_7921.webp"}, {"name": "photos/DSC_7922.jpg", "thumb": "thumbnails/DSC_7922.webp"}, {"name": "photos/DSC_7923.jpg", "thumb": "thumbnails/DSC_7923.webp"}, {"name": "photos/DSC_7924.jpg", "thumb": "thumbnails/DSC_7924.webp"}, {"name": "photos/DSC_7925.jpg", "thumb": "thumbnails/DSC_7925.webp"}, {"name": "photos/DSC_7930.jpg", "thumb": "thumbnails/DSC_7930.webp"}, {"name": "photos/DSC_7932.jpg", "thumb": "thumbnails/DSC_7932.webp"}, {"name": "photos/DSC_7933.jpg", "thumb": "thumbnails/DSC_7933.webp"}, {"name": "photos/DSC_7934.jpg", "thumb": "thumbnails/DSC_7934.webp"}, {"name": "photos/DSC_7936.jpg", "thumb": "thumbnails/DSC_7936.webp"}, {"name": "photos/DSC_7942.jpg", "thumb": "thumbnails/DSC_7942.webp"}, {"name": "photos/DSC_7943.jpg", "thumb": "thumbnails/DSC_7943.webp"}, {"name": "photos/DSC_7944.jpg", "thumb": "thumbnails/DSC_7944.webp"}, {"name": "photos/DSC_7945.jpg", "thumb": "thumbnails/DSC_7945.webp"}, {"name": "photos/DSC_7946.jpg", "thumb": "thumbnails/DSC_7946.webp"}, {"name": "photos/IMG_0353.JPEG", "thumb": "thumbnails/IMG_0353.webp"}, {"name": "photos/PXL_20260718_164545895.jpg", "thumb": "thumbnails/PXL_20260718_164545895.webp"}, {"name": "photos/PXL_20260718_171940569.jpg", "thumb": "thumbnails/PXL_20260718_171940569.webp"}, {"name": "photos/PXL_20260718_171956753.jpg", "thumb": "thumbnails/PXL_20260718_171956753.webp"}, {"name": "photos/PXL_20260718_180102497.jpg", "thumb": "thumbnails/PXL_20260718_180102497.webp"}, {"name": "photos/PXL_20260718_180520363.jpg", "thumb": "thumbnails/PXL_20260718_180520363.webp"}, {"name": "photos/PXL_20260718_180643404.jpg", "thumb": "thumbnails/PXL_20260718_180643404.webp"}, {"name": "photos/PXL_20260718_180723524.jpg", "thumb": "thumbnails/PXL_20260718_180723524.webp"}, {"name": "photos/PXL_20260718_180810301.PANO.jpg", "thumb": "thumbnails/PXL_20260718_180810301.PANO.webp"}, {"name": "photos/PXL_20260718_181144086.jpg", "thumb": "thumbnails/PXL_20260718_181144086.webp"}, {"name": "photos/PXL_20260718_181154891.jpg", "thumb": "thumbnails/PXL_20260718_181154891.webp"}, {"name": "photos/PXL_20260718_181416261.jpg", "thumb": "thumbnails/PXL_20260718_181416261.webp"}, {"name": "photos/PXL_20260718_181525336.jpg", "thumb": "thumbnails/PXL_20260718_181525336.webp"}, {"name": "photos/PXL_20260718_181618393.jpg", "thumb": "thumbnails/PXL_20260718_181618393.webp"}, {"name": "photos/PXL_20260718_181750768.jpg", "thumb": "thumbnails/PXL_20260718_181750768.webp"}, {"name": "photos/PXL_20260718_181851607.jpg", "thumb": "thumbnails/PXL_20260718_181851607.webp"}, {"name": "photos/PXL_20260718_182249827.PANO.jpg", "thumb": "thumbnails/PXL_20260718_182249827.PANO.webp"}, {"name": "photos/dogs.jpeg", "thumb": "thumbnails/dogs.webp"}];
 
         const contactSheet = document.getElementById('contact-sheet');
         const stats = document.getElementById('photo-stats');
         const lightbox = document.getElementById('lightbox');
         const projectorStrip = document.getElementById('projector-strip');
-        const lightboxTitle = null; // replaced by static .lightbox-logo
+        const lightboxTitle = document.getElementById('lightbox-title');
         const filmstrip = document.getElementById('filmstrip');
-
+        
         const btnClose = document.getElementById('btn-close');
         const btnPrev = document.getElementById('btn-prev');
         const btnNext = document.getElementById('btn-next');
@@ -929,7 +811,7 @@
         function renderContactSheet() {
             const containerWidth = contactSheet.clientWidth || window.innerWidth;
             // Target frame size is roughly 280px.
-            const targetFrameWidth = 280;
+            const targetFrameWidth = 280; 
             let framesPerRow = Math.floor(containerWidth / targetFrameWidth);
             if (framesPerRow < 3) framesPerRow = 3; // Force at least 3 slides per row on mobile
 
@@ -942,7 +824,7 @@
 
             for (let i = 0; i < IMAGES.length; i += framesPerRow) {
                 const rowImages = IMAGES.slice(i, i + framesPerRow);
-
+                
                 // Add CSS variable to row for dynamic width calculation
                 const row = document.createElement('div');
                 row.className = 'film-row';
@@ -1038,7 +920,7 @@
 
             const num = Math.floor(idx / 2) + 1;
             const suffix = idx % 2 === 0 ? '' : 'A';
-
+            
             // Meta overlays
             const metaTop = document.createElement('div');
             metaTop.className = 'proj-meta-top';
@@ -1057,13 +939,13 @@
                     updateProjectorPosition();
                 }
             };
-
+            
             filmContainer.appendChild(sprocketsTop);
             filmContainer.appendChild(metaTop);
             filmContainer.appendChild(image);
             filmContainer.appendChild(metaBottom);
             filmContainer.appendChild(sprocketsBottom);
-
+            
             frame.appendChild(filmContainer);
             projectorStrip.appendChild(frame);
 
@@ -1082,7 +964,7 @@
             lightbox.focus();
             navigateTo(index, true);
             document.body.style.overflow = 'hidden';
-
+            
             // Trigger recalculation in case layout resized
             setTimeout(updateProjectorPosition, 50);
         }
@@ -1099,7 +981,7 @@
 
             const viewportWidth = document.querySelector('.projector-viewport').clientWidth;
             const frameWidth = activeFrame.clientWidth;
-
+            
             // Calculate translation to perfectly center the active frame
             const leftOffset = activeFrame.offsetLeft;
             const translateX = (viewportWidth / 2) - leftOffset - (frameWidth / 2);
@@ -1142,8 +1024,10 @@
             }
 
             currentIndex = index;
-
-            // (title is static LIGHTBOX logo — no filename update needed)
+            
+            // Display filename clean (without path)
+            const cleanName = IMAGES[currentIndex].name.split('/').pop();
+            lightboxTitle.textContent = cleanName;
 
             // Highlight thumbnail strip
             const thumbs = filmstrip.children;
@@ -1210,9 +1094,9 @@
         function resetSlideshowTimer() {
             if (slideshowInterval) clearInterval(slideshowInterval);
             slideshowProgress.style.width = '0%';
-
+            
             slideshowStartTime = Date.now();
-
+            
             slideshowInterval = setInterval(() => {
                 navigateTo(currentIndex + 1, true);
             }, SLIDESHOW_DURATION);
@@ -1225,7 +1109,7 @@
             const elapsed = Date.now() - slideshowStartTime;
             const pct = Math.min((elapsed / SLIDESHOW_DURATION) * 100, 100);
             slideshowProgress.style.width = `${pct}%`;
-
+            
             if (elapsed < SLIDESHOW_DURATION) {
                 slideshowAnimationIdx = requestAnimationFrame(animateProgressBar);
             }
@@ -1267,7 +1151,7 @@
         // B&W Toggle functionality
         const btnToggleBw = document.getElementById('btn-toggle-bw');
         const btnLightboxBw = document.querySelector('.btn-bw-toggle');
-
+        
         function toggleBwMode() {
             document.body.classList.toggle('grayscale-mode');
             const isGrayscale = document.body.classList.contains('grayscale-mode');
@@ -1350,8 +1234,8 @@
 
         document.addEventListener('keydown', (e) => {
             if (!lightbox.classList.contains('active')) return;
-
-            switch (e.key) {
+            
+            switch(e.key) {
                 case 'ArrowRight':
                     nextImage();
                     break;
@@ -1407,7 +1291,7 @@
         brightnessSliders.forEach(slider => {
             slider.addEventListener('input', (e) => {
                 const val = parseInt(e.target.value, 10);
-
+                
                 // Sync all sliders
                 brightnessSliders.forEach(s => {
                     if (s !== e.target) s.value = val;
@@ -1422,17 +1306,17 @@
                 document.documentElement.style.setProperty('--overlay-bg', hex);
                 document.documentElement.style.setProperty('--logo-color', invHex);
                 document.documentElement.style.setProperty('--text-color', isLight ? '#111827' : '#f3f4f6');
-                document.documentElement.style.setProperty('--text-muted', isLight ? '#4b5563' : '#9ca3af');
-                document.documentElement.style.setProperty('--control-bg', isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.05)');
-                document.documentElement.style.setProperty('--control-hover', isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.12)');
+            document.documentElement.style.setProperty('--text-muted', isLight ? '#4b5563' : '#9ca3af');
+            document.documentElement.style.setProperty('--control-bg', isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.05)');
+            document.documentElement.style.setProperty('--control-hover', isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.12)');
 
-                let styleEl = document.getElementById('dynamic-sprockets');
-                if (!styleEl) {
-                    styleEl = document.createElement('style');
-                    styleEl.id = 'dynamic-sprockets';
-                    document.head.appendChild(styleEl);
-                }
-                styleEl.textContent = `
+            let styleEl = document.getElementById('dynamic-sprockets');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'dynamic-sprockets';
+                document.head.appendChild(styleEl);
+            }
+            styleEl.textContent = `
                 .sprockets-top, .sprockets-bottom {
                     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><rect x="7" y="6" width="14" height="16" rx="3" ry="3" fill="%23${hex.substring(1)}"/></svg>');
                 }
@@ -1530,11 +1414,11 @@
                 iconSoundOn.style.display = 'block';
                 iconSoundOff.style.display = 'none';
                 btnSoundToggle.style.color = 'var(--accent-color)';
+                initAudio();
             }
         }
         btnSoundToggle.addEventListener('click', toggleSound);
         btnSoundToggle.style.color = 'var(--accent-color)'; // Default ON
     </script>
 </body>
-
 </html>
