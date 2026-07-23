@@ -387,6 +387,28 @@
             position: relative;
         }
 
+        .proj-image-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            min-width: 40vw; /* Placeholder width so the strip isn't squished before images load */
+        }
+
+        .proj-loading-placeholder {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--accent-color);
+            font-family: var(--monospace-font);
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+
         .projector-film-container img {
             display: block;
             max-height: 100%;
@@ -398,6 +420,8 @@
             opacity: 0.25; /* Dimmed left-right images only */
             filter: invert(1); /* Default to Negative on sides */
             transition: opacity 0.45s ease, filter 1.5s ease-in-out;
+            position: relative;
+            z-index: 20;
         }
 
         .grayscale-mode .projector-film-container img {
@@ -1055,19 +1079,35 @@
             const modelText = img.model ? img.model.toUpperCase() : "PROCESS C-41";
             metaBottom.innerHTML = `<span>▶ ${idx + 1} &nbsp;&bull;&nbsp; ${cleanName}</span><span class="process-text">${modelText} &nbsp;&bull;&nbsp; ${exifText}</span>`;
 
+            const imageWrapper = document.createElement('div');
+            imageWrapper.className = 'proj-image-wrapper';
+            
+            const placeholder = document.createElement('div');
+            placeholder.className = 'proj-loading-placeholder';
+            placeholder.innerHTML = `<div class="spinner"></div><div class="progress-text">LOADING...</div>`;
+            
             const image = document.createElement('img');
-            image.src = img.data ? `data:image/webp;base64,${img.data}` : img.name;
+            image.src = img.name;
             image.alt = img.name;
             image.loading = 'lazy';
-            image.onload = () => {
-                if (lightbox.classList.contains('active')) {
-                    updateProjectorPosition();
-                }
-            };
+            
+            if (image.complete) {
+                placeholder.style.display = 'none';
+            } else {
+                image.onload = () => {
+                    placeholder.style.display = 'none';
+                    if (lightbox.classList.contains('active')) {
+                        updateProjectorPosition();
+                    }
+                };
+            }
+            
+            imageWrapper.appendChild(placeholder);
+            imageWrapper.appendChild(image);
             
             filmContainer.appendChild(sprocketsTop);
             filmContainer.appendChild(metaTop);
-            filmContainer.appendChild(image);
+            filmContainer.appendChild(imageWrapper);
             filmContainer.appendChild(metaBottom);
             filmContainer.appendChild(sprocketsBottom);
             
