@@ -13,6 +13,12 @@ A highly stylized, fully client-side single-page photo gallery designed to emula
 
 ## How to Deploy
 
+### Prerequisites
+The gallery compiler requires Python 3 and the Pillow library for image processing. Install the required package if you haven't already:
+```bash
+pip install Pillow
+```
+
 To deploy or update the gallery with your own photos:
 
 1. **Prepare your images**:
