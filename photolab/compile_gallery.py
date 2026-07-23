@@ -262,12 +262,34 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             filter: brightness(1.05) grayscale(100%) invert(1); /* Negative on hover */
         }
 
+        .frame-meta-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 0.2rem;
+            box-sizing: border-box;
+        }
+
         .frame-label {
             font-family: var(--monospace-font);
             font-size: 0.7rem;
             color: var(--accent-color);
-            text-align: center;
+            text-align: right;
             opacity: 0.7;
+        }
+        
+        .frame-filename {
+            font-family: var(--monospace-font);
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            text-align: left;
+            opacity: 0.8;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 0.5rem;
         }
 
         /* Lightbox / Slideshow (Continuous Filmstrip Mode) */
@@ -972,12 +994,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     frame.appendChild(image);
                     frameContainer.appendChild(frame);
 
+                    const metaContainer = document.createElement('div');
+                    metaContainer.className = 'frame-meta-container';
+                    
+                    const filenameLabel = document.createElement('div');
+                    filenameLabel.className = 'frame-filename';
+                    filenameLabel.textContent = img.name.split('/').pop();
+                    metaContainer.appendChild(filenameLabel);
+
                     const label = document.createElement('div');
                     label.className = 'frame-label';
                     const num = Math.floor(currentIdx / 2) + 1;
                     const suffix = currentIdx % 2 === 0 ? '' : 'A';
                     label.textContent = `${num}${suffix}`;
-                    frameContainer.appendChild(label);
+                    metaContainer.appendChild(label);
+                    
+                    frameContainer.appendChild(metaContainer);
 
                     framesContainer.appendChild(frameContainer);
                 });
@@ -1032,7 +1064,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             const metaBottom = document.createElement('div');
             metaBottom.className = 'proj-meta-bottom';
             const cleanName = img.name.split('/').pop();
-            metaBottom.innerHTML = `<span>▶ ${idx + 1} &nbsp;&bull;&nbsp; ${cleanName}</span><span class="process-text">PROCESS C-41 &nbsp;&bull;&nbsp; ROLL_01</span>`;
+            const exifText = img.exif ? img.exif : "ROLL_01";
+            const modelText = img.model ? img.model.toUpperCase() : "PROCESS C-41";
+            metaBottom.innerHTML = `<span>▶ ${idx + 1} &nbsp;&bull;&nbsp; ${cleanName}</span><span class="process-text">${modelText} &nbsp;&bull;&nbsp; ${exifText}</span>`;
 
             const image = document.createElement('img');
             image.src = img.data ? `data:image/webp;base64,${img.data}` : img.name;
@@ -1549,6 +1583,65 @@ def generate_thumbnail(filename):
         print(f"Error generating thumbnail for {filename}: {e}", file=sys.stderr)
         return None
 
+def extract_exif_data(filepath):
+    result = {"settings": None, "model": "PROCESS C-41"}
+    try:
+        from PIL import Image, ExifTags
+        with Image.open(filepath) as img:
+            exif_data = img._getexif()
+            if not exif_data:
+                return result
+            
+            tags = {ExifTags.TAGS.get(k, k): v for k, v in exif_data.items()}
+            
+            model = tags.get('Model')
+            if model:
+                if isinstance(model, bytes):
+                    model = model.decode('utf-8', errors='ignore')
+                model_str = str(model).strip('\x00').strip()
+                if model_str:
+                    result["model"] = model_str
+            
+            settings = []
+            
+            exp = tags.get('ExposureTime')
+            if exp:
+                try:
+                    val = float(exp)
+                    if val >= 1:
+                        settings.append(f"{val:g}s")
+                    else:
+                        settings.append(f"1/{int(round(1/val))}s")
+                except Exception:
+                    pass
+                    
+            fnum = tags.get('FNumber')
+            if fnum:
+                try:
+                    val = float(fnum)
+                    s = f"{val:.1f}".rstrip('0').rstrip('.')
+                    settings.append(f"f/{s}")
+                except Exception:
+                    pass
+                    
+            iso = tags.get('ISOSpeedRatings')
+            if iso:
+                settings.append(f"ISO{iso}")
+                
+            focal = tags.get('FocalLength')
+            if focal:
+                try:
+                    val = float(focal)
+                    settings.append(f"{int(round(val))}mm")
+                except Exception:
+                    pass
+                    
+            if settings:
+                result["settings"] = ", ".join(settings)
+    except Exception:
+        pass
+    return result
+
 def main():
     print("Scanning 'photos' directory for JPG/PNG images...")
     images = get_images()
@@ -1563,9 +1656,13 @@ def main():
         print(f"[{idx+1}/{len(images)}] Processing {f}...")
         thumb_path = generate_thumbnail(f)
         if thumb_path:
+            full_path = os.path.join("photos", f)
+            exif_data = extract_exif_data(full_path)
             index_data_list.append({
-                "name": f"photos/{f}",
-                "thumb": thumb_path
+                "name": full_path,
+                "thumb": thumb_path,
+                "exif": exif_data["settings"],
+                "model": exif_data["model"]
             })
             
     print(f"Successfully processed {len(index_data_list)} images.")
