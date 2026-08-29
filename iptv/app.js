@@ -174,6 +174,7 @@
     muted: localStorage.getItem('nova_muted') === 'true',
     streamHealth: loadStreamHealth(),
     hideOffline: localStorage.getItem('nova_hide_offline') === 'true',
+    subtitlesEnabled: localStorage.getItem('nova_subtitles') === 'true',
     isProbing: false
   };
 
@@ -295,7 +296,9 @@
     castStreamUrlInput: document.getElementById('cast-stream-url-input'),
     modalCopyStreamBtn: document.getElementById('modal-copy-stream-btn'),
     modalChromecastBtn: document.getElementById('modal-chromecast-btn'),
-    modalAirplayBtn: document.getElementById('modal-airplay-btn')
+    modalAirplayBtn: document.getElementById('modal-airplay-btn'),
+    ctrlCcBtn: document.getElementById('ctrl-cc-btn'),
+    fsCcBtn: document.getElementById('fs-cc-btn')
   };
 
   // --- Fast In-Browser M3U Parser ---
@@ -1160,7 +1163,67 @@
     }
 
     // Load Stream in Player
+    clearOldSubtitles();
     setupHlsPlayer(streamUrl, ch);
+  }
+
+  // --- Subtitles & Closed Captions Management ---
+  function clearOldSubtitles() {
+    const video = els.video;
+    if (!video) return;
+
+    // 1. Remove all child <track> DOM elements
+    video.querySelectorAll('track').forEach(t => t.remove());
+
+    // 2. Disable and purge all native TextTracks cues from screen
+    if (video.textTracks) {
+      for (let i = 0; i < video.textTracks.length; i++) {
+        try {
+          const track = video.textTracks[i];
+          track.mode = 'disabled';
+          if (track.cues && track.removeCue) {
+            for (let j = track.cues.length - 1; j >= 0; j--) {
+              try { track.removeCue(track.cues[j]); } catch (e) {}
+            }
+          }
+        } catch (e) {}
+      }
+    }
+
+    // 3. Clear Hls subtitle tracks
+    if (hls) {
+      try {
+        hls.subtitleTrack = -1;
+        hls.subtitleDisplay = false;
+      } catch (e) {}
+    }
+  }
+
+  function applySubtitleState() {
+    const video = els.video;
+    if (!video) return;
+
+    if (!state.subtitlesEnabled) {
+      clearOldSubtitles();
+    } else {
+      if (hls && hls.subtitleTracks && hls.subtitleTracks.length > 0) {
+        hls.subtitleDisplay = true;
+        hls.subtitleTrack = 0;
+      } else if (video.textTracks && video.textTracks.length > 0) {
+        video.textTracks[0].mode = 'showing';
+      }
+    }
+
+    [els.ctrlCcBtn, els.fsCcBtn].forEach(btn => {
+      if (btn) btn.classList.toggle('cc-active', state.subtitlesEnabled);
+    });
+  }
+
+  function toggleSubtitles() {
+    state.subtitlesEnabled = !state.subtitlesEnabled;
+    localStorage.setItem('nova_subtitles', state.subtitlesEnabled.toString());
+    applySubtitleState();
+    showToast(state.subtitlesEnabled ? 'Subtitles ON (Compact font)' : 'Subtitles OFF (Cleared)', '💬');
   }
 
   function setupHlsPlayer(url, ch) {
@@ -1168,6 +1231,8 @@
       hls.destroy();
       hls = null;
     }
+
+    clearOldSubtitles();
 
     const video = els.video;
 
@@ -1178,7 +1243,9 @@
         lowLatencyMode: true,
         manifestLoadingTimeOut: 12000,
         levelLoadingTimeOut: 12000,
-        fragLoadingTimeOut: 15000
+        fragLoadingTimeOut: 15000,
+        enableCEA708Captions: state.subtitlesEnabled,
+        subtitleDisplay: state.subtitlesEnabled
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
@@ -1220,6 +1287,7 @@
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         updateChannelRowStatus(ch.id, 'online');
+        applySubtitleState();
         video.play().catch(err => {
           console.warn('Autoplay prevented:', err);
           showToast('Click play to begin streaming', '▶️');
@@ -1833,6 +1901,11 @@
       if (btn) btn.addEventListener('click', startCasting);
     });
 
+    // Subtitles CC Buttons
+    [els.ctrlCcBtn, els.fsCcBtn].forEach(btn => {
+      if (btn) btn.addEventListener('click', toggleSubtitles);
+    });
+
     if (els.closeCastModalBtn) {
       els.closeCastModalBtn.addEventListener('click', closeCastModal);
     }
@@ -2021,6 +2094,10 @@
           e.preventDefault();
           startCasting();
           break;
+        case 'KeyS':
+          e.preventDefault();
+          toggleSubtitles();
+          break;
       }
     });
   }
@@ -2041,6 +2118,7 @@
     updateProxyBadge();
     setVolume(state.volume);
     initCastFramework();
+    applySubtitleState();
     setupEventListeners();
     loadPlaylist();
   }

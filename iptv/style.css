@@ -1994,6 +1994,53 @@ html, body {
   color: #bae6fd;
 }
 
+/* Subtitles / CC Button Styling */
+.ctrl-btn.cc-active,
+.fs-cc-btn.cc-active {
+  background: rgba(34, 197, 94, 0.35) !important;
+  border-color: #22c55e !important;
+  color: #86efac !important;
+}
+
+.fs-cc-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+
+.fs-cc-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ==========================================================================
+   SUBTITLES / CLOSED CAPTIONS STYLING (CRISP, COMPACT & BEAUTIFUL)
+   ========================================================================== */
+
+video::cue {
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 0.8rem !important; /* Clean, compact, non-intrusive */
+  line-height: 1.35 !important;
+  color: #ffffff !important;
+  background-color: rgba(10, 15, 29, 0.84) !important;
+  border-radius: 4px !important;
+  padding: 3px 8px !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
+  white-space: pre-line !important;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+@media (max-width: 768px), (max-height: 520px) {
+  video::cue {
+    font-size: 0.7rem !important; /* Extra small and clean on mobile / landscape */
+    line-height: 1.25 !important;
+    padding: 2px 6px !important;
+  }
+}
+
 .cast-dialog {
   max-width: 560px;
 }

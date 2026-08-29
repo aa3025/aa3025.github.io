@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -353,6 +353,9 @@
             <span class="fs-live-badge">LIVE</span>
           </div>
           <div class="fs-top-actions">
+            <button class="fs-vlc-btn fs-cc-btn" id="fs-cc-btn" title="Toggle Subtitles / Captions">
+              <span>CC</span>
+            </button>
             <button class="fs-vlc-btn fs-cast-btn" id="fs-cast-btn" title="Cast to Smart TV / Chromecast / AirPlay">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
@@ -440,6 +443,15 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
                 <line x1="2" y1="20" x2="2.01" y2="20"></line>
+              </svg>
+            </button>
+
+            <!-- Subtitles / Closed Captions Toggle Button -->
+            <button class="ctrl-btn" id="ctrl-cc-btn" title="Toggle Subtitles / Closed Captions">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+                <path d="M7 15h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H7v6z"></path>
+                <path d="M15 15h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2v6z"></path>
               </svg>
             </button>
 
@@ -583,6 +595,6 @@
   </div>
 
   <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-  <script src="app.js?v=13"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>
