@@ -1683,31 +1683,30 @@
 
   // --- Cast & AirPlay Integration ---
   function initCastFramework() {
-    window.__onGCastApiAvailable = function(isAvailable) {
-      if (isAvailable && window.cast && window.cast.framework) {
-        try {
-          cast.framework.CastContext.getInstance().setOptions({
-            receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-            autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-          });
-          const context = cast.framework.CastContext.getInstance();
-          context.addEventListener(
-            cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
-            (event) => {
-              if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
-                loadMediaOnCastSession();
-                updateCastButtons(true);
-              } else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
-                updateCastButtons(false);
-              }
+    if (window.cast && window.cast.framework) {
+      try {
+        cast.framework.CastContext.getInstance().setOptions({
+          receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+          autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+        });
+        const context = cast.framework.CastContext.getInstance();
+        context.addEventListener(
+          cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
+          (event) => {
+            if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
+              loadMediaOnCastSession();
+              updateCastButtons(true);
+            } else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
+              updateCastButtons(false);
             }
-          );
-        } catch (e) {
-          console.warn('Cast init:', e);
-        }
+          }
+        );
+      } catch (e) {
+        console.warn('Cast init:', e);
       }
-    };
+    }
   }
+  window.initGoogleCast = initCastFramework;
 
   function updateCastButtons(isCasting) {
     [els.fsCastBtn, els.ctrlCastBtn, els.vTopCastBtn].forEach(btn => {
@@ -1789,10 +1788,32 @@
       return;
     }
 
-    if (els.castPreviewFlag) els.castPreviewFlag.textContent = state.currentChannel.flag || '🌐';
-    if (els.castPreviewName) els.castPreviewName.textContent = state.currentChannel.name;
-    if (els.castPreviewMeta) els.castPreviewMeta.textContent = `${state.currentChannel.country_name || 'Global'} • ${state.currentChannel.group || 'Live'} • ${state.currentChannel.quality || 'HD'}`;
-    if (els.castStreamUrlInput) els.castStreamUrlInput.value = state.currentChannel.url;
+    const ch = state.currentChannel;
+    if (els.castPreviewFlag) els.castPreviewFlag.textContent = ch.flag || '🌐';
+    if (els.castPreviewName) els.castPreviewName.textContent = ch.name;
+    if (els.castPreviewMeta) els.castPreviewMeta.textContent = `${ch.country_name || 'Global'} • ${ch.group || 'Live'} • ${ch.quality || 'HD'}`;
+    if (els.castStreamUrlInput) els.castStreamUrlInput.value = ch.url;
+
+    const isHttps = ch.url.startsWith('https://');
+    const compatEl = document.getElementById('cast-compat-status');
+    if (compatEl) {
+      if (isHttps) {
+        compatEl.innerHTML = '<span style="color: #4ade80;">🟢 Secure HTTPS Stream</span> • Compatible with Chromecast & AirPlay';
+      } else {
+        compatEl.innerHTML = '<span style="color: #fbbf24;">⚠️ Plain HTTP Stream</span> • Smart TVs block HTTP on secure receivers. Use VLC on TV';
+      }
+    }
+
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+
+    const googleCard = document.getElementById('card-google-cast');
+    const airplayCard = document.getElementById('card-airplay');
+
+    if (googleCard && airplayCard) {
+      googleCard.style.borderColor = isChrome ? 'var(--accent-primary)' : '';
+      airplayCard.style.borderColor = isSafari ? 'var(--accent-primary)' : '';
+    }
 
     if (els.castModal) els.castModal.style.display = 'flex';
   }
@@ -1806,27 +1827,6 @@
       showToast('Select a channel first to cast', '⚠️');
       return;
     }
-
-    // 1. Try native Apple AirPlay first if on Safari/iOS
-    if (triggerAirPlay()) {
-      return;
-    }
-
-    // 2. Try Google Cast framework directly
-    if (triggerGoogleCast()) {
-      return;
-    }
-
-    // 3. Try Remote Playback API
-    if (els.video && els.video.remote && typeof els.video.remote.prompt === 'function') {
-      els.video.remote.prompt().then(
-        () => showToast('Connected to remote TV', '📺'),
-        () => openCastModal()
-      ).catch(() => openCastModal());
-      return;
-    }
-
-    // 4. Open Universal Cast Modal
     openCastModal();
   }
 

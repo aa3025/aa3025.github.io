@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=23">
+  <link rel="stylesheet" href="style.css?v=24">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -292,7 +292,7 @@
 
       <!-- Video Player Container (Cinema 16:9 Stage) -->
       <div class="video-container" id="video-container">
-        <video id="iptv-video" playsinline webkit-playsinline preload="auto"></video>
+        <video id="iptv-video" playsinline webkit-playsinline x-webkit-airplay="allow" airplay="allow" preload="auto"></video>
 
         <!-- Initial Placeholder State (Before channel selected) -->
         <div class="player-placeholder" id="player-placeholder">
@@ -544,6 +544,7 @@
           <div class="cast-preview-info">
             <h4 id="cast-preview-name">Select a channel to stream</h4>
             <span id="cast-preview-meta">Direct HLS Live Broadcast</span>
+            <div class="cast-compat-status" id="cast-compat-status" style="margin-top: 4px; font-size: 0.76rem; font-weight: 600;"></div>
           </div>
         </div>
 
@@ -597,7 +598,14 @@
     </div>
   </div>
 
+  <script>
+    window['__onGCastApiAvailable'] = function(isAvailable) {
+      if (isAvailable && window.initGoogleCast) {
+        window.initGoogleCast();
+      }
+    };
+  </script>
   <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-  <script src="app.js?v=23"></script>
+  <script src="app.js?v=24"></script>
 </body>
 </html>
