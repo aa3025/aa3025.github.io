@@ -2354,7 +2354,16 @@ video::cue {
 
   .channel-actions-right {
     gap: 6px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100%;
+    padding-bottom: 2px;
+  }
+
+  .channel-actions-right::-webkit-scrollbar {
+    display: none;
   }
 
   .vlc-action-btn {
@@ -2488,8 +2497,10 @@ video::cue {
     display: none;
   }
 
-  .stage-footer {
-    display: none;
+  .player-footer,
+  .stage-footer,
+  .shortcuts-row {
+    display: none !important;
   }
 
   /* SIDEBAR PANEL (NATURALLY SCROLLABLE UNDER VIDEO) */
