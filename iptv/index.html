@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=13">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -269,6 +269,15 @@
             <span>Copy URL</span>
           </button>
 
+          <!-- Cast to TV / Chromecast / AirPlay Button -->
+          <button class="action-btn cast-btn" id="cast-header-btn" title="Cast to Smart TV / Chromecast / AirPlay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+              <line x1="2" y1="20" x2="2.01" y2="20"></line>
+            </svg>
+            <span>Cast</span>
+          </button>
+
           <!-- CORS Proxy Switcher -->
           <button class="action-btn proxy-btn" id="toggle-cors-proxy-btn" title="Toggle Public CORS Proxy fallback">
             <span class="proxy-dot" id="proxy-dot"></span>
@@ -344,6 +353,13 @@
             <span class="fs-live-badge">LIVE</span>
           </div>
           <div class="fs-top-actions">
+            <button class="fs-vlc-btn fs-cast-btn" id="fs-cast-btn" title="Cast to Smart TV / Chromecast / AirPlay">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+                <line x1="2" y1="20" x2="2.01" y2="20"></line>
+              </svg>
+              <span>Cast</span>
+            </button>
             <button class="fs-vlc-btn" id="fs-vlc-btn" title="Open in VLC">
               <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 3 20 21 20 12 2"></polygon></svg>
               <span>VLC</span>
@@ -419,6 +435,14 @@
             <!-- Bitrate / Level tag -->
             <span class="stream-info-tag" id="stream-info-tag">Live</span>
 
+            <!-- Cast Button in Video Overlay -->
+            <button class="ctrl-btn" id="ctrl-cast-btn" title="Cast to Smart TV / Chromecast / AirPlay">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+                <line x1="2" y1="20" x2="2.01" y2="20"></line>
+              </svg>
+            </button>
+
             <!-- Picture-in-Picture -->
             <button class="ctrl-btn" id="ctrl-pip-btn" title="Picture in Picture (P)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -486,6 +510,79 @@
     </div>
   </div>
 
-  <script src="app.js?v=12"></script>
+  <!-- Cast & Smart TV Stream Modal -->
+  <div class="modal-overlay" id="cast-modal" style="display: none;">
+    <div class="modal-dialog cast-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-title-icon">
+            <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+            <line x1="2" y1="20" x2="2.01" y2="20"></line>
+          </svg>
+          <h3>Cast to Smart TV & Remote Devices</h3>
+        </div>
+        <button class="modal-close" id="close-cast-modal-btn">✕</button>
+      </div>
+      <div class="modal-content">
+        <div class="cast-channel-preview" id="cast-channel-preview">
+          <span class="cast-preview-flag" id="cast-preview-flag">🌍</span>
+          <div class="cast-preview-info">
+            <h4 id="cast-preview-name">Select a channel to stream</h4>
+            <span id="cast-preview-meta">Direct HLS Live Broadcast</span>
+          </div>
+        </div>
+
+        <div class="cast-options-grid">
+          <!-- Chromecast / Google Cast Option -->
+          <div class="cast-option-card" id="card-google-cast">
+            <div class="cast-card-icon">📺</div>
+            <div class="cast-card-body">
+              <strong>Chromecast / Google TV</strong>
+              <p>Beam directly to Chromecast, Google TV, or Android TV on Wi-Fi.</p>
+              <button class="primary-btn cast-action-trigger" id="modal-chromecast-btn">
+                <span>Connect & Cast</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Apple AirPlay Option -->
+          <div class="cast-option-card" id="card-airplay">
+            <div class="cast-card-icon">📡</div>
+            <div class="cast-card-body">
+              <strong>Apple AirPlay / Apple TV</strong>
+              <p>Stream to Apple TV, Mac, or AirPlay 2 smart TV (Samsung, LG, Sony).</p>
+              <button class="secondary-btn cast-action-trigger" id="modal-airplay-btn">
+                <span>AirPlay Picker</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Smart TV / VLC / Roku Stream Link Box -->
+        <div class="cast-manual-box">
+          <div class="cast-manual-title">
+            <span>Direct Stream URL (For Fire TV, Roku, Smart IPTV & VLC):</span>
+          </div>
+          <div class="modal-input-group">
+            <input type="text" id="cast-stream-url-input" readonly class="modal-text-input" value="">
+            <button class="primary-btn vlc-btn" id="modal-copy-stream-btn">Copy URL</button>
+          </div>
+          <div class="cast-tip-list">
+            <div class="cast-tip-item">
+              <span class="tip-num">1</span>
+              <span><strong>Fire TV / Apple TV / Roku / Google TV:</strong> Open the free <em>VLC</em> or <em>Web Video Caster</em> app on your TV.</span>
+            </div>
+            <div class="cast-tip-item">
+              <span class="tip-num">2</span>
+              <span>Select <strong>"Open Network Stream"</strong> and paste this URL to play full screen with zero lag.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>

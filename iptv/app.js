@@ -283,7 +283,19 @@
     filtersCollapseIcon: document.getElementById('filters-collapse-icon'),
     filtersCollapseText: document.getElementById('filters-collapse-text'),
     activeChipsContainer: document.getElementById('active-chips-container'),
-    miniCheckHealthBtn: document.getElementById('mini-check-health-btn')
+    miniCheckHealthBtn: document.getElementById('mini-check-health-btn'),
+    castHeaderBtn: document.getElementById('cast-header-btn'),
+    fsCastBtn: document.getElementById('fs-cast-btn'),
+    ctrlCastBtn: document.getElementById('ctrl-cast-btn'),
+    castModal: document.getElementById('cast-modal'),
+    closeCastModalBtn: document.getElementById('close-cast-modal-btn'),
+    castPreviewFlag: document.getElementById('cast-preview-flag'),
+    castPreviewName: document.getElementById('cast-preview-name'),
+    castPreviewMeta: document.getElementById('cast-preview-meta'),
+    castStreamUrlInput: document.getElementById('cast-stream-url-input'),
+    modalCopyStreamBtn: document.getElementById('modal-copy-stream-btn'),
+    modalChromecastBtn: document.getElementById('modal-chromecast-btn'),
+    modalAirplayBtn: document.getElementById('modal-airplay-btn')
   };
 
   // --- Fast In-Browser M3U Parser ---
@@ -1429,6 +1441,158 @@
     showToast('Favorites exported to JSON', '💾');
   }
 
+  // --- Cast & AirPlay Integration ---
+  function initCastFramework() {
+    window.__onGCastApiAvailable = function(isAvailable) {
+      if (isAvailable && window.cast && window.cast.framework) {
+        try {
+          cast.framework.CastContext.getInstance().setOptions({
+            receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+            autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+          });
+          const context = cast.framework.CastContext.getInstance();
+          context.addEventListener(
+            cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
+            (event) => {
+              if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
+                loadMediaOnCastSession();
+                updateCastButtons(true);
+              } else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
+                updateCastButtons(false);
+              }
+            }
+          );
+        } catch (e) {
+          console.warn('Cast init:', e);
+        }
+      }
+    };
+  }
+
+  function updateCastButtons(isCasting) {
+    [els.castHeaderBtn, els.fsCastBtn, els.ctrlCastBtn].forEach(btn => {
+      if (btn) btn.classList.toggle('casting', !!isCasting);
+    });
+  }
+
+  function loadMediaOnCastSession() {
+    if (!state.currentChannel) return;
+    if (!window.cast || !window.cast.framework) return;
+    const session = cast.framework.CastContext.getInstance().getCurrentSession();
+    if (!session) return;
+
+    let streamUrl = state.currentChannel.url;
+    if (state.useCorsProxy) {
+      streamUrl = `https://corsproxy.io/?url=${encodeURIComponent(state.currentChannel.url)}`;
+    }
+
+    try {
+      const mediaInfo = new chrome.cast.media.MediaInfo(streamUrl, 'application/x-mpegURL');
+      mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+      mediaInfo.metadata.title = state.currentChannel.name;
+      mediaInfo.metadata.subtitle = `${state.currentChannel.flag || '🌐'} ${state.currentChannel.country_name || 'Global'} • ${state.currentChannel.group || 'Live'}`;
+      mediaInfo.streamType = chrome.cast.media.StreamType.LIVE;
+
+      const request = new chrome.cast.media.LoadRequest(mediaInfo);
+      request.autoplay = true;
+
+      session.loadMedia(request).then(
+        () => showToast(`Casting "${state.currentChannel.name}" to TV`, '📺'),
+        (err) => console.warn('Error loading media to Cast:', err)
+      );
+    } catch (err) {
+      console.warn('Cast load error:', err);
+    }
+  }
+
+  function triggerAirPlay() {
+    if (els.video && typeof els.video.webkitShowPlaybackTargetPicker === 'function') {
+      try {
+        els.video.webkitShowPlaybackTargetPicker();
+        showToast('Opening AirPlay device picker...', '📡');
+        return true;
+      } catch (e) {
+        console.warn('AirPlay prompt error:', e);
+      }
+    }
+    return false;
+  }
+
+  function triggerGoogleCast() {
+    if (window.cast && window.cast.framework) {
+      try {
+        const context = cast.framework.CastContext.getInstance();
+        const session = context.getCurrentSession();
+        if (session) {
+          loadMediaOnCastSession();
+          if (els.castModal) els.castModal.style.display = 'none';
+          return true;
+        } else {
+          context.requestSession().then(
+            () => {
+              loadMediaOnCastSession();
+              if (els.castModal) els.castModal.style.display = 'none';
+            },
+            (err) => {
+              if (err !== 'cancel') openCastModal();
+            }
+          );
+          return true;
+        }
+      } catch (e) {
+        console.warn('Cast requestSession error:', e);
+      }
+    }
+    return false;
+  }
+
+  function openCastModal() {
+    if (!state.currentChannel) {
+      showToast('Select a channel first to cast', '⚠️');
+      return;
+    }
+
+    if (els.castPreviewFlag) els.castPreviewFlag.textContent = state.currentChannel.flag || '🌐';
+    if (els.castPreviewName) els.castPreviewName.textContent = state.currentChannel.name;
+    if (els.castPreviewMeta) els.castPreviewMeta.textContent = `${state.currentChannel.country_name || 'Global'} • ${state.currentChannel.group || 'Live'} • ${state.currentChannel.quality || 'HD'}`;
+    if (els.castStreamUrlInput) els.castStreamUrlInput.value = state.currentChannel.url;
+
+    if (els.castModal) els.castModal.style.display = 'flex';
+  }
+
+  function closeCastModal() {
+    if (els.castModal) els.castModal.style.display = 'none';
+  }
+
+  function startCasting() {
+    if (!state.currentChannel) {
+      showToast('Select a channel first to cast', '⚠️');
+      return;
+    }
+
+    // 1. Try native Apple AirPlay first if on Safari/iOS
+    if (triggerAirPlay()) {
+      return;
+    }
+
+    // 2. Try Google Cast framework directly
+    if (triggerGoogleCast()) {
+      return;
+    }
+
+    // 3. Try Remote Playback API
+    if (els.video && els.video.remote && typeof els.video.remote.prompt === 'function') {
+      els.video.remote.prompt().then(
+        () => showToast('Connected to remote TV', '📺'),
+        () => openCastModal()
+      ).catch(() => openCastModal());
+      return;
+    }
+
+    // 4. Open Universal Cast Modal
+    openCastModal();
+  }
+
   // --- Setup Event Listeners ---
   function setupEventListeners() {
     // Tabs
@@ -1664,6 +1828,47 @@
       });
     }
 
+    // Cast Modal & Buttons
+    [els.castHeaderBtn, els.fsCastBtn, els.ctrlCastBtn].forEach(btn => {
+      if (btn) btn.addEventListener('click', startCasting);
+    });
+
+    if (els.closeCastModalBtn) {
+      els.closeCastModalBtn.addEventListener('click', closeCastModal);
+    }
+
+    if (els.castModal) {
+      els.castModal.addEventListener('click', (e) => {
+        if (e.target === els.castModal) closeCastModal();
+      });
+    }
+
+    if (els.modalChromecastBtn) {
+      els.modalChromecastBtn.addEventListener('click', () => {
+        if (!triggerGoogleCast()) {
+          showToast('Use Google Chrome to cast to Chromecast devices', 'ℹ️');
+        }
+      });
+    }
+
+    if (els.modalAirplayBtn) {
+      els.modalAirplayBtn.addEventListener('click', () => {
+        if (!triggerAirPlay()) {
+          showToast('Use Apple Safari to use native AirPlay', 'ℹ️');
+        }
+      });
+    }
+
+    if (els.modalCopyStreamBtn) {
+      els.modalCopyStreamBtn.addEventListener('click', () => {
+        if (els.castStreamUrlInput && els.castStreamUrlInput.value) {
+          navigator.clipboard.writeText(els.castStreamUrlInput.value)
+            .then(() => showToast('Stream URL copied to clipboard!', '📋'))
+            .catch(() => showToast('Failed to copy URL', '⚠️'));
+        }
+      });
+    }
+
     if (els.loadUrlSubmitBtn) {
       els.loadUrlSubmitBtn.addEventListener('click', () => {
         const url = els.playlistUrlInput.value.trim();
@@ -1812,6 +2017,10 @@
           e.preventDefault();
           playNext();
           break;
+        case 'KeyC':
+          e.preventDefault();
+          startCasting();
+          break;
       }
     });
   }
@@ -1831,6 +2040,7 @@
     loadStoredData();
     updateProxyBadge();
     setVolume(state.volume);
+    initCastFramework();
     setupEventListeners();
     loadPlaylist();
   }
