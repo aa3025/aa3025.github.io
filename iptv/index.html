@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -302,6 +302,42 @@
           </div>
         </div>
 
+        <!-- Dedicated Fullscreen Top Bar (Visible on tap in Fullscreen) -->
+        <div class="fullscreen-top-bar" id="fullscreen-top-bar">
+          <button class="fs-exit-btn" id="fs-exit-btn" title="Exit Fullscreen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            <span>Exit Fullscreen</span>
+          </button>
+          <div class="fs-channel-meta">
+            <span class="fs-channel-flag" id="fs-channel-flag">🌍</span>
+            <span class="fs-channel-name" id="fs-channel-name">Select a Channel</span>
+            <span class="fs-live-badge">LIVE</span>
+          </div>
+          <div class="fs-top-actions">
+            <button class="fs-vlc-btn" id="fs-vlc-btn" title="Open in VLC">
+              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 3 20 21 20 12 2"></polygon></svg>
+              <span>VLC</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Center Tap Controls for Channel Switching & Play/Pause -->
+        <div class="fullscreen-center-controls" id="fullscreen-center-controls">
+          <button class="fs-center-btn" id="fs-prev-btn" title="Previous Channel">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5"></line></svg>
+          </button>
+          <button class="fs-center-btn fs-play-center-btn" id="fs-play-btn" title="Play / Pause">
+            <svg class="fs-icon-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <svg class="fs-icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+          </button>
+          <button class="fs-center-btn" id="fs-next-btn" title="Next Channel">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5"></line></svg>
+          </button>
+        </div>
+
         <!-- Cinema Video Overlay Controls -->
         <div class="video-overlay-controls" id="video-overlay-controls">
           <div class="controls-left">
@@ -423,6 +459,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
