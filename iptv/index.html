@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=16">
+  <link rel="stylesheet" href="style.css?v=17">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -186,14 +186,16 @@
 
           <!-- Health Checker Bar (Probing & Filter Dead Channels) -->
           <div class="health-checker-bar">
-            <button class="health-btn" id="check-health-btn" title="Check live status of channels in current view">
+            <button class="health-btn" id="check-health-btn" title="Scan live status of channels in current view">
               <span class="health-btn-icon">⚡</span>
               <span id="health-btn-text">Check Live</span>
             </button>
-            <label class="hide-dead-toggle" title="Hide dead or unreachable channels">
-              <input type="checkbox" id="hide-offline-checkbox">
-              <span>Hide Dead</span>
-            </label>
+            <select id="status-filter-select" class="sidebar-select status-select" title="Filter channels by live availability">
+              <option value="">Status: All</option>
+              <option value="browser">🟢 Browser Only</option>
+              <option value="live">🟢+🟠 Hide Dead</option>
+              <option value="offline">🔴 Dead / Blocked</option>
+            </select>
             <span class="health-stats" id="health-stats" style="display: none;"></span>
           </div>
           <div class="probe-progress-bar" id="probe-progress-bar" style="display: none;">
@@ -595,6 +597,6 @@
   </div>
 
   <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-  <script src="app.js?v=16"></script>
+  <script src="app.js?v=17"></script>
 </body>
 </html>

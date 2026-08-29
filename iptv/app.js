@@ -174,6 +174,7 @@
     muted: localStorage.getItem('nova_muted') === 'true',
     streamHealth: loadStreamHealth(),
     hideOffline: localStorage.getItem('nova_hide_offline') === 'true',
+    statusFilter: localStorage.getItem('nova_status_filter') || (localStorage.getItem('nova_hide_offline') === 'true' ? 'live' : ''),
     subtitlesEnabled: localStorage.getItem('nova_subtitles') === 'true',
     isProbing: false
   };
@@ -216,6 +217,7 @@
     checkHealthBtn: document.getElementById('check-health-btn'),
     healthBtnText: document.getElementById('health-btn-text'),
     hideOfflineCheckbox: document.getElementById('hide-offline-checkbox'),
+    statusFilterSelect: document.getElementById('status-filter-select'),
     healthStats: document.getElementById('health-stats'),
     probeProgressBar: document.getElementById('probe-progress-bar'),
     probeProgressFill: document.getElementById('probe-progress-fill'),
@@ -880,11 +882,21 @@
       });
     }
 
-    // Hide dead channels filter
-    if (state.hideOffline) {
+    // Stream status filter (All, Browser Only, Hide Dead, Offline Only)
+    if (state.statusFilter === 'browser') {
+      list = list.filter(c => {
+        const h = state.streamHealth.get(c.id);
+        return h && h.status === 'online';
+      });
+    } else if (state.statusFilter === 'live' || state.hideOffline) {
       list = list.filter(c => {
         const h = state.streamHealth.get(c.id);
         return !h || h.status !== 'offline';
+      });
+    } else if (state.statusFilter === 'offline') {
+      list = list.filter(c => {
+        const h = state.streamHealth.get(c.id);
+        return h && h.status === 'offline';
       });
     }
 
@@ -915,8 +927,12 @@
     if (state.filters.quality) {
       chips.push(state.filters.quality.replace(' FHD', '').replace(' UHD', ''));
     }
-    if (state.hideOffline) {
-      chips.push('🟢 Live Only');
+    if (state.statusFilter === 'browser') {
+      chips.push('🟢 Browser Only');
+    } else if (state.statusFilter === 'live' || state.hideOffline) {
+      chips.push('🟢+🟠 Hide Dead');
+    } else if (state.statusFilter === 'offline') {
+      chips.push('🔴 Dead Only');
     }
     if (state.groupBy && state.groupBy !== 'genre') {
       chips.push(`Group: ${state.groupBy}`);
@@ -1196,6 +1212,29 @@
     document.querySelectorAll('.channel-list-item.active').forEach(r => r.classList.remove('active'));
     const activeRow = document.getElementById(`row-${ch.id}`);
     if (activeRow) activeRow.classList.add('active');
+
+    // Immediate handling for known VLC-only channels or mixed-content HTTP
+    const knownHealth = state.streamHealth.get(ch.id);
+    const isHttpsOrigin = window.location.protocol === 'https:';
+    const isPlainHttp = ch.url.startsWith('http://');
+
+    if (knownHealth && knownHealth.status === 'vlc') {
+      showStreamError(
+        'Server Live • Requires VLC Player',
+        'This channel is actively broadcasting, but its media server blocks web browsers (CORS policy). Click below to launch and stream directly in VLC Player on your Mac with zero restrictions!',
+        ch
+      );
+      return;
+    }
+
+    if (isHttpsOrigin && isPlainHttp) {
+      showStreamError(
+        'Insecure HTTP Stream • Open in VLC',
+        'Modern browsers block unencrypted HTTP streams on HTTPS sites (Mixed Content security policy). This stream plays smoothly in VLC Player with zero restrictions!',
+        ch
+      );
+      return;
+    }
 
     // Build Stream URL (Direct vs Public CORS Proxy)
     let streamUrl = ch.url;
@@ -1807,6 +1846,24 @@
     // Health Checker Controls
     if (els.checkHealthBtn) {
       els.checkHealthBtn.addEventListener('click', probeFilteredChannels);
+    }
+
+    if (els.statusFilterSelect) {
+      els.statusFilterSelect.value = state.statusFilter || '';
+      els.statusFilterSelect.addEventListener('change', (e) => {
+        state.statusFilter = e.target.value;
+        state.hideOffline = (state.statusFilter === 'live');
+        localStorage.setItem('nova_status_filter', state.statusFilter);
+        localStorage.setItem('nova_hide_offline', state.hideOffline);
+        applyFiltersAndRender();
+        const labels = {
+          browser: 'Showing Browser-Playable channels only',
+          live: 'Hiding dead/offline channels',
+          offline: 'Showing dead/blocked channels only',
+          '': 'Showing all streams'
+        };
+        showToast(labels[state.statusFilter] || 'Status filter updated', '⚡');
+      });
     }
 
     if (els.hideOfflineCheckbox) {

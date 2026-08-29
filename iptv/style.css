@@ -629,6 +629,27 @@ html, body {
   pointer-events: none;
 }
 
+.status-select {
+  flex: 1;
+  max-width: 140px;
+  font-size: 0.72rem;
+  padding: 4px 18px 4px 6px;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.status-select:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.status-select:focus {
+  border-color: var(--accent-primary);
+}
+
 .hide-dead-toggle {
   display: inline-flex;
   align-items: center;
