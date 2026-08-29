@@ -485,9 +485,9 @@
     } catch (_) {}
   }
 
-  function updateChannelRowStatus(chId, status) {
+  function updateChannelRowStatus(chId, status, shouldSave = true) {
     state.streamHealth.set(chId, { status, timestamp: Date.now() });
-    saveStreamHealth();
+    if (shouldSave) saveStreamHealth();
 
     const row = document.getElementById(`row-${chId}`);
     if (!row) return;
@@ -502,9 +502,9 @@
 
     pill.className = `item-status-pill ${status}`;
     const tooltips = {
-      online: 'Live & Playable',
+      online: 'Live & Verified Playable in Browser',
       vlc: 'Live (CORS restricted - Works in VLC)',
-      offline: 'Offline / Inaccessible',
+      offline: 'Offline / Inaccessible / Blocked',
       testing: 'Checking status...'
     };
     pill.title = tooltips[status] || '';
@@ -516,42 +516,66 @@
     }
   }
 
-  // Probe single channel stream URL
+  // Probe single channel stream URL with deep content inspection
   async function probeSingleChannel(url, timeoutMs = 3500) {
-    if (!url) return 'offline';
+    if (!url || typeof url !== 'string') return 'offline';
+    url = url.trim();
+
+    // 1. Direct CORS Probe (Determines if stream plays natively in browser)
     try {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       const res = await fetch(url, {
         method: 'GET',
-        headers: { 'Range': 'bytes=0-512' },
         signal: ctrl.signal,
-        mode: 'cors'
+        mode: 'cors',
+        cache: 'no-cache'
       });
       clearTimeout(timer);
-      if (res.ok || res.status === 206 || res.status === 200 || res.status === 302) {
+
+      if (res.ok) {
+        // Inspect body chunk to eliminate false positives (e.g. 200 OK HTML error/block/parking pages)
+        const sample = await res.text().then(t => t.slice(0, 1500)).catch(() => '');
+        const isHtml = sample.startsWith('<!DOCTYPE') ||
+                       sample.startsWith('<html') ||
+                       sample.includes('<title>404') ||
+                       sample.includes('<title>403') ||
+                       sample.includes('Cloudflare') ||
+                       sample.includes('Access Denied');
+
+        if (!isHtml && (sample.includes('#EXTM3U') || sample.includes('#EXT-X-') || sample.includes('#EXTINF'))) {
+          return 'online'; // 🟢 100% verified browser playable
+        }
+        if (isHtml) {
+          return 'offline'; // 🔴 HTML block / parking page
+        }
         return 'online';
+      } else if (res.status === 404 || res.status === 410 || res.status === 403 || res.status === 500) {
+        return 'offline'; // 🔴 Hard HTTP error
+      }
+    } catch (_) {
+      // Direct CORS failed / blocked
+    }
+
+    // 2. Opaque Network Probe (Checks if host is alive on the internet for VLC without browser CORS)
+    try {
+      const ctrl2 = new AbortController();
+      const timer2 = setTimeout(() => ctrl2.abort(), 2500);
+      const res2 = await fetch(url, {
+        method: 'GET',
+        signal: ctrl2.signal,
+        mode: 'no-cors',
+        cache: 'no-cache'
+      });
+      clearTimeout(timer2);
+
+      // In web standards, 'opaque' indicates server returned 200/data bytes but withheld CORS headers
+      if (res2.type === 'opaque') {
+        return 'vlc'; // 🟠 Server alive! Works in VLC Player
       }
       return 'offline';
-    } catch (err) {
-      if (err.name === 'AbortError') return 'offline';
-      // If direct fetch fails (e.g. browser CORS), test through CORS proxy
-      try {
-        const pCtrl = new AbortController();
-        const pTimer = setTimeout(() => pCtrl.abort(), 2500);
-        const pRes = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, {
-          method: 'GET',
-          headers: { 'Range': 'bytes=0-256' },
-          signal: pCtrl.signal
-        });
-        clearTimeout(pTimer);
-        if (pRes.ok || pRes.status === 206 || pRes.status === 200 || pRes.status === 302) {
-          return 'vlc'; // Server is alive, plays in VLC or via proxy
-        }
-        return 'offline';
-      } catch (_) {
-        return 'offline';
-      }
+    } catch (_) {
+      return 'offline'; // 🔴 Server dead, connection refused, DNS failure, or timed out
     }
   }
 
@@ -559,7 +583,8 @@
   async function probeFilteredChannels() {
     if (state.isProbing) return;
 
-    const listToProbe = state.filteredChannels.slice(0, 150);
+    // Scan up to 300 channels in active view
+    const listToProbe = state.filteredChannels.slice(0, 300);
     if (!listToProbe.length) {
       showToast('No channels in active filter to check', 'ℹ️');
       return;
@@ -567,7 +592,7 @@
 
     state.isProbing = true;
     els.checkHealthBtn.classList.add('checking');
-    els.healthBtnText.textContent = 'Checking...';
+    els.healthBtnText.textContent = 'Scanning...';
     els.probeProgressBar.style.display = 'block';
     els.probeProgressFill.style.width = '0%';
     els.healthStats.style.display = 'inline-block';
@@ -603,7 +628,7 @@
       }
     });
 
-    const CONCURRENCY = 6;
+    const CONCURRENCY = 8;
     let idx = 0;
 
     async function worker() {
@@ -615,7 +640,7 @@
         else offlineCount++;
 
         done++;
-        updateChannelRowStatus(ch.id, status);
+        updateChannelRowStatus(ch.id, status, false);
         updateStats();
       }
     }
@@ -623,15 +648,23 @@
     const workers = Array.from({ length: Math.min(CONCURRENCY, total) }, () => worker());
     await Promise.all(workers);
 
+    // Save batch updates in a single localStorage call
+    saveStreamHealth();
+
     state.isProbing = false;
     els.checkHealthBtn.classList.remove('checking');
-    els.healthBtnText.textContent = 'Re-Check';
+    els.healthBtnText.textContent = 'Re-Scan';
     els.probeProgressFill.style.width = '100%';
     setTimeout(() => {
       els.probeProgressBar.style.display = 'none';
     }, 1500);
 
-    showToast(`Checked ${total} channels: ${onlineCount} Live, ${vlcCount} VLC, ${offlineCount} Dead`, '⚡');
+    // If Hide Dead is active, refresh the list to immediately prune newly detected dead channels
+    if (state.hideOffline) {
+      applyFiltersAndRender();
+    }
+
+    showToast(`Scan complete: ${onlineCount} Browser Live, ${vlcCount} VLC, ${offlineCount} Blocked/Dead`, '⚡');
   }
 
   // --- Playlist Loader ---
@@ -844,6 +877,14 @@
                c.group.toLowerCase().includes(q) ||
                c.country_name.toLowerCase().includes(q) ||
                (c.language && c.language.toLowerCase().includes(q));
+      });
+    }
+
+    // Hide dead channels filter
+    if (state.hideOffline) {
+      list = list.filter(c => {
+        const h = state.streamHealth.get(c.id);
+        return !h || h.status !== 'offline';
       });
     }
 
@@ -1776,6 +1817,7 @@
         state.hideOffline = e.target.checked;
         localStorage.setItem('nova_hide_offline', state.hideOffline);
         els.channelGroupsContainer.classList.toggle('hide-offline-active', state.hideOffline);
+        applyFiltersAndRender();
         showToast(state.hideOffline ? 'Hiding dead channels' : 'Showing all channels', '👁️');
       });
     }
