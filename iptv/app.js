@@ -1168,12 +1168,23 @@
 
   function toggleFullscreen() {
     const target = els.videoContainer;
+    const video = els.video;
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      if (target.requestFullscreen) target.requestFullscreen();
-      else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+      if (target.requestFullscreen) {
+        target.requestFullscreen().catch(err => {
+          if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+        });
+      } else if (target.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen();
+      } else if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      }
     } else {
-      if (document.exitFullscreen) document.exitFullscreen();
-      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
     }
   }
 
@@ -1489,7 +1500,16 @@
     });
 
     els.videoContainer.addEventListener('mousemove', resetOverlayIdleTimer);
-    els.videoContainer.addEventListener('click', resetOverlayIdleTimer);
+    els.videoContainer.addEventListener('click', (e) => {
+      if (e.target.closest('.ctrl-btn') || e.target.closest('.volume-slider') || e.target.closest('.stream-error-card')) {
+        return;
+      }
+      if (els.videoContainer.classList.contains('idle')) {
+        resetOverlayIdleTimer();
+      } else {
+        els.videoContainer.classList.add('idle');
+      }
+    });
 
     // Global Shortcuts
     document.addEventListener('keydown', (e) => {

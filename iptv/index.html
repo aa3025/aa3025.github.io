@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#07090e">
   <title>Nova IPTV | Pure JS Live Stream Player</title>
   <meta name="description" content="Pure JavaScript-driven IPTV web player with vertical list navigation grouped by genre, country, and language, with full-screen playback and VLC integration.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -253,7 +256,7 @@
 
       <!-- Video Player Container (Cinema 16:9 Stage) -->
       <div class="video-container" id="video-container">
-        <video id="iptv-video" playsinline preload="auto"></video>
+        <video id="iptv-video" playsinline webkit-playsinline preload="auto"></video>
 
         <!-- Initial Placeholder State (Before channel selected) -->
         <div class="player-placeholder" id="player-placeholder">
@@ -407,6 +410,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
