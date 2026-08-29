@@ -1,1 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova IPTV | Pure JS Live Stream Player</title>
+  <meta name="description" content="Pure JavaScript-driven IPTV web player with vertical list navigation grouped by genre, country, and language, with full-screen playback and VLC integration.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=4">
+  <script src="hls.min.js"></script>
+  <script>
+    if (typeof Hls === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"><\/script>');
+    }
+  </script>
+</head>
+<body class="theme-dark">
 
+  <!-- Ambient Glow Background -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- App Wrapper (Vertical Sidebar + Main Player Stage) -->
+  <div class="app-container" id="app-container">
+
+    <!-- ====================================================================
+         LEFT VERTICAL PANEL: Grouped Channel List & Filters
+         ==================================================================== -->
+    <aside class="sidebar-panel" id="sidebar-panel">
+
+      <!-- Sidebar Top Header -->
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span class="live-pulse"></span>
+          </div>
+          <div class="brand-meta">
+            <span class="brand-name">Nova<span class="brand-accent">IPTV</span></span>
+            <span class="channel-count-badge" id="total-count-badge">Loading playlist...</span>
+          </div>
+        </div>
+
+        <div class="sidebar-header-actions">
+          <button class="load-m3u-btn" id="open-url-modal-btn" title="Fetch M3U playlist from URL">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span>URL</span>
+          </button>
+          <label class="load-m3u-btn" title="Load local M3U file">
+            <input type="file" id="file-input" accept=".m3u,.m3u8" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>File</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs: All / Favorites / History -->
+      <div class="sidebar-tabs">
+        <button class="tab-btn active" id="tab-all-btn">
+          <span>All</span>
+          <span class="badge" id="badge-all">0</span>
+        </button>
+        <button class="tab-btn" id="tab-fav-btn">
+          <span>★ Favorites</span>
+          <span class="badge" id="badge-fav">0</span>
+        </button>
+        <button class="tab-btn" id="tab-recent-btn">
+          <span>🕒 History</span>
+          <span class="badge" id="badge-recent">0</span>
+        </button>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="sidebar-search">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="search-input" placeholder="Search channels, genre, country... (/)" autocomplete="off">
+          <button class="clear-btn" id="clear-search-btn" style="display: none;">✕</button>
+        </div>
+      </div>
+
+      <!-- Filters & Grouping Controls -->
+      <div class="sidebar-filters">
+        <!-- Grouping Switcher -->
+        <div class="filter-row">
+          <label class="filter-label" for="group-by-select">Group By:</label>
+          <select id="group-by-select" class="sidebar-select">
+            <option value="genre" selected>Genre / Category</option>
+            <option value="country">Country / Geography</option>
+            <option value="language">Language</option>
+            <option value="none">Flat List (A-Z)</option>
+          </select>
+        </div>
+
+        <!-- Geography / Country Filter -->
+        <div class="filter-row">
+          <label class="filter-label" for="country-filter">Country:</label>
+          <select id="country-filter" class="sidebar-select">
+            <option value="">All Countries</option>
+          </select>
+        </div>
+
+        <!-- Genre / Category Filter -->
+        <div class="filter-row">
+          <label class="filter-label" for="genre-filter">Genre:</label>
+          <select id="genre-filter" class="sidebar-select">
+            <option value="">All Genres</option>
+          </select>
+        </div>
+
+        <!-- Secondary Filter Row: Language & Resolution -->
+        <div class="filter-row-dual">
+          <div class="filter-col">
+            <label class="filter-label" for="language-filter">Language:</label>
+            <select id="language-filter" class="sidebar-select">
+              <option value="">All</option>
+            </select>
+          </div>
+          <div class="filter-col">
+            <label class="filter-label" for="quality-filter">Quality:</label>
+            <select id="quality-filter" class="sidebar-select">
+              <option value="">All</option>
+              <option value="4K UHD">4K</option>
+              <option value="1080p FHD">1080p</option>
+              <option value="720p HD">720p</option>
+              <option value="SD">SD</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Expand / Collapse All Accordions -->
+        <div class="accordion-actions-row">
+          <button class="text-action-btn" id="expand-all-btn">Expand All</button>
+          <span class="dot-sep">•</span>
+          <button class="text-action-btn" id="collapse-all-btn">Collapse All</button>
+          <span class="dot-sep">•</span>
+          <button class="text-action-btn reset-btn" id="reset-all-filters-btn">Reset Filters</button>
+        </div>
+      </div>
+
+      <!-- Grouped Channel List (Vertical Scrollable) -->
+      <div class="channel-groups-container" id="channel-groups-container">
+        <!-- Groups rendered dynamically -->
+        <div class="sidebar-loading" id="sidebar-loading">
+          <div class="loading-ring"></div>
+          <span>Loading channels from playlist.m3u...</span>
+        </div>
+      </div>
+
+      <!-- Fallback Dropzone if file fetch blocked -->
+      <div class="file-dropzone" id="file-dropzone" style="display: none;">
+        <div class="dropzone-icon">📁</div>
+        <div class="dropzone-title">Load playlist.m3u</div>
+        <div class="dropzone-subtitle">Click to select playlist.m3u or drag & drop here</div>
+        <input type="file" id="dropzone-file-input" accept=".m3u,.m3u8">
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <span id="rendered-count-text">0 channels loaded</span>
+        <button class="export-btn" id="export-favs-btn" title="Export Favorite Channels to JSON">Export ★</button>
+      </div>
+
+    </aside>
+
+    <!-- ====================================================================
+         RIGHT MAIN STAGE: Large Cinema Video Player & Controls
+         ==================================================================== -->
+    <main class="player-stage" id="player-stage">
+
+      <!-- Channel Information Bar (Above Player) -->
+      <header class="player-header" id="player-header">
+        <div class="channel-info-left">
+          <div class="channel-avatar-wrap" id="header-avatar-wrap">
+            <span class="channel-flag" id="header-flag">🌍</span>
+          </div>
+          <div class="channel-title-meta">
+            <h1 class="channel-title-display" id="header-channel-title">Select a Channel to Watch</h1>
+            <div class="channel-badges-row">
+              <span class="pill-badge pill-live">LIVE</span>
+              <span class="pill-badge pill-group" id="header-genre-badge">IPTV</span>
+              <span class="pill-badge pill-country" id="header-country-badge">Global</span>
+              <span class="pill-badge pill-quality" id="header-quality-badge">HD</span>
+              <span class="pill-badge pill-lang" id="header-lang-badge" style="display: none;"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Header Actions: VLC button, Copy URL, Proxy Toggle -->
+        <div class="channel-actions-right">
+          <!-- Open in VLC Player Button -->
+          <button class="vlc-action-btn" id="open-vlc-btn" title="Open this stream directly in VLC Player">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="12 2 3 20 21 20 12 2"></polygon>
+            </svg>
+            <span>Open in VLC</span>
+          </button>
+
+          <!-- Copy Stream URL Button -->
+          <button class="action-btn" id="copy-url-btn" title="Copy raw stream URL">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy URL</span>
+          </button>
+
+          <!-- CORS Proxy Switcher -->
+          <button class="action-btn proxy-btn" id="toggle-cors-proxy-btn" title="Toggle Public CORS Proxy fallback">
+            <span class="proxy-dot" id="proxy-dot"></span>
+            <span id="proxy-label">Direct Mode</span>
+          </button>
+
+          <!-- Favorite Current Channel -->
+          <button class="fav-header-btn" id="header-fav-btn" title="Toggle Favorite">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Video Player Container (Cinema 16:9 Stage) -->
+      <div class="video-container" id="video-container">
+        <video id="iptv-video" playsinline preload="auto"></video>
+
+        <!-- Initial Placeholder State (Before channel selected) -->
+        <div class="player-placeholder" id="player-placeholder">
+          <div class="placeholder-icon">📺</div>
+          <h2>Ready to Stream</h2>
+          <p>Choose any channel from the list on the left to start playing.</p>
+          <div class="vlc-tip-box">
+            <span>💡 <strong>Tip:</strong> If a particular stream is CORS-blocked in web browsers, click the orange <strong>"Open in VLC"</strong> button to launch it directly in VLC!</span>
+          </div>
+        </div>
+
+        <!-- Buffering Ring -->
+        <div class="buffering-spinner" id="buffering-spinner" style="display: none;">
+          <div class="ring"></div>
+        </div>
+
+        <!-- Stream Error Card -->
+        <div class="stream-error-card" id="stream-error-card" style="display: none;">
+          <div class="error-badge">⚠️ Browser Stream Notice</div>
+          <h3 id="error-title">Stream Could Not Load in Browser</h3>
+          <p id="error-desc">Most IPTV streams work in VLC because VLC bypasses browser CORS restrictions and has native codecs. You can open this stream directly in VLC with one click!</p>
+          <div class="error-actions-row">
+            <button class="primary-btn vlc-btn" id="error-vlc-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 3 20 21 20 12 2"></polygon></svg>
+              <span>Launch in VLC</span>
+            </button>
+            <button class="secondary-btn" id="error-copy-btn">Copy Stream URL</button>
+            <button class="secondary-btn" id="error-proxy-btn">Try with CORS Proxy</button>
+            <button class="secondary-btn" id="error-next-btn">Next Channel ⏭</button>
+          </div>
+        </div>
+
+        <!-- Cinema Video Overlay Controls -->
+        <div class="video-overlay-controls" id="video-overlay-controls">
+          <div class="controls-left">
+            <!-- Play / Pause -->
+            <button class="ctrl-btn play-btn" id="ctrl-play-btn" title="Play / Pause (Space)">
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+              </svg>
+            </button>
+
+            <!-- Channel Up / Down -->
+            <button class="ctrl-btn" id="ctrl-prev-btn" title="Previous Channel (↑ / K)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                <line x1="5" y1="19" x2="5" y2="5"></line>
+              </svg>
+            </button>
+            <button class="ctrl-btn" id="ctrl-next-btn" title="Next Channel (↓ / J)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                <line x1="19" y1="5" x2="19" y2="19"></line>
+              </svg>
+            </button>
+
+            <!-- Volume Slider & Mute -->
+            <div class="volume-group">
+              <button class="ctrl-btn" id="ctrl-mute-btn" title="Mute / Unmute (M)">
+                <svg class="icon-vol-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+                <svg class="icon-vol-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <line x1="23" y1="9" x2="17" y2="15"></line>
+                  <line x1="17" y1="9" x2="23" y2="15"></line>
+                </svg>
+              </button>
+              <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1" class="volume-range">
+            </div>
+
+            <!-- Equalizer Animation -->
+            <div class="equalizer-bars" id="equalizer-bars">
+              <span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <div class="controls-right">
+            <!-- Bitrate / Level tag -->
+            <span class="stream-info-tag" id="stream-info-tag">Live</span>
+
+            <!-- Picture-in-Picture -->
+            <button class="ctrl-btn" id="ctrl-pip-btn" title="Picture in Picture (P)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                <rect x="12" y="9" width="8" height="6" rx="1" fill="currentColor"></rect>
+              </svg>
+            </button>
+
+            <!-- Full-Screen Button -->
+            <button class="ctrl-btn" id="ctrl-fullscreen-btn" title="Toggle Full Screen (F)">
+              <svg class="icon-enter-fs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+              </svg>
+              <svg class="icon-exit-fs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Player Info & Keyboard Shortcuts Bar -->
+      <footer class="player-footer">
+        <div class="shortcuts-row">
+          <span>Keyboard:</span>
+          <span class="key-pill"><kbd>Space</kbd> Play/Pause</span>
+          <span class="key-pill"><kbd>F</kbd> Fullscreen</span>
+          <span class="key-pill"><kbd>M</kbd> Mute</span>
+          <span class="key-pill"><kbd>↑</kbd> <kbd>↓</kbd> Channel Prev/Next</span>
+          <span class="key-pill"><kbd>/</kbd> Search</span>
+          <span class="key-pill"><kbd>P</kbd> PiP</span>
+        </div>
+        <div class="stream-url-display" id="stream-url-display">No stream loaded</div>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-box" id="toast-box"></div>
+
+  <!-- Playlist URL Modal -->
+  <div class="modal-overlay" id="url-modal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Playlist Source URL</h3>
+        <button class="modal-close" id="close-url-modal-btn">✕</button>
+      </div>
+      <div class="modal-content">
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 12px;">
+          Fetch live channels directly from any public M3U / M3U8 URL:
+        </p>
+        <div class="modal-input-group">
+          <input type="url" id="playlist-url-input" value="https://iptv-org.github.io/iptv/index.m3u" placeholder="https://..." class="modal-text-input">
+          <button class="primary-btn vlc-btn" id="load-url-submit-btn" style="background: var(--accent-primary);">Fetch URL</button>
+        </div>
+        <div class="preset-sources">
+          <span class="preset-label">Quick Presets:</span>
+          <button class="preset-btn" data-url="https://iptv-org.github.io/iptv/index.m3u">🌐 iptv-org GitHub (Default)</button>
+          <button class="preset-btn" data-url="./playlist.m3u">📁 Local playlist.m3u</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=4"></script>
+</body>
+</html>
