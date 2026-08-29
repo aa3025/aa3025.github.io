@@ -173,8 +173,8 @@
     volume: parseFloat(localStorage.getItem('nova_volume') || '1'),
     muted: localStorage.getItem('nova_muted') === 'true',
     streamHealth: loadStreamHealth(),
-    hideOffline: localStorage.getItem('nova_hide_offline') === 'true',
-    statusFilter: localStorage.getItem('nova_status_filter') || (localStorage.getItem('nova_hide_offline') === 'true' ? 'live' : ''),
+    hideOffline: false,
+    statusFilter: '',
     subtitlesEnabled: localStorage.getItem('nova_subtitles') === 'true',
     isProbing: false
   };
@@ -2027,6 +2027,23 @@
       }, 250);
     });
 
+    els.searchInput.addEventListener('search', () => {
+      if (!els.searchInput.value) {
+        els.clearSearchBtn.style.display = 'none';
+        state.filters.search = '';
+        applyFiltersAndRender();
+      }
+    });
+
+    els.searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        els.searchInput.value = '';
+        els.clearSearchBtn.style.display = 'none';
+        state.filters.search = '';
+        applyFiltersAndRender();
+      }
+    });
+
     els.clearSearchBtn.addEventListener('click', () => {
       els.searchInput.value = '';
       els.clearSearchBtn.style.display = 'none';
@@ -2126,8 +2143,21 @@
       state.filters.genre = '';
       state.filters.language = '';
       state.filters.quality = '';
+      state.statusFilter = '';
+      state.hideOffline = false;
       state.activeTab = 'all';
       state.openGroups.clear();
+
+      localStorage.removeItem('nova_status_filter');
+      localStorage.removeItem('nova_hide_offline');
+      localStorage.removeItem('nova_playlist_url');
+
+      if (els.statusFilterSelect) els.statusFilterSelect.value = '';
+      if (els.hideOfflineCheckbox) {
+        els.hideOfflineCheckbox.checked = false;
+        els.channelGroupsContainer.classList.remove('hide-offline-active');
+      }
+
       els.searchInput.value = '';
       els.clearSearchBtn.style.display = 'none';
       els.countryFilter.value = '';
@@ -2146,7 +2176,7 @@
 
       populateGenreFilter('');
       applyFiltersAndRender();
-      showToast('Filters reset • Showing all channels', '🔄');
+      showToast('Filters reset • Showing all 12,869 channels', '🔄');
     });
 
     // Filter Collapse / Expand Listeners
