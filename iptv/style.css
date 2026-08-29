@@ -1610,6 +1610,38 @@ html, body {
    CROSS-BROWSER & RESPONSIVE DESIGN (MOBILE, TABLET, DESKTOP)
    ========================================================================== */
 
+/* Mobile navigation buttons */
+.mobile-nav-btn {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  background: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  border-radius: var(--radius-sm);
+  color: #c7d2fe;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition-fast);
+  user-select: none;
+}
+
+.mobile-nav-btn:hover {
+  background: rgba(99, 102, 241, 0.35);
+  border-color: rgba(99, 102, 241, 0.6);
+  color: #fff;
+}
+
+.mobile-nav-btn:active {
+  transform: scale(0.96);
+}
+
+.landscape-only-btn {
+  display: none !important;
+}
+
 /* Touch-specific optimizations */
 @media (hover: none) and (pointer: coarse) {
   .channel-list-item {
@@ -1652,22 +1684,37 @@ html, body {
   }
 }
 
-/* Tablets & Mobile Screens (under 860px) */
-@media (max-width: 860px) {
-  .app-container {
-    flex-direction: column;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
+/* Tablets, Mobile Phones & Landscape Devices (under 960px width OR under 560px height) */
+@media (max-width: 960px), (max-height: 560px) {
+  html, body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
   }
 
-  /* PLAYER STAGE GOES FIRST (TOP OF SCREEN) ON MOBILE */
+  .app-container {
+    flex-direction: column;
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-nav-btn {
+    display: inline-flex;
+  }
+
+  /* PLAYER STAGE GOES FIRST (TOP OF SCREEN) */
   .player-stage {
     order: 1;
     flex: 0 0 auto;
     width: 100%;
     height: auto;
-    max-height: 52vh;
+    position: relative;
     z-index: 25;
     background: #000;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
@@ -1678,6 +1725,7 @@ html, body {
     padding: 8px 12px;
     gap: 8px;
     background: rgba(13, 18, 29, 0.95);
+    flex-wrap: wrap;
   }
 
   .channel-avatar-wrap {
@@ -1708,7 +1756,7 @@ html, body {
 
   .channel-actions-right {
     gap: 6px;
-    flex-shrink: 0;
+    flex-wrap: wrap;
   }
 
   .vlc-action-btn {
@@ -1726,8 +1774,8 @@ html, body {
   .video-container {
     width: 100%;
     aspect-ratio: 16 / 9;
-    max-height: 38vh;
-    min-height: 190px;
+    max-height: 55vh;
+    min-height: 180px;
     background: #000;
   }
 
@@ -1749,22 +1797,22 @@ html, body {
   }
 
   .stage-footer {
-    display: none; /* Hide desktop shortcut bar on mobile */
+    display: none;
   }
 
-  /* SIDEBAR PANEL GOES SECOND (SCROLLABLE CHANNEL LIST BELOW PLAYER) */
+  /* SIDEBAR PANEL (NATURALLY SCROLLABLE UNDER VIDEO) */
   .sidebar-panel {
     order: 2;
-    flex: 1 1 0;
-    min-height: 0;
-    width: 100%;
-    max-width: 100%;
-    min-width: 100%;
-    height: auto;
+    flex: 0 0 auto;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    height: auto !important;
+    min-height: 80vh;
     border-right: none;
     border-top: 1px solid var(--border-subtle);
     box-shadow: none;
-    overflow: hidden;
+    overflow: visible !important;
   }
 
   .sidebar-header {
@@ -1837,7 +1885,9 @@ html, body {
 
   .channel-groups-container {
     padding: 4px 6px;
-    -webkit-overflow-scrolling: touch;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 250px;
   }
 
   .group-header {
@@ -1863,6 +1913,62 @@ html, body {
   .sidebar-footer {
     padding: 6px 12px;
     padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Landscape Mode on Phones (Height <= 520px) */
+@media (max-height: 520px) and (orientation: landscape) {
+  .video-container {
+    max-height: 65vh !important;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .landscape-only-btn {
+    display: inline-flex !important;
+  }
+}
+
+/* Optional Split View in Landscape (Side-by-side mode) */
+@media (orientation: landscape) and (max-height: 560px) {
+  .app-container.split-layout {
+    flex-direction: row !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  .app-container.split-layout .player-stage {
+    order: 1 !important;
+    flex: 1 1 56% !important;
+    width: 56% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .app-container.split-layout .video-container {
+    height: calc(100% - 46px) !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+  }
+
+  .app-container.split-layout .sidebar-panel {
+    order: 2 !important;
+    flex: 1 1 44% !important;
+    width: 44% !important;
+    max-width: 44% !important;
+    min-width: 290px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    border-top: none;
+    border-left: 1px solid var(--border-subtle);
+  }
+
+  .app-container.split-layout .channel-groups-container {
+    overflow-y: auto !important;
+    flex: 1 !important;
   }
 }
 
@@ -1922,37 +2028,5 @@ html, body {
   .error-actions-row button {
     font-size: 0.72rem;
     padding: 6px 10px;
-  }
-}
-
-/* Mobile Landscape Orientation (Phones in landscape) */
-@media (max-height: 520px) and (orientation: landscape) {
-  .app-container {
-    flex-direction: row;
-  }
-
-  .player-stage {
-    order: 2;
-    flex: 1;
-    height: 100%;
-    max-height: none;
-  }
-
-  .sidebar-panel {
-    order: 1;
-    width: 280px;
-    min-width: 260px;
-    max-width: 320px;
-    height: 100%;
-  }
-
-  .video-container {
-    height: calc(100% - 46px);
-    max-height: none;
-    aspect-ratio: auto;
-  }
-
-  .player-header {
-    padding: 6px 12px;
   }
 }

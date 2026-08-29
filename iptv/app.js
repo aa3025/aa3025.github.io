@@ -258,7 +258,14 @@
     ctrlPipBtn: document.getElementById('ctrl-pip-btn'),
     ctrlFullscreenBtn: document.getElementById('ctrl-fullscreen-btn'),
     streamUrlDisplay: document.getElementById('stream-url-display'),
-    toastBox: document.getElementById('toast-box')
+    toastBox: document.getElementById('toast-box'),
+    appContainer: document.getElementById('app-container'),
+    sidebarPanel: document.getElementById('sidebar-panel'),
+    playerStage: document.getElementById('player-stage'),
+    scrollToChannelsBtn: document.getElementById('scroll-to-channels-btn'),
+    scrollToPlayerBtn: document.getElementById('scroll-to-player-btn'),
+    toggleSplitBtn: document.getElementById('toggle-split-btn'),
+    toggleSplitText: document.getElementById('toggle-split-text')
   };
 
   // --- Fast In-Browser M3U Parser ---
@@ -1381,6 +1388,36 @@
       applyFiltersAndRender();
       showToast('Filters reset', '🔄');
     });
+
+    // Mobile & Landscape Navigation Handlers
+    if (els.scrollToChannelsBtn) {
+      els.scrollToChannelsBtn.addEventListener('click', () => {
+        els.sidebarPanel.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    if (els.scrollToPlayerBtn) {
+      els.scrollToPlayerBtn.addEventListener('click', () => {
+        els.playerStage.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    if (els.toggleSplitBtn) {
+      // Restore previous landscape split state
+      if (localStorage.getItem('nova_landscape_split') === 'true') {
+        els.appContainer.classList.add('split-layout');
+        if (els.toggleSplitText) els.toggleSplitText.textContent = '⇅ Full View';
+      }
+
+      els.toggleSplitBtn.addEventListener('click', () => {
+        const isSplit = els.appContainer.classList.toggle('split-layout');
+        localStorage.setItem('nova_landscape_split', isSplit.toString());
+        if (els.toggleSplitText) {
+          els.toggleSplitText.textContent = isSplit ? '⇅ Full View' : '⇄ Split View';
+        }
+        showToast(isSplit ? 'Split View enabled' : 'Stacked View enabled', '📱');
+      });
+    }
 
     // File Input Handlers (Load M3U)
     function handleFile(file) {

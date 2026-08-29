@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -66,6 +66,9 @@
             </svg>
             <span>File</span>
           </label>
+          <button class="mobile-nav-btn" id="scroll-to-player-btn" title="Back to video player">
+            <span>▲ Video</span>
+          </button>
         </div>
       </div>
 
@@ -251,6 +254,16 @@
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
             </svg>
           </button>
+
+          <!-- Quick Scroll to Channels Button -->
+          <button class="mobile-nav-btn" id="scroll-to-channels-btn" title="Scroll down to channel list">
+            <span>📋 Channels ↓</span>
+          </button>
+
+          <!-- Landscape Split View Toggle -->
+          <button class="mobile-nav-btn landscape-only-btn" id="toggle-split-btn" title="Toggle Split View / Stacked View">
+            <span id="toggle-split-text">⇄ Split View</span>
+          </button>
         </div>
       </header>
 
@@ -410,6 +423,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>
