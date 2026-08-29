@@ -1652,30 +1652,44 @@ html, body {
   flex-shrink: 0;
 }
 
-.fs-vlc-btn {
+.fs-top-actions {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.fs-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 6px;
-  background: rgba(249, 115, 22, 0.35);
-  border: 1px solid rgba(249, 115, 22, 0.6);
+  height: 34px;
+  min-height: 34px;
+  padding: 0 12px;
   border-radius: var(--radius-full);
-  color: #ffedd5;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  padding: 6px 14px;
-  min-height: 40px;
   cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
   transition: var(--transition-fast);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  line-height: 1;
+  box-sizing: border-box;
+  vertical-align: middle;
 }
 
-.fs-vlc-btn:hover {
-  background: var(--accent-vlc);
-  color: #fff;
+.fs-action-btn svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  display: block;
 }
 
-.fs-vlc-btn svg {
-  width: 16px;
-  height: 16px;
+.fs-action-btn span {
+  display: inline-block;
+  line-height: 1;
 }
 
 /* Fullscreen Center Tap Controls */
@@ -2116,18 +2130,19 @@ html, body {
 }
 
 .fs-cast-btn {
-  background: rgba(56, 189, 248, 0.22);
-  border: 1px solid rgba(56, 189, 248, 0.5);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: #e0f2fe;
 }
 
 .fs-cast-btn:hover {
-  background: #0284c7;
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.6);
   color: #fff;
 }
 
 .fs-cast-btn svg {
-  color: #bae6fd;
+  color: #38bdf8;
 }
 
 /* Subtitles / CC Button Styling */
@@ -2139,7 +2154,7 @@ html, body {
 }
 
 .fs-cc-btn {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.3);
   font-weight: 800;
   font-size: 0.72rem;
@@ -2148,7 +2163,8 @@ html, body {
 }
 
 .fs-cc-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 /* ==========================================================================
@@ -2598,19 +2614,58 @@ video::cue {
     padding-top: max(8px, env(safe-area-inset-top)) !important;
     padding-left: max(12px, env(safe-area-inset-left)) !important;
     padding-right: max(12px, env(safe-area-inset-right)) !important;
-    gap: 8px !important;
+    gap: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
   }
 
   .fs-exit-btn {
-    padding: 6px 12px !important;
-    min-height: 36px !important;
-    font-size: 0.75rem !important;
+    padding: 0 10px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    font-size: 0.72rem !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .fs-channel-meta {
+    flex: 1 !important;
+    min-width: 0 !important;
     gap: 5px !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
   }
 
   .fs-channel-name {
-    max-width: 150px !important;
-    font-size: 0.85rem !important;
+    max-width: none !important;
+    flex: 1 !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .fs-top-actions {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .fs-action-btn {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 8px !important;
+    font-size: 0.7rem !important;
+    gap: 4px !important;
+  }
+
+  .fs-action-btn svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .fs-center-btn {
