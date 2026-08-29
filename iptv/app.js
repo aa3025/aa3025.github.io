@@ -737,10 +737,10 @@
       languages[lang] = (languages[lang] || 0) + 1;
     });
 
-    // Country select
+    // Country select - sorted alphabetically A to Z
     els.countryFilter.innerHTML = '<option value="">All Countries</option>';
     Object.entries(countries)
-      .sort((a, b) => b[1].count - a[1].count)
+      .sort((a, b) => a[1].name.localeCompare(b[1].name))
       .forEach(([cc, data]) => {
         const opt = document.createElement('option');
         opt.value = cc;
@@ -748,10 +748,10 @@
         els.countryFilter.appendChild(opt);
       });
 
-    // Language select
+    // Language select - sorted alphabetically A to Z
     els.languageFilter.innerHTML = '<option value="">All</option>';
     Object.entries(languages)
-      .sort((a, b) => b[1] - a[1])
+      .sort((a, b) => a[0].localeCompare(b[0]))
       .forEach(([lang, count]) => {
         const opt = document.createElement('option');
         opt.value = lang;
@@ -851,8 +851,18 @@
       groups.get(key).items.push(ch);
     });
 
-    // Sort groups: largest first
-    const sortedGroups = Array.from(groups.values()).sort((a, b) => b.items.length - a.items.length);
+    // Sort groups: if country or language, sort alphabetically A-Z; otherwise by channel count descending
+    let sortedGroups;
+    if (groupBy === 'country' || groupBy === 'language') {
+      sortedGroups = Array.from(groups.values()).sort((a, b) => a.key.localeCompare(b.key));
+    } else {
+      sortedGroups = Array.from(groups.values()).sort((a, b) => b.items.length - a.items.length);
+    }
+
+    // Inside each group, sort channels alphabetically
+    sortedGroups.forEach(g => {
+      g.items.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    });
 
     // If searching or very few groups, expand all; otherwise keep first group open by default if nothing selected yet
     if (state.filters.search || sortedGroups.length <= 2) {
