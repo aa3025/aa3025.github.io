@@ -171,7 +171,10 @@
     },
     useCorsProxy: localStorage.getItem('nova_use_cors_proxy') === 'true',
     volume: parseFloat(localStorage.getItem('nova_volume') || '1'),
-    muted: localStorage.getItem('nova_muted') === 'true'
+    muted: localStorage.getItem('nova_muted') === 'true',
+    streamHealth: loadStreamHealth(),
+    hideOffline: localStorage.getItem('nova_hide_offline') === 'true',
+    isProbing: false
   };
 
   let hls = null;
@@ -209,6 +212,12 @@
     closeUrlModalBtn: document.getElementById('close-url-modal-btn'),
     playlistUrlInput: document.getElementById('playlist-url-input'),
     loadUrlSubmitBtn: document.getElementById('load-url-submit-btn'),
+    checkHealthBtn: document.getElementById('check-health-btn'),
+    healthBtnText: document.getElementById('health-btn-text'),
+    hideOfflineCheckbox: document.getElementById('hide-offline-checkbox'),
+    healthStats: document.getElementById('health-stats'),
+    probeProgressBar: document.getElementById('probe-progress-bar'),
+    probeProgressFill: document.getElementById('probe-progress-fill'),
     // Player
     videoContainer: document.getElementById('video-container'),
     video: document.getElementById('iptv-video'),
@@ -404,6 +413,185 @@
     if (state.activeTab === 'favorites') {
       applyFiltersAndRender();
     }
+  }
+
+  // --- Stream Health Cache & Prober ---
+  function loadStreamHealth() {
+    try {
+      const raw = localStorage.getItem('nova_stream_health');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const map = new Map();
+        const now = Date.now();
+        const MAX_AGE = 12 * 60 * 60 * 1000; // 12h cache
+        for (const [id, item] of Object.entries(parsed)) {
+          if (item && now - item.timestamp < MAX_AGE) {
+            map.set(id, item);
+          }
+        }
+        return map;
+      }
+    } catch (_) {}
+    return new Map();
+  }
+
+  function saveStreamHealth() {
+    try {
+      const obj = {};
+      state.streamHealth.forEach((val, key) => {
+        obj[key] = val;
+      });
+      localStorage.setItem('nova_stream_health', JSON.stringify(obj));
+    } catch (_) {}
+  }
+
+  function updateChannelRowStatus(chId, status) {
+    state.streamHealth.set(chId, { status, timestamp: Date.now() });
+    saveStreamHealth();
+
+    const row = document.getElementById(`row-${chId}`);
+    if (!row) return;
+
+    let pill = row.querySelector('.item-status-pill');
+    if (!pill) {
+      pill = document.createElement('span');
+      pill.className = 'item-status-pill';
+      const nameEl = row.querySelector('.item-name');
+      if (nameEl) nameEl.insertAdjacentElement('afterend', pill);
+    }
+
+    pill.className = `item-status-pill ${status}`;
+    const tooltips = {
+      online: 'Live & Playable',
+      vlc: 'Live (CORS restricted - Works in VLC)',
+      offline: 'Offline / Inaccessible',
+      testing: 'Checking status...'
+    };
+    pill.title = tooltips[status] || '';
+
+    if (status === 'offline') {
+      row.classList.add('is-offline');
+    } else {
+      row.classList.remove('is-offline');
+    }
+  }
+
+  // Probe single channel stream URL
+  async function probeSingleChannel(url, timeoutMs = 3500) {
+    if (!url) return 'offline';
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: { 'Range': 'bytes=0-512' },
+        signal: ctrl.signal,
+        mode: 'cors'
+      });
+      clearTimeout(timer);
+      if (res.ok || res.status === 206 || res.status === 200 || res.status === 302) {
+        return 'online';
+      }
+      return 'offline';
+    } catch (err) {
+      if (err.name === 'AbortError') return 'offline';
+      // If direct fetch fails (e.g. browser CORS), test through CORS proxy
+      try {
+        const pCtrl = new AbortController();
+        const pTimer = setTimeout(() => pCtrl.abort(), 2500);
+        const pRes = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, {
+          method: 'GET',
+          headers: { 'Range': 'bytes=0-256' },
+          signal: pCtrl.signal
+        });
+        clearTimeout(pTimer);
+        if (pRes.ok || pRes.status === 206 || pRes.status === 200 || pRes.status === 302) {
+          return 'vlc'; // Server is alive, plays in VLC or via proxy
+        }
+        return 'offline';
+      } catch (_) {
+        return 'offline';
+      }
+    }
+  }
+
+  // Batch probe filtered channels
+  async function probeFilteredChannels() {
+    if (state.isProbing) return;
+
+    const listToProbe = state.filteredChannels.slice(0, 150);
+    if (!listToProbe.length) {
+      showToast('No channels in active filter to check', 'ℹ️');
+      return;
+    }
+
+    state.isProbing = true;
+    els.checkHealthBtn.classList.add('checking');
+    els.healthBtnText.textContent = 'Checking...';
+    els.probeProgressBar.style.display = 'block';
+    els.probeProgressFill.style.width = '0%';
+    els.healthStats.style.display = 'inline-block';
+
+    let done = 0;
+    let onlineCount = 0;
+    let vlcCount = 0;
+    let offlineCount = 0;
+    const total = listToProbe.length;
+
+    function updateStats() {
+      els.healthStats.innerHTML = `<span style="color:var(--accent-emerald);">🟢 ${onlineCount}</span> <span style="color:#f59e0b;">🟠 ${vlcCount}</span> <span style="color:var(--accent-rose);">🔴 ${offlineCount}</span>`;
+      const pct = Math.round((done / total) * 100);
+      els.probeProgressFill.style.width = `${pct}%`;
+    }
+
+    updateStats();
+
+    // Mark as testing in DOM
+    listToProbe.forEach(ch => {
+      const row = document.getElementById(`row-${ch.id}`);
+      if (row) {
+        let pill = row.querySelector('.item-status-pill');
+        if (!pill) {
+          pill = document.createElement('span');
+          pill.className = 'item-status-pill testing';
+          pill.title = 'Checking status...';
+          row.querySelector('.item-name')?.insertAdjacentElement('afterend', pill);
+        } else {
+          pill.className = 'item-status-pill testing';
+          pill.title = 'Checking status...';
+        }
+      }
+    });
+
+    const CONCURRENCY = 6;
+    let idx = 0;
+
+    async function worker() {
+      while (idx < listToProbe.length) {
+        const ch = listToProbe[idx++];
+        const status = await probeSingleChannel(ch.url);
+        if (status === 'online') onlineCount++;
+        else if (status === 'vlc') vlcCount++;
+        else offlineCount++;
+
+        done++;
+        updateChannelRowStatus(ch.id, status);
+        updateStats();
+      }
+    }
+
+    const workers = Array.from({ length: Math.min(CONCURRENCY, total) }, () => worker());
+    await Promise.all(workers);
+
+    state.isProbing = false;
+    els.checkHealthBtn.classList.remove('checking');
+    els.healthBtnText.textContent = 'Re-Check';
+    els.probeProgressFill.style.width = '100%';
+    setTimeout(() => {
+      els.probeProgressBar.style.display = 'none';
+    }, 1500);
+
+    showToast(`Checked ${total} channels: ${onlineCount} Live, ${vlcCount} VLC, ${offlineCount} Dead`, '⚡');
   }
 
   // --- Playlist Loader ---
@@ -726,7 +914,22 @@
   function createChannelRowElement(ch) {
     const row = document.createElement('div');
     const isPlaying = state.currentChannel && state.currentChannel.id === ch.id;
-    row.className = `channel-list-item ${isPlaying ? 'active' : ''}`;
+    const health = state.streamHealth.get(ch.id);
+
+    let statusPill = '';
+    let isOfflineClass = '';
+    if (health) {
+      const tooltips = {
+        online: 'Live & Playable',
+        vlc: 'Live in VLC (CORS restricted)',
+        offline: 'Offline / Inaccessible',
+        testing: 'Checking status...'
+      };
+      statusPill = `<span class="item-status-pill ${health.status}" title="${tooltips[health.status] || ''}"></span>`;
+      if (health.status === 'offline') isOfflineClass = 'is-offline';
+    }
+
+    row.className = `channel-list-item ${isPlaying ? 'active' : ''} ${isOfflineClass}`;
     row.id = `row-${ch.id}`;
 
     const isFav = state.favorites.has(ch.id);
@@ -745,6 +948,7 @@
     row.innerHTML = `
       <div class="item-logo-box">${logoContent}</div>
       <span class="item-name" title="${escapeHtml(ch.name)}">${escapeHtml(ch.name)}</span>
+      ${statusPill}
       <span class="item-flag">${ch.flag || '🌐'}</span>
       ${ch.quality !== 'Auto' ? `<span class="item-quality ${qualityClass}">${escapeHtml(ch.quality.replace(' UHD','').replace(' FHD','').replace(' HD',''))}</span>` : ''}
       <button class="item-fav-btn ${isFav ? 'favorited' : ''}" data-id="${ch.id}" title="Favorite">
@@ -839,6 +1043,7 @@
           console.warn('HLS Fatal Error:', data.type, data.details);
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
+              updateChannelRowStatus(ch.id, state.useCorsProxy ? 'offline' : 'vlc');
               showStreamError(
                 'Stream Network / CORS Notice',
                 'This stream could not be loaded directly by your browser (frequently due to CORS or token expiration). You can launch it in VLC Player with one click!',
@@ -849,6 +1054,7 @@
               hls.recoverMediaError();
               break;
             default:
+              updateChannelRowStatus(ch.id, 'offline');
               showStreamError(
                 'Playback Error',
                 `Stream codec or format is not supported natively in this browser. Click below to open in VLC.`,
@@ -870,6 +1076,7 @@
       hls.loadSource(url);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        updateChannelRowStatus(ch.id, 'online');
         video.play().catch(err => {
           console.warn('Autoplay prevented:', err);
           showToast('Click play to begin streaming', '▶️');
@@ -1115,6 +1322,23 @@
       state.openGroups.clear();
       applyFiltersAndRender();
     });
+
+    // Health Checker Controls
+    if (els.checkHealthBtn) {
+      els.checkHealthBtn.addEventListener('click', probeFilteredChannels);
+    }
+
+    if (els.hideOfflineCheckbox) {
+      els.hideOfflineCheckbox.checked = state.hideOffline;
+      els.channelGroupsContainer.classList.toggle('hide-offline-active', state.hideOffline);
+
+      els.hideOfflineCheckbox.addEventListener('change', (e) => {
+        state.hideOffline = e.target.checked;
+        localStorage.setItem('nova_hide_offline', state.hideOffline);
+        els.channelGroupsContainer.classList.toggle('hide-offline-active', state.hideOffline);
+        showToast(state.hideOffline ? 'Hiding dead channels' : 'Showing all channels', '👁️');
+      });
+    }
 
     // Expand / Collapse all
     els.expandAllBtn.addEventListener('click', () => {

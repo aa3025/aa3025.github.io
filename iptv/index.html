@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -150,6 +150,22 @@
           <button class="text-action-btn" id="collapse-all-btn">Collapse All</button>
           <span class="dot-sep">•</span>
           <button class="text-action-btn reset-btn" id="reset-all-filters-btn">Reset Filters</button>
+        </div>
+
+        <!-- Health Checker Bar (Probing & Filter Dead Channels) -->
+        <div class="health-checker-bar">
+          <button class="health-btn" id="check-health-btn" title="Check live status of channels in current view">
+            <span class="health-btn-icon">⚡</span>
+            <span id="health-btn-text">Check Live</span>
+          </button>
+          <label class="hide-dead-toggle" title="Hide dead or unreachable channels">
+            <input type="checkbox" id="hide-offline-checkbox">
+            <span>Hide Dead</span>
+          </label>
+          <span class="health-stats" id="health-stats" style="display: none;"></span>
+        </div>
+        <div class="probe-progress-bar" id="probe-progress-bar" style="display: none;">
+          <div class="probe-progress-fill" id="probe-progress-fill" style="width: 0%;"></div>
         </div>
       </div>
 
@@ -391,6 +407,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

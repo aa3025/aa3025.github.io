@@ -437,6 +437,82 @@ html, body {
   opacity: 0.5;
 }
 
+/* Health Checker Controls & Filter */
+.health-checker-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 4px 10px;
+  margin-top: 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.health-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(99, 102, 241, 0.16);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: var(--radius-sm);
+  color: #c7d2fe;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.health-btn:hover {
+  background: rgba(99, 102, 241, 0.3);
+  border-color: rgba(99, 102, 241, 0.6);
+  color: #fff;
+}
+
+.health-btn.checking {
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.hide-dead-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  margin-left: 2px;
+}
+
+.hide-dead-toggle input {
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+}
+
+.health-stats {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+.probe-progress-bar {
+  width: 100%;
+  height: 2.5px;
+  background: rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  margin-top: 6px;
+  border-radius: 2px;
+}
+
+.probe-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #10b981);
+  transition: width 0.15s ease;
+}
+
 /* ==========================================================================
    VERTICAL GROUPED LIST (ACCORDION & ITEMS)
    ========================================================================== */
@@ -626,6 +702,60 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Status Pills */
+.item-status-pill {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+  transition: background-color var(--transition-fast);
+}
+
+.item-status-pill.online {
+  background-color: var(--accent-emerald);
+  box-shadow: 0 0 6px var(--accent-emerald);
+}
+
+.item-status-pill.vlc {
+  background-color: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+}
+
+.item-status-pill.offline {
+  background-color: var(--accent-rose);
+  box-shadow: 0 0 4px rgba(244, 63, 94, 0.4);
+}
+
+.item-status-pill.testing {
+  background-color: #38bdf8;
+  animation: pulseTesting 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes pulseTesting {
+  from { opacity: 0.3; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1.3); }
+}
+
+.channel-list-item.is-offline {
+  opacity: 0.42;
+  filter: grayscale(0.6);
+}
+
+.channel-list-item.is-offline:hover {
+  opacity: 0.85;
+}
+
+.channel-list-item.is-offline .item-name {
+  text-decoration: line-through;
+  text-decoration-color: rgba(244, 63, 94, 0.4);
+}
+
+/* Hide dead when toggle is active */
+.hide-offline-active .channel-list-item.is-offline {
+  display: none !important;
 }
 
 .channel-list-item.active .item-name {
