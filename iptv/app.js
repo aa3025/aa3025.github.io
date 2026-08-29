@@ -290,6 +290,10 @@
     castHeaderBtn: document.getElementById('cast-header-btn'),
     fsCastBtn: document.getElementById('fs-cast-btn'),
     ctrlCastBtn: document.getElementById('ctrl-cast-btn'),
+    vTopCastBtn: document.getElementById('v-top-cast-btn'),
+    videoCenterPlayBtn: document.getElementById('video-center-play-btn'),
+    vCenterIconPlay: document.querySelector('.v-center-icon-play'),
+    vCenterIconPause: document.querySelector('.v-center-icon-pause'),
     castModal: document.getElementById('cast-modal'),
     closeCastModalBtn: document.getElementById('close-cast-modal-btn'),
     castPreviewFlag: document.getElementById('cast-preview-flag'),
@@ -1639,7 +1643,7 @@
   }
 
   function updateCastButtons(isCasting) {
-    [els.castHeaderBtn, els.fsCastBtn, els.ctrlCastBtn].forEach(btn => {
+    [els.castHeaderBtn, els.fsCastBtn, els.ctrlCastBtn, els.vTopCastBtn].forEach(btn => {
       if (btn) btn.classList.toggle('casting', !!isCasting);
     });
   }
@@ -2017,7 +2021,7 @@
     }
 
     // Cast Modal & Buttons
-    [els.castHeaderBtn, els.fsCastBtn, els.ctrlCastBtn].forEach(btn => {
+    [els.castHeaderBtn, els.fsCastBtn, els.ctrlCastBtn, els.vTopCastBtn].forEach(btn => {
       if (btn) btn.addEventListener('click', startCasting);
     });
 
@@ -2108,6 +2112,7 @@
 
     // Player Controls
     els.ctrlPlayBtn.addEventListener('click', togglePlayPause);
+    if (els.videoCenterPlayBtn) els.videoCenterPlayBtn.addEventListener('click', togglePlayPause);
     els.ctrlPrevBtn.addEventListener('click', playPrev);
     els.ctrlNextBtn.addEventListener('click', playNext);
     els.ctrlMuteBtn.addEventListener('click', () => toggleMute());
@@ -2132,6 +2137,8 @@
       els.iconPause.style.display = 'block';
       if (els.fsIconPlay) els.fsIconPlay.style.display = 'none';
       if (els.fsIconPause) els.fsIconPause.style.display = 'block';
+      if (els.vCenterIconPlay) els.vCenterIconPlay.style.display = 'none';
+      if (els.vCenterIconPause) els.vCenterIconPause.style.display = 'block';
       els.equalizerBars.classList.add('playing');
       els.bufferingSpinner.style.display = 'none';
       els.streamErrorCard.style.display = 'none';
@@ -2142,6 +2149,8 @@
       els.iconPause.style.display = 'none';
       if (els.fsIconPlay) els.fsIconPlay.style.display = 'block';
       if (els.fsIconPause) els.fsIconPause.style.display = 'none';
+      if (els.vCenterIconPlay) els.vCenterIconPlay.style.display = 'block';
+      if (els.vCenterIconPause) els.vCenterIconPause.style.display = 'none';
       els.equalizerBars.classList.remove('playing');
     });
 

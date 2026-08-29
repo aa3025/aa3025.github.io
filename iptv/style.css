@@ -1760,6 +1760,125 @@ html, body {
   transform: translate(-50%, -50%) scale(1);
 }
 
+/* Top Right Corner Video Overlay (Cast to Smart TV) */
+.video-top-overlay {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: auto;
+}
+
+.video-container.idle .video-top-overlay {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+}
+
+.v-top-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(10, 15, 29, 0.78);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: var(--transition-fast);
+}
+
+.v-top-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.v-top-btn:hover {
+  background: rgba(14, 165, 233, 0.35);
+  border-color: #38bdf8;
+  color: #fff;
+  transform: scale(1.06);
+}
+
+.v-top-btn:active {
+  transform: scale(0.94);
+}
+
+.v-top-btn.casting {
+  background: #38bdf8;
+  color: #0b1120;
+  border-color: #7dd3fc;
+}
+
+/* Center Tap Play / Pause Button */
+.video-center-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.82);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 14;
+  opacity: 1;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s;
+  pointer-events: auto;
+}
+
+.video-center-play-btn svg {
+  width: 32px;
+  height: 32px;
+}
+
+.video-container.idle .video-center-play-btn {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.9);
+}
+
+.video-center-play-btn:hover {
+  background: var(--accent-primary);
+  border-color: #c7d2fe;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.video-center-play-btn:active {
+  transform: translate(-50%, -50%) scale(0.92);
+}
+
+/* In fullscreen mode, dedicated fs center controls take over */
+.video-container:fullscreen .video-center-play-btn,
+.video-container:-webkit-full-screen .video-center-play-btn,
+.video-container.is-fullscreen .video-center-play-btn {
+  display: none !important;
+}
+
+.video-container:fullscreen .video-top-overlay,
+.video-container:-webkit-full-screen .video-top-overlay,
+.video-container.is-fullscreen .video-top-overlay {
+  display: none !important;
+}
+
 /* True Fullscreen Container Sizing */
 .video-container:fullscreen,
 .video-container:-webkit-full-screen,
@@ -2425,9 +2544,33 @@ video::cue {
     display: none !important;
   }
 
-  /* Hide PiP button on mobile */
-  .ctrl-pip-btn {
+  /* Hide PiP, Prev, Next, Play, and bottom Cast buttons on mobile */
+  .ctrl-pip-btn,
+  #ctrl-prev-btn,
+  #ctrl-next-btn,
+  #ctrl-play-btn,
+  #ctrl-cast-btn {
     display: none !important;
+  }
+
+  .video-overlay-controls {
+    padding: 8px 12px !important;
+    gap: 8px !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .controls-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .controls-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-left: auto !important;
   }
 
   .ctrl-btn {
@@ -2436,9 +2579,13 @@ video::cue {
     min-height: 36px !important;
   }
 
-  .ctrl-btn.play-btn {
-    width: 38px !important;
-    height: 38px !important;
+  #ctrl-fullscreen-btn {
+    display: inline-flex !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-radius: var(--radius-sm) !important;
+    flex-shrink: 0 !important;
   }
 
   .stream-info-tag {

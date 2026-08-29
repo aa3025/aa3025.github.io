@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=18">
+  <link rel="stylesheet" href="style.css?v=19">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -386,6 +386,27 @@
           </button>
         </div>
 
+        <!-- Top Right Corner Video Overlay (Cast to TV Button) -->
+        <div class="video-top-overlay" id="video-top-overlay">
+          <button class="v-top-btn" id="v-top-cast-btn" title="Cast to Smart TV / Chromecast / AirPlay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+              <line x1="2" y1="20" x2="2.01" y2="20"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Standard Center Tap Play / Pause Button -->
+        <button class="video-center-play-btn" id="video-center-play-btn" title="Play / Pause">
+          <svg class="v-center-icon-play" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="6 4 20 12 6 20 6 4"></polygon>
+          </svg>
+          <svg class="v-center-icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </button>
+
         <!-- Cinema Video Overlay Controls -->
         <div class="video-overlay-controls" id="video-overlay-controls">
           <div class="controls-left">
@@ -597,6 +618,6 @@
   </div>
 
   <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-  <script src="app.js?v=18"></script>
+  <script src="app.js?v=19"></script>
 </body>
 </html>
