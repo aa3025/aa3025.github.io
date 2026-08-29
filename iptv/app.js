@@ -1317,15 +1317,6 @@
       return;
     }
 
-    if (isHttpsOrigin && isPlainHttp) {
-      showStreamError(
-        'Insecure HTTP Stream • Open in VLC',
-        'Modern browsers block unencrypted HTTP streams on HTTPS sites (Mixed Content security policy). This stream plays smoothly in VLC Player with zero restrictions!',
-        ch
-      );
-      return;
-    }
-
     // Direct Stream URL
     const streamUrl = ch.url;
 
@@ -1442,11 +1433,19 @@
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
               updateChannelRowStatus(ch.id, 'vlc');
-              showStreamError(
-                'Stream Network / CORS Notice',
-                'This stream could not be loaded directly by your browser (frequently due to CORS or token expiration). You can launch it in VLC Player with one click!',
-                ch
-              );
+              if (isHttpsOrigin && isPlainHttp) {
+                showStreamError(
+                  'Insecure HTTP Stream • Blocked by Browser',
+                  'Your browser blocked this HTTP stream under HTTPS Mixed Content security rules. You can launch it in VLC Player with 1-click below, OR in Chrome: click the tune/padlock icon next to the URL -> Site settings -> Insecure content -> Allow, then reload to play it directly here!',
+                  ch
+                );
+              } else {
+                showStreamError(
+                  'Stream Network / CORS Notice',
+                  'This stream could not be loaded directly by your browser (frequently due to CORS or token expiration). You can launch it in VLC Player with one click!',
+                  ch
+                );
+              }
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
               hls.recoverMediaError();
