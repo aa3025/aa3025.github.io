@@ -1537,6 +1537,59 @@
           }
         });
 
+        // Codec translation hook: map in-band 'hev1' to browser-friendly 'hvc1'
+        dashPlayer.on(dashjs.MediaPlayer.events.MANIFEST_LOADED, (e) => {
+          if (e && e.data) {
+            try {
+              const manifest = e.data;
+              const periods = manifest.Period_asArray || (manifest.Period ? [manifest.Period] : []);
+              periods.forEach(p => {
+                const adaptSets = p.AdaptationSet_asArray || (p.AdaptationSet ? [p.AdaptationSet] : []);
+                adaptSets.forEach(as => {
+                  if (as.contentType === 'video' || as.mimeType === 'video/mp4') {
+                    const reps = as.Representation_asArray || (as.Representation ? [as.Representation] : []);
+                    reps.forEach(rep => {
+                      if (rep.codecs && rep.codecs.startsWith('hev1')) {
+                        const hvc1Codec = rep.codecs.replace('hev1', 'hvc1');
+                        if (window.MediaSource && MediaSource.isTypeSupported && MediaSource.isTypeSupported(`video/mp4; codecs="${hvc1Codec}"`)) {
+                          console.log(`Normalizing HEVC codec: ${rep.codecs} -> ${hvc1Codec}`);
+                          rep.codecs = hvc1Codec;
+                        }
+                      }
+                    });
+                  }
+                });
+              });
+            } catch (err) {
+              console.warn('Manifest codec normalization error:', err);
+            }
+          }
+        });
+
+        // Automatic Video Fallback:
+        // If playing an HEVC stream and videoWidth is 0 (audio-only),
+        // automatically fallback to the broadcast-grade H.264 50fps profile
+        if (url.includes('hevc_')) {
+          const hevcFallbackTimer = setTimeout(() => {
+            if (video && !video.paused && video.videoWidth === 0) {
+              console.warn('HEVC video decoding unsupported by browser hardware. Falling back to H.264 HD feed...');
+              const fallbackUrl = url.replace(/hevc_iptv_mse_v\d+\.mpd/i, 'pc_hd_abr_v2.mpd');
+              showToast('Switching to H.264 50fps video feed...', '🔄');
+              setupDashPlayer(fallbackUrl, ch);
+            }
+          }, 3000);
+
+          const onData = () => {
+            if (video.videoWidth > 0) {
+              clearTimeout(hevcFallbackTimer);
+              video.removeEventListener('loadeddata', onData);
+              video.removeEventListener('timeupdate', onData);
+            }
+          };
+          video.addEventListener('loadeddata', onData);
+          video.addEventListener('timeupdate', onData);
+        }
+
         dashPlayer.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
           updateChannelRowStatus(ch.id, 'online');
           els.streamInfoTag.textContent = 'MPEG-DASH • LIVE';
