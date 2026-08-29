@@ -243,9 +243,6 @@
     headerLangBadge: document.getElementById('header-lang-badge'),
     openVlcBtn: document.getElementById('open-vlc-btn'),
     copyUrlBtn: document.getElementById('copy-url-btn'),
-    toggleCorsProxyBtn: document.getElementById('toggle-cors-proxy-btn'),
-    proxyDot: document.getElementById('proxy-dot'),
-    proxyLabel: document.getElementById('proxy-label'),
     headerFavBtn: document.getElementById('header-fav-btn'),
     ctrlPlayBtn: document.getElementById('ctrl-play-btn'),
     iconPlay: document.querySelector('.icon-play'),
@@ -287,7 +284,6 @@
     filtersCollapseText: document.getElementById('filters-collapse-text'),
     activeChipsContainer: document.getElementById('active-chips-container'),
     miniCheckHealthBtn: document.getElementById('mini-check-health-btn'),
-    castHeaderBtn: document.getElementById('cast-header-btn'),
     fsCastBtn: document.getElementById('fs-cast-btn'),
     ctrlCastBtn: document.getElementById('ctrl-cast-btn'),
     vTopCastBtn: document.getElementById('v-top-cast-btn'),
@@ -1240,11 +1236,8 @@
       return;
     }
 
-    // Build Stream URL (Direct vs Public CORS Proxy)
-    let streamUrl = ch.url;
-    if (state.useCorsProxy) {
-      streamUrl = `https://corsproxy.io/?url=${encodeURIComponent(ch.url)}`;
-    }
+    // Direct Stream URL
+    const streamUrl = ch.url;
 
     // Load Stream in Player
     clearOldSubtitles();
@@ -1358,7 +1351,7 @@
           console.warn('HLS Fatal Error:', data.type, data.details);
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              updateChannelRowStatus(ch.id, state.useCorsProxy ? 'offline' : 'vlc');
+              updateChannelRowStatus(ch.id, 'vlc');
               showStreamError(
                 'Stream Network / CORS Notice',
                 'This stream could not be loaded directly by your browser (frequently due to CORS or token expiration). You can launch it in VLC Player with one click!',
@@ -1441,22 +1434,6 @@
     navigator.clipboard.writeText(state.currentChannel.url).then(() => {
       showToast('Stream URL copied to clipboard!', '📋');
     });
-  }
-
-  function toggleCorsProxy() {
-    state.useCorsProxy = !state.useCorsProxy;
-    localStorage.setItem('nova_use_cors_proxy', state.useCorsProxy.toString());
-    updateProxyBadge();
-    showToast(`CORS Mode: ${state.useCorsProxy ? 'Public Proxy Enabled' : 'Direct Mode'}`, '🔄');
-
-    if (state.currentChannel) {
-      playChannel(state.currentChannel);
-    }
-  }
-
-  function updateProxyBadge() {
-    els.toggleCorsProxyBtn.classList.toggle('active-proxy', state.useCorsProxy);
-    els.proxyLabel.textContent = state.useCorsProxy ? 'Proxy Mode' : 'Direct Mode';
   }
 
   // --- Video Controls ---
@@ -1643,7 +1620,7 @@
   }
 
   function updateCastButtons(isCasting) {
-    [els.castHeaderBtn, els.fsCastBtn, els.ctrlCastBtn, els.vTopCastBtn].forEach(btn => {
+    [els.fsCastBtn, els.ctrlCastBtn, els.vTopCastBtn].forEach(btn => {
       if (btn) btn.classList.toggle('casting', !!isCasting);
     });
   }
@@ -1654,10 +1631,7 @@
     const session = cast.framework.CastContext.getInstance().getCurrentSession();
     if (!session) return;
 
-    let streamUrl = state.currentChannel.url;
-    if (state.useCorsProxy) {
-      streamUrl = `https://corsproxy.io/?url=${encodeURIComponent(state.currentChannel.url)}`;
-    }
+    const streamUrl = state.currentChannel.url;
 
     try {
       const mediaInfo = new chrome.cast.media.MediaInfo(streamUrl, 'application/x-mpegURL');
@@ -2021,7 +1995,7 @@
     }
 
     // Cast Modal & Buttons
-    [els.castHeaderBtn, els.fsCastBtn, els.ctrlCastBtn, els.vTopCastBtn].forEach(btn => {
+    [els.fsCastBtn, els.ctrlCastBtn, els.vTopCastBtn].forEach(btn => {
       if (btn) btn.addEventListener('click', startCasting);
     });
 
@@ -2100,8 +2074,6 @@
     els.errorVlcBtn.addEventListener('click', openCurrentInVlc);
     els.copyUrlBtn.addEventListener('click', copyCurrentUrl);
     els.errorCopyBtn.addEventListener('click', copyCurrentUrl);
-    els.toggleCorsProxyBtn.addEventListener('click', toggleCorsProxy);
-    els.errorProxyBtn.addEventListener('click', toggleCorsProxy);
     els.errorNextBtn.addEventListener('click', playNext);
 
     els.headerFavBtn.addEventListener('click', () => {

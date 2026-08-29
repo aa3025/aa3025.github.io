@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=21">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -271,21 +271,6 @@
             <span>Copy URL</span>
           </button>
 
-          <!-- Cast to TV / Chromecast / AirPlay Button -->
-          <button class="action-btn cast-btn" id="cast-header-btn" title="Cast to Smart TV / Chromecast / AirPlay">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
-              <line x1="2" y1="20" x2="2.01" y2="20"></line>
-            </svg>
-            <span>Cast</span>
-          </button>
-
-          <!-- CORS Proxy Switcher -->
-          <button class="action-btn proxy-btn" id="toggle-cors-proxy-btn" title="Toggle Public CORS Proxy fallback">
-            <span class="proxy-dot" id="proxy-dot"></span>
-            <span id="proxy-label">Direct Mode</span>
-          </button>
-
           <!-- Favorite Current Channel -->
           <button class="fav-header-btn" id="header-fav-btn" title="Toggle Favorite">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -335,7 +320,6 @@
               <span>Launch in VLC</span>
             </button>
             <button class="secondary-btn" id="error-copy-btn">Copy Stream URL</button>
-            <button class="secondary-btn" id="error-proxy-btn">Try with CORS Proxy</button>
             <button class="secondary-btn" id="error-next-btn">Next Channel ⏭</button>
           </div>
         </div>
@@ -618,6 +602,6 @@
   </div>
 
   <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-  <script src="app.js?v=20"></script>
+  <script src="app.js?v=21"></script>
 </body>
 </html>
