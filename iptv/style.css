@@ -1992,6 +1992,100 @@ html, body {
     background: #000;
   }
 
+  /* Mobile & Fullscreen Bottom Controls: Compact horizontal fit */
+  .video-overlay-controls {
+    padding: 8px 12px !important;
+    padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    padding-left: max(12px, env(safe-area-inset-left)) !important;
+    padding-right: max(12px, env(safe-area-inset-right)) !important;
+    gap: 6px !important;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%) !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .controls-left {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .controls-right {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Hide the 100px volume range on mobile and small fullscreen - users use hardware volume buttons or tap Mute */
+  .volume-range {
+    display: none !important;
+  }
+
+  /* Hide equalizer on mobile to save space */
+  .equalizer-bars {
+    display: none !important;
+  }
+
+  /* Hide PiP button on mobile */
+  .ctrl-pip-btn {
+    display: none !important;
+  }
+
+  .ctrl-btn {
+    padding: 6px 8px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+
+  .ctrl-btn.play-btn {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .stream-info-tag {
+    font-size: 0.65rem !important;
+    padding: 3px 6px !important;
+    max-width: 75px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .fullscreen-top-bar {
+    padding: 8px 12px !important;
+    padding-top: max(8px, env(safe-area-inset-top)) !important;
+    padding-left: max(12px, env(safe-area-inset-left)) !important;
+    padding-right: max(12px, env(safe-area-inset-right)) !important;
+    gap: 8px !important;
+  }
+
+  .fs-exit-btn {
+    padding: 6px 12px !important;
+    min-height: 36px !important;
+    font-size: 0.75rem !important;
+    gap: 5px !important;
+  }
+
+  .fs-channel-name {
+    max-width: 150px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .fs-center-btn {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .fs-center-btn.fs-play-center-btn {
+    width: 62px !important;
+    height: 62px !important;
+  }
+
   .player-placeholder {
     padding: 16px;
   }

@@ -1296,7 +1296,7 @@
     els.videoContainer.classList.remove('idle');
     clearTimeout(overlayTimer);
     if (!els.video.paused) {
-      const delay = typeof customDelay === 'number' ? customDelay : 3500;
+      const delay = typeof customDelay === 'number' ? customDelay : 7000;
       overlayTimer = setTimeout(() => {
         els.videoContainer.classList.add('idle');
       }, delay);
@@ -1608,32 +1608,31 @@
       els.streamErrorCard.style.display = 'none';
     });
 
-    // Video container tap/click to toggle controls
-    els.videoContainer.addEventListener('mousemove', () => resetOverlayIdleTimer(3500));
-    els.videoContainer.addEventListener('click', (e) => {
-      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.stream-error-card')) {
-        resetOverlayIdleTimer(4000);
-        return;
-      }
-      if (els.videoContainer.classList.contains('idle')) {
-        resetOverlayIdleTimer(4000);
-      } else {
-        els.videoContainer.classList.add('idle');
-      }
-    });
+    // Video container tap/click to toggle controls with ghost-click protection
+    let lastTapTimestamp = 0;
 
-    // Touch tap on mobile
-    els.videoContainer.addEventListener('touchend', (e) => {
-      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.stream-error-card')) {
-        resetOverlayIdleTimer(4000);
+    function handleVideoTap(e) {
+      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('label') || e.target.closest('.stream-error-card') || e.target.closest('.fs-exit-btn')) {
+        resetOverlayIdleTimer(7000);
         return;
       }
+
+      const now = Date.now();
+      if (now - lastTapTimestamp < 450) {
+        return;
+      }
+      lastTapTimestamp = now;
+
       if (els.videoContainer.classList.contains('idle')) {
-        resetOverlayIdleTimer(4000);
+        resetOverlayIdleTimer(7000);
       } else {
         els.videoContainer.classList.add('idle');
       }
-    }, { passive: true });
+    }
+
+    els.videoContainer.addEventListener('mousemove', () => resetOverlayIdleTimer(5000));
+    els.videoContainer.addEventListener('click', handleVideoTap);
+    els.videoContainer.addEventListener('touchend', handleVideoTap, { passive: true });
 
     // Global Shortcuts
     document.addEventListener('keydown', (e) => {
