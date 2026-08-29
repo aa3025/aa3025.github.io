@@ -669,11 +669,98 @@
     showToast(`Scan complete: ${onlineCount} Browser Live, ${vlcCount} VLC, ${offlineCount} Blocked/Dead`, '⚡');
   }
 
-  // --- Playlist Loader ---
-  const DEFAULT_PLAYLIST_URL = 'https://iptv-org.github.io/iptv/index.m3u';
+  // --- IndexedDB Channel Cache for Instant Zero-Second Startup ---
+  const DB_NAME = 'NovaIPTV_DB';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'channels_cache';
 
-  async function loadPlaylist(sourceUrl) {
-    const url = sourceUrl || localStorage.getItem('nova_playlist_url') || DEFAULT_PLAYLIST_URL;
+  function openDatabase() {
+    return new Promise((resolve, reject) => {
+      if (!window.indexedDB) {
+        return reject(new Error('IndexedDB not supported'));
+      }
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function getSavedChannels() {
+    try {
+      const db = await openDatabase();
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get('saved_playlist');
+        req.onsuccess = () => {
+          if (req.result && Array.isArray(req.result.channels) && req.result.channels.length > 0) {
+            resolve(req.result);
+          } else {
+            resolve(null);
+          }
+        };
+        req.onerror = () => resolve(null);
+      });
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function saveChannelsToCache(channels, source) {
+    try {
+      const db = await openDatabase();
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      store.put({
+        id: 'saved_playlist',
+        source: source || './playlist.m3u',
+        timestamp: Date.now(),
+        channels: channels
+      });
+    } catch (e) {
+      console.warn('Failed to cache channels in IndexedDB:', e);
+    }
+  }
+
+  // --- Playlist Loader ---
+  const DEFAULT_PLAYLIST_URL = './playlist.m3u';
+
+  async function loadPlaylist(sourceUrl, forceNetwork = false) {
+    // If old slow remote URL was saved in localStorage, upgrade it to local fast playlist
+    let storedUrl = localStorage.getItem('nova_playlist_url');
+    if (storedUrl === 'https://iptv-org.github.io/iptv/index.m3u') {
+      storedUrl = DEFAULT_PLAYLIST_URL;
+      localStorage.setItem('nova_playlist_url', DEFAULT_PLAYLIST_URL);
+    }
+
+    const url = sourceUrl || storedUrl || DEFAULT_PLAYLIST_URL;
+
+    // 1. FAST PATH: Instant startup from saved IndexedDB cache!
+    if (!forceNetwork && !sourceUrl) {
+      const cached = await getSavedChannels();
+      if (cached && cached.channels && cached.channels.length > 0) {
+        console.log(`Instant startup from saved playlist cache: ${cached.channels.length} channels`);
+        state.allChannels = cached.channels;
+        els.sidebarLoading.style.display = 'none';
+        els.fileDropzone.style.display = 'none';
+        els.totalCountBadge.textContent = `${state.allChannels.length.toLocaleString()} channels`;
+
+        populateDropdownFilters();
+        populateGenreFilter();
+        updateTabBadges();
+        applyFiltersAndRender();
+        showToast(`Loaded ${state.allChannels.length.toLocaleString()} channels (Instant Cache)`, '⚡');
+        return;
+      }
+    }
+
+    // 2. NETWORK PATH: Load from URL (bundled local ./playlist.m3u or custom)
     els.sidebarLoading.style.display = 'flex';
     els.fileDropzone.style.display = 'none';
 
@@ -682,8 +769,8 @@
 
     if (loadingText) {
       loadingText.textContent = isOnlineUrl
-        ? `Fetching live channels from ${url.replace('https://', '')}...`
-        : `Loading channels from ${url}...`;
+        ? `Fetching channels from ${url.replace('https://', '')}...`
+        : `Loading saved playlist (${url})...`;
     }
 
     try {
@@ -692,29 +779,34 @@
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const text = await res.text();
       localStorage.setItem('nova_playlist_url', url);
-      onPlaylistLoaded(text, isOnlineUrl ? 'iptv-org GitHub' : url);
+      onPlaylistLoaded(text, isOnlineUrl ? 'Remote URL' : 'Saved playlist.m3u');
     } catch (err) {
       console.warn(`Fetch from ${url} failed:`, err);
 
-      // Fallback: If online URL failed, try local ./playlist.m3u
+      // Fallback: If custom/remote URL failed, try local ./playlist.m3u
       if (url !== './playlist.m3u') {
-        showToast('Online fetch failed, loading local playlist.m3u...', '⚠️');
         try {
           const resLocal = await fetch('./playlist.m3u');
           if (resLocal.ok) {
             const textLocal = await resLocal.text();
-            onPlaylistLoaded(textLocal, 'Local playlist.m3u');
+            onPlaylistLoaded(textLocal, 'Saved playlist.m3u');
             return;
           }
-        } catch (e) {
-          console.warn('Local playlist.m3u fetch also failed:', e);
-        }
+        } catch (_) {}
       }
 
-      // Check cache in localStorage
-      const cached = localStorage.getItem('nova_cached_m3u');
-      if (cached) {
-        onPlaylistLoaded(cached, 'Cached playlist');
+      // Check saved cache as fallback
+      const cachedFallback = await getSavedChannels();
+      if (cachedFallback && cachedFallback.channels) {
+        state.allChannels = cachedFallback.channels;
+        els.sidebarLoading.style.display = 'none';
+        els.fileDropzone.style.display = 'none';
+        els.totalCountBadge.textContent = `${state.allChannels.length.toLocaleString()} channels`;
+        populateDropdownFilters();
+        populateGenreFilter();
+        updateTabBadges();
+        applyFiltersAndRender();
+        showToast('Loaded channels from saved cache', '📦');
       } else {
         els.sidebarLoading.style.display = 'none';
         els.fileDropzone.style.display = 'flex';
@@ -733,10 +825,8 @@
     els.fileDropzone.style.display = 'none';
     els.totalCountBadge.textContent = `${state.allChannels.length.toLocaleString()} channels`;
 
-    // Cache small/medium playlists
-    if (text.length < 5 * 1024 * 1024) {
-      try { localStorage.setItem('nova_cached_m3u', text); } catch (_) {}
-    }
+    // Persist parsed channels to IndexedDB for instant sub-second startup on next visit
+    saveChannelsToCache(state.allChannels, filename);
 
     populateDropdownFilters();
     populateGenreFilter();
@@ -2223,7 +2313,6 @@
   // --- Init ---
   function init() {
     loadStoredData();
-    updateProxyBadge();
     setVolume(state.volume);
     initCastFramework();
     applySubtitleState();

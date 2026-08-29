@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=21">
+  <link rel="stylesheet" href="style.css?v=22">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -517,13 +517,13 @@
           Fetch live channels directly from any public M3U / M3U8 URL:
         </p>
         <div class="modal-input-group">
-          <input type="url" id="playlist-url-input" value="https://iptv-org.github.io/iptv/index.m3u" placeholder="https://..." class="modal-text-input">
+          <input type="url" id="playlist-url-input" value="./playlist.m3u" placeholder="https://... or ./playlist.m3u" class="modal-text-input">
           <button class="primary-btn vlc-btn" id="load-url-submit-btn" style="background: var(--accent-primary);">Fetch URL</button>
         </div>
         <div class="preset-sources">
           <span class="preset-label">Quick Presets:</span>
-          <button class="preset-btn" data-url="https://iptv-org.github.io/iptv/index.m3u">🌐 iptv-org GitHub (Default)</button>
-          <button class="preset-btn" data-url="./playlist.m3u">📁 Local playlist.m3u</button>
+          <button class="preset-btn" data-url="./playlist.m3u">⚡ Saved Local playlist.m3u (Instant)</button>
+          <button class="preset-btn" data-url="https://iptv-org.github.io/iptv/index.m3u">🌐 iptv-org GitHub Live</button>
         </div>
       </div>
     </div>
@@ -602,6 +602,6 @@
   </div>
 
   <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-  <script src="app.js?v=21"></script>
+  <script src="app.js?v=22"></script>
 </body>
 </html>
