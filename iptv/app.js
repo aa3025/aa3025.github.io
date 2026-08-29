@@ -1209,8 +1209,21 @@
       if (hls && hls.subtitleTracks && hls.subtitleTracks.length > 0) {
         hls.subtitleDisplay = true;
         hls.subtitleTrack = 0;
-      } else if (video.textTracks && video.textTracks.length > 0) {
-        video.textTracks[0].mode = 'showing';
+      }
+
+      // Enforce strict uniqueness: only the first track is allowed to show,
+      // all other tracks (CC3, duplicate 708, etc.) are strictly disabled to prevent double captions!
+      if (video.textTracks && video.textTracks.length > 0) {
+        let firstTrackShowing = false;
+        for (let i = 0; i < video.textTracks.length; i++) {
+          const track = video.textTracks[i];
+          if (!firstTrackShowing) {
+            track.mode = 'showing';
+            firstTrackShowing = true;
+          } else {
+            track.mode = 'disabled';
+          }
+        }
       }
     }
 
@@ -1244,8 +1257,16 @@
         manifestLoadingTimeOut: 12000,
         levelLoadingTimeOut: 12000,
         fragLoadingTimeOut: 15000,
-        enableCEA708Captions: state.subtitlesEnabled,
+        enableCEA708Captions: false, // Prevents duplicate CEA-708 tracks from mirroring CEA-608
         subtitleDisplay: state.subtitlesEnabled
+      });
+
+      hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, () => {
+        applySubtitleState();
+      });
+
+      hls.on(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, () => {
+        applySubtitleState();
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
@@ -1905,6 +1926,13 @@
     [els.ctrlCcBtn, els.fsCcBtn].forEach(btn => {
       if (btn) btn.addEventListener('click', toggleSubtitles);
     });
+
+    // Guard against duplicate captions added dynamically
+    if (els.video && els.video.textTracks) {
+      els.video.textTracks.onaddtrack = () => {
+        applySubtitleState();
+      };
+    }
 
     if (els.closeCastModalBtn) {
       els.closeCastModalBtn.addEventListener('click', closeCastModal);
