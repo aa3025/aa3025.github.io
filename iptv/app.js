@@ -714,6 +714,8 @@
   }
 
   async function saveChannelsToCache(channels, source) {
+    // Only cache full master playlists to IndexedDB, NEVER single streams or tiny subsets
+    if (!channels || channels.length < 500) return;
     try {
       const db = await openDatabase();
       const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -733,19 +735,19 @@
   const DEFAULT_PLAYLIST_URL = './playlist.m3u';
 
   async function loadPlaylist(sourceUrl, forceNetwork = false) {
-    // If old slow remote URL was saved in localStorage, upgrade it to local fast playlist
+    // If old slow remote URL or a single stream was saved in localStorage, reset to bundled playlist
     let storedUrl = localStorage.getItem('nova_playlist_url');
-    if (storedUrl === 'https://iptv-org.github.io/iptv/index.m3u') {
+    if (storedUrl === 'https://iptv-org.github.io/iptv/index.m3u' || (storedUrl && (storedUrl.endsWith('.mpd') || storedUrl.includes('mcquack') || storedUrl.includes('hevc_')))) {
       storedUrl = DEFAULT_PLAYLIST_URL;
       localStorage.setItem('nova_playlist_url', DEFAULT_PLAYLIST_URL);
     }
 
     const url = sourceUrl || storedUrl || DEFAULT_PLAYLIST_URL;
 
-    // 1. FAST PATH: Instant startup from saved IndexedDB cache!
+    // 1. FAST PATH: Instant startup from saved IndexedDB cache (only if full playlist >= 500 channels)
     if (!forceNetwork && !sourceUrl) {
       const cached = await getSavedChannels();
-      if (cached && cached.channels && cached.channels.length > 0) {
+      if (cached && cached.channels && cached.channels.length >= 500) {
         console.log(`Instant startup from saved playlist cache: ${cached.channels.length} channels`);
         state.allChannels = cached.channels;
         els.sidebarLoading.style.display = 'none';
@@ -758,6 +760,10 @@
         applyFiltersAndRender();
         showToast(`Loaded ${state.allChannels.length.toLocaleString()} channels (Instant Cache)`, '⚡');
         return;
+      } else {
+        // Cache is polluted with a single stream or subset - discard and force network reload of ./playlist.m3u
+        console.log('Cached playlist contains insufficient channels. Reloading bundled ./playlist.m3u...');
+        localStorage.setItem('nova_playlist_url', DEFAULT_PLAYLIST_URL);
       }
     }
 
@@ -2120,15 +2126,27 @@
       state.filters.genre = '';
       state.filters.language = '';
       state.filters.quality = '';
+      state.activeTab = 'all';
+      state.openGroups.clear();
       els.searchInput.value = '';
       els.clearSearchBtn.style.display = 'none';
       els.countryFilter.value = '';
       if (els.genreFilter) els.genreFilter.value = '';
       els.languageFilter.value = '';
       els.qualityFilter.value = '';
+      document.querySelectorAll('.sidebar-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+      els.tabAllBtn.classList.add('active');
+
+      // If channel list has shrunk below 500 (polluted by a single stream test), restore 12,869 channels!
+      if (state.allChannels.length < 500) {
+        showToast('Restoring 12,869 channels...', '🔄');
+        loadPlaylist(DEFAULT_PLAYLIST_URL, true);
+        return;
+      }
+
       populateGenreFilter('');
       applyFiltersAndRender();
-      showToast('Filters reset', '🔄');
+      showToast('Filters reset • Showing all channels', '🔄');
     });
 
     // Filter Collapse / Expand Listeners
@@ -2295,7 +2313,27 @@
         const url = els.playlistUrlInput.value.trim();
         if (url) {
           els.urlModal.style.display = 'none';
-          loadPlaylist(url);
+          // If the user entered a single stream URL (.m3u8, .mpd, .ts) rather than a playlist file:
+          const isDirectStream = url.endsWith('.mpd') || (url.endsWith('.m3u8') && !url.includes('index.m3u') && !url.includes('playlist.m3u')) || url.endsWith('.ts');
+          if (isDirectStream) {
+            const streamName = 'Custom Stream: ' + url.split('/').filter(Boolean).pop().split('?')[0];
+            const customCh = {
+              id: 'custom_' + Date.now(),
+              name: streamName,
+              url: url,
+              group: 'Custom Streams',
+              country_code: 'int',
+              country_name: 'Custom',
+              flag: '🌐',
+              quality: url.includes('1080') ? '1080p FHD' : (url.includes('720') ? '720p HD' : 'Auto')
+            };
+            state.allChannels.unshift(customCh);
+            applyFiltersAndRender();
+            playChannel(customCh);
+            showToast(`Streaming "${streamName}"`, '▶️');
+          } else {
+            loadPlaylist(url);
+          }
         }
       });
     }
