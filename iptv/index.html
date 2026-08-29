@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=11">
   <script src="hls.min.js"></script>
   <script>
     if (typeof Hls === 'undefined') {
@@ -101,77 +101,104 @@
       </div>
 
       <!-- Filters & Grouping Controls -->
-      <div class="sidebar-filters">
-        <!-- Grouping Switcher -->
-        <div class="filter-row">
-          <label class="filter-label" for="group-by-select">Group By:</label>
-          <select id="group-by-select" class="sidebar-select">
-            <option value="genre" selected>Genre / Category</option>
-            <option value="country">Country / Geography</option>
-            <option value="language">Language</option>
-            <option value="none">Flat List (A-Z)</option>
-          </select>
-        </div>
-
-        <!-- Geography / Country Filter -->
-        <div class="filter-row">
-          <label class="filter-label" for="country-filter">Country:</label>
-          <select id="country-filter" class="sidebar-select">
-            <option value="">All Countries</option>
-          </select>
-        </div>
-
-        <!-- Genre / Category Filter -->
-        <div class="filter-row">
-          <label class="filter-label" for="genre-filter">Genre:</label>
-          <select id="genre-filter" class="sidebar-select">
-            <option value="">All Genres</option>
-          </select>
-        </div>
-
-        <!-- Secondary Filter Row: Language & Resolution -->
-        <div class="filter-row-dual">
-          <div class="filter-col">
-            <label class="filter-label" for="language-filter">Language:</label>
-            <select id="language-filter" class="sidebar-select">
-              <option value="">All</option>
-            </select>
+      <div class="sidebar-filters" id="sidebar-filters">
+        <!-- Persistent One-Row Filter Header with Collapse/Expand Toggle -->
+        <div class="filters-toggle-bar" id="filters-toggle-bar">
+          <div class="filters-toggle-left">
+            <svg class="filters-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span class="filters-title">Filters</span>
+            <div class="active-chips-container" id="active-chips-container">
+              <!-- Dynamically populated with active filter tags when collapsed -->
+            </div>
           </div>
-          <div class="filter-col">
-            <label class="filter-label" for="quality-filter">Quality:</label>
-            <select id="quality-filter" class="sidebar-select">
-              <option value="">All</option>
-              <option value="4K UHD">4K</option>
-              <option value="1080p FHD">1080p</option>
-              <option value="720p HD">720p</option>
-              <option value="SD">SD</option>
-            </select>
+          <div class="filters-toggle-right">
+            <!-- Mini quick check button visible when collapsed -->
+            <button class="mini-quick-btn" id="mini-check-health-btn" title="Quick check live channels in current view">
+              <span>⚡ Check</span>
+            </button>
+            <!-- Collapse / Expand Toggle Button -->
+            <button class="filters-collapse-btn" id="filters-collapse-btn" title="Collapse or expand filters to increase channel list height">
+              <span id="filters-collapse-icon">▲</span>
+              <span id="filters-collapse-text">Hide</span>
+            </button>
           </div>
         </div>
 
-        <!-- Expand / Collapse All Accordions -->
-        <div class="accordion-actions-row">
-          <button class="text-action-btn" id="expand-all-btn">Expand All</button>
-          <span class="dot-sep">•</span>
-          <button class="text-action-btn" id="collapse-all-btn">Collapse All</button>
-          <span class="dot-sep">•</span>
-          <button class="text-action-btn reset-btn" id="reset-all-filters-btn">Reset Filters</button>
-        </div>
+        <!-- Collapsible Body Containing Dropdowns and Controls -->
+        <div class="filters-collapsible-body" id="filters-collapsible-body">
+          <!-- Grouping Switcher -->
+          <div class="filter-row">
+            <label class="filter-label" for="group-by-select">Group By:</label>
+            <select id="group-by-select" class="sidebar-select">
+              <option value="genre" selected>Genre / Category</option>
+              <option value="country">Country / Geography</option>
+              <option value="language">Language</option>
+              <option value="none">Flat List (A-Z)</option>
+            </select>
+          </div>
 
-        <!-- Health Checker Bar (Probing & Filter Dead Channels) -->
-        <div class="health-checker-bar">
-          <button class="health-btn" id="check-health-btn" title="Check live status of channels in current view">
-            <span class="health-btn-icon">⚡</span>
-            <span id="health-btn-text">Check Live</span>
-          </button>
-          <label class="hide-dead-toggle" title="Hide dead or unreachable channels">
-            <input type="checkbox" id="hide-offline-checkbox">
-            <span>Hide Dead</span>
-          </label>
-          <span class="health-stats" id="health-stats" style="display: none;"></span>
-        </div>
-        <div class="probe-progress-bar" id="probe-progress-bar" style="display: none;">
-          <div class="probe-progress-fill" id="probe-progress-fill" style="width: 0%;"></div>
+          <!-- Geography / Country Filter -->
+          <div class="filter-row">
+            <label class="filter-label" for="country-filter">Country:</label>
+            <select id="country-filter" class="sidebar-select">
+              <option value="">All Countries</option>
+            </select>
+          </div>
+
+          <!-- Genre / Category Filter -->
+          <div class="filter-row">
+            <label class="filter-label" for="genre-filter">Genre:</label>
+            <select id="genre-filter" class="sidebar-select">
+              <option value="">All Genres</option>
+            </select>
+          </div>
+
+          <!-- Secondary Filter Row: Language & Resolution -->
+          <div class="filter-row-dual">
+            <div class="filter-col">
+              <label class="filter-label" for="language-filter">Language:</label>
+              <select id="language-filter" class="sidebar-select">
+                <option value="">All</option>
+              </select>
+            </div>
+            <div class="filter-col">
+              <label class="filter-label" for="quality-filter">Quality:</label>
+              <select id="quality-filter" class="sidebar-select">
+                <option value="">All</option>
+                <option value="4K UHD">4K</option>
+                <option value="1080p FHD">1080p</option>
+                <option value="720p HD">720p</option>
+                <option value="SD">SD</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Expand / Collapse All Accordions -->
+          <div class="accordion-actions-row">
+            <button class="text-action-btn" id="expand-all-btn">Expand All</button>
+            <span class="dot-sep">•</span>
+            <button class="text-action-btn" id="collapse-all-btn">Collapse All</button>
+            <span class="dot-sep">•</span>
+            <button class="text-action-btn reset-btn" id="reset-all-filters-btn">Reset Filters</button>
+          </div>
+
+          <!-- Health Checker Bar (Probing & Filter Dead Channels) -->
+          <div class="health-checker-bar">
+            <button class="health-btn" id="check-health-btn" title="Check live status of channels in current view">
+              <span class="health-btn-icon">⚡</span>
+              <span id="health-btn-text">Check Live</span>
+            </button>
+            <label class="hide-dead-toggle" title="Hide dead or unreachable channels">
+              <input type="checkbox" id="hide-offline-checkbox">
+              <span>Hide Dead</span>
+            </label>
+            <span class="health-stats" id="health-stats" style="display: none;"></span>
+          </div>
+          <div class="probe-progress-bar" id="probe-progress-bar" style="display: none;">
+            <div class="probe-progress-fill" id="probe-progress-fill" style="width: 0%;"></div>
+          </div>
         </div>
       </div>
 
@@ -459,6 +486,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>

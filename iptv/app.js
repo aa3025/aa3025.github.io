@@ -276,7 +276,14 @@
     fsPlayBtn: document.getElementById('fs-play-btn'),
     fsNextBtn: document.getElementById('fs-next-btn'),
     fsIconPlay: document.querySelector('.fs-icon-play'),
-    fsIconPause: document.querySelector('.fs-icon-pause')
+    fsIconPause: document.querySelector('.fs-icon-pause'),
+    sidebarFilters: document.getElementById('sidebar-filters'),
+    filtersToggleBar: document.getElementById('filters-toggle-bar'),
+    filtersCollapseBtn: document.getElementById('filters-collapse-btn'),
+    filtersCollapseIcon: document.getElementById('filters-collapse-icon'),
+    filtersCollapseText: document.getElementById('filters-collapse-text'),
+    activeChipsContainer: document.getElementById('active-chips-container'),
+    miniCheckHealthBtn: document.getElementById('mini-check-health-btn')
   };
 
   // --- Fast In-Browser M3U Parser ---
@@ -807,7 +814,69 @@
     state.filteredChannels = list;
     els.renderedCountText.textContent = `${list.length.toLocaleString()} channels matching`;
 
+    updateFilterChips();
     renderVerticalGroupedList();
+  }
+
+  // --- Filter Collapse & Chips Management ---
+  function updateFilterChips() {
+    if (!els.activeChipsContainer) return;
+    els.activeChipsContainer.innerHTML = '';
+
+    const chips = [];
+
+    if (state.filters.country) {
+      const opt = els.countryFilter.querySelector(`option[value="${state.filters.country}"]`);
+      chips.push(opt ? opt.textContent.split('(')[0].trim() : state.filters.country);
+    }
+    if (state.filters.genre) {
+      chips.push(state.filters.genre);
+    }
+    if (state.filters.language) {
+      chips.push(state.filters.language);
+    }
+    if (state.filters.quality) {
+      chips.push(state.filters.quality.replace(' FHD', '').replace(' UHD', ''));
+    }
+    if (state.hideOffline) {
+      chips.push('🟢 Live Only');
+    }
+    if (state.groupBy && state.groupBy !== 'genre') {
+      chips.push(`Group: ${state.groupBy}`);
+    }
+
+    if (chips.length === 0) {
+      const chip = document.createElement('span');
+      chip.className = 'filter-chip';
+      chip.textContent = 'All Channels';
+      els.activeChipsContainer.appendChild(chip);
+    } else {
+      chips.forEach(text => {
+        const chip = document.createElement('span');
+        chip.className = 'filter-chip';
+        chip.textContent = text;
+        els.activeChipsContainer.appendChild(chip);
+      });
+    }
+  }
+
+  function setFiltersCollapsed(collapsed) {
+    if (!els.sidebarFilters) return;
+    els.sidebarFilters.classList.toggle('collapsed', collapsed);
+    if (els.filtersCollapseIcon) {
+      els.filtersCollapseIcon.textContent = collapsed ? '▼' : '▲';
+    }
+    if (els.filtersCollapseText) {
+      els.filtersCollapseText.textContent = collapsed ? 'Filters' : 'Hide';
+    }
+    updateFilterChips();
+    localStorage.setItem('nova_filters_collapsed', collapsed ? 'true' : 'false');
+  }
+
+  function toggleFiltersCollapsed() {
+    if (!els.sidebarFilters) return;
+    const isCollapsed = els.sidebarFilters.classList.contains('collapsed');
+    setFiltersCollapsed(!isCollapsed);
   }
 
   // --- Render Vertical Grouped List (NOT tiles, list grouped by genre/etc) ---
@@ -1455,6 +1524,35 @@
       applyFiltersAndRender();
       showToast('Filters reset', '🔄');
     });
+
+    // Filter Collapse / Expand Listeners
+    if (els.filtersCollapseBtn) {
+      els.filtersCollapseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFiltersCollapsed();
+      });
+    }
+
+    if (els.filtersToggleBar) {
+      els.filtersToggleBar.addEventListener('click', (e) => {
+        if (e.target.closest('#mini-check-health-btn')) return;
+        toggleFiltersCollapsed();
+      });
+    }
+
+    if (els.miniCheckHealthBtn) {
+      els.miniCheckHealthBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        probeFilteredChannels();
+      });
+    }
+
+    // Restore collapsed filters state
+    if (localStorage.getItem('nova_filters_collapsed') === 'true') {
+      setFiltersCollapsed(true);
+    } else {
+      updateFilterChips();
+    }
 
     // Mobile & Landscape Navigation Handlers
     if (els.scrollToChannelsBtn) {
