@@ -2310,11 +2310,66 @@
       .replace(/'/g, '&#039;');
   }
 
+  // --- Progressive Web App (PWA) & Native Installation ---
+  let deferredInstallPrompt = null;
+
+  function initPwa() {
+    // Register Service Worker for offline shell and instant boot
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('ServiceWorker registered with scope:', reg.scope))
+          .catch((err) => console.warn('ServiceWorker registration error:', err));
+      });
+    }
+
+    const installBtn = document.getElementById('install-app-btn');
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    if (isStandalone && installBtn) {
+      installBtn.style.display = 'none';
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (installBtn && !isStandalone) {
+        installBtn.style.display = 'inline-flex';
+      }
+    });
+
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          const { outcome } = await deferredInstallPrompt.userChoice;
+          if (outcome === 'accepted') {
+            installBtn.style.display = 'none';
+            showToast('Nova IPTV installed successfully!', '📲');
+          }
+          deferredInstallPrompt = null;
+        } else {
+          // Guided instructions for iOS Safari and Mac Safari
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+          const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+          if (isIOS) {
+            showToast('On iPhone: Tap Share ⎋ -> "Add to Home Screen" to install app', '📲');
+          } else if (isMac) {
+            showToast('On Mac: In Safari, click File -> "Add to Dock..." to install app', '📲');
+          } else {
+            showToast('In browser menu: Click "Install Nova IPTV" or "Add to Home Screen"', '📲');
+          }
+        }
+      });
+    }
+  }
+
   // --- Init ---
   function init() {
     loadStoredData();
     setVolume(state.volume);
     initCastFramework();
+    initPwa();
     applySubtitleState();
     setupEventListeners();
     loadPlaylist();
