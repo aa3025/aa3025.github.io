@@ -549,6 +549,14 @@ html, body {
   color: var(--text-main);
 }
 
+.sidebar-select optgroup {
+  background: var(--bg-sidebar-elevated);
+  color: var(--accent-cyan);
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 4px 0;
+}
+
 .accordion-actions-row {
   display: flex;
   align-items: center;
