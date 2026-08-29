@@ -1536,7 +1536,7 @@
     if (iconExit) iconExit.style.display = fs ? 'block' : 'none';
 
     if (fs) {
-      resetOverlayIdleTimer(4000);
+      resetOverlayIdleTimer(1600);
       syncFullscreenMetadata();
     }
   }
@@ -1593,7 +1593,7 @@
     els.videoContainer.classList.remove('idle');
     clearTimeout(overlayTimer);
     if (!els.video.paused) {
-      const delay = typeof customDelay === 'number' ? customDelay : 7000;
+      const delay = typeof customDelay === 'number' ? customDelay : 1600;
       overlayTimer = setTimeout(() => {
         els.videoContainer.classList.add('idle');
       }, delay);
@@ -2168,7 +2168,7 @@
 
     function handleVideoTap(e) {
       if (e.target.closest('button') || e.target.closest('input') || e.target.closest('label') || e.target.closest('.stream-error-card') || e.target.closest('.fs-exit-btn')) {
-        resetOverlayIdleTimer(7000);
+        resetOverlayIdleTimer(1600);
         return;
       }
 
@@ -2179,13 +2179,13 @@
       lastTapTimestamp = now;
 
       if (els.videoContainer.classList.contains('idle')) {
-        resetOverlayIdleTimer(7000);
+        resetOverlayIdleTimer(1600);
       } else {
         els.videoContainer.classList.add('idle');
       }
     }
 
-    els.videoContainer.addEventListener('mousemove', () => resetOverlayIdleTimer(5000));
+    els.videoContainer.addEventListener('mousemove', () => resetOverlayIdleTimer(1600));
     els.videoContainer.addEventListener('click', handleVideoTap);
     els.videoContainer.addEventListener('touchend', handleVideoTap, { passive: true });
 
