@@ -180,6 +180,7 @@
   };
 
   let hls = null;
+  let dashPlayer = null;
   let searchTimer = null;
   let overlayTimer = null;
 
@@ -1320,9 +1321,14 @@
     // Direct Stream URL
     const streamUrl = ch.url;
 
-    // Load Stream in Player
+    // Load Stream in Player (MPEG-DASH vs HLS)
     clearOldSubtitles();
-    setupHlsPlayer(streamUrl, ch);
+    const isDash = ch.url.toLowerCase().includes('.mpd');
+    if (isDash) {
+      setupDashPlayer(streamUrl, ch);
+    } else {
+      setupHlsPlayer(streamUrl, ch);
+    }
   }
 
   // --- Subtitles & Closed Captions Management ---
@@ -1401,6 +1407,10 @@
     if (hls) {
       hls.destroy();
       hls = null;
+    }
+    if (dashPlayer) {
+      dashPlayer.destroy();
+      dashPlayer = null;
     }
 
     clearOldSubtitles();
@@ -1489,6 +1499,97 @@
       });
     } else {
       showStreamError('HLS Unsupported', 'Your browser does not support HLS playback. Open in VLC instead.', ch);
+    }
+  }
+
+  // --- MPEG-DASH Player Integration (dash.js) ---
+  function setupDashPlayer(url, ch) {
+    if (hls) {
+      hls.destroy();
+      hls = null;
+    }
+    if (dashPlayer) {
+      dashPlayer.destroy();
+      dashPlayer = null;
+    }
+
+    clearOldSubtitles();
+    const video = els.video;
+    if (!video) return;
+
+    const isHttpsOrigin = window.location.protocol === 'https:';
+    const isPlainHttp = url.startsWith('http://');
+
+    if (typeof dashjs !== 'undefined') {
+      try {
+        dashPlayer = dashjs.MediaPlayer().create();
+        dashPlayer.initialize(video, url, true);
+
+        dashPlayer.updateSettings({
+          streaming: {
+            lowLatencyEnabled: true,
+            abr: {
+              autoSwitchBitrate: {
+                video: true,
+                audio: true
+              }
+            }
+          }
+        });
+
+        dashPlayer.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+          updateChannelRowStatus(ch.id, 'online');
+          els.streamInfoTag.textContent = 'MPEG-DASH • LIVE';
+        });
+
+        dashPlayer.on(dashjs.MediaPlayer.events.QUALITY_CHANGE_RENDERED, (e) => {
+          if (e && e.mediaType === 'video') {
+            try {
+              const bitrates = dashPlayer.getBitrateInfoListFor('video');
+              if (bitrates && bitrates[e.newQuality]) {
+                const q = bitrates[e.newQuality];
+                els.streamInfoTag.textContent = `${q.width}x${q.height} • ${Math.round(q.bitrate / 1000)} kbps (DASH)`;
+              }
+            } catch (_) {}
+          }
+        });
+
+        dashPlayer.on(dashjs.MediaPlayer.events.ERROR, (e) => {
+          console.warn('DASH Player Error:', e);
+          updateChannelRowStatus(ch.id, 'vlc');
+          if (isHttpsOrigin && isPlainHttp) {
+            showStreamError(
+              'Insecure HTTP DASH Stream • Blocked by Browser',
+              'Your browser blocked this HTTP DASH stream under HTTPS Mixed Content security rules. You can launch it in VLC Player with 1-click below, OR in Chrome: click the tune/padlock icon next to the URL -> Site settings -> Insecure content -> Allow, then reload!',
+              ch
+            );
+          } else {
+            showStreamError(
+              'MPEG-DASH Stream Notice',
+              'This MPEG-DASH (.mpd) stream could not be loaded directly by the browser (frequently due to BBC UK geo-blocking or CORS). Click below to launch in VLC Player with one click!',
+              ch
+            );
+          }
+        });
+
+        video.play().catch(err => {
+          console.warn('Autoplay prevented:', err);
+          showToast('Click play to begin streaming', '▶️');
+        });
+      } catch (err) {
+        console.warn('Failed to initialize dashjs:', err);
+        showStreamError(
+          'MPEG-DASH Error',
+          'Failed to initialize MPEG-DASH engine. Click below to launch in VLC.',
+          ch
+        );
+      }
+    } else {
+      showStreamError(
+        'MPEG-DASH Engine Loading',
+        'MPEG-DASH (.mpd) engine is loading. Click below to play in VLC.',
+        ch
+      );
     }
   }
 

@@ -1,11 +1,12 @@
 // Nova IPTV Progressive Web App Service Worker
-const CACHE_NAME = 'nova-iptv-v1';
+const CACHE_NAME = 'nova-iptv-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
   './hls.min.js',
+  './dash.all.min.js',
   './manifest.webmanifest',
   './icon.svg',
   './icon-192.png',
@@ -38,6 +39,7 @@ self.addEventListener('fetch', (event) => {
   // Strictly bypass service worker cache for live streams and video segments
   if (
     url.pathname.endsWith('.m3u8') ||
+    url.pathname.endsWith('.mpd') ||
     url.pathname.endsWith('.ts') ||
     url.pathname.endsWith('.aac') ||
     url.pathname.endsWith('.m4s') ||
