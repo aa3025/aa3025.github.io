@@ -243,7 +243,8 @@
     headerCountryBadge: document.getElementById('header-country-badge'),
     headerQualityBadge: document.getElementById('header-quality-badge'),
     headerLangBadge: document.getElementById('header-lang-badge'),
-    openVlcBtn: document.getElementById('open-vlc-btn'),
+    openPopupBtn: document.getElementById('open-popup-btn') || document.getElementById('open-vlc-btn'),
+    openVlcBtn: document.getElementById('open-vlc-btn') || document.getElementById('open-popup-btn'),
     copyUrlBtn: document.getElementById('copy-url-btn'),
     headerFavBtn: document.getElementById('header-fav-btn'),
     ctrlPlayBtn: document.getElementById('ctrl-play-btn'),
@@ -1318,8 +1319,8 @@
 
     if (knownHealth && knownHealth.status === 'vlc') {
       showStreamError(
-        'Server Live • Requires VLC Player',
-        'This channel is actively broadcasting, but its media server blocks web browsers (CORS policy). Click below to launch and stream directly in VLC Player on your Mac with zero restrictions!',
+        'Server Live • Pop-up Recommended',
+        `This channel is actively broadcasting, but its media server blocks in-page web browsers (CORS policy). <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click here to open in Pop-up</a> to stream directly!`,
         ch
       );
       return;
@@ -1453,13 +1454,13 @@
               if (isHttpsOrigin && isPlainHttp) {
                 showStreamError(
                   'Insecure HTTP Stream • Blocked by Browser',
-                  `Your browser blocked this HTTP stream under HTTPS Mixed Content security rules. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click here to open stream in a new pop-up window</a>, or launch in VLC Player below.`,
+                  `Your browser blocked this HTTP stream under HTTPS Mixed Content security rules. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click here to open stream in a pop-up window</a>, or click Pop-up below.`,
                   ch
                 );
               } else {
                 showStreamError(
                   'Stream Network / CORS Notice',
-                  `This stream could not be loaded directly by your browser (frequently due to CORS or token expiration). <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Try opening in a pop-up window</a> or launch in VLC Player below!`,
+                  `This stream could not be loaded directly by your browser (frequently due to CORS or token expiration). <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click here to open in Pop-up</a>!`,
                   ch
                 );
               }
@@ -1471,7 +1472,7 @@
               updateChannelRowStatus(ch.id, 'offline');
               showStreamError(
                 'Playback Error',
-                `Stream codec or format is not supported natively in this browser. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click here to open in a new pop-up window</a> or open in VLC below.`,
+                `Stream codec or format is not supported natively in this browser. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click here to open in a new pop-up window</a>.`,
                 ch
               );
               hls.destroy();
@@ -1505,7 +1506,7 @@
         console.warn('Native playback error:', err);
       });
     } else {
-      showStreamError('HLS Unsupported', 'Your browser does not support HLS playback. Open in VLC instead.', ch);
+      showStreamError('HLS Unsupported', `Your browser does not support HLS playback. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Open stream in Pop-up</a>.`, ch);
     }
   }
 
@@ -1640,14 +1641,14 @@
         console.warn('Failed to initialize dashjs:', err);
         showStreamError(
           'MPEG-DASH Error',
-          'Failed to initialize MPEG-DASH engine. Click below to launch in VLC.',
+          `Failed to initialize MPEG-DASH engine. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click to open in Pop-up</a>.`,
           ch
         );
       }
     } else {
       showStreamError(
         'MPEG-DASH Engine Loading',
-        'MPEG-DASH (.mpd) engine is loading. Click below to play in VLC.',
+        `MPEG-DASH (.mpd) engine is loading. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click to open in Pop-up</a>.`,
         ch
       );
     }
@@ -2406,15 +2407,16 @@
       });
     });
 
-    // VLC & Action Buttons
+    // Pop-up & Action Buttons
     if (els.errorCloseBtn) {
       els.errorCloseBtn.addEventListener('click', () => {
         els.streamErrorCard.style.display = 'none';
       });
     }
-    els.openVlcBtn.addEventListener('click', openCurrentInVlc);
-    els.errorVlcBtn.addEventListener('click', openCurrentInVlc);
+    if (els.openPopupBtn) els.openPopupBtn.addEventListener('click', () => openCurrentInPopup());
+    if (els.openVlcBtn && els.openVlcBtn !== els.openPopupBtn) els.openVlcBtn.addEventListener('click', () => openCurrentInPopup());
     if (els.errorPopupBtn) els.errorPopupBtn.addEventListener('click', () => openCurrentInPopup());
+    if (els.errorVlcBtn && els.errorVlcBtn !== els.errorPopupBtn) els.errorVlcBtn.addEventListener('click', () => openCurrentInPopup());
     els.copyUrlBtn.addEventListener('click', copyCurrentUrl);
     els.errorCopyBtn.addEventListener('click', copyCurrentUrl);
     els.errorNextBtn.addEventListener('click', playNext);

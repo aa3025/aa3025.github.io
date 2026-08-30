@@ -1164,13 +1164,14 @@ html, body {
   flex-shrink: 0;
 }
 
-/* Prominent VLC Button */
-.vlc-action-btn {
+/* Prominent Pop-up Button */
+.vlc-action-btn,
+.popup-action-btn {
   display: flex;
   align-items: center;
   gap: 7px;
   padding: 7px 14px;
-  background: var(--accent-vlc);
+  background: var(--accent-primary);
   border: none;
   border-radius: var(--radius-md);
   color: white;
@@ -1178,17 +1179,19 @@ html, body {
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 3px 12px rgba(234, 88, 12, 0.35);
+  box-shadow: 0 3px 12px rgba(99, 102, 241, 0.35);
   transition: var(--transition-fast);
 }
 
-.vlc-action-btn:hover {
-  background: var(--accent-vlc-hover);
+.vlc-action-btn:hover,
+.popup-action-btn:hover {
+  background: var(--accent-primary-hover, #4f46e5);
   transform: translateY(-1px);
-  box-shadow: 0 5px 16px rgba(234, 88, 12, 0.5);
+  box-shadow: 0 5px 16px rgba(99, 102, 241, 0.5);
 }
 
-.vlc-action-btn svg {
+.vlc-action-btn svg,
+.popup-action-btn svg {
   width: 14px;
   height: 14px;
 }
@@ -1452,8 +1455,9 @@ html, body {
   margin-top: 6px;
 }
 
-.primary-btn.vlc-btn {
-  background: var(--accent-vlc);
+.primary-btn.vlc-btn,
+.primary-btn.popup-btn {
+  background: var(--accent-primary);
   color: white;
   border: none;
   border-radius: var(--radius-full);
@@ -1463,11 +1467,12 @@ html, body {
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
-.primary-btn.vlc-btn:hover {
-  background: var(--accent-vlc-hover);
+.primary-btn.vlc-btn:hover,
+.primary-btn.popup-btn:hover {
+  background: var(--accent-primary-hover, #4f46e5);
 }
 
 .secondary-btn {

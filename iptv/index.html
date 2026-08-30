@@ -270,14 +270,16 @@
           </div>
         </div>
 
-        <!-- Header Actions: VLC button, Copy URL, Proxy Toggle -->
+        <!-- Header Actions: Pop-up button, Copy URL, Proxy Toggle -->
         <div class="channel-actions-right">
-          <!-- Open in VLC Player Button -->
-          <button class="vlc-action-btn" id="open-vlc-btn" title="Open this stream directly in VLC Player">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="12 2 3 20 21 20 12 2"></polygon>
+          <!-- Open in Pop-up Player Button -->
+          <button class="vlc-action-btn popup-action-btn" id="open-popup-btn" title="Open this stream in a new pop-up window">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
             </svg>
-            <span>Open in VLC</span>
+            <span>Pop-up</span>
           </button>
 
           <!-- Copy Stream URL Button -->
@@ -318,7 +320,7 @@
           <h2>Ready to Stream</h2>
           <p>Choose any channel from the list on the left to start playing.</p>
           <div class="vlc-tip-box">
-            <span>💡 <strong>Tip:</strong> If a particular stream is CORS-blocked in web browsers, click the orange <strong>"Open in VLC"</strong> button to launch it directly in VLC!</span>
+            <span>💡 <strong>Tip:</strong> If a particular stream is CORS-blocked in web browsers, click the <strong>"Pop-up"</strong> button to open and stream it directly in a pop-up window!</span>
           </div>
         </div>
 
@@ -337,19 +339,15 @@
           </button>
           <div class="error-badge">⚠️ Browser Stream Notice</div>
           <h3 id="error-title">Stream Could Not Load in Browser</h3>
-          <p id="error-desc">Most IPTV streams work in VLC because VLC bypasses browser CORS restrictions and has native codecs. You can open this stream directly in VLC with one click!</p>
+          <p id="error-desc">This stream cannot be loaded directly in the page. You can open and stream it in a pop-up window with one click!</p>
           <div class="error-actions-row">
-            <button class="primary-btn vlc-btn" id="error-vlc-btn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 3 20 21 20 12 2"></polygon></svg>
-              <span>Launch in VLC</span>
-            </button>
-            <button class="secondary-btn" id="error-popup-btn" title="Open stream in a new browser pop-up window">
+            <button class="primary-btn popup-btn" id="error-popup-btn" title="Open stream in a new browser pop-up window">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 15px; height: 15px; margin-right: 4px; vertical-align: middle;">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15 3 21 3 21 9"></polyline>
                 <line x1="10" y1="14" x2="21" y2="3"></line>
               </svg>
-              <span>Open in Pop-up</span>
+              <span>Pop-up</span>
             </button>
             <button class="secondary-btn" id="error-copy-btn">Copy Stream URL</button>
             <button class="secondary-btn" id="error-next-btn">Next Channel ⏭</button>
