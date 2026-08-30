@@ -2408,18 +2408,23 @@
       });
     });
 
-    // Pull Updated Channels Button
+    // Pull Updated Channels Button (Syncs directly from iptv-org GitHub repository)
     if (els.pullUpdatedBtn) {
       els.pullUpdatedBtn.addEventListener('click', async () => {
-        showToast('Pulling updated channel lists...', '🔄');
+        showToast('Syncing latest channels from iptv-org GitHub...', '🔄');
         els.pullUpdatedBtn.classList.add('rotating');
         try {
-          const updateUrl = `./playlist.m3u?t=${Date.now()}`;
-          await loadPlaylist(updateUrl, true);
-          showToast(`Updated! ${state.allChannels.length.toLocaleString()} channels loaded.`, '✅');
+          const liveRepoUrl = `https://iptv-org.github.io/iptv/index.m3u?t=${Date.now()}`;
+          await loadPlaylist(liveRepoUrl, true);
+          showToast(`Synced! ${state.allChannels.length.toLocaleString()} channels loaded from iptv-org.`, '✅');
         } catch (err) {
-          console.warn('Update failed:', err);
-          showToast('Could not reload updated channels', '⚠️');
+          console.warn('Live GitHub sync failed, falling back to local master playlist:', err);
+          try {
+            await loadPlaylist(`./playlist.m3u?t=${Date.now()}`, true);
+            showToast(`Loaded ${state.allChannels.length.toLocaleString()} channels from local master playlist.`, '✅');
+          } catch (e) {
+            showToast('Could not sync updated channels', '⚠️');
+          }
         } finally {
           els.pullUpdatedBtn.classList.remove('rotating');
         }
