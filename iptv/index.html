@@ -45,17 +45,22 @@
 
       <!-- Sidebar Top Header -->
       <div class="sidebar-header">
-        <div class="brand">
-          <div class="brand-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            <span class="live-pulse"></span>
+        <div class="brand-row">
+          <div class="brand">
+            <div class="brand-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span class="live-pulse"></span>
+            </div>
+            <div class="brand-meta">
+              <span class="brand-name">Nova<span class="brand-accent">IPTV</span></span>
+              <span class="channel-count-badge" id="total-count-badge">Loading playlist...</span>
+            </div>
           </div>
-          <div class="brand-meta">
-            <span class="brand-name">Nova<span class="brand-accent">IPTV</span></span>
-            <span class="channel-count-badge" id="total-count-badge">Loading playlist...</span>
-          </div>
+          <button class="mobile-nav-btn" id="scroll-to-player-btn" title="Back to video player">
+            <span>▲ Video</span>
+          </button>
         </div>
 
         <div class="sidebar-header-actions">
@@ -90,9 +95,6 @@
             </svg>
             <span>File</span>
           </label>
-          <button class="mobile-nav-btn" id="scroll-to-player-btn" title="Back to video player">
-            <span>▲ Video</span>
-          </button>
         </div>
       </div>
 
