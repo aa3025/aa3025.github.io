@@ -1606,6 +1606,51 @@
         const volumeSlider = document.getElementById('volume-slider');
         const autoplayCheckbox = document.getElementById('autoplay-checkbox');
 
+        // Determine book to open from URL parameters (?book_2, ?book=2, ?book_liff, #book_2)
+        function getInitialBook() {
+            if (!BOOKS_DATA || BOOKS_DATA.length === 0) return null;
+            const search = window.location.search;
+            const hash = window.location.hash;
+            const params = new URLSearchParams(search);
+
+            // 1. Check ?book=2 or ?book=7 or ?book=liff
+            let bookParam = params.get('book') || params.get('b');
+
+            // 2. Check ?book_2, ?book_7, ?book_liff, ?2, ?7
+            if (!bookParam) {
+                for (const [key] of params.entries()) {
+                    const m = key.match(/^book_?(\d+|liff)$/i) || key.match(/^b_?(\d+|liff)$/i) || key.match(/^(\d+)$/);
+                    if (m) {
+                        bookParam = m[1];
+                        break;
+                    }
+                }
+            }
+
+            // 3. Check hash #book_2, #book-2, #2, #liff
+            if (!bookParam && hash) {
+                const h = hash.replace(/^#/, '');
+                const m = h.match(/^(?:book[-_]?)?(\d+|liff)$/i);
+                if (m) {
+                    bookParam = m[1];
+                }
+            }
+
+            if (bookParam) {
+                if (bookParam.toLowerCase() === 'liff') {
+                    const liffBook = BOOKS_DATA.find(b => b.isDictionary || b.id === 7);
+                    if (liffBook) return liffBook;
+                }
+                const num = parseInt(bookParam, 10);
+                if (!isNaN(num)) {
+                    const found = BOOKS_DATA.find(b => b.id === num);
+                    if (found) return found;
+                }
+            }
+
+            return BOOKS_DATA[0];
+        }
+
         // Initial setup
         async function init() {
             try {
@@ -1631,7 +1676,7 @@
             }
 
             renderLibrary();
-            selectBook(BOOKS_DATA[0]);
+            selectBook(getInitialBook(), false);
 
             // Audio event listeners
             audio.addEventListener('timeupdate', updateProgress);
@@ -1665,6 +1710,14 @@
                 }
             });
 
+            // Browser back/forward navigation support
+            window.addEventListener('popstate', () => {
+                const targetBook = getInitialBook();
+                if (targetBook && (!currentBook || currentBook.id !== targetBook.id)) {
+                    selectBook(targetBook, false);
+                }
+            });
+
             // Initialize custom cyber dropdown
             initCustomDropdown();
         }
@@ -1683,79 +1736,85 @@
 
             document.addEventListener('click', (e) => {
                 if (!dropdownWrap.contains(e.target)) {
-                    closeCustomDropdown();
+                    dropdownWrap.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
                 }
             });
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    closeCustomDropdown();
+                    dropdownWrap.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
                 }
             });
         }
 
-        function closeCustomDropdown() {
-            const dropdownWrap = document.getElementById('custom-book-dropdown');
-            const btn = document.getElementById('custom-dropdown-btn');
-            if (dropdownWrap) dropdownWrap.classList.remove('open');
-            if (btn) btn.setAttribute('aria-expanded', 'false');
-        }
-
-        // Render book cards in sidebar and mobile dropdown
+        // Render books into sidebar and custom dropdown
         function renderLibrary() {
             booksListEl.innerHTML = '<div class="sidebar-title">Library</div>';
-
-            const menuEl = document.getElementById('custom-dropdown-menu');
-            if (menuEl) menuEl.innerHTML = '';
+            const dropdownMenu = document.getElementById('custom-dropdown-menu');
+            if (dropdownMenu) dropdownMenu.innerHTML = '';
 
             BOOKS_DATA.forEach(book => {
-                const countText = book.isDictionary ? `${book.chapters.length} Words` : `${book.chapters.length} Chapters`;
-                const isSelected = currentBook && currentBook.id === book.id;
-
-                // Desktop sidebar card
+                // Desktop Sidebar Card
                 const card = document.createElement('div');
-                card.className = `book-card ${isSelected ? 'active' : ''}`;
+                card.className = 'book-card';
                 card.dataset.id = book.id;
+
+                const countText = book.isDictionary
+                    ? '551 Terms • Voiced Dictionary'
+                    : `${book.chapters.length} Chapters`;
+
                 card.innerHTML = `
-                    <div class="book-number">Book ${book.id}</div>
-                    <div class="book-title">${book.title}</div>
-                    <div class="book-meta">
-                        <span>${countText}</span>
-                    </div>
+                    <div class="book-num">Book ${book.id}</div>
+                    <div class="book-title">${escapeHtml(book.title)}</div>
+                    <div class="book-chapter-count">${countText}</div>
                 `;
-                card.addEventListener('click', () => selectBook(book));
+
+                card.addEventListener('click', () => {
+                    selectBook(book);
+                });
+
                 booksListEl.appendChild(card);
 
                 // Custom Dropdown Item
-                if (menuEl) {
+                if (dropdownMenu) {
                     const item = document.createElement('div');
-                    item.className = `custom-dropdown-item ${isSelected ? 'active' : ''}`;
+                    item.className = 'custom-dropdown-item';
                     item.dataset.id = book.id;
+                    item.setAttribute('role', 'option');
                     item.innerHTML = `
-                        <div class="dropdown-item-left">
-                            <span class="dropdown-book-badge">Book ${book.id}</span>
-                            <span class="dropdown-item-title">${book.title}</span>
-                        </div>
-                        <span class="dropdown-item-count">${countText}</span>
+                        <span class="dropdown-item-num">Book ${book.id}</span>
+                        <span class="dropdown-item-title">${escapeHtml(book.title)}</span>
                     `;
                     item.addEventListener('click', (e) => {
                         e.stopPropagation();
                         selectBook(book);
-                        closeCustomDropdown();
+                        const dropdownWrap = document.getElementById('custom-book-dropdown');
+                        const btn = document.getElementById('custom-dropdown-btn');
+                        if (dropdownWrap) dropdownWrap.classList.remove('open');
+                        if (btn) btn.setAttribute('aria-expanded', 'false');
                     });
-                    menuEl.appendChild(item);
+                    dropdownMenu.appendChild(item);
                 }
             });
         }
 
         // Select active book
-        function selectBook(book) {
+        function selectBook(book, updateUrl = true) {
+            if (!book) return;
             if (currentBook) {
                 lastSelectedChapters[currentBook.id] = currentChapterIndex;
             }
 
             currentBook = book;
             currentChapterIndex = lastSelectedChapters[book.id] !== undefined ? lastSelectedChapters[book.id] : 0;
+
+            // Sync URL parameter (?book_2)
+            if (updateUrl && window.history && window.history.replaceState) {
+                const newUrl = window.location.pathname + `?book_${book.id}`;
+                window.history.replaceState({ bookId: book.id }, '', newUrl);
+            }
 
             document.querySelectorAll('.book-card').forEach(card => {
                 const isMatch = parseInt(card.dataset.id, 10) === book.id;
