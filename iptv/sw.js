@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nova-iptv-v3';
+const CACHE_NAME = 'nova-iptv-v4';
 const STATIC_ASSETS = [
   './',
   './index.html',
