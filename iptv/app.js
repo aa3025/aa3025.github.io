@@ -210,6 +210,7 @@
     sidebarLoading: document.getElementById('sidebar-loading'),
     renderedCountText: document.getElementById('rendered-count-text'),
     exportFavsBtn: document.getElementById('export-favs-btn'),
+    pullUpdatedBtn: document.getElementById('pull-updated-channels-btn'),
     openUrlModalBtn: document.getElementById('open-url-modal-btn'),
     urlModal: document.getElementById('url-modal'),
     closeUrlModalBtn: document.getElementById('close-url-modal-btn'),
@@ -2406,6 +2407,24 @@
         }
       });
     });
+
+    // Pull Updated Channels Button
+    if (els.pullUpdatedBtn) {
+      els.pullUpdatedBtn.addEventListener('click', async () => {
+        showToast('Pulling updated channel lists...', '🔄');
+        els.pullUpdatedBtn.classList.add('rotating');
+        try {
+          const updateUrl = `./playlist.m3u?t=${Date.now()}`;
+          await loadPlaylist(updateUrl, true);
+          showToast(`Updated! ${state.allChannels.length.toLocaleString()} channels loaded.`, '✅');
+        } catch (err) {
+          console.warn('Update failed:', err);
+          showToast('Could not reload updated channels', '⚠️');
+        } finally {
+          els.pullUpdatedBtn.classList.remove('rotating');
+        }
+      });
+    }
 
     // Pop-up & Action Buttons
     if (els.errorCloseBtn) {

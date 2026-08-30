@@ -233,6 +233,23 @@ html, body {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+.load-m3u-btn.update-channels-btn {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+
+.load-m3u-btn.update-channels-btn:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: rgba(56, 189, 248, 0.6);
+  color: #7dd3fc;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.load-m3u-btn.update-channels-btn.rotating svg {
+  animation: spin 0.8s linear infinite;
+}
+
 .load-m3u-btn svg {
   width: 14px;
   height: 14px;
