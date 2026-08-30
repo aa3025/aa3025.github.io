@@ -4,14 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Hitchhiker's Guide - Audiobook Player</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <!-- Google Fonts for premium typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Orbitron:wght@500;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
+    <!-- Zero-CORS Dictionary Data for Book 7 -->
+    
     <style>
         :root {
             --bg-color: #050508;
@@ -19,6 +24,7 @@
             --border-color: rgba(255, 255, 255, 0.08);
             --primary-glow: #00f2fe;
             --secondary-glow: #4facfe;
+            --accent-magenta: #ff3366;
             --text-main: #e2e8f0;
             --text-muted: #94a3b8;
             --active-glow: rgba(0, 242, 254, 0.15);
@@ -50,7 +56,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 2.5rem;
+            padding: 1.25rem 2.5rem;
             background: rgba(5, 5, 8, 0.4);
             border-bottom: 1px solid var(--border-color);
             backdrop-filter: blur(12px);
@@ -116,6 +122,9 @@
             display: flex;
             flex: 1;
             overflow: hidden;
+            padding-bottom: 90px; /* Binds viewport strictly above bottom player dock */
+            box-sizing: border-box;
+            height: calc(100vh - 85px);
         }
 
         /* Left Sidebar: Books Selection */
@@ -123,11 +132,33 @@
             width: 320px;
             background: rgba(10, 10, 18, 0.3);
             border-right: 1px solid var(--border-color);
-            padding: 1.5rem;
+            padding: 1.5rem 1.25rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.85rem;
             overflow-y: auto;
+            overflow-x: hidden;
+            flex-shrink: 0;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 242, 254, 0.3) rgba(255, 255, 255, 0.03);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.25);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.5);
         }
 
         .sidebar-title {
@@ -139,20 +170,23 @@
             color: var(--text-muted);
             margin-bottom: 0.5rem;
             padding-left: 0.5rem;
+            flex-shrink: 0;
         }
 
         .book-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 1.25rem;
+            padding: 1.15rem 1.25rem;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            min-height: 105px;
+            flex-shrink: 0;
         }
 
         .book-card::before {
@@ -190,112 +224,134 @@
             color: var(--primary-glow);
             text-transform: uppercase;
             letter-spacing: 1px;
+            flex-shrink: 0;
         }
 
         .book-title {
             font-size: 0.95rem;
             font-weight: 600;
-            line-height: 1.4;
+            line-height: 1.35;
             color: var(--text-main);
+            min-height: 2.7rem;
+            display: flex;
+            align-items: flex-start;
+            word-break: break-word;
         }
 
         .book-meta {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: auto;
+            flex-shrink: 0;
         }
 
-        /* Main Workspace: Chapter List */
+        /* Main Content: Chapter View */
         main {
             flex: 1;
+            padding: 2.5rem 3rem 2rem 3rem;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            background: radial-gradient(circle at top right, rgba(0, 242, 254, 0.02), transparent 40%);
-            overflow-y: auto;
-            padding: 2.5rem;
+            gap: 1.5rem;
         }
 
         .active-book-header {
-            margin-bottom: 2rem;
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.25rem;
         }
 
         .active-book-subtitle {
+            font-family: 'Orbitron', sans-serif;
             font-size: 0.9rem;
+            font-weight: 800;
             color: var(--primary-glow);
-            font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
         .active-book-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            color: #ffffff;
             letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Chapters Layout Grid/List */
+        /* Chapter Table/List */
         .chapter-list {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 6rem;
-            /* Ensure space for player */
+            gap: 0.5rem;
         }
 
         .chapter-row {
             display: grid;
-            grid-template-columns: 50px 1fr 100px 80px;
+            grid-template-columns: 80px 1fr 140px 100px;
             align-items: center;
             padding: 1rem 1.5rem;
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--surface-color);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .chapter-row:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(0, 242, 254, 0.4);
+            background: rgba(0, 242, 254, 0.02);
             transform: translateX(4px);
         }
 
         .chapter-row.active {
+            border-color: var(--primary-glow);
             background: var(--active-glow);
-            border-color: rgba(0, 242, 254, 0.4);
+            box-shadow: inset 0 0 15px rgba(0, 242, 254, 0.05);
         }
 
         .chapter-index {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.85rem;
             color: var(--text-muted);
         }
 
         .chapter-row.active .chapter-index {
             color: var(--primary-glow);
+            font-weight: bold;
         }
 
         .chapter-name {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: var(--text-main);
         }
 
+        .chapter-row.active .chapter-name {
+            color: #ffffff;
+        }
+
+        .chapter-duration {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+            font-family: monospace;
+        }
+
         .chapter-status-badge {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
-            text-align: center;
-            font-weight: 600;
             text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            text-align: center;
             width: fit-content;
         }
 
@@ -306,35 +362,519 @@
         }
 
         .status-pending {
-            background: rgba(245, 158, 11, 0.1);
-            color: #f59e0b;
-            border: 1px solid rgba(245, 158, 11, 0.2);
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .chapter-duration {
-            font-size: 0.85rem;
+        /* --- Interactive Dictionary Explorer (Book 7) --- */
+        .dict-explorer-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            height: 100%;
+        }
+
+        .dict-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background: rgba(10, 14, 26, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+        }
+
+        .dict-search-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dict-search-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .dict-search-input:focus {
+            border-color: var(--primary-glow);
+            background: rgba(0, 242, 254, 0.05);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+        }
+
+        .dict-count-badge {
+            font-size: 0.8rem;
             color: var(--text-muted);
-            text-align: right;
+            font-family: 'Orbitron', sans-serif;
+            white-space: nowrap;
         }
 
-        /* Bottom Player Dashboard */
+        .dict-toggles-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .dict-continuous-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .dict-continuous-toggle:hover {
+            border-color: rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.04);
+        }
+
+        .dict-mute-toggle {
+            border-color: rgba(255, 107, 107, 0.25);
+        }
+
+        .dict-mute-toggle:hover {
+            border-color: rgba(255, 107, 107, 0.5);
+            background: rgba(255, 107, 107, 0.06);
+        }
+
+        .dict-toggle-label {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .dict-mute-toggle .dict-toggle-label {
+            color: #cbd5e1;
+        }
+
+        .dict-continuous-toggle input[type="checkbox"] {
+            display: none;
+        }
+
+        .dict-continuous-toggle input[type="checkbox"]:checked + .toggle-switch {
+            background: var(--primary-glow);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
+
+        .dict-mute-toggle input[type="checkbox"]:checked + .toggle-switch {
+            background: #ff6b6b;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.45);
+        }
+
+        .dict-continuous-toggle input[type="checkbox"]:checked + .toggle-switch::after {
+            transform: translateX(16px);
+            background: var(--bg-color);
+        }
+
+        .dict-alpha-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .alpha-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .alpha-pill:hover {
+            color: #fff;
+            border-color: rgba(0, 242, 254, 0.4);
+            background: rgba(0, 242, 254, 0.08);
+        }
+
+        .alpha-pill.active {
+            background: var(--primary-glow);
+            color: #000;
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+        }
+
+        .dict-stage-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 1.5rem;
+            flex: 1;
+            min-height: 480px;
+        }
+
+        .dict-words-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 6px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 242, 254, 0.3) transparent;
+        }
+
+        .dict-word-tile {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .dict-word-tile:hover {
+            border-color: rgba(0, 242, 254, 0.4);
+            background: rgba(0, 242, 254, 0.04);
+            transform: translateX(3px);
+        }
+
+        .dict-word-tile.active {
+            border-color: var(--primary-glow);
+            background: var(--active-glow);
+            box-shadow: inset 0 0 12px rgba(0, 242, 254, 0.1);
+        }
+
+        .dict-word-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .dict-pos-tag {
+            font-size: 0.7rem;
+            color: var(--primary-glow);
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: lowercase;
+            font-style: italic;
+        }
+
+        .dict-card-pane {
+            background: rgba(10, 14, 26, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: visible;
+        }
+
+        .dict-card-pane::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-glow), var(--secondary-glow));
+            border-radius: 16px 16px 0 0;
+        }
+
+        .dict-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .dict-card-title-wrap {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+        }
+
+        .dict-card-term {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .dict-card-pos {
+            font-size: 1rem;
+            color: var(--primary-glow);
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .dict-card-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dict-btn-fav {
+            background: rgba(255, 183, 3, 0.08);
+            border: 1.5px solid rgba(255, 183, 3, 0.35);
+            color: #94a3b8;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dict-btn-fav:hover {
+            border-color: #ffb703;
+            color: #ffb703;
+            background: rgba(255, 183, 3, 0.18);
+            transform: scale(1.08);
+            box-shadow: 0 0 16px rgba(255, 183, 3, 0.45);
+        }
+
+        .dict-btn-fav.active {
+            border-color: #ffb703;
+            color: #ffb703;
+            background: rgba(255, 183, 3, 0.22);
+            box-shadow: 0 0 18px rgba(255, 183, 3, 0.5);
+        }
+
+        .dict-btn-fav svg {
+            transition: transform 0.2s ease;
+        }
+
+        .dict-btn-fav:active svg {
+            transform: scale(1.25);
+        }
+
+        .tile-fav-star {
+            color: #ffb703;
+            font-size: 0.85rem;
+            margin-left: auto;
+            text-shadow: 0 0 8px rgba(255, 183, 3, 0.6);
+        }
+
+        .alpha-pill.pill-fav {
+            color: #ffb703;
+            border-color: rgba(255, 183, 3, 0.4);
+            font-weight: 700;
+        }
+
+        .alpha-pill.pill-fav.active {
+            background: #ffb703;
+            color: #04060c;
+            box-shadow: 0 0 16px rgba(255, 183, 3, 0.6);
+        }
+
+        .dict-card-btn-play {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 242, 254, 0.18);
+            color: #ffffff;
+            border: 1.5px solid var(--primary-glow);
+            padding: 9px 20px;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 0 16px rgba(0, 242, 254, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .dict-card-btn-play:hover {
+            background: var(--primary-glow);
+            color: #04060c;
+            transform: scale(1.04);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.6);
+        }
+
+        .dict-card-btn-play svg {
+            fill: currentColor;
+        }
+
+        .dict-card-body {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            user-select: text;
+            flex: 1;
+            position: relative;
+        }
+
+        .dict-qv-link {
+            color: var(--primary-glow);
+            text-decoration: none;
+            border-bottom: 1.5px dashed var(--primary-glow);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            padding: 0 3px;
+            border-radius: 3px;
+            position: relative;
+        }
+
+        .dict-qv-link:hover {
+            color: #ffffff;
+            background: rgba(0, 242, 254, 0.15);
+            border-bottom-style: solid;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.7);
+        }
+
+        .qv-badge {
+            font-size: 0.65rem;
+            background: rgba(0, 242, 254, 0.15);
+            border: 1px solid rgba(0, 242, 254, 0.35);
+            color: var(--primary-glow);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
+
+        /* Hover Preview Tooltip */
+        .dict-qv-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            width: 300px;
+            max-width: 340px;
+            background: rgba(12, 17, 34, 0.96);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--primary-glow);
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.8), 0 0 22px rgba(0, 242, 254, 0.25);
+            border-radius: 10px;
+            padding: 12px 15px;
+            z-index: 1000;
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            text-align: left;
+            white-space: normal;
+            line-height: 1.45;
+        }
+
+        .dict-qv-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--primary-glow) transparent transparent transparent;
+        }
+
+        .dict-qv-link:hover .dict-qv-tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .qv-tt-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+            padding-bottom: 4px;
+        }
+
+        .qv-tt-term {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .qv-tt-pos {
+            font-size: 0.75rem;
+            color: var(--primary-glow);
+            font-style: italic;
+        }
+
+        .qv-tt-body {
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .qv-tt-footer {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-style: italic;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-top: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .qv-tt-footer span:last-child {
+            color: var(--secondary-glow);
+            font-weight: 600;
+        }
+
+        .dict-card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+
+        /* Persistent Player Dashboard */
         .player-bar {
             position: fixed;
             bottom: 0;
             left: 0;
-            right: 0;
-            height: 100px;
-            background: rgba(10, 10, 18, 0.7);
+            width: 100%;
+            height: 90px;
+            background: rgba(5, 5, 8, 0.85);
             border-top: 1px solid var(--border-color);
             backdrop-filter: blur(20px);
-            z-index: 100;
             display: grid;
             grid-template-columns: 320px 1fr 320px;
             align-items: center;
-            padding: 0 2rem;
+            padding: 0 2.5rem;
+            z-index: 100;
         }
 
-        /* Player Left: Current Track Meta */
         .player-meta {
             display: flex;
             flex-direction: column;
@@ -343,72 +883,75 @@
 
         .player-track-title {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .player-track-album {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* Player Center: Controls & Timeline */
+        /* Controls */
         .player-controls-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 0.5rem;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
         }
 
         .player-buttons {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
 
         .btn {
             background: none;
             border: none;
+            color: var(--text-main);
             cursor: pointer;
-            color: var(--text-muted);
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
         }
 
-        .btn:hover:not(:disabled) {
-            color: #ffffff;
+        .btn:hover {
+            color: var(--primary-glow);
+            transform: scale(1.05);
         }
 
         .btn:disabled {
+            color: var(--text-muted);
             opacity: 0.3;
             cursor: not-allowed;
+            transform: none;
         }
 
         .btn-play-pause {
-            background: #ffffff;
-            color: var(--bg-color);
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-            transition: all 0.2s ease;
+            background: var(--text-main);
+            color: var(--bg-color);
         }
 
         .btn-play-pause:hover {
-            transform: scale(1.05);
             background: var(--primary-glow);
-            box-shadow: 0 0 20px var(--primary-glow);
             color: var(--bg-color);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
         }
 
         .btn-play-pause svg {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             fill: currentColor;
         }
 
@@ -418,29 +961,29 @@
             fill: currentColor;
         }
 
-        /* Timeline Slider styling */
+        /* Timeline Scrubber */
         .timeline-container {
+            width: 100%;
+            max-width: 500px;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            width: 100%;
         }
 
         .time-label {
-            font-family: 'Orbitron', sans-serif;
             font-size: 0.75rem;
             color: var(--text-muted);
-            width: 45px;
-            text-align: center;
+            font-family: monospace;
+            min-width: 35px;
         }
 
         .slider-bar {
             flex: 1;
-            height: 4px;
             -webkit-appearance: none;
             appearance: none;
-            background: rgba(255, 255, 255, 0.1);
+            height: 4px;
             border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
             outline: none;
             cursor: pointer;
             position: relative;
@@ -452,18 +995,17 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: #ffffff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            background: var(--primary-glow);
+            box-shadow: 0 0 8px var(--primary-glow);
+            cursor: pointer;
             transition: transform 0.1s ease;
         }
 
         .slider-bar::-webkit-slider-thumb:hover {
-            transform: scale(1.3);
-            background: var(--primary-glow);
-            box-shadow: 0 0 12px var(--primary-glow);
+            transform: scale(1.2);
         }
 
-        /* Player Right: Volume and Autoplay Settings */
+        /* Player Right Settings */
         .player-settings {
             display: flex;
             align-items: center;
@@ -480,10 +1022,8 @@
 
         .autoplay-label {
             font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         .autoplay-toggle input[type="checkbox"] {
@@ -491,10 +1031,10 @@
         }
 
         .toggle-switch {
-            width: 36px;
+            width: 34px;
             height: 20px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 9999px;
+            border-radius: 10px;
             position: relative;
             transition: background 0.3s ease;
             border: 1px solid var(--border-color);
@@ -538,6 +1078,315 @@
         .volume-slider {
             width: 80px;
         }
+
+        /* Custom Cyber-Themed Dropdown Component */
+        .mobile-book-selector {
+            display: none;
+        }
+
+        .mobile-book-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--primary-glow);
+            text-transform: uppercase;
+        }
+
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+            user-select: none;
+        }
+
+        .custom-dropdown-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(13, 13, 24, 0.92);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .custom-dropdown-btn:hover,
+        .custom-dropdown.open .custom-dropdown-btn {
+            border-color: var(--primary-glow);
+            background: rgba(0, 242, 254, 0.05);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
+        }
+
+        .dropdown-selected-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .dropdown-book-badge {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--primary-glow);
+            background: rgba(0, 242, 254, 0.12);
+            border: 1px solid rgba(0, 242, 254, 0.35);
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        .dropdown-book-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dropdown-chevron {
+            color: var(--primary-glow);
+            display: flex;
+            align-items: center;
+            transition: transform 0.25s ease;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .custom-dropdown.open .dropdown-chevron {
+            transform: rotate(180deg);
+        }
+
+        .custom-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 100%;
+            background: rgba(8, 8, 15, 0.98);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(0, 242, 254, 0.35);
+            border-radius: 12px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 242, 254, 0.15);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px;
+            z-index: 1000;
+            animation: dropdownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-dropdown.open .custom-dropdown-menu {
+            display: flex;
+        }
+
+        .custom-dropdown-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+        }
+
+        .custom-dropdown-item:hover {
+            background: rgba(0, 242, 254, 0.08);
+            border-color: rgba(0, 242, 254, 0.25);
+            transform: translateX(3px);
+        }
+
+        .custom-dropdown-item.active {
+            background: rgba(0, 242, 254, 0.12);
+            border-color: var(--primary-glow);
+            box-shadow: inset 0 0 12px rgba(0, 242, 254, 0.15);
+        }
+
+        .dropdown-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .dropdown-item-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .custom-dropdown-item.active .dropdown-item-title {
+            color: var(--primary-glow);
+        }
+
+        .dropdown-item-count {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* Responsive Layouts: Dropdown Selector & Vertical Stacking on Narrow Screens */
+        @media (max-width: 1024px) {
+            .app-container {
+                display: block;
+                height: auto;
+                min-height: calc(100vh - 85px);
+                padding-bottom: 120px;
+                overflow-y: auto;
+            }
+
+            .sidebar {
+                display: none !important;
+            }
+
+            .mobile-book-selector {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 1.25rem;
+                padding-bottom: 1.25rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            main {
+                padding: 1.5rem 1.5rem 2rem 1.5rem;
+                width: 100%;
+            }
+
+            .active-book-title {
+                font-size: 1.85rem;
+            }
+
+            .chapter-row {
+                grid-template-columns: 60px 1fr auto;
+                padding: 0.85rem 1.25rem;
+                gap: 12px;
+            }
+
+            .chapter-duration {
+                display: none;
+            }
+
+            .dict-stage-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 1.25rem;
+                min-height: auto;
+            }
+
+            .dict-words-pane {
+                max-height: 250px;
+                width: 100%;
+            }
+
+            .dict-card-pane {
+                padding: 1.5rem;
+                width: 100%;
+            }
+
+            .dict-search-row {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .dict-search-input {
+                width: 100%;
+                flex: 1 1 100%;
+            }
+
+            .dict-toggles-wrap {
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: 100%;
+                justify-content: space-between;
+                gap: 8px;
+            }
+
+            .dict-continuous-toggle {
+                flex: 1 1 auto;
+            }
+
+            .player-bar {
+                grid-template-columns: 1fr auto;
+                padding: 0 1.25rem;
+                height: 95px;
+            }
+
+            .player-volume-wrapper {
+                display: none;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .sidebar {
+                padding: 0.6rem 1rem;
+            }
+
+            main {
+                padding: 1.25rem 1rem 2rem 1rem;
+            }
+
+            .active-book-title {
+                font-size: 1.5rem;
+            }
+
+            .chapter-row {
+                grid-template-columns: 45px 1fr auto;
+                padding: 0.75rem 0.85rem;
+            }
+
+            .dict-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .dict-card-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .dict-card-term {
+                font-size: 1.5rem;
+            }
+
+            .dict-qv-tooltip {
+                width: 260px;
+                left: 0;
+                transform: translateY(8px);
+            }
+
+            .dict-qv-link:hover .dict-qv-tooltip {
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
@@ -567,8 +1416,27 @@
             <!-- Rendered dynamically -->
         </div>
 
-        <!-- Main section showing chapters -->
+        <!-- Main section showing chapters or interactive dictionary -->
         <main>
+            <!-- Mobile/Narrow Screen Custom Themed Book Dropdown Selector -->
+            <div class="mobile-book-selector" id="mobile-book-dropdown-wrap">
+                <label class="mobile-book-label">SELECT BOOK / VOLUME:</label>
+                <div class="custom-dropdown" id="custom-book-dropdown">
+                    <button type="button" class="custom-dropdown-btn" id="custom-dropdown-btn" aria-haspopup="listbox" aria-expanded="false">
+                        <div class="dropdown-selected-content">
+                            <span class="dropdown-book-badge" id="dropdown-curr-badge">Book 1</span>
+                            <span class="dropdown-book-title" id="dropdown-curr-title">The Hitchhiker's Guide to the Galaxy</span>
+                        </div>
+                        <div class="dropdown-chevron">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                    </button>
+                    <div class="custom-dropdown-menu" id="custom-dropdown-menu" role="listbox">
+                        <!-- Populated dynamically with rich cyber-themed items -->
+                    </div>
+                </div>
+            </div>
+
             <div class="active-book-header">
                 <div class="active-book-subtitle" id="active-book-num">Book 1</div>
                 <h1 class="active-book-title" id="active-book-title">The Hitchhiker's Guide to the Galaxy</h1>
@@ -646,11 +1514,12 @@
     </div>
 
     <script>
-        // Core Audio State
         const audio = new Audio();
         let BOOKS_DATA = [];
         let currentBook = null;
         let currentObjectURL = null;
+        let currentChapterIndex = -1;
+        let isScrubbing = false;
         const lastSelectedChapters = {};
 
         function _0x3b8a() {
@@ -658,8 +1527,65 @@
             const mask = 188;
             return obs.map(b => b ^ mask);
         }
-        let currentChapterIndex = -1;
-        let isScrubbing = false;
+
+        async function decryptAudioFile(srcUrl) {
+            const response = await fetch(srcUrl);
+            if (!response.ok) throw new Error("Failed to load audio file: " + srcUrl);
+            const base64Text = await response.text();
+            const binaryString = atob(base64Text.trim());
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const key = _0x3b8a();
+            const decryptedBytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                decryptedBytes[i] = bytes[i] ^ key[i % key.length];
+            }
+            return new Blob([decryptedBytes], { type: 'audio/mp3' });
+        }
+
+        // Dictionary State
+        let dictActiveLetter = "ALL";
+        let dictSearchQuery = "";
+        let dictActiveTermIndex = 0;
+        let dictContinuousPlay = false;
+        let dictMute = false;
+        let currentDictTerm = null;
+
+        // Persistent Bookmarks / Favorites
+        let dictFavorites = new Set(JSON.parse(localStorage.getItem('hgttg_liff_favorites') || '[]'));
+
+        function saveFavorites() {
+            try {
+                localStorage.setItem('hgttg_liff_favorites', JSON.stringify(Array.from(dictFavorites)));
+            } catch (e) {
+                console.warn("Could not persist favorites:", e);
+            }
+        }
+
+        function toggleFavorite(termId) {
+            if (dictFavorites.has(termId)) {
+                dictFavorites.delete(termId);
+            } else {
+                dictFavorites.add(termId);
+            }
+            saveFavorites();
+        }
+
+        function getFilteredTerms() {
+            if (!currentBook || !currentBook.isDictionary) return [];
+            const terms = currentBook.chapters;
+            return terms.filter(t => {
+                const matchesCategory = (dictActiveLetter === "ALL") ||
+                    (dictActiveLetter === "FAV" ? dictFavorites.has(t.id) : t.letter === dictActiveLetter);
+                const matchesSearch = !dictSearchQuery ||
+                    t.term.toLowerCase().includes(dictSearchQuery.toLowerCase()) ||
+                    t.definition.toLowerCase().includes(dictSearchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+        }
 
         // Cache elements
         const booksListEl = document.getElementById('books-list');
@@ -686,29 +1612,21 @@
                 const response = await fetch('books_data.dat');
                 if (!response.ok) throw new Error("Metadata file not found");
                 const base64Text = await response.text();
-
                 const binaryString = atob(base64Text.trim());
                 const len = binaryString.length;
                 const bytes = new Uint8Array(len);
                 for (let i = 0; i < len; i++) {
                     bytes[i] = binaryString.charCodeAt(i);
                 }
-
                 const key = _0x3b8a();
                 const decryptedBytes = new Uint8Array(len);
                 for (let i = 0; i < len; i++) {
                     decryptedBytes[i] = bytes[i] ^ key[i % key.length];
                 }
-
                 const jsonText = new TextDecoder("utf-8").decode(decryptedBytes);
                 BOOKS_DATA = JSON.parse(jsonText);
             } catch (err) {
                 console.error("Failed to load or decrypt books metadata:", err);
-                return;
-            }
-
-            if (!BOOKS_DATA || !BOOKS_DATA.length) {
-                console.error("BOOKS_DATA is missing or empty.");
                 return;
             }
 
@@ -718,6 +1636,7 @@
             // Audio event listeners
             audio.addEventListener('timeupdate', updateProgress);
             audio.addEventListener('durationchange', setDuration);
+            audio.addEventListener('loadedmetadata', setDuration);
             audio.addEventListener('ended', handleTrackEnded);
 
             // Controls listeners
@@ -732,64 +1651,144 @@
             timelineSlider.addEventListener('input', () => {
                 currentTimeLabel.textContent = formatTime((timelineSlider.value / 100) * audio.duration || 0);
             });
+
+            // Keyboard Shortcuts
+            window.addEventListener('keydown', (e) => {
+                if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    togglePlayPause();
+                } else if (e.code === 'ArrowLeft') {
+                    audio.currentTime = Math.max(0, audio.currentTime - 10);
+                } else if (e.code === 'ArrowRight') {
+                    if (audio.duration) audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+                }
+            });
+
+            // Initialize custom cyber dropdown
+            initCustomDropdown();
         }
 
-        // Render book cards in sidebar
+        // Custom Cyber-Themed Dropdown Controls
+        function initCustomDropdown() {
+            const dropdownWrap = document.getElementById('custom-book-dropdown');
+            const btn = document.getElementById('custom-dropdown-btn');
+            if (!dropdownWrap || !btn) return;
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownWrap.classList.toggle('open');
+                btn.setAttribute('aria-expanded', dropdownWrap.classList.contains('open'));
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!dropdownWrap.contains(e.target)) {
+                    closeCustomDropdown();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeCustomDropdown();
+                }
+            });
+        }
+
+        function closeCustomDropdown() {
+            const dropdownWrap = document.getElementById('custom-book-dropdown');
+            const btn = document.getElementById('custom-dropdown-btn');
+            if (dropdownWrap) dropdownWrap.classList.remove('open');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+
+        // Render book cards in sidebar and mobile dropdown
         function renderLibrary() {
-            // Keep the title header and just render the dynamic cards below
-            const header = booksListEl.querySelector('.sidebar-title');
-            booksListEl.innerHTML = '';
-            booksListEl.appendChild(header);
+            booksListEl.innerHTML = '<div class="sidebar-title">Library</div>';
+
+            const menuEl = document.getElementById('custom-dropdown-menu');
+            if (menuEl) menuEl.innerHTML = '';
 
             BOOKS_DATA.forEach(book => {
+                const countText = book.isDictionary ? `${book.chapters.length} Words` : `${book.chapters.length} Chapters`;
+                const isSelected = currentBook && currentBook.id === book.id;
+
+                // Desktop sidebar card
                 const card = document.createElement('div');
-                card.className = `book-card ${currentBook && currentBook.id === book.id ? 'active' : ''}`;
+                card.className = `book-card ${isSelected ? 'active' : ''}`;
                 card.dataset.id = book.id;
                 card.innerHTML = `
                     <div class="book-number">Book ${book.id}</div>
                     <div class="book-title">${book.title}</div>
                     <div class="book-meta">
-                        <span>Chapters: ${book.chapters.length}</span>
+                        <span>${countText}</span>
                     </div>
                 `;
                 card.addEventListener('click', () => selectBook(book));
                 booksListEl.appendChild(card);
+
+                // Custom Dropdown Item
+                if (menuEl) {
+                    const item = document.createElement('div');
+                    item.className = `custom-dropdown-item ${isSelected ? 'active' : ''}`;
+                    item.dataset.id = book.id;
+                    item.innerHTML = `
+                        <div class="dropdown-item-left">
+                            <span class="dropdown-book-badge">Book ${book.id}</span>
+                            <span class="dropdown-item-title">${book.title}</span>
+                        </div>
+                        <span class="dropdown-item-count">${countText}</span>
+                    `;
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectBook(book);
+                        closeCustomDropdown();
+                    });
+                    menuEl.appendChild(item);
+                }
             });
         }
 
         // Select active book
         function selectBook(book) {
-            // Save current selection for the old book
             if (currentBook) {
                 lastSelectedChapters[currentBook.id] = currentChapterIndex;
             }
 
             currentBook = book;
-            
-            // Restore selection or default to 0
             currentChapterIndex = lastSelectedChapters[book.id] !== undefined ? lastSelectedChapters[book.id] : 0;
 
-            // Update active state in sidebar
             document.querySelectorAll('.book-card').forEach(card => {
-                card.classList.toggle('active', parseInt(card.dataset.id) === book.id);
+                const isMatch = parseInt(card.dataset.id, 10) === book.id;
+                card.classList.toggle('active', isMatch);
+                if (isMatch) {
+                    card.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+                }
             });
 
-            // Update main window headers
+            // Sync Custom Dropdown Display
+            const badgeEl = document.getElementById('dropdown-curr-badge');
+            const titleEl = document.getElementById('dropdown-curr-title');
+            if (badgeEl) badgeEl.textContent = `Book ${book.id}`;
+            if (titleEl) titleEl.textContent = book.title;
+
+            document.querySelectorAll('.custom-dropdown-item').forEach(item => {
+                item.classList.toggle('active', parseInt(item.dataset.id, 10) === book.id);
+            });
+
             activeBookNumEl.textContent = `Book ${book.id}`;
             activeBookTitleEl.textContent = book.title;
 
             const activeBookStatusEl = document.getElementById('active-book-status');
-            if (book.id === 6) {
-                activeBookStatusEl.textContent = 'Publicly unavailable';
-            } else {
-                activeBookStatusEl.textContent = '';
-            }
+            activeBookStatusEl.textContent = book.isDictionary ? 'Interactive Audio Dictionary (551 Terms)' : '';
 
-            // Render active chapters
-            renderChapters(book);
+            if (book.isDictionary) {
+                renderDictionaryExplorer();
+            } else {
+                renderChapters(book);
+            }
         }
 
-        // Render chapters in active book list
+        // Render standard chapters in active book list
         function renderChapters(book) {
             chaptersListEl.innerHTML = '';
 
@@ -830,7 +1829,423 @@
             });
         }
 
-        // Play selected chapter
+        // Render Interactive Dictionary Explorer for Book 7
+        function renderDictionaryExplorer() {
+            const filteredTerms = getFilteredTerms();
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+            const activeTerm = currentDictTerm && filteredTerms.some(t => t.id === currentDictTerm.id)
+                ? currentDictTerm
+                : (filteredTerms[dictActiveTermIndex] || filteredTerms[0] || (currentBook.chapters ? currentBook.chapters[0] : null));
+
+            const isFav = activeTerm ? dictFavorites.has(activeTerm.id) : false;
+
+            chaptersListEl.innerHTML = `
+                <div class="dict-explorer-wrap">
+                    <div class="dict-toolbar">
+                        <div class="dict-search-row">
+                            <input type="text" class="dict-search-input" id="dict-search" placeholder="Search across 551 definitions... (e.g. airport, tea, fart)" value="${escapeHtml(dictSearchQuery)}">
+                            <span class="dict-count-badge">${filteredTerms.length} Words</span>
+                            <div class="dict-toggles-wrap">
+                                <label class="dict-continuous-toggle" title="Play words continuously one after another">
+                                    <span class="dict-toggle-label">Continuous Play</span>
+                                    <input type="checkbox" id="dict-continuous-checkbox" ${dictContinuousPlay ? 'checked' : ''}>
+                                    <div class="toggle-switch"></div>
+                                </label>
+                                <label class="dict-continuous-toggle dict-mute-toggle" title="Mute audio to browse words silently">
+                                    <span class="dict-toggle-label">Mute Audio</span>
+                                    <input type="checkbox" id="dict-mute-checkbox" ${dictMute ? 'checked' : ''}>
+                                    <div class="toggle-switch"></div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="dict-alpha-nav">
+                            <button class="alpha-pill ${dictActiveLetter === 'ALL' ? 'active' : ''}" data-letter="ALL">ALL</button>
+                            <button class="alpha-pill pill-fav ${dictActiveLetter === 'FAV' ? 'active' : ''}" data-letter="FAV" title="View Starred Favorites">★ FAVS ${dictFavorites.size > 0 ? `(${dictFavorites.size})` : ''}</button>
+                            ${alphabet.map(l => `<button class="alpha-pill ${dictActiveLetter === l ? 'active' : ''}" data-letter="${l}">${l}</button>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="dict-stage-grid">
+                        <!-- Left Words Pane -->
+                        <div class="dict-words-pane" id="dict-words-list">
+                            ${filteredTerms.length > 0 ? filteredTerms.map((t, idx) => `
+                                <div class="dict-word-tile ${t.id === (activeTerm ? activeTerm.id : -1) ? 'active' : ''}" data-idx="${idx}" data-id="${t.id}">
+                                    <span class="dict-word-name">${escapeHtml(t.term)}</span>
+                                    <span class="dict-pos-tag">${escapeHtml(t.pos)}</span>
+                                    ${dictFavorites.has(t.id) ? '<span class="tile-fav-star" title="Favorited">★</span>' : ''}
+                                </div>
+                            `).join('') : '<div style="color: var(--text-muted); font-style: italic; padding: 2rem 1rem; text-align: center;">No words found in this category. Click the ★ icon on any word to bookmark it here.</div>'}
+                        </div>
+
+                        <!-- Right Definition Card -->
+                        <div class="dict-card-pane">
+                            ${activeTerm ? `
+                                <div class="dict-card-header">
+                                    <div class="dict-card-title-wrap">
+                                        <h2 class="dict-card-term">${escapeHtml(activeTerm.term)}</h2>
+                                        <span class="dict-card-pos">${escapeHtml(activeTerm.pos)}</span>
+                                    </div>
+                                    <div class="dict-card-actions">
+                                        <button class="dict-btn-fav ${isFav ? 'active' : ''}" id="dict-card-fav-btn" title="${isFav ? 'Remove from Favorites' : 'Add to Favorites'}">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? '#ffb703' : 'none'}" stroke="${isFav ? '#ffb703' : 'currentColor'}" stroke-width="2">
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                            </svg>
+                                        </button>
+                                        <button class="dict-card-btn-play" id="dict-card-play-btn">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+                                            <span>Play Audio</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="dict-card-body">
+                                    <p>${linkifyQV(escapeHtml(activeTerm.definition))}</p>
+                                </div>
+                                <div class="dict-card-meta">
+                                    <span>Word #${activeTerm.id} of 551 • Section ${activeTerm.letter}</span>
+                                    <span>Chatterbox TTS AI Model</span>
+                                </div>
+                            ` : '<div style="color: var(--text-muted); font-style: italic; padding: 2rem;">No matching words found.</div>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Auto-scroll active word into view in left pane
+            setTimeout(() => {
+                const activeEl = document.querySelector('.dict-word-tile.active');
+                if (activeEl) {
+                    activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            }, 30);
+
+            // Wire Dictionary Events
+            const continuousCheck = document.getElementById('dict-continuous-checkbox');
+            if (continuousCheck) {
+                continuousCheck.addEventListener('change', (e) => {
+                    dictContinuousPlay = e.target.checked;
+                });
+            }
+
+            const muteCheck = document.getElementById('dict-mute-checkbox');
+            if (muteCheck) {
+                muteCheck.addEventListener('change', (e) => {
+                    dictMute = e.target.checked;
+                    audio.muted = dictMute;
+                    if (dictMute && !audio.paused) {
+                        audio.pause();
+                        updateUIState();
+                    }
+                });
+            }
+
+            const searchInput = document.getElementById('dict-search');
+            searchInput.addEventListener('input', (e) => {
+                dictSearchQuery = e.target.value;
+                dictActiveTermIndex = 0;
+                renderDictionaryExplorer();
+                const newSearch = document.getElementById('dict-search');
+                if (newSearch) {
+                    newSearch.focus();
+                    newSearch.setSelectionRange(newSearch.value.length, newSearch.value.length);
+                }
+            });
+
+            document.querySelectorAll('.alpha-pill').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    dictActiveLetter = e.target.dataset.letter;
+                    dictActiveTermIndex = 0;
+                    const newFiltered = getFilteredTerms();
+                    if (newFiltered.length > 0) {
+                        if (!audio.paused && dictContinuousPlay && !dictMute) {
+                            playDictionaryTerm(newFiltered[0]);
+                        } else {
+                            currentDictTerm = newFiltered[0];
+                        }
+                    } else {
+                        currentDictTerm = null;
+                    }
+                    renderDictionaryExplorer();
+                });
+            });
+
+            document.querySelectorAll('.dict-word-tile').forEach(tile => {
+                tile.addEventListener('click', () => {
+                    const idx = parseInt(tile.dataset.idx, 10);
+                    dictActiveTermIndex = idx;
+                    const term = filteredTerms[idx];
+                    if (term) {
+                        selectWord(term, false);
+                        if (!dictMute) {
+                            playDictionaryTerm(term);
+                        } else {
+                            currentDictTerm = term;
+                            playerTrackNameEl.textContent = `${term.term} (${term.pos})`;
+                            playerTrackBookEl.textContent = `The Meaning of Liff • Section ${term.letter}`;
+                        }
+                    }
+                });
+            });
+
+            const cardPlayBtn = document.getElementById('dict-card-play-btn');
+            if (cardPlayBtn && activeTerm) {
+                cardPlayBtn.addEventListener('click', () => {
+                    playDictionaryTerm(activeTerm);
+                });
+            }
+
+            wireFavoriteButton(activeTerm);
+
+            // Wire QV Cross-Reference Links
+            chaptersListEl.querySelectorAll('.dict-qv-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const targetId = parseInt(link.dataset.id, 10);
+                    jumpToDictionaryTermById(targetId);
+                });
+            });
+        }
+
+        // Fast lookup map for QV cross-references
+        let dictTermLookup = null;
+        function getDictTermLookup() {
+            if (dictTermLookup) return dictTermLookup;
+            dictTermLookup = {};
+            if (BOOKS_DATA[6] && BOOKS_DATA[6].chapters) {
+                BOOKS_DATA[6].chapters.forEach(t => {
+                    dictTermLookup[t.term.toLowerCase()] = t;
+                    dictTermLookup[t.term.toLowerCase().replace(/[\s\-]/g, "")] = t;
+                });
+                // Common irregular mappings
+                const overrides = {
+                    "buldoo": "Buldooo",
+                    "sandberge": "Sadberge",
+                    "gossnargh": "Goosnargh",
+                    "kirbies": "Kirby",
+                    "snitterbies": "Snitterby",
+                    "throckmorton": "Throckmorton",
+                    "throcking": "Throckmorton",
+                    "araglin": "Araglin",
+                    "ardscalpsie": "Ardscalpsie",
+                    "clonmult": "Clonmult",
+                    "wembley": "Wembley",
+                    "ely": "Ely",
+                    "swanage": "Swanage",
+                    "yates": "Yate"
+                };
+                for (const [key, targetName] of Object.entries(overrides)) {
+                    const found = BOOKS_DATA[6].chapters.find(t => t.term === targetName);
+                    if (found) dictTermLookup[key] = found;
+                }
+            }
+            return dictTermLookup;
+        }
+
+        // Convert preceding words of QV into interactive clickable cross-reference links with hover previews
+        function linkifyQV(text) {
+            const map = getDictTermLookup();
+            return text.replace(/([a-zA-Z\x27\-]+(?:\s+[a-zA-Z\x27\-]+)?)(?:,\s*|\s+)QV\b([.,;]?)/gi, (match, words, punct) => {
+                const cleanWords = words.trim();
+                const parts = cleanWords.split(/\s+/);
+                let found = null;
+                let matchedStr = cleanWords;
+
+                for (let len = parts.length; len >= 1; len--) {
+                    const cand = parts.slice(parts.length - len).join(" ").toLowerCase();
+                    const candClean = cand.replace(/^(the|an|a|of|and|or)\s+/, "");
+                    if (map[candClean] || map[candClean.replace(/s$/, "")] || map[candClean.replace(/es$/, "")]) {
+                        found = map[candClean] || map[candClean.replace(/s$/, "")] || map[candClean.replace(/es$/, "")];
+                        matchedStr = parts.slice(parts.length - len).join(" ");
+                        break;
+                    }
+                }
+
+                if (found) {
+                    const prefix = cleanWords.slice(0, cleanWords.length - matchedStr.length);
+                    const tooltipHtml = `
+                        <span class="dict-qv-tooltip">
+                            <span class="qv-tt-header">
+                                <span class="qv-tt-term">${escapeHtml(found.term)}</span>
+                                <span class="qv-tt-pos">${escapeHtml(found.pos)}</span>
+                            </span>
+                            <span class="qv-tt-body">${escapeHtml(found.definition)}</span>
+                            <span class="qv-tt-footer">
+                                <span>Section ${found.letter} • Word #${found.id}</span>
+                                <span>Click to Jump & Play</span>
+                            </span>
+                        </span>
+                    `;
+                    return `${prefix}<a href="javascript:void(0)" class="dict-qv-link" data-id="${found.id}"><strong>${matchedStr}</strong> <span class="qv-badge">QV</span>${tooltipHtml}</a>${punct || ""}`;
+                }
+                return match;
+            });
+        }
+
+        // Jump directly to a cross-referenced term
+        function jumpToDictionaryTermById(targetId) {
+            if (!currentBook || !currentBook.chapters) return;
+            const target = currentBook.chapters.find(t => t.id === targetId);
+            if (!target) return;
+
+            if (dictActiveLetter !== "ALL" && dictActiveLetter !== target.letter) {
+                dictActiveLetter = target.letter;
+            }
+            dictSearchQuery = "";
+            renderDictionaryExplorer();
+            selectWord(target, true);
+            playDictionaryTerm(target);
+        }
+
+        // Wire Favorite Button Toggle
+        function wireFavoriteButton(activeTerm) {
+            const favBtn = document.getElementById('dict-card-fav-btn');
+            if (favBtn && activeTerm) {
+                favBtn.addEventListener('click', () => {
+                    toggleFavorite(activeTerm.id);
+                    const isFav = dictFavorites.has(activeTerm.id);
+                    favBtn.classList.toggle('active', isFav);
+                    favBtn.title = isFav ? 'Remove from Favorites' : 'Add to Favorites';
+                    const svg = favBtn.querySelector('svg');
+                    if (svg) {
+                        svg.setAttribute('fill', isFav ? '#ffb703' : 'none');
+                        svg.setAttribute('stroke', isFav ? '#ffb703' : 'currentColor');
+                    }
+
+                    // Update star icon in word tiles
+                    document.querySelectorAll('.dict-word-tile').forEach(tile => {
+                        if (parseInt(tile.dataset.id, 10) === activeTerm.id) {
+                            let star = tile.querySelector('.tile-fav-star');
+                            if (isFav && !star) {
+                                const s = document.createElement('span');
+                                s.className = 'tile-fav-star';
+                                s.title = 'Favorited';
+                                s.textContent = '★';
+                                tile.appendChild(s);
+                            } else if (!isFav && star) {
+                                star.remove();
+                            }
+                        }
+                    });
+
+                    // Update FAVS pill count badge
+                    const favPill = document.querySelector('.alpha-pill.pill-fav');
+                    if (favPill) {
+                        favPill.textContent = `★ FAVS ${dictFavorites.size > 0 ? `(${dictFavorites.size})` : ''}`;
+                    }
+
+                    if (dictActiveLetter === 'FAV') {
+                        renderDictionaryExplorer();
+                    }
+                });
+            }
+        }
+
+        // Update active word and definition card without re-rendering the whole words list
+        function selectWord(term, shouldAutoScroll = false) {
+            currentDictTerm = term;
+
+            document.querySelectorAll('.dict-word-tile').forEach(tile => {
+                const isMatch = (parseInt(tile.dataset.id, 10) === term.id || tile.querySelector('.dict-word-name')?.textContent === term.term);
+                tile.classList.toggle('active', isMatch);
+                if (isMatch && shouldAutoScroll) {
+                    scrollWordIntoViewIfNeeded(tile);
+                }
+            });
+
+            updateDefinitionCard(term);
+        }
+
+        // Only scroll the words pane if the active item is not currently visible
+        function scrollWordIntoViewIfNeeded(tile) {
+            const pane = document.getElementById('dict-words-list');
+            if (!pane || !tile) return;
+            const paneRect = pane.getBoundingClientRect();
+            const tileRect = tile.getBoundingClientRect();
+
+            if (tileRect.top < paneRect.top) {
+                tile.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            } else if (tileRect.bottom > paneRect.bottom) {
+                tile.scrollIntoView({ block: 'end', behavior: 'smooth' });
+            }
+        }
+
+        // Update definition card content directly
+        function updateDefinitionCard(term) {
+            const cardPane = document.querySelector('.dict-card-pane');
+            if (!cardPane) return;
+            if (!term) {
+                cardPane.innerHTML = '<div style="color: var(--text-muted); font-style: italic; padding: 2rem;">No matching words found.</div>';
+                return;
+            }
+
+            const isFav = dictFavorites.has(term.id);
+
+            cardPane.innerHTML = `
+                <div class="dict-card-header">
+                    <div class="dict-card-title-wrap">
+                        <h2 class="dict-card-term">${escapeHtml(term.term)}</h2>
+                        <span class="dict-card-pos">${escapeHtml(term.pos)}</span>
+                    </div>
+                    <div class="dict-card-actions">
+                        <button class="dict-btn-fav ${isFav ? 'active' : ''}" id="dict-card-fav-btn" title="${isFav ? 'Remove from Favorites' : 'Add to Favorites'}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? '#ffb703' : 'none'}" stroke="${isFav ? '#ffb703' : 'currentColor'}" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                        </button>
+                        <button class="dict-card-btn-play" id="dict-card-play-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+                            <span>Play Audio</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="dict-card-body">
+                    <p>${linkifyQV(escapeHtml(term.definition))}</p>
+                </div>
+                <div class="dict-card-meta">
+                    <span>Word #${term.id} of 551 • Section ${term.letter}</span>
+                    <span>Chatterbox TTS AI Model</span>
+                </div>
+            `;
+
+            const btn = document.getElementById('dict-card-play-btn');
+            if (btn) {
+                btn.addEventListener('click', () => playDictionaryTerm(term));
+            }
+
+            wireFavoriteButton(term);
+
+            // Wire QV links inside updated card
+            cardPane.querySelectorAll('.dict-qv-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const targetId = parseInt(link.dataset.id, 10);
+                    jumpToDictionaryTermById(targetId);
+                });
+            });
+        }
+
+        // Play individual dictionary word audio
+        function playDictionaryTerm(term) {
+            currentDictTerm = term;
+            playerTrackNameEl.textContent = `${term.term} (${term.pos})`;
+            playerTrackBookEl.textContent = `The Meaning of Liff • Section ${term.letter}`;
+
+            audio.src = term.src;
+            audio.load();
+            audio.play().then(() => {
+                updateUIState();
+            }).catch(err => {
+                console.warn("Audio file pending or not yet synthesized:", err);
+                updateUIState();
+            });
+
+            btnPlayPause.disabled = false;
+            timelineSlider.disabled = false;
+        }
+
+        // Play selected chapter (Books 1-6)
         async function playChapter(book, index, chapter) {
             if (currentBook && currentBook.id === book.id && currentChapterIndex === index) {
                 togglePlayPause();
@@ -839,69 +2254,59 @@
 
             currentBook = book;
             currentChapterIndex = index;
-
-            // Sync visual active rows
             syncActiveRow();
 
             try {
-                // Show loading state
                 playerTrackNameEl.textContent = "Loading & Decrypting...";
                 playerTrackBookEl.textContent = book.title;
                 btnPlayPause.disabled = true;
 
-                // Fetch the obfuscated Base64 file
-                const response = await fetch(chapter.src);
-                if (!response.ok) throw new Error("Failed to load audio file");
-                const base64Text = await response.text();
-
-                // Decode base64 to binary data
-                const binaryString = atob(base64Text.trim());
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-
-                // De-obfuscate using the key
-                const key = _0x3b8a();
-                const decryptedBytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    decryptedBytes[i] = bytes[i] ^ key[i % key.length];
-                }
-
-                // Create object URL
+                const blob = await decryptAudioFile(chapter.src);
                 if (currentObjectURL) {
                     URL.revokeObjectURL(currentObjectURL);
                 }
-                const blob = new Blob([decryptedBytes], { type: 'audio/mp3' });
                 currentObjectURL = URL.createObjectURL(blob);
-
                 audio.src = currentObjectURL;
                 audio.load();
                 audio.play().then(() => {
                     updateUIState();
                 }).catch(err => {
-                    console.error("Audio playback error:", err);
+                    console.warn("Audio playback issue:", err);
+                    updateUIState();
                 });
 
-                // Update persistent player labels
-                playerTrackNameEl.textContent = chapter.name;
-                playerTrackBookEl.textContent = book.title;
-
-                // Enable player controls
                 btnPlayPause.disabled = false;
                 timelineSlider.disabled = false;
 
             } catch (err) {
-                console.error("Decryption / Playback error:", err);
+                console.error("Playback error:", err);
                 playerTrackNameEl.textContent = "Playback Error";
             }
         }
 
         // Play/Pause toggler
         function togglePlayPause() {
+            if (!audio.src) {
+                if (currentBook && currentBook.chapters.length > 0) {
+                    if (currentBook.isDictionary) {
+                        const visible = getFilteredTerms();
+                        const term = (currentDictTerm && visible.some(t => t.id === currentDictTerm.id))
+                            ? currentDictTerm
+                            : (visible[dictActiveTermIndex] || visible[0]);
+                        if (term) {
+                            selectWord(term, true);
+                            playDictionaryTerm(term);
+                        }
+                    } else {
+                        const idx = currentChapterIndex >= 0 ? currentChapterIndex : 0;
+                        playChapter(currentBook, idx, currentBook.chapters[idx]);
+                    }
+                }
+                return;
+            }
+
             if (audio.paused) {
-                audio.play().then(() => updateUIState());
+                audio.play().then(() => updateUIState()).catch(console.warn);
             } else {
                 audio.pause();
                 updateUIState();
@@ -917,22 +2322,56 @@
                 playIcon.style.display = 'none';
                 pauseIcon.style.display = 'block';
             }
-            btnPrev.disabled = currentChapterIndex <= 0;
-            btnNext.disabled = currentChapterIndex >= currentBook.chapters.length - 1 || currentChapterIndex === -1;
+
+            if (currentBook && currentBook.isDictionary) {
+                const visibleTerms = getFilteredTerms();
+                const curIdx = visibleTerms.findIndex(t => t.id === (currentDictTerm ? currentDictTerm.id : -1));
+                btnPrev.disabled = (curIdx <= 0 && dictActiveLetter === "A");
+                btnNext.disabled = (curIdx >= visibleTerms.length - 1 && dictActiveLetter === "Z");
+            } else {
+                btnPrev.disabled = currentChapterIndex <= 0;
+                btnNext.disabled = currentChapterIndex >= (currentBook ? currentBook.chapters.length - 1 : 0) || currentChapterIndex === -1;
+            }
             syncActiveRow();
         }
 
-        // Highlight the currently playing chapter list row
+        // Highlight active chapter
         function syncActiveRow() {
+            if (currentBook && currentBook.isDictionary) return;
             document.querySelectorAll('.chapter-row').forEach((row, idx) => {
                 const isCurrent = (currentChapterIndex === idx);
                 row.classList.toggle('active', isCurrent);
             });
         }
 
-        // Play Previous Chapter
+        // Play Previous
         function playPrevious() {
-            if (currentChapterIndex > 0) {
+            if (currentBook && currentBook.isDictionary) {
+                const visibleTerms = getFilteredTerms();
+                if (visibleTerms.length === 0) return;
+
+                let currentIndex = visibleTerms.findIndex(t => t.id === (currentDictTerm ? currentDictTerm.id : -1));
+                if (currentIndex > 0) {
+                    const prevTerm = visibleTerms[currentIndex - 1];
+                    dictActiveTermIndex = currentIndex - 1;
+                    selectWord(prevTerm, true);
+                    playDictionaryTerm(prevTerm);
+                } else if (currentIndex === 0 && dictActiveLetter !== "ALL" && !dictSearchQuery) {
+                    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    const prevLetterIdx = alphabet.indexOf(dictActiveLetter) - 1;
+                    if (prevLetterIdx >= 0) {
+                        dictActiveLetter = alphabet[prevLetterIdx];
+                        const prevSectionTerms = getFilteredTerms();
+                        if (prevSectionTerms.length > 0) {
+                            dictActiveTermIndex = prevSectionTerms.length - 1;
+                            const prevTerm = prevSectionTerms[dictActiveTermIndex];
+                            renderDictionaryExplorer();
+                            selectWord(prevTerm, true);
+                            playDictionaryTerm(prevTerm);
+                        }
+                    }
+                }
+            } else if (currentChapterIndex > 0) {
                 const prevIdx = currentChapterIndex - 1;
                 const prevChap = currentBook.chapters[prevIdx];
                 if (prevChap && prevChap.src) {
@@ -941,9 +2380,39 @@
             }
         }
 
-        // Play Next Chapter
+        // Play Next
         function playNext() {
-            if (currentChapterIndex < currentBook.chapters.length - 1) {
+            if (currentBook && currentBook.isDictionary) {
+                const visibleTerms = getFilteredTerms();
+                if (visibleTerms.length === 0) return;
+
+                let currentIndex = visibleTerms.findIndex(t => t.id === (currentDictTerm ? currentDictTerm.id : -1));
+
+                if (currentIndex >= 0 && currentIndex < visibleTerms.length - 1) {
+                    const nextTerm = visibleTerms[currentIndex + 1];
+                    dictActiveTermIndex = currentIndex + 1;
+                    selectWord(nextTerm, true);
+                    playDictionaryTerm(nextTerm);
+                } else if (currentIndex === -1 && visibleTerms.length > 0) {
+                    selectWord(visibleTerms[0], true);
+                    playDictionaryTerm(visibleTerms[0]);
+                } else if (currentIndex === visibleTerms.length - 1 && dictActiveLetter !== "ALL" && !dictSearchQuery) {
+                    // Advance to next letter
+                    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    const nextLetterIdx = alphabet.indexOf(dictActiveLetter) + 1;
+                    if (nextLetterIdx < alphabet.length) {
+                        dictActiveLetter = alphabet[nextLetterIdx];
+                        dictActiveTermIndex = 0;
+                        const nextSectionTerms = getFilteredTerms();
+                        if (nextSectionTerms.length > 0) {
+                            const nextTerm = nextSectionTerms[0];
+                            renderDictionaryExplorer();
+                            selectWord(nextTerm, true);
+                            playDictionaryTerm(nextTerm);
+                        }
+                    }
+                }
+            } else if (currentChapterIndex < currentBook.chapters.length - 1) {
                 const nextIdx = currentChapterIndex + 1;
                 const nextChap = currentBook.chapters[nextIdx];
                 if (nextChap && nextChap.src) {
@@ -954,11 +2423,18 @@
 
         // Handle Audio end (Autoplay Next)
         function handleTrackEnded() {
-            if (autoplayCheckbox.checked) {
-                // Pause 2 seconds before playing next track
+            if (currentBook && currentBook.isDictionary) {
+                if (dictContinuousPlay) {
+                    setTimeout(() => {
+                        playNext();
+                    }, 600);
+                } else {
+                    updateUIState();
+                }
+            } else if (autoplayCheckbox.checked) {
                 setTimeout(() => {
                     playNext();
-                }, 2000);
+                }, 800);
             } else {
                 updateUIState();
             }
@@ -990,10 +2466,15 @@
 
         // Format raw seconds to MM:SS
         function formatTime(secs) {
-            if (isNaN(secs)) return "0:00";
+            if (isNaN(secs) || !isFinite(secs)) return "0:00";
             const m = Math.floor(secs / 60);
             const s = Math.floor(secs % 60).toString().padStart(2, '0');
             return `${m}:${s}`;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
         }
 
         // Initialize on load
