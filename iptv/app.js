@@ -894,19 +894,19 @@
       languages[lang] = (languages[lang] || 0) + 1;
     });
 
-    // Country select - Top 10 by channel count first, then alphabetical A-Z for the rest
+    // Country select - Top 20 by channel count first, then alphabetical A-Z for the rest
     els.countryFilter.innerHTML = '<option value="">All Countries</option>';
     const countriesList = Object.entries(countries);
     const byCount = [...countriesList].sort((a, b) => b[1].count - a[1].count);
-    const top10 = byCount.slice(0, 10);
-    const top10Keys = new Set(top10.map(([cc]) => cc));
+    const top20 = byCount.slice(0, 20);
+    const top20Keys = new Set(top20.map(([cc]) => cc));
     const rest = countriesList
-      .filter(([cc]) => !top10Keys.has(cc))
+      .filter(([cc]) => !top20Keys.has(cc))
       .sort((a, b) => a[1].name.localeCompare(b[1].name));
 
     const optGroupTop = document.createElement('optgroup');
-    optGroupTop.label = '⭐ Top 10 Countries';
-    top10.forEach(([cc, data]) => {
+    optGroupTop.label = '⭐ Top 20 Countries';
+    top20.forEach(([cc, data]) => {
       const opt = document.createElement('option');
       opt.value = cc;
       opt.textContent = `${data.flag} ${data.name} (${data.count})`;
@@ -1114,19 +1114,19 @@
     });
 
     // Sort groups:
-    // - Country: Top 10 countries with largest channel count first, then alphabetical A-Z for the rest
+    // - Country: Top 20 countries with largest channel count first, then alphabetical A-Z for the rest
     // - Language: Alphabetical A-Z
     // - Other (Genre/etc): Largest first
     let sortedGroups;
     if (groupBy === 'country') {
       const allGroups = Array.from(groups.values());
       const byCount = [...allGroups].sort((a, b) => b.items.length - a.items.length);
-      const top10 = byCount.slice(0, 10);
-      const top10Keys = new Set(top10.map(g => g.key));
+      const top20 = byCount.slice(0, 20);
+      const top20Keys = new Set(top20.map(g => g.key));
       const rest = allGroups
-        .filter(g => !top10Keys.has(g.key))
+        .filter(g => !top20Keys.has(g.key))
         .sort((a, b) => a.key.localeCompare(b.key));
-      sortedGroups = [...top10, ...rest];
+      sortedGroups = [...top20, ...rest];
     } else if (groupBy === 'language') {
       sortedGroups = Array.from(groups.values()).sort((a, b) => a.key.localeCompare(b.key));
     } else {
