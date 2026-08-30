@@ -329,6 +329,12 @@
 
         <!-- Stream Error Card -->
         <div class="stream-error-card" id="stream-error-card" style="display: none;">
+          <button class="error-close-btn" id="error-close-btn" title="Dismiss Notice">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
           <div class="error-badge">⚠️ Browser Stream Notice</div>
           <h3 id="error-title">Stream Could Not Load in Browser</h3>
           <p id="error-desc">Most IPTV streams work in VLC because VLC bypasses browser CORS restrictions and has native codecs. You can open this stream directly in VLC with one click!</p>

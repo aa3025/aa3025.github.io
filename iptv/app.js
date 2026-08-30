@@ -228,6 +228,7 @@
     playerPlaceholder: document.getElementById('player-placeholder'),
     bufferingSpinner: document.getElementById('buffering-spinner'),
     streamErrorCard: document.getElementById('stream-error-card'),
+    errorCloseBtn: document.getElementById('error-close-btn'),
     errorTitle: document.getElementById('error-title'),
     errorDesc: document.getElementById('error-desc'),
     errorVlcBtn: document.getElementById('error-vlc-btn'),
@@ -2406,6 +2407,11 @@
     });
 
     // VLC & Action Buttons
+    if (els.errorCloseBtn) {
+      els.errorCloseBtn.addEventListener('click', () => {
+        els.streamErrorCard.style.display = 'none';
+      });
+    }
     els.openVlcBtn.addEventListener('click', openCurrentInVlc);
     els.errorVlcBtn.addEventListener('click', openCurrentInVlc);
     if (els.errorPopupBtn) els.errorPopupBtn.addEventListener('click', () => openCurrentInPopup());

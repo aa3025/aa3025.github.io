@@ -1375,6 +1375,37 @@ html, body {
   z-index: 4;
 }
 
+.error-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.error-close-btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+}
+
+.error-close-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  transform: scale(1.08);
+}
+
 .error-badge {
   font-size: 0.72rem;
   font-weight: 700;
