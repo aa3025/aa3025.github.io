@@ -231,8 +231,8 @@
     errorTitle: document.getElementById('error-title'),
     errorDesc: document.getElementById('error-desc'),
     errorVlcBtn: document.getElementById('error-vlc-btn'),
+    errorPopupBtn: document.getElementById('error-popup-btn'),
     errorCopyBtn: document.getElementById('error-copy-btn'),
-    errorProxyBtn: document.getElementById('error-proxy-btn'),
     errorNextBtn: document.getElementById('error-next-btn'),
     videoOverlayControls: document.getElementById('video-overlay-controls'),
     headerAvatarWrap: document.getElementById('header-avatar-wrap'),
@@ -1452,13 +1452,13 @@
               if (isHttpsOrigin && isPlainHttp) {
                 showStreamError(
                   'Insecure HTTP Stream • Blocked by Browser',
-                  'Your browser blocked this HTTP stream under HTTPS Mixed Content security rules. You can launch it in VLC Player with 1-click below, OR in Chrome: click the tune/padlock icon next to the URL -> Site settings -> Insecure content -> Allow, then reload to play it directly here!',
+                  `Your browser blocked this HTTP stream under HTTPS Mixed Content security rules. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click here to open stream in a new pop-up window</a>, or launch in VLC Player below.`,
                   ch
                 );
               } else {
                 showStreamError(
                   'Stream Network / CORS Notice',
-                  'This stream could not be loaded directly by your browser (frequently due to CORS or token expiration). You can launch it in VLC Player with one click!',
+                  `This stream could not be loaded directly by your browser (frequently due to CORS or token expiration). <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Try opening in a pop-up window</a> or launch in VLC Player below!`,
                   ch
                 );
               }
@@ -1470,7 +1470,7 @@
               updateChannelRowStatus(ch.id, 'offline');
               showStreamError(
                 'Playback Error',
-                `Stream codec or format is not supported natively in this browser. Click below to open in VLC.`,
+                `Stream codec or format is not supported natively in this browser. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click here to open in a new pop-up window</a> or open in VLC below.`,
                 ch
               );
               hls.destroy();
@@ -1619,13 +1619,13 @@
           if (isHttpsOrigin && isPlainHttp) {
             showStreamError(
               'Insecure HTTP DASH Stream • Blocked by Browser',
-              'Your browser blocked this HTTP DASH stream under HTTPS Mixed Content security rules. You can launch it in VLC Player with 1-click below, OR in Chrome: click the tune/padlock icon next to the URL -> Site settings -> Insecure content -> Allow, then reload!',
+              `Your browser blocked this HTTP DASH stream under HTTPS Mixed Content security rules. <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Click here to open in new pop-up window</a>, or launch in VLC Player below.`,
               ch
             );
           } else {
             showStreamError(
               'MPEG-DASH Stream Notice',
-              'This MPEG-DASH (.mpd) stream could not be loaded directly by the browser (frequently due to BBC UK geo-blocking or CORS). Click below to launch in VLC Player with one click!',
+              `This MPEG-DASH (.mpd) stream could not be loaded directly by the browser (frequently due to BBC UK geo-blocking or CORS). <a href="${escapeHtml(ch.url)}" class="error-popup-link" target="_blank" rel="noopener noreferrer">Try opening in a pop-up window</a> or launch in VLC Player below!`,
               ch
             );
           }
@@ -1655,8 +1655,33 @@
   function showStreamError(title, desc, ch) {
     els.bufferingSpinner.style.display = 'none';
     els.errorTitle.textContent = title;
-    els.errorDesc.textContent = desc;
+    els.errorDesc.innerHTML = desc;
     els.streamErrorCard.style.display = 'flex';
+  }
+
+  // --- Launch in Pop-up Window ---
+  function openCurrentInPopup(customUrl) {
+    const url = customUrl || (state.currentChannel ? state.currentChannel.url : null);
+    if (!url) {
+      showToast('Select a channel first', 'ℹ️');
+      return;
+    }
+    const w = 854;
+    const h = 480;
+    const left = Math.max(0, Math.floor((window.screen.width - w) / 2));
+    const top = Math.max(0, Math.floor((window.screen.height - h) / 2));
+    const popup = window.open(
+      url,
+      'iptv_popup_' + Date.now(),
+      `width=${w},height=${h},top=${top},left=${left},scrollbars=no,resizable=yes,status=no,location=yes,toolbar=no,menubar=no`
+    );
+    if (popup) {
+      popup.focus();
+      showToast('Opening stream in pop-up window...', '🌐');
+    } else {
+      window.open(url, '_blank');
+      showToast('Opening stream in new tab...', '🌐');
+    }
   }
 
   // --- Launch in VLC Player ---
@@ -2383,9 +2408,19 @@
     // VLC & Action Buttons
     els.openVlcBtn.addEventListener('click', openCurrentInVlc);
     els.errorVlcBtn.addEventListener('click', openCurrentInVlc);
+    if (els.errorPopupBtn) els.errorPopupBtn.addEventListener('click', () => openCurrentInPopup());
     els.copyUrlBtn.addEventListener('click', copyCurrentUrl);
     els.errorCopyBtn.addEventListener('click', copyCurrentUrl);
     els.errorNextBtn.addEventListener('click', playNext);
+
+    els.errorDesc.addEventListener('click', (e) => {
+      const link = e.target.closest('.error-popup-link');
+      if (link) {
+        e.preventDefault();
+        const url = link.getAttribute('href');
+        openCurrentInPopup(url);
+      }
+    });
 
     els.headerFavBtn.addEventListener('click', () => {
       if (state.currentChannel) toggleFavorite(state.currentChannel.id);

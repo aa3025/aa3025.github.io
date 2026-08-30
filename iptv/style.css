@@ -1397,6 +1397,22 @@ html, body {
   line-height: 1.4;
 }
 
+.stream-error-card a,
+.stream-error-card .error-popup-link {
+  color: #38bdf8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease, text-shadow 0.15s ease;
+}
+
+.stream-error-card a:hover,
+.stream-error-card .error-popup-link:hover {
+  color: #7dd3fc;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
 .error-actions-row {
   display: flex;
   flex-wrap: wrap;
