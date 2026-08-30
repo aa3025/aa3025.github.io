@@ -1609,7 +1609,7 @@
         // Initial setup
         async function init() {
             try {
-                const response = await fetch('books_data.dat');
+                const response = await fetch('books_data.dat?v=' + Date.now());
                 if (!response.ok) throw new Error("Metadata file not found");
                 const base64Text = await response.text();
                 const binaryString = atob(base64Text.trim());
