@@ -2408,20 +2408,34 @@
       });
     });
 
-    // Pull Updated Channels Button (Syncs directly from iptv-org GitHub repository)
+    // Pull Updated Channels Button (Syncs directly from cloned iptv-org repo or raw GitHub)
     if (els.pullUpdatedBtn) {
       els.pullUpdatedBtn.addEventListener('click', async () => {
-        showToast('Syncing latest channels from iptv-org GitHub...', '🔄');
+        showToast('Syncing latest channels from iptv-org repository...', '🔄');
         els.pullUpdatedBtn.classList.add('rotating');
         try {
-          const liveRepoUrl = `https://iptv-org.github.io/iptv/index.m3u?t=${Date.now()}`;
-          await loadPlaylist(liveRepoUrl, true);
-          showToast(`Synced! ${state.allChannels.length.toLocaleString()} channels loaded from iptv-org.`, '✅');
+          let synced = false;
+          // 1. Try local cloned repo access first
+          try {
+            const checkLocal = await fetch(`./iptv-org/streams/uk.m3u?t=${Date.now()}`);
+            if (checkLocal.ok) {
+              await loadPlaylist(`./playlist.m3u?t=${Date.now()}`, true);
+              showToast(`Synced! ${state.allChannels.length.toLocaleString()} channels loaded from local iptv-org repo.`, '✅');
+              synced = true;
+            }
+          } catch (_) {}
+
+          // 2. If not served locally, fetch live from GitHub repository
+          if (!synced) {
+            const liveRepoUrl = `https://iptv-org.github.io/iptv/index.m3u?t=${Date.now()}`;
+            await loadPlaylist(liveRepoUrl, true);
+            showToast(`Synced! ${state.allChannels.length.toLocaleString()} channels loaded from iptv-org GitHub.`, '✅');
+          }
         } catch (err) {
-          console.warn('Live GitHub sync failed, falling back to local master playlist:', err);
+          console.warn('Sync failed, falling back to bundled playlist:', err);
           try {
             await loadPlaylist(`./playlist.m3u?t=${Date.now()}`, true);
-            showToast(`Loaded ${state.allChannels.length.toLocaleString()} channels from local master playlist.`, '✅');
+            showToast(`Loaded ${state.allChannels.length.toLocaleString()} channels from bundled playlist.`, '✅');
           } catch (e) {
             showToast('Could not sync updated channels', '⚠️');
           }
