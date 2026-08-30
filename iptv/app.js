@@ -2652,12 +2652,87 @@
     }
   }
 
+  // --- Sidebar Resizer for Desktop ---
+  function initSidebarResizer() {
+    const resizer = document.getElementById('sidebar-resizer');
+    const sidebar = document.getElementById('sidebar-panel');
+    if (!resizer || !sidebar) return;
+
+    // Restore saved width from localStorage
+    const savedWidth = localStorage.getItem('nova_sidebar_width');
+    if (savedWidth && window.innerWidth > 768) {
+      const parsed = parseInt(savedWidth, 10);
+      if (parsed >= 260 && parsed <= window.innerWidth * 0.65) {
+        sidebar.style.width = `${parsed}px`;
+      }
+    }
+
+    let isDragging = false;
+    let startX = 0;
+    let startWidth = 0;
+
+    function onPointerDown(e) {
+      if (window.innerWidth <= 768) return;
+      isDragging = true;
+      startX = e.clientX;
+      startWidth = sidebar.getBoundingClientRect().width;
+      resizer.classList.add('resizing');
+      document.body.classList.add('is-resizing');
+      e.preventDefault();
+    }
+
+    function onPointerMove(e) {
+      if (!isDragging) return;
+      const deltaX = e.clientX - startX;
+      const minW = 260;
+      const maxW = Math.floor(window.innerWidth * 0.65);
+      const newWidth = Math.min(Math.max(startWidth + deltaX, minW), maxW);
+      sidebar.style.width = `${newWidth}px`;
+    }
+
+    function onPointerUp() {
+      if (!isDragging) return;
+      isDragging = false;
+      resizer.classList.remove('resizing');
+      document.body.classList.remove('is-resizing');
+      const finalWidth = Math.round(sidebar.getBoundingClientRect().width);
+      localStorage.setItem('nova_sidebar_width', finalWidth);
+    }
+
+    // Double click to reset to default (380px)
+    resizer.addEventListener('dblclick', () => {
+      sidebar.style.width = '380px';
+      localStorage.setItem('nova_sidebar_width', 380);
+      showToast('Sidebar reset to default width (380px)', '📐');
+    });
+
+    resizer.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+
+    // Touch dragging on touch-enabled laptops / tablets
+    resizer.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        onPointerDown(e.touches[0]);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (isDragging && e.touches.length === 1) {
+        onPointerMove(e.touches[0]);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', onPointerUp);
+  }
+
   // --- Init ---
   function init() {
     loadStoredData();
     setVolume(state.volume);
     initCastFramework();
     initPwa();
+    initSidebarResizer();
     applySubtitleState();
     setupEventListeners();
     loadPlaylist();
