@@ -2227,19 +2227,29 @@
         }
 
         // Play individual dictionary word audio
-        function playDictionaryTerm(term) {
+        async function playDictionaryTerm(term) {
             currentDictTerm = term;
             playerTrackNameEl.textContent = `${term.term} (${term.pos})`;
             playerTrackBookEl.textContent = `The Meaning of Liff • Section ${term.letter}`;
+            btnPlayPause.disabled = true;
 
-            audio.src = term.src;
-            audio.load();
-            audio.play().then(() => {
-                updateUIState();
-            }).catch(err => {
-                console.warn("Audio file pending or not yet synthesized:", err);
-                updateUIState();
-            });
+            try {
+                const blob = await decryptAudioFile(term.src);
+                if (currentObjectURL) {
+                    URL.revokeObjectURL(currentObjectURL);
+                }
+                currentObjectURL = URL.createObjectURL(blob);
+                audio.src = currentObjectURL;
+                audio.load();
+                audio.play().then(() => {
+                    updateUIState();
+                }).catch(err => {
+                    console.warn("Audio playback error:", err);
+                    updateUIState();
+                });
+            } catch (err) {
+                console.error("Failed to decrypt dictionary audio:", err);
+            }
 
             btnPlayPause.disabled = false;
             timelineSlider.disabled = false;
