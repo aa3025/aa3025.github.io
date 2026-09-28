@@ -1,0 +1,164 @@
+<div class="problem-outcomes">
+<h1>Problem 5: Physics Simulation - Free Fall with Drag <span class="badge-tag badge-stretch">Optional Stretch</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Model dynamic physical systems (free fall with aerodynamic drag) using first-order ordinary differential equations (ODEs).</li>
+<li>Implement Euler&#39;s forward time-stepping algorithm to numerically simulate velocity evolution over time.</li>
+<li>Determine and calculate the theoretical asymptotic terminal velocity ($v_{\text{term}} = mg/c$).</li>
+<li>Analyze how numerical approximations approach steady-state physical limits.</li>
+</ul>
+<h3>Description</h3>
+<p>In this capstone engineering simulation, you will apply Euler's numerical integration method to simulate a real-world aerodynamic problem: predicting the velocity profile of an 80 kg skydiver falling under gravity and turbulent atmospheric drag until terminal velocity is reached.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description / Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>m</code>, <code>g</code>, <code>c</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalars</td>
+      <td>Mass $80$ kg, gravity $9.81\ \text{m/s}^2$, drag $15$ kg/s</td>
+    </tr>
+    <tr>
+      <td><code>v0</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Initial velocity $v(0) = 0$ m/s</td>
+    </tr>
+    <tr>
+      <td><code>h</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Time step size $h = 0.1$ s</td>
+    </tr>
+    <tr>
+      <td><code>T</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Total simulation time $T = 20$ s</td>
+    </tr>
+    <tr>
+      <td><code>N</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Total time steps $T / h = 200$</td>
+    </tr>
+    <tr>
+      <td><code>f</code></td>
+      <td>function_handle</td>
+      <td>handle</td>
+      <td>ODE derivative handle <code>@(t, v) g - (c/m)*v</code></td>
+    </tr>
+    <tr>
+      <td><code>v_final</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Simulated velocity at $T = 20$ s [m/s]</td>
+    </tr>
+    <tr>
+      <td><code>v_term</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Theoretical terminal velocity $(m g)/c$ [m/s]</td>
+    </tr>
+    <tr>
+      <td><code>diff_terminal</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Absolute difference $|v_{\text{final}} - v_{\text{term}}|$ [m/s]</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> When a skydiver reaches terminal velocity, acceleration drops to zero ($dv/dt = 0$). From $g - \frac{c}{m}v_{\text{term}} = 0$, predict $v_{\text{term}}$: $v_{\text{term}} = \frac{mg}{c} = \frac{80 \times 9.81}{15} = 52.32\text{ m/s}$ (approx. $188\text{ km/h}$).
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_6_5.m</code>. A skydiver ($m=80$ kg) falls under gravity ($g=9.81\ \text{m/s}^2$) with drag force $F_d = -cv$ ($c=15$ kg/s), giving the ODE:
+$$\frac{dv}{dt} = g - \frac{c}{m}v$$</p>
+
+<p><strong>Part A — Set Physical Parameters</strong><br>
+Set <code>m = 80</code>, <code>g = 9.81</code>, <code>c = 15</code>, initial velocity <code>v0 = 0</code>, step size <code>h = 0.1</code>, and total duration <code>T = 20</code>. Calculate the number of steps <code>N = T / h</code>.</p>
+
+<p><strong>Part B — Define the ODE Function Handle</strong><br>
+Define the function handle <code>f = @(t, v) g - (c/m)*v</code>.</p>
+
+<p><strong>Part C — Implement Euler's Method</strong><br>
+Use a <code>for</code> loop to advance velocity <code>v</code> forward <code>N</code> steps using Euler's algorithm:
+$$v_{i+1} = v_i + h \cdot f(t_i, v_i)$$
+Store the velocity at the end of the simulation ($t = 20$ s) in <code>v_final</code>.</p>
+
+<p><strong>Part D — Compare with Terminal Velocity</strong><br>
+Calculate theoretical terminal velocity <code>v_term = (m*g)/c</code> and the absolute difference <code>diff_terminal = abs(v_final - v_term)</code>.</p>
+
+<p><strong>Part E — Visualisation (Optional Extension)</strong><br>
+Store velocity values at each step into a vector <code>v_history</code>, then plot velocity vs time overlaid with a dashed horizontal line at <code>v_term</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Euler's Method for ODEs)</summary>
+  <div class="hint-content">
+    <p>Euler's method approximates the continuous derivative with a finite difference: $\frac{dv}{dt} \approx \frac{v_{i+1} - v_i}{h}$. Rearranging gives the explicit forward step: $v_{i+1} = v_i + h f(t_i, v_i)$. As $t \to \infty$, velocity asymptotically approaches the steady-state value where $f(t, v) = 0$.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Initialize <code>v = v0; t = 0;</code> before the loop. Inside <code>for i = 1:N</code>, update <code>v = v + h * f(t, v);</code> and <code>t = t + h;</code>. After the loop, save <code>v_final = v;</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+m = 80;
+g = 9.81;
+c = 15;
+v0 = 0;
+h = 0.1;
+T = 20;
+N = T / h;
+
+% Part B
+f = @(t, v) g - (c/m)*v;
+
+% Part C
+v = v0;
+t = 0;
+for i = 1:N
+    v = v + h * f(t, v);
+    t = t + h;
+end
+v_final = v;
+
+% Part D
+v_term = (m * g) / c;
+diff_terminal = abs(v_final - v_term);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>N</code> must be <code>200</code> steps.</li>
+  <li><code>v_term</code> is $(80 \times 9.81) / 15 = 52.32$ m/s.</li>
+  <li><code>v_final</code> after 20 seconds is approximately $51.13$ m/s (approaching $98\%$ of terminal velocity).</li>
+  <li><code>diff_terminal</code> should be approximately $1.19$ m/s.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>What happens if you run Euler's simulation with an excessively large time step such as $h = 15.0$ seconds? (<em>Answer: Numerical instability occurs! The update overshoots terminal velocity wildly and oscillates unstably towards $\pm\infty$. Time step $h$ must be significantly smaller than the system's dynamic time constant $\tau = m/c = 80/15 \approx 5.33\text{ s}$.</em>)</p>
+</div>

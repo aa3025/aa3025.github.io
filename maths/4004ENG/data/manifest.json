@@ -1,0 +1,307 @@
+{
+  "weeks": [
+    {
+      "id": "week1",
+      "title": "Week 1: Introduction & MATLAB Onboarding",
+      "sections": [
+        {
+          "id": "learning",
+          "title": "Introduction and MATLAB Onboarding",
+          "type": "html",
+          "file": "data/week1/intro.html"
+        },
+        {
+          "id": "core_assignment",
+          "title": "MATLAB Core Assignment",
+          "type": "html",
+          "file": "data/week1/matlab_core_assignment.html"
+        }
+      ]
+    },
+    {
+      "id": "week2",
+      "title": "Week 2: Vectors & Geometric Applications",
+      "sections": [
+        {
+          "id": "learning",
+          "title": "Learning Guide & Objectives",
+          "type": "html",
+          "file": "data/week2/intro.html"
+        },
+        {
+          "id": "prob1",
+          "title": "Problem 1: Vector Basics",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week2/prob_2_1.html",
+          "template_m": "data/week2/prob_2_1.m",
+          "solution_m": "data/week2/prob_2_1_sol.m"
+        },
+        {
+          "id": "prob2",
+          "title": "Problem 2: Magnitude and Unit Vectors",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week2/prob_2_2.html",
+          "template_m": "data/week2/prob_2_2.m",
+          "solution_m": "data/week2/prob_2_2_sol.m"
+        },
+        {
+          "id": "prob3",
+          "title": "Problem 3: Dot Product and Angle Between Vectors",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week2/prob_2_3.html",
+          "template_m": "data/week2/prob_2_3.m",
+          "solution_m": "data/week2/prob_2_3_sol.m"
+        },
+        {
+          "id": "prob4",
+          "title": "Problem 4: Cross Product and Orthogonality",
+          "badge": "Independent Consolidation",
+          "type": "problem",
+          "file": "data/week2/prob_2_4.html",
+          "template_m": "data/week2/prob_2_4.m",
+          "solution_m": "data/week2/prob_2_4_sol.m"
+        },
+        {
+          "id": "prob5",
+          "title": "Problem 5: Engineering Application - Work Done by a Force",
+          "badge": "Optional Stretch",
+          "type": "problem",
+          "file": "data/week2/prob_2_5.html",
+          "template_m": "data/week2/prob_2_5.m",
+          "solution_m": "data/week2/prob_2_5_sol.m"
+        }
+      ]
+    },
+    {
+      "id": "week3",
+      "title": "Week 3: Matrices & Systems of Equations",
+      "sections": [
+        {
+          "id": "intro",
+          "title": "Introduction & Objectives",
+          "type": "html",
+          "file": "data/week3/intro.html"
+        },
+        {
+          "id": "prob1",
+          "title": "Problem 1: Matrix Basics",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week3/prob_3_1.html",
+          "template_m": "data/week3/prob_3_1.m",
+          "solution_m": "data/week3/prob_3_1_sol.m"
+        },
+        {
+          "id": "prob2",
+          "title": "Problem 2: Matrix Multiplication",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week3/prob_3_2.html",
+          "template_m": "data/week3/prob_3_2.m",
+          "solution_m": "data/week3/prob_3_2_sol.m"
+        },
+        {
+          "id": "prob3",
+          "title": "Problem 3: Determinant and Inverse",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week3/prob_3_3.html",
+          "template_m": "data/week3/prob_3_3.m",
+          "solution_m": "data/week3/prob_3_3_sol.m"
+        },
+        {
+          "id": "prob4",
+          "title": "Problem 4: Solving Systems of Equations",
+          "badge": "Independent Consolidation",
+          "type": "problem",
+          "file": "data/week3/prob_3_4.html",
+          "template_m": "data/week3/prob_3_4.m",
+          "solution_m": "data/week3/prob_3_4_sol.m"
+        },
+        {
+          "id": "prob5",
+          "title": "Problem 5: Geometric Transformations",
+          "badge": "Optional Stretch",
+          "type": "problem",
+          "file": "data/week3/prob_3_5.html",
+          "template_m": "data/week3/prob_3_5.m",
+          "solution_m": "data/week3/prob_3_5_sol.m"
+        }
+      ]
+    },
+    {
+      "id": "week4",
+      "title": "Week 4: Symbolic Calculus & Optimization",
+      "sections": [
+        {
+          "id": "intro",
+          "title": "Introduction & Objectives",
+          "type": "html",
+          "file": "data/week4/intro.html"
+        },
+        {
+          "id": "prob1",
+          "title": "Problem 1: Introduction to Symbolic Differentiation",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week4/prob_4_1.html",
+          "template_m": "data/week4/prob_4_1.m",
+          "solution_m": "data/week4/prob_4_1_sol.m"
+        },
+        {
+          "id": "prob2",
+          "title": "Problem 2: Differentiation Rules",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week4/prob_4_2.html",
+          "template_m": "data/week4/prob_4_2.m",
+          "solution_m": "data/week4/prob_4_2_sol.m"
+        },
+        {
+          "id": "prob3",
+          "title": "Problem 3: Gradients and Tangent Lines",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week4/prob_4_3.html",
+          "template_m": "data/week4/prob_4_3.m",
+          "solution_m": "data/week4/prob_4_3_sol.m"
+        },
+        {
+          "id": "prob4",
+          "title": "Problem 4: Engineering Kinematics",
+          "badge": "Independent Consolidation",
+          "type": "problem",
+          "file": "data/week4/prob_4_4.html",
+          "template_m": "data/week4/prob_4_4.m",
+          "solution_m": "data/week4/prob_4_4_sol.m"
+        },
+        {
+          "id": "prob5",
+          "title": "Problem 5: Engineering Optimization",
+          "badge": "Optional Stretch",
+          "type": "problem",
+          "file": "data/week4/prob_4_5.html",
+          "template_m": "data/week4/prob_4_5.m",
+          "solution_m": "data/week4/prob_4_5_sol.m"
+        }
+      ]
+    },
+    {
+      "id": "week5",
+      "title": "Week 5: Integration & Applications",
+      "sections": [
+        {
+          "id": "intro",
+          "title": "Introduction & Objectives",
+          "type": "html",
+          "file": "data/week5/intro.html"
+        },
+        {
+          "id": "prob1",
+          "title": "Problem 1: Basic Symbolic Integration",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week5/prob_5_1.html",
+          "template_m": "data/week5/prob_5_1.m",
+          "solution_m": "data/week5/prob_5_1_sol.m"
+        },
+        {
+          "id": "prob2",
+          "title": "Problem 2: Advanced Integration Techniques",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week5/prob_5_2.html",
+          "template_m": "data/week5/prob_5_2.m",
+          "solution_m": "data/week5/prob_5_2_sol.m"
+        },
+        {
+          "id": "prob3",
+          "title": "Problem 3: Numerical Integration",
+          "badge": "Live Core",
+          "type": "problem",
+          "file": "data/week5/prob_5_3.html",
+          "template_m": "data/week5/prob_5_3.m",
+          "solution_m": "data/week5/prob_5_3_sol.m"
+        },
+        {
+          "id": "prob4",
+          "title": "Problem 4: Area Under and Between Curves",
+          "badge": "Independent Consolidation",
+          "type": "problem",
+          "file": "data/week5/prob_5_4.html",
+          "template_m": "data/week5/prob_5_4.m",
+          "solution_m": "data/week5/prob_5_4_sol.m"
+        },
+        {
+          "id": "prob5",
+          "title": "Problem 5: Engineering Application - Work Done",
+          "badge": "Optional Stretch",
+          "type": "problem",
+          "file": "data/week5/prob_5_5.html",
+          "template_m": "data/week5/prob_5_5.m",
+          "solution_m": "data/week5/prob_5_5_sol.m"
+        }
+      ]
+    },
+    {
+      "id": "week6",
+      "title": "Week 6: Complex Numbers & Numerical Methods",
+      "sections": [
+        {
+          "id": "intro",
+          "title": "Introduction & Objectives",
+          "type": "html",
+          "file": "data/week6/intro.html"
+        },
+        {
+          "id": "prob1",
+          "title": "Problem 1: Complex Number Basics",
+          "badge": "Live Core (Route A)",
+          "type": "problem",
+          "file": "data/week6/prob_6_1.html",
+          "template_m": "data/week6/prob_6_1.m",
+          "solution_m": "data/week6/prob_6_1_sol.m"
+        },
+        {
+          "id": "prob2",
+          "title": "Problem 2: Polar and Exponential Forms",
+          "badge": "Live Core (Route A)",
+          "type": "problem",
+          "file": "data/week6/prob_6_2.html",
+          "template_m": "data/week6/prob_6_2.m",
+          "solution_m": "data/week6/prob_6_2_sol.m"
+        },
+        {
+          "id": "prob3",
+          "title": "Problem 3: Complex Roots and De Moivre's Theorem",
+          "badge": "Live Core (Route A)",
+          "type": "problem",
+          "file": "data/week6/prob_6_3.html",
+          "template_m": "data/week6/prob_6_3.m",
+          "solution_m": "data/week6/prob_6_3_sol.m"
+        },
+        {
+          "id": "prob4",
+          "title": "Problem 4: Newton-Raphson Method",
+          "badge": "Independent Consolidation (Route B)",
+          "type": "problem",
+          "file": "data/week6/prob_6_4.html",
+          "template_m": "data/week6/prob_6_4.m",
+          "solution_m": "data/week6/prob_6_4_sol.m"
+        },
+        {
+          "id": "prob5",
+          "title": "Problem 5: Physics Simulation - Free Fall with Drag",
+          "badge": "Optional Stretch (Route B)",
+          "type": "problem",
+          "file": "data/week6/prob_6_5.html",
+          "template_m": "data/week6/prob_6_5.m",
+          "solution_m": "data/week6/prob_6_5_sol.m"
+        }
+      ]
+    }
+  ]
+}

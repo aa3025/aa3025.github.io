@@ -1,0 +1,138 @@
+<div class="problem-outcomes">
+<h1>Problem 4: Engineering Kinematics <span class="badge-tag badge-consolidation">Independent Consolidation</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Apply first and second-order derivatives to model physical motion in 1D mechanics.</li>
+<li>Derive velocity $v(t) = s'(t)$ and acceleration $a(t) = v'(t) = s''(t)$ from position-time equations.</li>
+<li>Evaluate instantaneous dynamic quantities at a specified time using <code>subs()</code> and <code>double()</code>.</li>
+<li>Use the <code>solve()</code> equation solver to locate critical points (when a moving body comes to instantaneous rest).</li>
+</ul>
+<h3>Description</h3>
+<p>In mechanical and vehicle engineering, the calculus chain relating position, velocity, and acceleration is fundamental. In this problem, you will differentiate a position equation to calculate velocity and acceleration, and solve for the exact moments the particle comes to rest.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description / Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>t</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Time variable [s]</td>
+    </tr>
+    <tr>
+      <td><code>s</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Position function $2t^3 - 9t^2 + 12t + 5$ [m]</td>
+    </tr>
+    <tr>
+      <td><code>v</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Velocity function $v(t) = s'(t)$ [m/s]</td>
+    </tr>
+    <tr>
+      <td><code>a</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Acceleration function $a(t) = v'(t)$ [$\text{m/s}^2$]</td>
+    </tr>
+    <tr>
+      <td><code>v_at_4</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Velocity at $t=4$ s converted to double [m/s]</td>
+    </tr>
+    <tr>
+      <td><code>a_at_4</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Acceleration at $t=4$ s converted to double [$\text{m/s}^2$]</td>
+    </tr>
+    <tr>
+      <td><code>t_rest</code></td>
+      <td>sym / double</td>
+      <td>$2 \times 1$ column</td>
+      <td>Times where $v(t) = 0$ via <code>solve()</code> [s]</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Differentiate $s(t) = 2t^3 - 9t^2 + 12t + 5$ by hand: $v(t) = 6t^2 - 18t + 12 = 6(t^2 - 3t + 2) = 6(t-1)(t-2)$. At what two times will the particle come to instantaneous rest? ($t = 1\text{ s}$ and $t = 2\text{ s}$).
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_4_4.m</code>. Recall that $v(t) = s'(t)$ and $a(t) = v'(t) = s''(t)$.</p>
+
+<p><strong>Part A — Define the Position Function</strong><br>
+A particle moves according to $s(t) = 2t^3 - 9t^2 + 12t + 5$ ($t$ in seconds). Define symbolic variable <code>t</code> and store the function as <code>s</code>.</p>
+
+<p><strong>Part B — Velocity and Acceleration</strong><br>
+Calculate the velocity function <code>v</code> (first derivative of <code>s</code>) and the acceleration function <code>a</code> (second derivative of <code>s</code>, or first derivative of <code>v</code>).</p>
+
+<p><strong>Part C — Evaluate at a Specific Time</strong><br>
+Calculate the velocity <code>v_at_4</code> and acceleration <code>a_at_4</code> at $t = 4$ seconds, converting both to double.</p>
+
+<p><strong>Part D — When Is the Particle at Rest?</strong><br>
+The particle is at rest when $v(t) = 0$. Use <code>solve(v == 0, t)</code> to find all values of <code>t</code> for which this holds, storing the result in <code>t_rest</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Kinematics Chain)</summary>
+  <div class="hint-content">
+    <p>Velocity is the time rate of change of position: $v(t) = \frac{ds}{dt}$. Acceleration is the time rate of change of velocity: $a(t) = \frac{dv}{dt} = \frac{d^2s}{dt^2}$. A particle is momentarily at rest whenever its instantaneous velocity is zero ($v(t) = 0$).</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Declare <code>syms t</code>. Differentiate using <code>diff(s, t)</code> and <code>diff(v, t)</code>. Solve for roots using <code>solve(v == 0, t)</code>. Substitute using <code>double(subs(v, t, 4))</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">syms t
+
+% Part A
+s = 2*t^3 - 9*t^2 + 12*t + 5;
+
+% Part B
+v = diff(s, t);
+a = diff(v, t);
+
+% Part C
+v_at_4 = double(subs(v, t, 4));
+a_at_4 = double(subs(a, t, 4));
+
+% Part D
+t_rest = solve(v == 0, t);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>v</code> must be $6t^2 - 18t + 12$.</li>
+  <li><code>a</code> must be $12t - 18$.</li>
+  <li><code>v_at_4</code> is $6(16) - 18(4) + 12 = 96 - 72 + 12 = 36$ m/s.</li>
+  <li><code>a_at_4</code> is $12(4) - 18 = 30$ $\text{m/s}^2$.</li>
+  <li><code>double(t_rest)</code> should be <code>[1; 2]</code> seconds.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>If a piston in an internal combustion engine has $v(t) = 0$ at top-dead-center (TDC), why is the acceleration $a(t)$ at its maximum at that exact same instant? (<em>Answer: The velocity is reversing direction, requiring the maximum net inertial force from Newton's second law $F = ma$.</em>)</p>
+</div>

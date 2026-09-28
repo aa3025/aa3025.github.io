@@ -1,0 +1,127 @@
+<div class="problem-outcomes">
+<h1>Problem 3: Complex Roots and De Moivre's Theorem <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Apply De Moivre's theorem to find all $n$ distinct roots of a polynomial complex equation.</li>
+<li>Use <code>for</code> loops and array pre-allocation to iteratively generate complex roots.</li>
+<li>Visualize complex root distributions on an Argand diagram.</li>
+<li>Verify the cyclic symmetry and zero-sum property of roots of unity ($\sum_{k=0}^{n-1} z_k = 0$).</li>
+</ul>
+<h3>Description</h3>
+<p>Finding all roots of complex polynomial equations is critical for stability analysis in control systems and structural vibration modes. In this exercise, you will calculate all five roots of $z^5 = 32$, plot their geometric distribution on the Argand plane, and verify their sum.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>w</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Target number $w = 32$</td>
+    </tr>
+    <tr>
+      <td><code>r_w</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Modulus $|w| = 32$ via <code>abs(w)</code></td>
+    </tr>
+    <tr>
+      <td><code>theta_w</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Phase angle of $w$ in radians via <code>angle(w)</code></td>
+    </tr>
+    <tr>
+      <td><code>z_roots</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 5$ row</td>
+      <td>Vector containing all 5 complex roots</td>
+    </tr>
+    <tr>
+      <td><code>sum_roots</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Sum of all 5 roots via <code>sum(z_roots)</code> ($\approx 0$)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> How many distinct roots does $z^5 = 32$ have in the complex plane? (By the Fundamental Theorem of Algebra, exactly 5). If they are distributed symmetrically around a circle of radius $32^{1/5} = 2$, what will their vector sum be? (Zero!).
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_6_3.m</code>. By De Moivre's theorem, the $n$ roots of $w = re^{i\theta}$ are:
+$$z_k = r^{1/n}\exp\left(i\frac{\theta + 2\pi k}{n}\right), \quad k = 0, 1, \dots, n-1$$</p>
+
+<p><strong>Part A — Define the Target Number</strong><br>
+Set <code>w = 32</code>. Calculate its magnitude <code>r_w = abs(w)</code> and angle <code>theta_w = angle(w)</code>.</p>
+
+<p><strong>Part B — Calculate the 5 Roots</strong><br>
+Pre-allocate <code>z_roots = zeros(1, 5)</code> and use a <code>for</code> loop (<code>k = 0:4</code>) to calculate all 5 roots of $z^5 = 32$. Store into array index <code>k+1</code>.</p>
+
+<p><strong>Part C — Visualise on an Argand Diagram</strong><br>
+Plot the roots as points on the complex plane using <code>plot(real(z_roots), imag(z_roots), 'ro')</code> with <code>grid on</code>, <code>axis equal</code>, and axis labels.</p>
+
+<p><strong>Part D — Sum of the Roots</strong><br>
+Calculate <code>sum_roots = sum(z_roots)</code>, and confirm that it is zero within floating-point tolerance.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Roots of Complex Numbers)</summary>
+  <div class="hint-content">
+    <p>The $n$ roots of $w = r e^{i\theta}$ all lie on a circle centered at the origin with radius $R = r^{1/n}$. They are spaced at equal angular intervals of $\Delta\theta = \frac{2\pi}{n}$ radians ($72^\circ$ for $n=5$), forming the vertices of a regular polygon.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Pre-allocate <code>z_roots = zeros(1, 5);</code>. In MATLAB, array indices must be $\ge 1$, so for loop index <code>k = 0:4</code>, store the computed root into <code>z_roots(k+1)</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+w = 32;
+r_w = abs(w);
+theta_w = angle(w);
+
+% Part B
+z_roots = zeros(1, 5);
+for k = 0:4
+    z_roots(k+1) = r_w^(1/5) * exp(1i * (theta_w + 2*pi*k)/5);
+end
+
+% Part C
+% plot(real(z_roots), imag(z_roots), 'ro'); grid on; axis equal;
+
+% Part D
+sum_roots = sum(z_roots);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>r_w</code> is <code>32</code> and <code>theta_w</code> is <code>0</code> (since 32 is a positive real number).</li>
+  <li>The first root ($k=0$) is $2e^{i(0)} = 2.0 + 0i$.</li>
+  <li>The magnitude of every root in <code>z_roots</code> must equal $2.0$ (verify with <code>abs(z_roots)</code>).</li>
+  <li><code>abs(sum_roots)</code> must be less than $10^{-14}$.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>In digital filter design, what does the positioning of poles and zeros on the complex unit circle ($z$-plane) indicate about system stability? (<em>Answer: Poles strictly inside the unit circle $|z| &lt; 1$ indicate bounded-input bounded-output (BIBO) stability; poles outside cause unstable exponential oscillation.</em>)</p>
+</div>

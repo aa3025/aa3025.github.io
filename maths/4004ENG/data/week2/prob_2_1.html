@@ -1,0 +1,154 @@
+<div class="problem-outcomes">
+<h1>Problem 1: Vector Basics <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Create 2D and 3D vectors in MATLAB using row-vector array notation.</li>
+<li>Perform element-wise vector addition and subtraction, respecting dimension constraints.</li>
+<li>Apply scalar multiplication to stretch, shrink, or reverse a vector&#39;s direction.</li>
+<li>Relate vector arithmetic to physical quantities such as position, velocity, and force.</li>
+</ul>
+<h3>Description</h3>
+<p>In this exercise, you will practice the fundamental steps of working with vectors in MATLAB. You will create both 2D and 3D vectors and perform common arithmetic operations used in engineering analysis.</p>
+<h3>Background</h3>
+<h4>Vector Representation in Engineering</h4>
+<p>In engineering and physical sciences, quantities such as force, velocity, acceleration, and displacement have both magnitude and direction, modeled in 3D Cartesian coordinates as:
+$$\mathbf{v} = v_x\mathbf{i} + v_y\mathbf{j} + v_z\mathbf{k}$$</p>
+<h4>MATLAB Vector Representation</h4>
+<p>In MATLAB, row vectors are enclosed in square brackets and separated by spaces or commas:</p>
+<pre><code class="language-matlab">pos_2d = [3, 4];          % 2D row vector
+vel_3d = [5, -2, 1];      % 3D row vector
+</code></pre>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description / Physical Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>pos_2d</code></td>
+      <td>double</td>
+      <td>$1 \times 2$ row</td>
+      <td>2D position vector $(x, y) = (3, 4)$ [m]</td>
+    </tr>
+    <tr>
+      <td><code>vel_3d</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>3D velocity vector $(v_x, v_y, v_z) = (5, -2, 1)$ [m/s]</td>
+    </tr>
+    <tr>
+      <td><code>u</code>, <code>v</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Initial 3D vectors $[1, 2, 3]$ and $[4, -1, 2]$</td>
+    </tr>
+    <tr>
+      <td><code>w_add</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Vector sum $\mathbf{u} + \mathbf{v}$</td>
+    </tr>
+    <tr>
+      <td><code>d_sub</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Vector difference $\mathbf{u} - \mathbf{v}$</td>
+    </tr>
+    <tr>
+      <td><code>scaled_u</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Scalar product $3\mathbf{u}$</td>
+    </tr>
+    <tr>
+      <td><code>neg_half_v</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Scalar product $-0.5\mathbf{v}$</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Before running Part B, calculate the first element of $\mathbf{u} + \mathbf{v}$ by hand: $1 + 4 = 5$. Does addition change the dimension of the vectors?
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_2_1.m</code>.</p>
+
+<p><strong>Part A — Create Vectors</strong></p>
+<ul>
+<li>Create a 2D position vector <code>pos_2d</code> representing the point $(3, 4)$.</li>
+<li>Create a 3D velocity vector <code>vel_3d</code> with components $v_x = 5$, $v_y = -2$, $v_z = 1$ (m/s).</li>
+</ul>
+
+<p><strong>Part B — Vector Addition and Subtraction</strong><br>
+Given $\mathbf{u} = [1, 2, 3]$ and $\mathbf{v} = [4, -1, 2]$:</p>
+<ol>
+<li>Store these as <code>u</code> and <code>v</code>.</li>
+<li>Calculate <code>w_add</code> $= \mathbf{u} + \mathbf{v}$ (the vector sum).</li>
+<li>Calculate <code>d_sub</code> $= \mathbf{u} - \mathbf{v}$ (the vector difference).</li>
+</ol>
+
+<p><strong>Part C — Scalar Multiplication</strong></p>
+<ol>
+<li>Scale <code>u</code> by a factor of 3 and store the result in <code>scaled_u</code>.</li>
+<li>Scale <code>v</code> by $-0.5$ and store the result in <code>neg_half_v</code>.</li>
+</ol>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Vector Arithmetic)</summary>
+  <div class="hint-content">
+    <p>Vector addition and subtraction operate component-wise. If $\mathbf{u} = [u_1, u_2, u_3]$ and $\mathbf{v} = [v_1, v_2, v_3]$, then:</p>
+    $$\mathbf{u} \pm \mathbf{v} = [u_1 \pm v_1, \; u_2 \pm v_2, \; u_3 \pm v_3]$$
+    <p>Vectors must have identical dimensions. Scalar multiplication scales each component by the scalar factor $c$: $c\mathbf{u} = [c u_1, c u_2, c u_3]$.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>In MATLAB, row vectors are defined with commas or spaces: <code>u = [1, 2, 3];</code>. Standard operators (<code>+</code>, <code>-</code>, <code>*</code>) work directly on vectors of identical dimensions.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+pos_2d = [3, 4];
+vel_3d = [5, -2, 1];
+
+% Part B
+u = [1, 2, 3];
+v = [4, -1, 2];
+w_add = u + ______;
+d_sub = u - ______;
+
+% Part C
+scaled_u = 3 * ______;
+neg_half_v = -0.5 * ______;</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>size(w_add)</code> and <code>size(d_sub)</code> must both equal <code>[1, 3]</code>.</li>
+  <li><code>w_add</code> should be <code>[5, 1, 5]</code>.</li>
+  <li><code>d_sub</code> should be <code>[-3, 3, 1]</code>.</li>
+  <li><code>neg_half_v</code> should have its direction reversed compared to <code>v</code>.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>If $\mathbf{u}$ and $\mathbf{v}$ represent two cable tension forces acting on a suspension bridge joint, what physical quantity does $\mathbf{w}_{\text{add}} = \mathbf{u} + \mathbf{v}$ represent? (<em>Answer: The resultant net force vector experienced by the joint.</em>)</p>
+</div>

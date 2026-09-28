@@ -1,0 +1,161 @@
+<div class="problem-outcomes">
+<h1>Problem 4: Solving Systems of Equations <span class="badge-tag badge-consolidation">Independent Consolidation</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Formulate systems of simultaneous linear equations in standard matrix form ($A\mathbf{x} = \mathbf{b}$).</li>
+<li>Solve linear systems efficiently using MATLAB&#39;s backslash operator (<code>\</code>).</li>
+<li>Utilize the <code>linsolve()</code> solver function for comparison.</li>
+<li>Verify numerical solutions by reconstructing the constant vector ($A\mathbf{x} = \mathbf{b}$).</li>
+</ul>
+<h3>Description</h3>
+<p>One of the most powerful applications of matrices in engineering is solving large systems of simultaneous equations arising from circuit analysis and structural frameworks. In this exercise, you will master the industry-standard methods for solving linear systems in MATLAB.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>A</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>2x2 coefficient matrix $[2, 3; 4, -1]$</td>
+    </tr>
+    <tr>
+      <td><code>b</code></td>
+      <td>double</td>
+      <td>$2 \times 1$ column</td>
+      <td>2x1 constant vector $[8; 2]$</td>
+    </tr>
+    <tr>
+      <td><code>x_sol_2x2</code></td>
+      <td>double</td>
+      <td>$2 \times 1$ column</td>
+      <td>Solution vector via <code>A \ b</code></td>
+    </tr>
+    <tr>
+      <td><code>A3</code></td>
+      <td>double</td>
+      <td>$3 \times 3$</td>
+      <td>3x3 coefficient matrix</td>
+    </tr>
+    <tr>
+      <td><code>b3</code></td>
+      <td>double</td>
+      <td>$3 \times 1$ column</td>
+      <td>3x1 constant vector $[6; -4; 27]$</td>
+    </tr>
+    <tr>
+      <td><code>x_sol_3x3</code></td>
+      <td>double</td>
+      <td>$3 \times 1$ column</td>
+      <td>3x1 solution vector via <code>linsolve()</code></td>
+    </tr>
+    <tr>
+      <td><code>b3_check</code></td>
+      <td>double</td>
+      <td>$3 \times 1$ column</td>
+      <td>Reconstructed constant vector $A_3 \mathbf{x}$</td>
+    </tr>
+    <tr>
+      <td><code>x_sol_inv</code></td>
+      <td>double</td>
+      <td>$2 \times 1$ column</td>
+      <td>Solution via matrix inversion $A^{-1}b$</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Why must $\mathbf{b}$ be entered as a <em>column vector</em> (using semicolons, e.g. <code>[8; 2]</code>) rather than a row vector when solving $A\mathbf{x} = \mathbf{b}$? (Because $A$ has 2 rows and 2 columns; matrix multiplication requires $A_{2 \times 2} \mathbf{x}_{2 \times 1} = \mathbf{b}_{2 \times 1}$).
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_3_4.m</code>.</p>
+
+<p><strong>Part A — Solving a 2x2 System</strong><br>
+Solve the simultaneous system:
+$$2x + 3y = 8$$
+$$4x - y = 2$$</p>
+<ol>
+<li>Create the coefficient matrix <code>A = [2, 3; 4, -1]</code>.</li>
+<li>Create the column constant vector <code>b = [8; 2]</code>.</li>
+<li>Solve for <code>x_sol_2x2</code> using the backslash operator (<code>\</code>).</li>
+</ol>
+
+<p><strong>Part B — Solving a 3x3 System</strong><br>
+Solve the 3-variable system:
+$$x + y + z = 6$$
+$$2y + 5z = -4$$
+$$2x + 5y - z = 27$$
+Create coefficient matrix <code>A3</code> and column vector <code>b3</code>, then solve for <code>x_sol_3x3</code> using <code>linsolve()</code>.</p>
+
+<p><strong>Part C — Verification by Multiplication</strong><br>
+Verify your 3x3 solution by calculating <code>b3_check = A3 * x_sol_3x3</code>. This should equal <code>b3</code>.</p>
+
+<p><strong>Part D — Matrix Inversion Method</strong><br>
+Solve the 2x2 system from Part A again, this time using <code>x_sol_inv = inv(A) * b</code>.</p>
+
+<p><strong>Part E — Visualisation (Optional Extension)</strong><br>
+Plot the two equations from Part A as lines on the same axes, then plot the intersection point from <code>x_sol_2x2</code> to confirm the algebraic solution graphically.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Matrix Formulation $A\mathbf{x} = \mathbf{b}$)</summary>
+  <div class="hint-content">
+    <p>Every linear system can be rewritten in matrix form:</p>
+    $$\begin{bmatrix}a_{11} & a_{12}\\ a_{21} & a_{22}\end{bmatrix}\begin{bmatrix}x\\ y\end{bmatrix} = \begin{bmatrix}b_1\\ b_2\end{bmatrix}$$
+    <p>In MATLAB, the backslash operator <code>A \ b</code> performs Gaussian elimination with partial pivoting, which is numerically faster and more stable than computing the explicit matrix inverse.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Ensure <code>b</code> has semicolons between entries: <code>b = [8; 2];</code>. Solve using <code>x_sol_2x2 = A \ b;</code>. For Part B, call <code>x_sol_3x3 = linsolve(A3, b3);</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+A = [2, 3; 4, -1];
+b = [8; 2];
+x_sol_2x2 = A \ b;
+
+% Part B
+A3 = [1, 1, 1; 
+      0, 2, 5; 
+      2, 5, -1];
+b3 = [6; -4; 27];
+x_sol_3x3 = linsolve(A3, b3);
+
+% Part C
+b3_check = A3 * x_sol_3x3;
+
+% Part D
+x_sol_inv = inv(A) * b;</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>x_sol_2x2</code> should equal <code>[1; 2]</code> (i.e. $x = 1, y = 2$).</li>
+  <li><code>x_sol_inv</code> must match <code>x_sol_2x2</code> exactly.</li>
+  <li><code>x_sol_3x3</code> should be <code>[5; 3; -2]</code> (i.e. $x = 5, y = 3, z = -2$).</li>
+  <li><code>norm(b3_check - b3)</code> should be near zero ($&lt; 10^{-14}$).</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>In electrical nodal analysis, why is solving $G\mathbf{v} = \mathbf{i}$ with <code>G \ i</code> preferred over <code>inv(G) * i</code> when analyzing an integrated circuit with 10,000 nodes? (<em>Answer: Gaussian elimination requires $O(n^3/3)$ operations versus $O(n^3)$ for inversion, consumes far less memory, and minimizes floating-point roundoff error.</em>)</p>
+</div>

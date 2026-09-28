@@ -1,0 +1,134 @@
+<div class="problem-outcomes">
+<h1>Problem 5: Engineering Application - Work Done <span class="badge-tag badge-stretch">Optional Stretch</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Model mechanical work as the integral of non-constant force with respect to distance: $W = \int_{x_1}^{x_2} F(x)\,dx$.</li>
+<li>Apply both symbolic (<code>int</code>) and numerical (<code>integral</code>) calculus to solve real-world energy problems.</li>
+<li>Convert analytical energy equations into numerical quantities with engineering units (Joules).</li>
+<li>Evaluate energy dissipation and spring potential storage.</li>
+</ul>
+<h3>Description</h3>
+<p>In physics and mechanical engineering, work is defined as an integral whenever applied forces vary continuously with position. In this engineering application, you will compute the mechanical energy required to compress an elastic spring, drive a hydraulic piston against resistance, and overcome non-linear oscillating external forces.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description / Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>work_spring</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Symbolic spring work $\int_0^{0.2} 500x\,dx$</td>
+    </tr>
+    <tr>
+      <td><code>work_piston</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Symbolic piston work $\int_1^5 \frac{100}{1+x}\,dx$</td>
+    </tr>
+    <tr>
+      <td><code>work_ext</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Numerical work $\int_0^2 e^x \cos(x^2)\,dx$ via <code>integral()</code></td>
+    </tr>
+    <tr>
+      <td><code>W_spring_num</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Spring work converted via <code>double()</code> [Joules]</td>
+    </tr>
+    <tr>
+      <td><code>W_piston_num</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Piston work converted via <code>double()</code> [Joules]</td>
+    </tr>
+    <tr>
+      <td><code>W_ext_num</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Numerical work value [Joules]</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> For the linear spring $F(x) = kx$ with $k=500\text{ N/m}$, integrate by hand: $\int_0^{0.2} 500x\,dx = [250 x^2]_0^{0.2} = 250(0.04) = 10\text{ J}$. Does energy increase linearly or quadratically with displacement?
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_5_5.m</code>. Recall that mechanical work is $W = \displaystyle\int_{x_1}^{x_2} F(x)\,dx$.</p>
+
+<p><strong>Part A — Symbolic Calculation (Spring)</strong><br>
+A linear spring exerts restoring force $F(x) = kx$ with stiffness $k = 500$ N/m. Calculate <code>work_spring</code>, the work done compressing the spring from $x = 0$ to $x = 0.2$ m using symbolic integration.</p>
+
+<p><strong>Part B — Variable Force (Piston)</strong><br>
+A hydraulic piston moves against a fluid resistance force $F(x) = \dfrac{100}{1+x}$. Calculate <code>work_piston</code>, the work done as it strokes from $x = 1$ to $x = 5$ m using symbolic integration.</p>
+
+<p><strong>Part C — Numerical Approach</strong><br>
+For the more complex oscillating force $F_{\text{ext}}(x) = e^x\cos(x^2)$, calculate <code>work_ext</code>, the work done from $x = 0$ to $x = 2$, using numerical integration (<code>integral()</code>).</p>
+
+<p><strong>Part D — Convert to Numeric Values</strong><br>
+Convert all three results to standard double precision numbers: <code>W_spring_num</code>, <code>W_piston_num</code>, <code>W_ext_num</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Work from Non-Constant Force)</summary>
+  <div class="hint-content">
+    <p>When force varies with position $F(x)$, total work is the definite integral $W = \int_{x_1}^{x_2} F(x)\,dx$. For the spring, $\int kx\,dx = \frac{1}{2}kx^2$. For the piston, $\int \frac{100}{1+x}dx = 100\ln(1+x)$. For $e^x\cos(x^2)$, no elementary antiderivative exists, so numerical quadrature is required.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Use <code>syms x</code> with <code>int(F, x, a, b)</code> for Parts A and B. For Part C, define <code>F_ext = @(x) exp(x) .* cos(x.^2);</code> and call <code>integral(F_ext, 0, 2)</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">syms x
+
+% Part A
+k = 500;
+F_spring = k * x;
+work_spring = int(F_spring, x, 0, 0.2);
+
+% Part B
+F_piston = 100 / (1 + x);
+work_piston = int(F_piston, x, 1, 5);
+
+% Part C
+F_ext = @(x) exp(x) .* cos(x.^2);
+work_ext = integral(F_ext, 0, 2);
+
+% Part D
+W_spring_num = double(work_spring);
+W_piston_num = double(work_piston);
+W_ext_num = double(work_ext);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>W_spring_num</code> must equal exactly <code>10.0</code> Joules.</li>
+  <li><code>W_piston_num</code> is $100\ln(6/2) = 100\ln(3) \approx 109.86$ Joules.</li>
+  <li><code>W_ext_num</code> should be approximately $2.114$ Joules.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>Why is spring potential energy quadratic with compression ($U = \frac{1}{2}kx^2$) while gravitational potential energy is linear with height ($U = mgh$)? (<em>Answer: Spring force increases proportionally with displacement ($F = kx$), so integrating yields $\frac{1}{2}kx^2$; gravity near Earth is constant ($F = mg$), so integrating yields $mgh$.</em>)</p>
+</div>

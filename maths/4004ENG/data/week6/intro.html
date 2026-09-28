@@ -1,0 +1,319 @@
+<h1>Week 6: Complex Numbers &amp; Numerical Methods</h1>
+
+<h2>Why This Matters in Engineering</h2>
+<p>This capstone module brings together two indispensable pillars of modern engineering computation:</p>
+<ul>
+  <li><strong>Complex Numbers ($z = a + bi = re^{i\theta}$):</strong> Used universally in AC electrical circuits (impedance $Z = R + j\omega L$), vibration and damping analysis in civil structures, aerodynamic flutter in aircraft, and frequency response in feedback control systems.</li>
+  <li><strong>Numerical Methods:</strong> In the real world, most engineering equations cannot be solved with a neat analytical pencil-and-paper formula. Numerical algorithms &mdash; such as <strong>Newton-Raphson</strong> for non-linear root finding and <strong>Euler's Method</strong> for dynamic system simulations &mdash; enable computers to find high-precision solutions iteratively.</li>
+</ul>
+
+<hr>
+
+<!-- Self-Study & 2-Hour Delivery Wrapper (Dual Route) -->
+<div class="route-schedule-card">
+  <h3><i data-lucide="clock"></i> Recommended 2-Hour Lab &amp; Self-Study Dual Route</h3>
+  <p>Because Week 6 covers two major themes, the module is structured into two complementary routes:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Route / Phase</th>
+        <th>Time</th>
+        <th>Focus Activity</th>
+        <th>Key Milestones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Route A: Live Core (Complex Numbers)</strong></td>
+        <td>50 min</td>
+        <td><strong>Problems 1, 2 &amp; 3</strong> <span class="badge-tag badge-core">Live Core</span></td>
+        <td>Complex arithmetic, <code>1i</code> notation, polar/exponential form, De Moivre roots, Argand plot</td>
+      </tr>
+      <tr>
+        <td><strong>Live Checkpoint</strong></td>
+        <td>10 min</td>
+        <td>Troubleshooting check &amp; transition to numerical methods</td>
+        <td>Confirm Argand roots symmetry on complex circle of radius $r^{1/n}$</td>
+      </tr>
+      <tr>
+        <td><strong>Route B: Live Core (Numerical Methods)</strong></td>
+        <td>40 min</td>
+        <td><strong>Problem 4</strong> <span class="badge-tag badge-consolidation">Consolidation</span> (Newton-Raphson)</td>
+        <td>Iterative loop $x_{n+1} = x_n - f(x_n)/f'(x_n)$, tolerance check $|x_{n+1} - x_n| &lt; 10^{-6}$</td>
+      </tr>
+      <tr>
+        <td><strong>Independent Stretch &amp; Grader</strong></td>
+        <td>20 min</td>
+        <td><strong>Problem 5</strong> <span class="badge-tag badge-stretch">Optional Stretch</span> (Euler Simulation)</td>
+        <td>Euler ODE time-stepping for free fall with drag, comparison with analytical $v_{\text{term}} = mg/c$</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="readiness-card">
+  <h3><i data-lucide="check-square"></i> Before You Begin: Prerequisites &amp; Readiness Check</h3>
+  <ul>
+    <li><strong>Mathematical Prerequisites:</strong> Complex plane (real and imaginary axes), Euler's formula ($e^{i\theta} = \cos\theta + i\sin\theta$), trigonometric conversion ($\tan\theta = b/a$), and derivative definition as slope.</li>
+    <li><strong>MATLAB Prerequisites:</strong> <code>for</code> loops, array pre-allocation with <code>zeros()</code>, and function handles.</li>
+    <li><strong>Required Files:</strong> Starter files <code>prob_6_1.m</code> through <code>prob_6_5.m</code> in your active working directory.</li>
+  </ul>
+
+  <h4>Quick Formative Checks</h4>
+  <details class="staged-hint hint-concept">
+    <summary class="hint-header">Readiness Check 1: Imaginary Unit in MATLAB</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> Why is <code>z = 3 + 4*1i</code> safer in MATLAB than <code>z = 3 + 4*i</code>?</p>
+      <p><strong>Answer:</strong> If a script uses <code>i</code> as a loop counter (e.g. <code>for i = 1:10</code>), the variable <code>i</code> gets overwritten with an integer, breaking subsequent complex calculations. <code>1i</code> or <code>1j</code> is hardcoded into MATLAB's lexical parser and can never be overwritten.</p>
+    </div>
+  </details>
+
+  <details class="staged-hint hint-matlab">
+    <summary class="hint-header">Readiness Check 2: Newton-Raphson Division by Zero</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> What happens to the Newton update $x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}$ if the initial guess is placed at a local maximum or minimum of $f(x)$?</p>
+      <p><strong>Answer:</strong> At a local extremum, $f'(x_n) = 0$. Division by zero causes the update step to explode to $\pm\infty$ or produce <code>NaN</code>. Always choose an initial guess where the derivative is safely non-zero.</p>
+    </div>
+  </details>
+</div>
+
+<hr>
+
+<h2>Learning Objectives</h2>
+<p>By the end of this lab, you should be able to:</p>
+<ul>
+  <li>Define complex numbers and execute arithmetic (addition, multiplication, division) using <code>1i</code>.</li>
+  <li>Extract real parts, imaginary parts, magnitudes (<code>abs</code>), and phase angles (<code>angle</code>).</li>
+  <li>Convert seamlessly between Cartesian, polar, and complex exponential forms.</li>
+  <li>Apply De Moivre's theorem to calculate all $n$ complex roots of an equation and plot them on an Argand diagram.</li>
+  <li>Implement Newton-Raphson iteration to solve non-linear equations with convergence stopping criteria.</li>
+  <li>Implement Euler's method for first-order dynamic ODEs (free fall with drag) and compare asymptotic limits with analytical steady-state values.</li>
+</ul>
+
+<hr>
+
+<h2>Quick Reference: Complex Numbers &amp; Numerical Methods</h2>
+
+<h3>Complex Number Tools in MATLAB</h3>
+<p>MATLAB uses <code>1i</code> (or <code>1j</code>) for the imaginary unit. Always use <code>1i</code> to avoid variable collision:</p>
+<pre><code class="language-matlab">z = 3 + 4*1i;
+zr = real(z);          % Real part: 3
+zi = imag(z);          % Imaginary part: 4
+r  = abs(z);           % Modulus / magnitude: 5
+th = angle(z);         % Phase angle in radians: 0.9273
+th_deg = rad2deg(th);  % Phase angle in degrees: 53.13 deg
+zc = conj(z);          % Complex conjugate: 3 - 4*1i
+</code></pre>
+
+<h3>Polar and Exponential Forms</h3>
+<p>For any complex number $z = a + bi$:</p>
+\[z = r(\cos\theta + i\sin\theta) = re^{i\theta}\]
+<p>where $r = |z| = \sqrt{a^2 + b^2}$ and $\theta = \text{atan2}(b, a)$. In MATLAB:</p>
+<pre><code class="language-matlab">z_reconstructed = r * exp(1i * th);  % Matches z within 1e-15
+</code></pre>
+
+<h3>De Moivre's Theorem for Powers and Roots</h3>
+<p>For powers: $(re^{i\theta})^n = r^n e^{in\theta}$.</p>
+<p>For the $n$-th roots of $w = re^{i\theta}$, the $n$ distinct roots spaced evenly around a circle are:</p>
+\[z_k = r^{1/n} \exp\left(i\frac{\theta + 2\pi k}{n}\right), \quad k = 0, 1, \dots, n-1\]
+
+<h3>Numerical Algorithms</h3>
+
+<h4>1. Newton-Raphson Iteration ($f(x) = 0$)</h4>
+\[x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}\]
+<p>Stop iterating when $|x_{n+1} - x_n| &lt; \text{tolerance}$ or after a maximum number of steps.</p>
+
+<h4>2. Euler's Method for First-Order ODEs ($\frac{dy}{dt} = f(t, y)$)</h4>
+\[y_{i+1} = y_i + h \cdot f(t_i, y_i)\]
+<p>where $h$ is the time step size ($\Delta t$). Smaller $h$ reduces local truncation error but increases computation time. If $h$ is too large, numerical instability occurs.</p>
+
+<hr>
+
+<h2>Worked Examples</h2>
+
+<h3>Example 1: Complex Arithmetic and Conjugate</h3>
+<pre><code class="language-matlab">z1 = 3 + 4*1i;
+z2 = 1 - 2*1i;
+
+z_sum  = z1 + z2;     % 4 + 2i
+z_prod = z1 * z2;     % (3*1 - 4*(-2)) + (3*(-2) + 4*1)i = 11 - 2i
+z_quot = z1 / z2;     % -1 + 2i
+z1_conj = conj(z1);   % 3 - 4i
+</code></pre>
+
+<h3>Example 2: Polar to Exponential Reconstruction</h3>
+<pre><code class="language-matlab">z = -1 + 1*1i;
+r = abs(z);                    % sqrt(2) = 1.4142
+theta = angle(z);              % 3*pi/4 = 2.3562 rad (135 deg)
+z_exp = r * exp(1i * theta);   % Reconstructs -1 + 1i
+</code></pre>
+
+<h3>Example 3: Five Roots of $z^5 = 32$ and Argand Plot</h3>
+<pre><code class="language-matlab">w = 32;
+r_w = abs(w);
+theta_w = angle(w);            % 0 for positive real 32
+
+z_roots = zeros(1, 5);
+for k = 0:4
+    z_roots(k+1) = r_w^(1/5) * exp(1i * (theta_w + 2*pi*k) / 5);
+end
+
+% Sum of roots of unity / symmetric polynomial is zero
+sum_roots = sum(z_roots);      % Approximately 0 (within 1e-15)
+</code></pre>
+
+<h3>Example 4: Newton-Raphson Iteration</h3>
+<pre><code class="language-matlab">f = @(x) x.^2 - 2;             % Solve x^2 = 2 -> sqrt(2)
+df = @(x) 2*x;
+
+x = 1.5;                       % Initial guess
+for i = 1:5
+    x = x - f(x) / df(x);
+end
+x_final = x;
+err = abs(x_final - sqrt(2));  % < 1e-12 after 5 iterations!
+</code></pre>
+
+<h3>Example 5: Euler Simulation of Free Fall with Drag</h3>
+<pre><code class="language-matlab">m = 80; g = 9.81; c = 15;
+v0 = 0; h = 0.1; T = 20;
+N = T / h;
+
+f = @(t, v) g - (c/m)*v;
+v = v0;
+t = 0;
+for i = 1:N
+    v = v + h * f(t, v);
+    t = t + h;
+end
+v_final = v;
+v_term = (m * g) / c;          % Analytical terminal velocity: 52.32 m/s
+diff_terminal = abs(v_final - v_term);
+</code></pre>
+
+<hr>
+
+<h2>Problems in This Module</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Route</th>
+      <th>Starter File</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Problem 1</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span> (Route A)</td>
+      <td><code>prob_6_1.m</code></td>
+      <td>Complex arithmetic, real/imag parts, modulus, angle, and conjugate</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 2</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span> (Route A)</td>
+      <td><code>prob_6_2.m</code></td>
+      <td>Polar/exponential forms, reconstruction, and powers via De Moivre</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 3</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span> (Route A)</td>
+      <td><code>prob_6_3.m</code></td>
+      <td>De Moivre complex roots, array pre-allocation, and Argand diagram plotting</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 4</strong></td>
+      <td><span class="badge-tag badge-consolidation">Independent Consolidation</span> (Route B)</td>
+      <td><code>prob_6_4.m</code></td>
+      <td>Newton-Raphson root-finding iterative loop with tolerance check</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 5</strong></td>
+      <td><span class="badge-tag badge-stretch">Optional Stretch</span> (Route B)</td>
+      <td><code>prob_6_5.m</code></td>
+      <td>Euler numerical simulation of skydiver free fall with drag force</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- COMMON ERRORS & TROUBLESHOOTING (AUDIT HIGHLIGHT) -->
+<h2>Common Errors &amp; Troubleshooting</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Error / Symptom</th>
+      <th>Likely Cause</th>
+      <th>Fix</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Wrong complex result after multiplication/division</td>
+      <td>Typo in sign or missing <code>1i</code> factor</td>
+      <td>Re-check algebra and use <code>1i</code> explicitly (avoid bare <code>i</code>)</td>
+    </tr>
+    <tr>
+      <td>Angle seems incorrect in degrees</td>
+      <td><code>angle()</code> returns radians</td>
+      <td>Convert with <code>rad2deg(...)</code></td>
+    </tr>
+    <tr>
+      <td>Reconstructed <code>z_exp</code> is not exactly equal to <code>z</code></td>
+      <td>Floating-point rounding</td>
+      <td>Compare with tolerance: <code>abs(z - z_exp) &lt; 1e-12</code></td>
+    </tr>
+    <tr>
+      <td>Newton update fails or explodes to infinity</td>
+      <td>Initial guess too far, or derivative near zero</td>
+      <td>Choose a better initial guess and verify $f'(x) \neq 0$</td>
+    </tr>
+    <tr>
+      <td>Euler solution oscillates or blows up</td>
+      <td>Step size $h$ too large for the system time constant</td>
+      <td>Reduce $h$ (e.g. from $0.5$ to $0.05$) and re-run</td>
+    </tr>
+    <tr>
+      <td>Terminal velocity comparison seems wrong sign</td>
+      <td>Using signed difference instead of magnitude</td>
+      <td>Use <code>abs(v_final - v_term)</code> for magnitude of error</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- REMOTE LAB HELP BOX -->
+<div class="remote-help-card">
+  <h3><i data-lucide="help-circle"></i> Remote Lab Help: Newton-Raphson &amp; ODE Loops</h3>
+  <ul>
+    <li><strong>Loop runs forever (script freezes):</strong> Check your loop termination condition. In MATLAB, press <code>Ctrl+C</code> in the Command Window to immediately abort execution.</li>
+    <li><strong>"Subscript indices must either be real positive integers or logicals":</strong> In MATLAB, arrays start at index <code>1</code>! When writing loops over $k=0, \dots, n-1$, store into array index <code>z_roots(k+1)</code>.</li>
+    <li><strong>Complex values in Euler method:</strong> Check for negative values inside square roots in your ODE function.</li>
+    <li><strong>Assignment Expectations:</strong> Centralized guidance for all MATLAB Grader submissions is in <a href="#" onclick="navigateTo('week1', 'core_assignment'); return false;">Week 1: MATLAB Core Assignment</a>.</li>
+  </ul>
+
+  <h4>Standard Teams Help Request Template</h4>
+  <pre><code class="language-text">Problem: Week 6 Problem 4
+Part: Part B (Newton-Raphson loop)
+Command that failed: x = x - f(x)/df(x);
+Exact Error / Symptom: Variable x becomes NaN after 2 iterations.
+What I expected: Converging to 1.4142.
+What I already tried: Checked derivative function df; discovered df(x) had a typo that evaluated to zero!</code></pre>
+</div>
+
+<hr>
+
+<!-- COMPLETION CHECKLIST -->
+<div class="checklist-card" style="border-left: 4px solid #10b981;">
+  <h3><i data-lucide="award"></i> Completion Criteria: Full PC Lab Series Mastery</h3>
+  <ul style="list-style: none; padding-left: 0;">
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>1.</strong> You can perform complex arithmetic and convert between Cartesian and exponential polar forms.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>2.</strong> You can calculate and plot all $n$ complex roots using De Moivre's theorem.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>3.</strong> You can implement an iterative numerical root-finder (Newton-Raphson) with convergence monitoring.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>4.</strong> You can simulate continuous physical systems with Euler's method and verify asymptotic limits.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>5.</strong> You have submitted all weekly assignment tasks on <a href="https://grader.mathworks.com/courses/176671-4004eng-sept-2026" target="_blank" rel="noopener">MATLAB Grader</a> (60%+ overall required to pass).</li>
+  </ul>
+</div>

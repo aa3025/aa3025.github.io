@@ -1,0 +1,131 @@
+<div class="problem-outcomes">
+<h1>Problem 5: Geometric Transformations <span class="badge-tag badge-stretch">Optional Stretch</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Define 2D geometric shapes as coordinate matrices with vertices as column vectors.</li>
+<li>Apply scaling transformation matrices to enlarge or compress geometries.</li>
+<li>Implement 2D rotation matrices using trigonometric functions.</li>
+<li>Understand the linear algebraic principles underlying computer graphics, CAD modeling, and robotic kinematics.</li>
+</ul>
+<h3>Description</h3>
+<p>Matrices are the computational engine behind computer-aided design (CAD), game engines, and robotic kinematics. In this capstone problem for Week 3, you will define a 2D geometric shape and apply scaling and rotation matrices to manipulate its position and orientation in the Cartesian plane.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>P</code></td>
+      <td>double</td>
+      <td>$2 \times 3$</td>
+      <td>Triangle vertices as columns: $[0, 2, 1; 0, 0, 2]$</td>
+    </tr>
+    <tr>
+      <td><code>S</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Scaling matrix $[2, 0; 0, 2]$</td>
+    </tr>
+    <tr>
+      <td><code>P_scaled</code></td>
+      <td>double</td>
+      <td>$2 \times 3$</td>
+      <td>Scaled shape $S \times P$</td>
+    </tr>
+    <tr>
+      <td><code>theta</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Rotation angle in radians (from $45^\circ$)</td>
+    </tr>
+    <tr>
+      <td><code>R</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Rotation matrix $[\cos\theta, -\sin\theta; \sin\theta, \cos\theta]$</td>
+    </tr>
+    <tr>
+      <td><code>P_rotated</code></td>
+      <td>double</td>
+      <td>$2 \times 3$</td>
+      <td>Rotated shape $R \times P$</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Why must the vertices of the shape be stored as <em>columns</em> $[x; y]$ in $P$ ($2 \times 3$) rather than rows ($3 \times 2$)? (Because the $2 \times 2$ transformation matrix pre-multiplies the coordinates: $P_{\text{new}} = T_{2 \times 2} P_{2 \times 3}$. If $P$ had 3 rows, inner dimensions would not match!).
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_3_5.m</code>.</p>
+
+<p><strong>Part A — Define a Shape</strong><br>
+Define a triangle with vertices at $(0,0)$, $(2,0)$, and $(1,2)$. Store the vertices as columns in matrix <code>P = [0, 2, 1; 0, 0, 2]</code>.</p>
+
+<p><strong>Part B — Scaling Transformation</strong><br>
+Create a scaling matrix <code>S</code> that doubles the size of the shape in both $x$ and $y$: $S = [s_x, 0; 0, s_y]$ with $s_x = s_y = 2$. Apply the transformation: <code>P_scaled = S * P</code>.</p>
+
+<p><strong>Part C — Rotation Transformation</strong><br>
+Create a rotation matrix <code>R</code> to rotate the original shape <code>P</code> by 45° counter-clockwise (use <code>theta = deg2rad(45)</code>):
+$$R = \begin{bmatrix}\cos\theta & -\sin\theta\\ \sin\theta & \cos\theta\end{bmatrix}$$
+Apply the transformation: <code>P_rotated = R * P</code>.</p>
+
+<p><strong>Part D — Visualisation (Optional Extension)</strong><br>
+Plot the original triangle <code>P</code> in blue and the rotated triangle <code>P_rotated</code> in red on the same axes. Remember to repeat the first vertex at the end (e.g. <code>P(1, [1:3, 1])</code>) to close the triangle perimeter, then set <code>axis equal</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Linear Transformations)</summary>
+  <div class="hint-content">
+    <p>A linear transformation transforms coordinate vectors $\mathbf{x}' = T\mathbf{x}$. By placing multiple points into a coordinate matrix as columns $P = [\mathbf{p}_1, \mathbf{p}_2, \dots, \mathbf{p}_n]$, pre-multiplying by matrix $T$ applies the transformation simultaneously to all points in a single vectorised operation: $P' = TP$.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Convert angles using <code>theta = deg2rad(45);</code>. Use standard trigonometric functions <code>cos(theta)</code> and <code>sin(theta)</code> to build $R$. Multiply using <code>R * P</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+P = [0, 2, 1; 
+     0, 0, 2];
+
+% Part B
+S = [2, 0; 
+     0, 2];
+P_scaled = S * P;
+
+% Part C
+theta = deg2rad(45);
+R = [cos(theta), -sin(theta); 
+     sin(theta),  cos(theta)];
+P_rotated = R * P;</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>size(P)</code>, <code>size(P_scaled)</code>, and <code>size(P_rotated)</code> must all be $2 \times 3$.</li>
+  <li><code>P_scaled</code> should be <code>[0, 4, 2; 0, 0, 4]</code>.</li>
+  <li>The origin $(0, 0)$ remains at $(0, 0)$ under both scaling and rotation (because linear transformations preserve the origin).</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>In autonomous vehicles and robotic arm kinematics, how are combined transformations (scaling, rotation, translation) concatenated into a single matrix? (<em>Answer: By multiplying the individual transformation matrices in reverse sequence $T_{\text{net}} = T_n \dots T_2 T_1$, known as homogeneous transformation matrices.</em>)</p>
+</div>

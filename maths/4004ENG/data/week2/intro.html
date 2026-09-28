@@ -1,0 +1,270 @@
+<h1>Week 2: Vectors &amp; Geometric Applications</h1>
+
+<h2>Why This Matters in Engineering</h2>
+<p>Vectors are the foundational mathematical language of the physical world. In mechanical, civil, and aerospace engineering, quantities such as forces on bridge trusses, aircraft velocities in crosswinds, fluid velocity fields, and robotic manipulator links have both a <strong>magnitude</strong> and a <strong>direction</strong>.</p>
+<p>In this module, you will master vector operations in MATLAB &mdash; computing magnitudes, normalizing vectors into directional unit vectors, calculating dot products to find angles and mechanical work, and taking cross products to compute 3D surface normals and moments. MATLAB's vectorized syntax lets you perform these calculations simultaneously across thousands of data points without slow scalar loops.</p>
+
+<hr>
+
+<!-- Self-Study & 2-Hour Delivery Wrapper -->
+<div class="route-schedule-card">
+  <h3><i data-lucide="clock"></i> Recommended 2-Hour Lab &amp; Self-Study Route</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Phase</th>
+        <th>Time</th>
+        <th>Focus Activity</th>
+        <th>Key Milestones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Before the Lab</strong></td>
+        <td>15 min</td>
+        <td>Read vector reference below &amp; test the readiness check</td>
+        <td>Confirm row vector syntax <code>[x, y, z]</code> in MATLAB Online</td>
+      </tr>
+      <tr>
+        <td><strong>Live Block 1</strong></td>
+        <td>45 min</td>
+        <td><strong>Problem 1</strong> <span class="badge-tag badge-core">Live Core</span> &amp; <strong>Problem 2</strong> <span class="badge-tag badge-core">Live Core</span></td>
+        <td>Vector arithmetic, <code>norm()</code>, unit vectors with floating-point tolerance check</td>
+      </tr>
+      <tr>
+        <td><strong>Live Block 2</strong></td>
+        <td>40 min</td>
+        <td><strong>Problem 3</strong> <span class="badge-tag badge-core">Live Core</span> + Live Troubleshooting</td>
+        <td>Compute <code>dot()</code>, determine vector angles using <code>acos()</code> / <code>acosd()</code></td>
+      </tr>
+      <tr>
+        <td><strong>After the Lab</strong></td>
+        <td>20 min</td>
+        <td><strong>Problem 4</strong> <span class="badge-tag badge-consolidation">Consolidation</span> &amp; <strong>Problem 5</strong> <span class="badge-tag badge-stretch">Stretch</span></td>
+        <td>3D <code>cross()</code> surface normals, work done by force vector, MATLAB Grader submission</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="readiness-card">
+  <h3><i data-lucide="check-square"></i> Before You Begin: Prerequisites &amp; Readiness Check</h3>
+  <ul>
+    <li><strong>Mathematical Prerequisites:</strong> Cartesian coordinates in 2D and 3D, Pythagoras' theorem ($r = \sqrt{x^2+y^2+z^2}$), and basic trigonometry ($\cos\theta$).</li>
+    <li><strong>MATLAB Prerequisites:</strong> Variable assignment, suppressing output with semicolons (Week 1), and calling built-in functions.</li>
+    <li><strong>Required Files:</strong> Ensure you have the templates <code>prob_2_1.m</code> through <code>prob_2_5.m</code> ready in your workspace.</li>
+  </ul>
+
+  <h4>Quick Formative Checks</h4>
+  <details class="staged-hint hint-concept">
+    <summary class="hint-header">Readiness Check 1: Unit Vector Property</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> If vector $\mathbf{v} = [3, 4]$, what is its magnitude, and what is its unit vector $\mathbf{\hat{v}}$?</p>
+      <p><strong>Answer:</strong> Magnitude is $\|\mathbf{v}\| = \sqrt{3^2 + 4^2} = 5$. The unit vector is $\mathbf{\hat{v}} = [3/5, 4/5] = [0.6, 0.8]$. Its magnitude is $\|\mathbf{\hat{v}}\| = \sqrt{0.6^2 + 0.8^2} = 1.0$.</p>
+    </div>
+  </details>
+
+  <details class="staged-hint hint-matlab">
+    <summary class="hint-header">Readiness Check 2: Dot Product and Orthogonality</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> What does <code>dot([1, 0], [0, 5]) == 0</code> tell you about the two vectors?</p>
+      <p><strong>Answer:</strong> Since $\mathbf{a} \cdot \mathbf{b} = \|\mathbf{a}\| \|\mathbf{b}\| \cos\theta = 0$ and neither vector has zero magnitude, $\cos\theta = 0$, meaning the angle is $\theta = 90^\circ$. The vectors are orthogonal (perpendicular).</p>
+    </div>
+  </details>
+</div>
+
+<hr>
+
+<h2>Learning Objectives</h2>
+<p>By the end of this lab, you should be able to:</p>
+<ul>
+  <li>Define and manipulate 2D and 3D vectors in MATLAB using row-vector notation.</li>
+  <li>Perform element-wise vector arithmetic and scalar multiplication.</li>
+  <li>Calculate vector magnitudes using <code>norm()</code> and construct normalized unit vectors.</li>
+  <li>Calculate scalar dot products using <code>dot()</code> and determine angles between vectors.</li>
+  <li>Compute vector cross products using <code>cross()</code> to determine perpendicular 3D surface normals.</li>
+  <li>Apply vector mechanics to compute the work done by a force vector along a displacement path.</li>
+</ul>
+
+<hr>
+
+<h2>Quick Reference: Vector Mathematics</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Operation</th>
+      <th>Mathematical Formula</th>
+      <th>MATLAB Command</th>
+      <th>Notes / Grader Gotcha</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Vector Definition</strong></td>
+      <td>$\mathbf{v} = [v_1, v_2, v_3]$</td>
+      <td><code>v = [1, 2, 3];</code></td>
+      <td>Row vector (use commas/spaces, not semicolons)</td>
+    </tr>
+    <tr>
+      <td><strong>Magnitude (Length)</strong></td>
+      <td>$\|\mathbf{v}\| = \sqrt{\sum v_i^2}$</td>
+      <td><code>mag_v = norm(v);</code></td>
+      <td>Returns a non-negative scalar</td>
+    </tr>
+    <tr>
+      <td><strong>Unit Vector</strong></td>
+      <td>$\mathbf{\hat{v}} = \frac{\mathbf{v}}{\|\mathbf{v}\|}$</td>
+      <td><code>u_hat = v / norm(v);</code></td>
+      <td>Magnitude is $1.0$ (verify with <code>abs(norm(u_hat)-1) &lt; 1e-12</code>)</td>
+    </tr>
+    <tr>
+      <td><strong>Dot Product</strong></td>
+      <td>$\mathbf{a} \cdot \mathbf{b} = \sum a_i b_i$</td>
+      <td><code>d = dot(a, b);</code></td>
+      <td>Scalar result; 0 indicates perpendicular vectors</td>
+    </tr>
+    <tr>
+      <td><strong>Angle Between</strong></td>
+      <td>$\theta = \arccos\left(\frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\|\|\mathbf{b}\|}\right)$</td>
+      <td><code>th = acos(dot(a,b)/(norm(a)*norm(b)));</code></td>
+      <td><code>acos()</code> returns radians; use <code>rad2deg()</code> for degrees</td>
+    </tr>
+    <tr>
+      <td><strong>Cross Product</strong></td>
+      <td>$\mathbf{a} \times \mathbf{b}$</td>
+      <td><code>c = cross(a, b);</code></td>
+      <td>Strictly for 3D vectors; result is orthogonal to both</td>
+    </tr>
+    <tr>
+      <td><strong>Work Done</strong></td>
+      <td>$W = \mathbf{F} \cdot \mathbf{d}$</td>
+      <td><code>W = dot(F, d);</code></td>
+      <td>Scalar energy in Joules ($1\text{ N}\cdot\text{m} = 1\text{ J}$)</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>Worked Examples</h2>
+
+<h3>Example 1: Magnitude and Normalized Unit Vector</h3>
+<pre><code class="language-matlab">% Define 3D displacement vector
+d = [2, -3, 6];
+
+% Compute Euclidean norm
+mag_d = norm(d);            % sqrt(4 + 9 + 36) = sqrt(49) = 7
+
+% Directional unit vector
+u_hat = d / mag_d;          % [2/7, -3/7, 6/7]
+
+% Sanity check: unit vector magnitude must be 1 (within floating point tolerance)
+is_valid_unit = abs(norm(u_hat) - 1.0) &lt; 1e-12;  % returns true (1)
+</code></pre>
+
+<h3>Example 2: Angle Between Force Vectors</h3>
+<pre><code class="language-matlab">F1 = [10, 0, 5];
+F2 = [0, 8, 2];
+
+% Dot product
+dp = dot(F1, F2);           % 10*0 + 0*8 + 5*2 = 10
+
+% Angle calculation
+cos_theta = dp / (norm(F1) * norm(F2));
+theta_rad = acos(cos_theta);
+theta_deg = rad2deg(theta_rad);  % Angle in degrees
+</code></pre>
+
+<h3>Example 3: 3D Surface Normal via Cross Product</h3>
+<pre><code class="language-matlab">% Two vectors lying on a structural plate
+v1 = [1, 0, 0];
+v2 = [0, 1, 0];
+
+% Normal vector perpendicular to the plate surface
+n = cross(v1, v2);          % [0, 0, 1] (unit vector in +z direction)
+
+% Verify orthogonality: dot products with original vectors must be zero
+check1 = dot(n, v1);        % 0
+check2 = dot(n, v2);        % 0
+</code></pre>
+
+<hr>
+
+<h2>Problems in This Module</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Route Category</th>
+      <th>Starter File</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Problem 1</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span></td>
+      <td><code>prob_2_1.m</code></td>
+      <td>Vector creation in 2D/3D, addition, subtraction, scalar scaling</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 2</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span></td>
+      <td><code>prob_2_2.m</code></td>
+      <td>Magnitude calculation using <code>norm()</code>, unit vectors, tolerance verification</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 3</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span></td>
+      <td><code>prob_2_3.m</code></td>
+      <td>Dot product, angle between vectors in radians and degrees</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 4</strong></td>
+      <td><span class="badge-tag badge-consolidation">Independent Consolidation</span></td>
+      <td><code>prob_2_4.m</code></td>
+      <td>3D Cross product, orthogonality verification, plane normal vector</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 5</strong></td>
+      <td><span class="badge-tag badge-stretch">Optional Stretch</span></td>
+      <td><code>prob_2_5.m</code></td>
+      <td>Engineering application: mechanical work done by force vector along displacement</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- REMOTE LAB HELP BOX -->
+<div class="remote-help-card">
+  <h3><i data-lucide="help-circle"></i> Remote Lab Help: Common Errors in Vectors</h3>
+  <ul>
+    <li><strong>"Matrix dimensions must agree":</strong> You tried to add or subtract vectors of different lengths (e.g. adding a 2D vector <code>[1, 2]</code> to a 3D vector <code>[1, 2, 3]</code>).</li>
+    <li><strong>"Inner matrix dimensions must agree" on multiplication:</strong> Using <code>a * b</code> for two row vectors. To multiply element-by-element use <code>a .* b</code>; to compute scalar dot product use <code>dot(a, b)</code>.</li>
+    <li><strong>Cross product error:</strong> <code>cross(a, b)</code> requires both vectors to have exactly <strong>3 components</strong>. For 2D vectors in the $xy$-plane, pad with zero: <code>[x, y, 0]</code>.</li>
+    <li><strong>Angle seems huge or tiny:</strong> MATLAB's <code>acos()</code> returns radians. Multiply by <code>180/pi</code> or use <code>rad2deg()</code>.</li>
+  </ul>
+
+  <h4>Standard Teams Help Request Template</h4>
+  <pre><code class="language-text">Problem: Week 2 Problem 3
+Part: Part B (Angle calculation)
+Command that failed: theta = acos(dot(u, v));
+Exact Error / Symptom: Output is complex number / imaginary value.
+What I expected: Real angle between 0 and 180 degrees.
+What I already tried: Realized I forgot to divide by (norm(u)*norm(v)), so dot product was > 1!</code></pre>
+</div>
+
+<hr>
+
+<!-- COMPLETION CHECKLIST -->
+<div class="checklist-card" style="border-left: 4px solid #10b981;">
+  <h3><i data-lucide="award"></i> Completion Criteria: You are ready for Week 3 if...</h3>
+  <ul style="list-style: none; padding-left: 0;">
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>1.</strong> You can create 2D and 3D row vectors and perform element-wise arithmetic.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>2.</strong> You can calculate the magnitude of any vector using <code>norm()</code> and normalize it into a unit vector.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>3.</strong> You can compute dot products with <code>dot()</code> and determine angles between vectors.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>4.</strong> You can compute 3D surface normals using <code>cross()</code> and verify orthogonality.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>5.</strong> You have submitted the Week 2 MATLAB Grader assignment questions.</li>
+  </ul>
+</div>

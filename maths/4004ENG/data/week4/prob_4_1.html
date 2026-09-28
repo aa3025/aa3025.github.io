@@ -1,0 +1,140 @@
+<div class="problem-outcomes">
+<h1>Problem 1: Introduction to Symbolic Differentiation <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Define symbolic variables using the <code>syms</code> command.</li>
+<li>Compute analytical derivatives of polynomial, trigonometric, and exponential functions using <code>diff()</code>.</li>
+<li>Calculate higher-order derivatives (such as second derivatives).</li>
+<li>Evaluate symbolic derivatives at specific numeric points using <code>subs()</code> and <code>double()</code>.</li>
+</ul>
+<h3>Description</h3>
+<p>This exercise introduces the Symbolic Math Toolbox, which allows you to perform calculus analytically rather than numerically. You will learn how to define symbols, differentiate standard functions, and extract numerical results for engineering applications.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>x</code>, <code>t</code>, <code>a</code>, <code>b</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ syms</td>
+      <td>Symbolic variable declarations</td>
+    </tr>
+    <tr>
+      <td><code>f1</code>, <code>f2</code>, <code>f3</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ syms</td>
+      <td>Symbolic function expressions</td>
+    </tr>
+    <tr>
+      <td><code>df1</code>, <code>df2</code>, <code>df3</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ syms</td>
+      <td>First analytical derivatives with respect to $x$</td>
+    </tr>
+    <tr>
+      <td><code>d2f1</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Second analytical derivative of $f_1$ via <code>diff(f1, x, 2)</code></td>
+    </tr>
+    <tr>
+      <td><code>val_x2</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Symbolic evaluation at $x=2$ via <code>subs()</code></td>
+    </tr>
+    <tr>
+      <td><code>df1_numeric</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Numeric evaluation converted via <code>double(val_x2)</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> For $f_1 = 3x^4 - 5x^2 + 10$, differentiate by hand: $f_1'(x) = 12x^3 - 10x$. What is $f_1'(2)$? ($12(8) - 10(2) = 96 - 20 = 76$).
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_4_1.m</code>.</p>
+
+<p><strong>Part A — Define Symbolic Variables</strong><br>
+Define <code>x</code>, <code>t</code>, <code>a</code>, and <code>b</code> as symbolic variables using a single <code>syms</code> command.</p>
+
+<p><strong>Part B — Standard Derivatives</strong><br>
+Calculate the derivative with respect to $x$ of each of the following, storing the functions as <code>f1</code>, <code>f2</code>, <code>f3</code> and their derivatives as <code>df1</code>, <code>df2</code>, <code>df3</code>:</p>
+<ol>
+<li>$f_1 = 3x^4 - 5x^2 + 10$</li>
+<li>$f_2 = \sin(2x) + \cos(3x)$</li>
+<li>$f_3 = e^{-0.5x}$ (use <code>exp(-0.5*x)</code>)</li>
+</ol>
+
+<p><strong>Part C — Second-Order Derivative</strong><br>
+Calculate the second derivative of <code>f1</code> with respect to $x$ and store it in <code>d2f1</code> (use <code>diff(f1, x, 2)</code>).</p>
+
+<p><strong>Part D — Substitution</strong><br>
+Calculate the numerical value of <code>df1</code> at $x = 2$: substitute using <code>subs()</code> into <code>val_x2</code>, then convert to a plain number <code>df1_numeric</code> using <code>double()</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Analytical Differentiation)</summary>
+  <div class="hint-content">
+    <p>The derivative of $x^n$ is $nx^{n-1}$. For trigonometric terms, $\frac{d}{dx}\sin(kx) = k\cos(kx)$ and $\frac{d}{dx}\cos(kx) = -k\sin(kx)$. For exponential terms, $\frac{d}{dx}e^{kx} = k e^{kx}$.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Declare multiple symbols at once: <code>syms x t a b</code>. Call <code>diff(f, x)</code> for first derivatives and <code>diff(f, x, 2)</code> for second derivatives. To substitute, use <code>subs(df1, x, 2)</code> followed by <code>double(...)</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+syms x t a b
+
+% Part B
+f1 = 3*x^4 - 5*x^2 + 10;
+df1 = diff(f1, x);
+
+f2 = sin(2*x) + cos(3*x);
+df2 = diff(f2, x);
+
+f3 = exp(-0.5*x);
+df3 = diff(f3, x);
+
+% Part C
+d2f1 = diff(f1, x, 2);
+
+% Part D
+val_x2 = subs(df1, x, 2);
+df1_numeric = double(val_x2);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>df1</code> must be <code>12*x^3 - 10*x</code>.</li>
+  <li><code>df2</code> must be <code>2*cos(2*x) - 3*sin(3*x)</code>.</li>
+  <li><code>d2f1</code> must be <code>36*x^2 - 10</code>.</li>
+  <li><code>df1_numeric</code> must equal <code>76</code> as an IEEE double.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>Why do aerospace guidance systems rely on analytical symbolic derivatives rather than finite-difference approximations ($\frac{f(x+h)-f(x)}{h}$) for mission-critical flight equations? (<em>Answer: Symbolic derivatives produce zero truncation error and avoid step-size $h$ numerical instability or catastrophic cancellation.</em>)</p>
+</div>

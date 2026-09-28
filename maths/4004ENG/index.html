@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4004ENG Engineering Mathematics - MATLAB PC Labs</title>
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="index.css">
+  
+  <!-- KaTeX CSS for LaTeX math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  
+  <!-- Prism.js Dark Theme for code syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-container">
+          <div class="logo-text">
+            <span class="logo-title">4004ENG</span>
+            <span class="logo-subtitle">MATLAB PC Labs</span>
+          </div>
+          <img src="Coventry-University-Logo-Blue-2000pm.png" alt="Coventry University Logo" class="logo-img logo-light">
+          <img src="Coventry-University-Logo-White-2000pm.png" alt="Coventry University Logo" class="logo-img logo-dark">
+        </div>
+        <button class="close-sidebar-btn" id="close-sidebar-btn" title="Close sidebar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
 
+      <!-- Progress Meter -->
+      <div class="progress-container">
+        <div class="progress-labels">
+          <span class="progress-title">Your Progress</span>
+          <span class="progress-percent" id="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+        </div>
+        <span class="progress-stats" id="progress-stats">0 of 0 completed</span>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="search" id="search-input" placeholder="Search topics or problems..." autocomplete="new-password" name="prevent_autofill_search" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');">
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="nav-menu" id="nav-menu">
+        <!-- Will be populated dynamically by app.js -->
+        <div class="menu-skeleton">
+          <div class="skeleton-item"></div>
+          <div class="skeleton-item"></div>
+          <div class="skeleton-item"></div>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Sidebar Resizer with Delimiter Collapse/Restore Button -->
+    <div class="sidebar-resizer" id="sidebar-resizer" title="Drag to resize sidebar">
+      <button class="sidebar-delimiter-btn" id="collapse-sidebar-btn" title="Toggle sidebar (Ctrl+B)">
+        <i data-lucide="chevron-left" class="icon-collapse"></i>
+        <i data-lucide="chevron-right" class="icon-restore"></i>
+      </button>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main Content Panel -->
+    <main class="main-content">
+      
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle-btn" id="menu-toggle-btn" title="Toggle navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="breadcrumbs" id="breadcrumbs">
+            <span class="breadcrumb-item active">Loading...</span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <!-- Light/Dark Theme Toggle -->
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Theme">
+            <i data-lucide="sun" class="sun-icon"></i>
+            <i data-lucide="moon" class="moon-icon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="content-pane" id="content-pane">
+        <!-- Will be populated dynamically by app.js -->
+        <div class="content-loading">
+          <div class="spinner"></div>
+          <p>Loading course materials...</p>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <footer class="footer">
+        <p>&copy; 2026 Coventry University &bull; 4004ENG Engineering Mathematics PC Labs</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- CDN Script Libraries -->
+  <!-- Lucide Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+  
+  <!-- Marked.js (Markdown parsing) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <!-- KaTeX (LaTeX Equation rendering) -->
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  
+  <!-- Prism.js (Syntax highlighting core & MATLAB loader) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-matlab.min.js"></script>
+  
+  <!-- Course Data Bundle (Enables offline and file:// usage without web server) -->
+  <script src="data/course_data.js"></script>
+  
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<div class="problem-outcomes">
+<h1>Problem 2: Advanced Integration Techniques <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Solve complex integrals involving analytical substitution ($u$-substitution).</li>
+<li>Apply integration by parts ($\int u\,dv = uv - \int v\,du$) symbolically.</li>
+<li>Handle rational functions using partial fraction decomposition.</li>
+<li>Evaluate definite integrals of composite analytical functions.</li>
+</ul>
+<h3>Description</h3>
+<p>Many real-world engineering integrals involve composite functions requiring substitution, parts, or partial fractions. In this problem, you will use MATLAB's symbolic engine to solve advanced analytical integrals and verify pen-and-paper solutions.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>f_sub</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Substitution integrand $2x e^{x^2}$</td>
+    </tr>
+    <tr>
+      <td><code>F_sub</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Indefinite integral via substitution</td>
+    </tr>
+    <tr>
+      <td><code>g_parts</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Parts integrand $x \sin(x)$</td>
+    </tr>
+    <tr>
+      <td><code>G_parts</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Indefinite integral via integration by parts</td>
+    </tr>
+    <tr>
+      <td><code>h_rational</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Rational integrand $\frac{1}{x^2 - 1}$</td>
+    </tr>
+    <tr>
+      <td><code>H_rational</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Indefinite integral via partial fractions</td>
+    </tr>
+    <tr>
+      <td><code>result_definite</code></td>
+      <td>sym / double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Definite integral of <code>f_sub</code> from $x=0$ to $1$</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> For $\int 2x e^{x^2}\,dx$, substitute $u = x^2 \implies du = 2x\,dx$. The integral reduces to $\int e^u du = e^u = e^{x^2}$. Evaluating from $x=0$ to $1$ gives $e^1 - e^0 = e - 1 \approx 1.7183$.
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_5_2.m</code>. Declare symbolic variable <code>x</code>.</p>
+
+<p><strong>Part A — Integration by Substitution</strong><br>
+Find the indefinite integral of $f(x) = 2x\,e^{x^2}$. Store the function as <code>f_sub</code> and the result as <code>F_sub</code>.</p>
+
+<p><strong>Part B — Integration by Parts</strong><br>
+Find the indefinite integral of $g(x) = x\sin(x)$. Store the function as <code>g_parts</code> and the result as <code>G_parts</code>.</p>
+
+<p><strong>Part C — Partial Fractions</strong><br>
+Find the indefinite integral of $h(x) = \dfrac{1}{x^2-1}$. Store the function as <code>h_rational</code> and the result as <code>H_rational</code>.</p>
+
+<p><strong>Part D — Definite Application</strong><br>
+Calculate <code>result_definite</code>, the definite integral of <code>f_sub</code> from $x=0$ to $x=1$.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Advanced Integration Rules)</summary>
+  <div class="hint-content">
+    <ul>
+      <li><strong>Substitution:</strong> Identifies an inner function $u(x)$ whose derivative $u'(x)$ appears in the integrand: $\int f(u(x))u'(x)dx = \int f(u)du$.</li>
+      <li><strong>Integration by Parts:</strong> Derived from the product rule: $\int u\,dv = uv - \int v\,du$. For $\int x\sin(x)dx$, set $u=x$ and $dv = \sin(x)dx$.</li>
+      <li><strong>Partial Fractions:</strong> Decomposes $\frac{1}{x^2-1} = \frac{1}{(x-1)(x+1)} = \frac{1/2}{x-1} - \frac{1/2}{x+1}$, integrating into logarithms.</li>
+    </ul>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>MATLAB's <code>int()</code> function automatically applies substitution, parts, and partial fraction expansions internally. Call <code>int(f_sub, x)</code>, <code>int(g_parts, x)</code>, and <code>int(h_rational, x)</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">syms x
+
+% Part A
+f_sub = 2*x * exp(x^2);
+F_sub = int(f_sub, x);
+
+% Part B
+g_parts = x * sin(x);
+G_parts = int(g_parts, x);
+
+% Part C
+h_rational = 1 / (x^2 - 1);
+H_rational = int(h_rational, x);
+
+% Part D
+result_definite = int(f_sub, x, 0, 1);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>F_sub</code> must equal <code>exp(x^2)</code>.</li>
+  <li><code>G_parts</code> must equal <code>sin(x) - x*cos(x)</code>.</li>
+  <li><code>H_rational</code> involves logarithms: $-\text{atanh}(x)$ or $\frac{1}{2}\log(x-1) - \frac{1}{2}\log(x+1)$.</li>
+  <li><code>double(result_definite)</code> should equal $e - 1 \approx 1.7183$.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>When solving transient heat transfer or signal filtering equations containing terms like $t e^{-at}$, why does integration by parts arise naturally? (<em>Answer: The differential equations governing linear systems produce product convolutions of polynomial inputs and exponential impulse responses.</em>)</p>
+</div>

@@ -1,0 +1,138 @@
+<div class="problem-outcomes">
+<h1>Problem 2: Magnitude and Unit Vectors <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Calculate the magnitude (length) of a vector using the built-in <code>norm()</code> function.</li>
+<li>Implement manual magnitude calculations using the 3D Pythagorean theorem.</li>
+<li>Create normalized directional unit vectors to represent line of action.</li>
+<li>Verify vector properties using numerical floating-point tolerances.</li>
+</ul>
+<h3>Description</h3>
+<p>Calculating the size of a vector and isolating its pure direction is critical for structural and force analysis. In this exercise, you will calculate Euclidean magnitudes and normalize vectors into unit vectors.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description / Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>r</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Position vector $[3, 4, 12]$ [m]</td>
+    </tr>
+    <tr>
+      <td><code>mag_r</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Norm of $\mathbf{r}$ via <code>norm(r)</code> [m]</td>
+    </tr>
+    <tr>
+      <td><code>F</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Force vector $[6, -8, 0]$ [N]</td>
+    </tr>
+    <tr>
+      <td><code>mag_F_manual</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Pythagorean magnitude $\sqrt{F_x^2 + F_y^2 + F_z^2}$ [N]</td>
+    </tr>
+    <tr>
+      <td><code>d</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Displacement vector $[2, -3, 6]$ [m]</td>
+    </tr>
+    <tr>
+      <td><code>u_hat_d</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Normalized unit vector $\mathbf{d} / \|\mathbf{d}\|$ (dimensionless)</td>
+    </tr>
+    <tr>
+      <td><code>mag_unit_d</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Norm of unit vector $\approx 1.0$</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> For $\mathbf{r} = [3, 4, 12]$, predict $\|\mathbf{r}\|$ mentally: $\sqrt{3^2 + 4^2} = 5$, then $\sqrt{5^2 + 12^2} = 13$. Can a vector magnitude ever be negative?
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_2_2.m</code>.</p>
+
+<p><strong>Part A — Magnitude via <code>norm()</code></strong><br>
+Given position vector $\mathbf{r} = [3, 4, 12]$ m, store it as <code>r</code> and calculate its magnitude <code>mag_r</code> using the built-in <code>norm()</code> function.</p>
+
+<p><strong>Part B — Manual Magnitude Calculation</strong><br>
+Given force vector $\mathbf{F} = [6, -8, 0]$ N, store it as <code>F</code> and calculate its magnitude <code>mag_F_manual</code> manually using:
+$$|\mathbf{F}| = \sqrt{F_x^2 + F_y^2 + F_z^2}$$</p>
+
+<p><strong>Part C — Create a Unit Vector</strong><br>
+Given displacement vector $\mathbf{d} = [2, -3, 6]$, store it as <code>d</code> and calculate the unit vector <code>u_hat_d</code> in the direction of <code>d</code>:
+$$\hat{\mathbf{u}}_d = \frac{\mathbf{d}}{|\mathbf{d}|}$$</p>
+
+<p><strong>Part D — Verify Your Unit Vector</strong><br>
+Calculate the magnitude <code>mag_unit_d</code> of <code>u_hat_d</code> using <code>norm()</code>. Due to standard IEEE floating-point rounding, verify that it equals $1$ within numerical tolerance (e.g. <code>abs(mag_unit_d - 1) &lt; 1e-12</code>).</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Unit Vectors)</summary>
+  <div class="hint-content">
+    <p>A unit vector points in the identical direction as the original vector but has a scaled length of exactly 1. It is computed by dividing every component by the vector's Euclidean magnitude: $\mathbf{\hat{u}} = \mathbf{d} / \|\mathbf{d}\|$.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Use <code>norm(d)</code> for magnitude. To compute components manually, index with parentheses: <code>F(1)</code>, <code>F(2)</code>, <code>F(3)</code>. Use <code>sqrt(...)</code> for square roots.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+r = [3, 4, 12];
+mag_r = norm(____);
+
+% Part B
+F = [6, -8, 0];
+mag_F_manual = sqrt(F(1)^2 + F(2)^2 + F(3)^2);
+
+% Part C
+d = [2, -3, 6];
+u_hat_d = d / norm(____);
+
+% Part D
+mag_unit_d = norm(u_hat_d);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>mag_r</code> should equal exactly <code>13</code>.</li>
+  <li><code>mag_F_manual</code> should equal exactly <code>10</code>.</li>
+  <li><code>norm(d)</code> is $\sqrt{4 + 9 + 36} = 7$, so <code>u_hat_d</code> is approximately <code>[0.2857, -0.4286, 0.8571]</code>.</li>
+  <li><code>abs(mag_unit_d - 1.0)</code> should be zero within machine epsilon ($&lt; 10^{-14}$).</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>Why do structural engineers decompose cable forces into a scalar tension magnitude times a directional unit vector $\mathbf{F} = T \mathbf{\hat{u}}$? (<em>Answer: It separates the variable load intensity $T$ from the fixed geometric orientation of the cable $\mathbf{\hat{u}}$.</em>)</p>
+</div>

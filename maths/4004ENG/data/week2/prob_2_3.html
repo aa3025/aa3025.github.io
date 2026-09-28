@@ -1,0 +1,164 @@
+<div class="problem-outcomes">
+<h1>Problem 3: Dot Product and Angle Between Vectors <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Calculate the scalar (dot) product using MATLAB&#39;s built-in <code>dot()</code> function.</li>
+<li>Implement manual dot product calculations for 3D vectors.</li>
+<li>Determine the angle between two spatial vectors using the dot product formula.</li>
+<li>Convert angular measurements between radians and degrees using <code>rad2deg()</code>.</li>
+</ul>
+<h3>Description</h3>
+<p>The dot product is a key tool for finding the directional alignment between two vectors. You will use it to calculate projections and determine the exact angle between force and velocity vectors.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description / Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>F1</code>, <code>F2</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Force vectors $[10, 5, -2]$ and $[3, -4, 6]$ [N]</td>
+    </tr>
+    <tr>
+      <td><code>dot_F1F2</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Dot product $\mathbf{F}_1 \cdot \mathbf{F}_2$ via <code>dot()</code></td>
+    </tr>
+    <tr>
+      <td><code>A</code>, <code>B</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Position vectors $[2, -3, 1]$ and $[-1, 4, 5]$ [m]</td>
+    </tr>
+    <tr>
+      <td><code>dot_AB_manual</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Manual dot product $A_x B_x + A_y B_y + A_z B_z$</td>
+    </tr>
+    <tr>
+      <td><code>v1</code>, <code>v2</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>Velocity vectors $[4, -2, 3]$ and $[-1, 5, 2]$ [m/s]</td>
+    </tr>
+    <tr>
+      <td><code>dot_v1v2</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Dot product $\mathbf{v}_1 \cdot \mathbf{v}_2$</td>
+    </tr>
+    <tr>
+      <td><code>mag_v1</code>, <code>mag_v2</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalars</td>
+      <td>Norms $\|\mathbf{v}_1\|$ and $\|\mathbf{v}_2\|$</td>
+    </tr>
+    <tr>
+      <td><code>theta_rad</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Angle between vectors [radians]</td>
+    </tr>
+    <tr>
+      <td><code>theta_deg</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Angle between vectors [degrees]</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> For $\mathbf{v}_1 = [4, -2, 3]$ and $\mathbf{v}_2 = [-1, 5, 2]$, estimate the sign of $\mathbf{v}_1 \cdot \mathbf{v}_2$: $(4)(-1) + (-2)(5) + (3)(2) = -4 - 10 + 6 = -8$. Since the dot product is negative, will the angle $\theta$ be acute ($&lt;90^\circ$) or obtuse ($&gt;90^\circ$)?
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_2_3.m</code>.</p>
+
+<p><strong>Part A — Dot Product via <code>dot()</code></strong><br>
+Given force vectors $\mathbf{F_1} = [10, 5, -2]$ N and $\mathbf{F_2} = [3, -4, 6]$ N, store them as <code>F1</code> and <code>F2</code> and calculate their dot product <code>dot_F1F2</code> using the <code>dot()</code> function.</p>
+
+<p><strong>Part B — Manual Dot Product</strong><br>
+Given position vectors $\mathbf{A} = [2, -3, 1]$ m and $\mathbf{B} = [-1, 4, 5]$ m, store them as <code>A</code> and <code>B</code> and calculate <code>dot_AB_manual</code> manually using:
+$$\mathbf{A}\cdot\mathbf{B} = A_xB_x + A_yB_y + A_zB_z$$</p>
+
+<p><strong>Part C — Angle Between Two Vectors</strong><br>
+Given velocity vectors $\mathbf{v_1} = [4, -2, 3]$ m/s and $\mathbf{v_2} = [-1, 5, 2]$ m/s, store them as <code>v1</code> and <code>v2</code>, then:</p>
+<ol>
+<li>Calculate the dot product <code>dot_v1v2</code>.</li>
+<li>Calculate the magnitudes <code>mag_v1</code> and <code>mag_v2</code>.</li>
+<li>Use $\cos\theta = \dfrac{\mathbf{v_1}\cdot\mathbf{v_2}}{|\mathbf{v_1}||\mathbf{v_2}|}$ and <code>acos()</code> to find <code>theta_rad</code>.</li>
+</ol>
+
+<p><strong>Part D — Convert to Degrees</strong><br>
+Convert <code>theta_rad</code> to <code>theta_deg</code> using <code>rad2deg()</code> (or by multiplying by $180/\pi$).</p>
+
+<p><strong>Part E — Visualisation (Optional Extension)</strong><br>
+Plot <code>v1</code> and <code>v2</code> as vectors on the same axes using <code>quiver</code> or <code>plot3</code> to visually observe the obtuse angle between them.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Angle Between Vectors)</summary>
+  <div class="hint-content">
+    <p>From the geometric definition of the scalar product $\mathbf{a} \cdot \mathbf{b} = \|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$, the angle is:</p>
+    $$\theta = \arccos\left(\frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\|\|\mathbf{b}\|}\right)$$
+    <p>If $\mathbf{a}\cdot\mathbf{b} &gt; 0$, $\theta$ is acute. If $\mathbf{a}\cdot\mathbf{b} = 0$, $\theta = 90^\circ$ (perpendicular). If $\mathbf{a}\cdot\mathbf{b} &lt; 0$, $\theta$ is obtuse.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Use <code>dot(v1, v2)</code> for the numerator and <code>norm(v1) * norm(v2)</code> for the denominator. Wrap the quotient in <code>acos(...)</code>. MATLAB returns radians; use <code>rad2deg(...)</code> to convert to degrees.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+F1 = [10, 5, -2];
+F2 = [3, -4, 6];
+dot_F1F2 = dot(F1, F2);
+
+% Part B
+A = [2, -3, 1];
+B = [-1, 4, 5];
+dot_AB_manual = A(1)*B(1) + A(2)*B(2) + A(3)*B(3);
+
+% Part C
+v1 = [4, -2, 3];
+v2 = [-1, 5, 2];
+dot_v1v2 = dot(v1, v2);
+mag_v1 = norm(v1);
+mag_v2 = norm(v2);
+theta_rad = acos(dot_v1v2 / (mag_v1 * mag_v2));
+
+% Part D
+theta_deg = rad2deg(theta_rad);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>dot_F1F2</code> should be $30 - 20 - 12 = -2$.</li>
+  <li><code>dot_AB_manual</code> should be $-2 - 12 + 5 = -9$.</li>
+  <li><code>dot_v1v2</code> is negative ($-8$), so <code>theta_deg</code> must be greater than $90^\circ$ (approx. $106.1^\circ$).</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>If two aircraft are tracking along velocity vectors $\mathbf{v}_1$ and $\mathbf{v}_2$ and radar telemetry indicates $\mathbf{v}_1 \cdot \mathbf{v}_2 = 0$, what does this reveal about their flight paths relative to one another? (<em>Answer: Their flight paths are mutually perpendicular.</em>)</p>
+</div>

@@ -1,0 +1,145 @@
+<div class="problem-outcomes">
+<h1>Problem 1: Matrix Basics <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Define matrices in MATLAB using row and column syntax with semicolons.</li>
+<li>Perform matrix transpose operations using the apostrophe (<code>'</code>).</li>
+<li>Execute basic matrix arithmetic (addition, subtraction, and scalar multiplication).</li>
+<li>Verify dimension consistency for matrix addition.</li>
+</ul>
+<h3>Description</h3>
+<p>This exercise introduces the syntax for creating matrices of various dimensions in MATLAB and performing the fundamental operations required for engineering linear algebra.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>A</code></td>
+      <td>double</td>
+      <td>$2 \times 3$</td>
+      <td>Matrix with rows $[1, 2, 3]$ and $[4, 5, 6]$</td>
+    </tr>
+    <tr>
+      <td><code>B</code></td>
+      <td>double</td>
+      <td>$3 \times 2$</td>
+      <td>Matrix with rows $[7, 8]$, $[9, 10]$, $[11, 12]$</td>
+    </tr>
+    <tr>
+      <td><code>A_trans</code></td>
+      <td>double</td>
+      <td>$3 \times 2$</td>
+      <td>Transpose of $A$ via <code>A'</code></td>
+    </tr>
+    <tr>
+      <td><code>M</code>, <code>N</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Matrices $[1, 2; 3, 4]$ and $[5, 6; 7, 8]$</td>
+    </tr>
+    <tr>
+      <td><code>S</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Matrix sum $M + N$</td>
+    </tr>
+    <tr>
+      <td><code>D</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Matrix difference $M - N$</td>
+    </tr>
+    <tr>
+      <td><code>M_scaled</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Scalar product $10 \times M$</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Matrix $A$ is $2 \times 3$. When you transpose it to form $A^T$, what will its dimensions be? Does transposing change the total number of elements?
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_3_1.m</code>.</p>
+
+<p><strong>Part A — Create Matrices</strong></p>
+<ol>
+<li>Create a $2\times3$ matrix <code>A</code> with rows $[1, 2, 3]$ and $[4, 5, 6]$.</li>
+<li>Create a $3\times2$ matrix <code>B</code> with rows $[7, 8]$, $[9, 10]$, and $[11, 12]$.</li>
+</ol>
+
+<p><strong>Part B — Matrix Transpose</strong><br>
+Calculate the transpose of <code>A</code> and store it in <code>A_trans</code> using <code>A_trans = A'</code>.</p>
+
+<p><strong>Part C — Matrix Addition and Subtraction</strong><br>
+Given $M = [1, 2; 3, 4]$ and $N = [5, 6; 7, 8]$:</p>
+<ol>
+<li>Store these as <code>M</code> and <code>N</code>.</li>
+<li>Calculate the sum <code>S = M + N</code>.</li>
+<li>Calculate the difference <code>D = M - N</code>.</li>
+</ol>
+
+<p><strong>Part D — Scalar Multiplication</strong><br>
+Multiply <code>M</code> by a scalar factor of 10 and store the result in <code>M_scaled</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Matrix Dimensions &amp; Transpose)</summary>
+  <div class="hint-content">
+    <p>A matrix of size $m \times n$ has $m$ rows and $n$ columns. The transpose operation swaps rows and columns such that $(A^T)_{ij} = A_{ji}$, resulting in an $n \times m$ matrix. Matrix addition requires identical dimensions ($m \times n$).</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Separate elements in the same row with spaces or commas, and separate rows with semicolons: <code>A = [1, 2, 3; 4, 5, 6];</code>. The transpose operator in MATLAB is the apostrophe <code>'</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+A = [1, 2, 3; 4, 5, 6];
+B = [7, 8; 9, 10; 11, 12];
+
+% Part B
+A_trans = A';
+
+% Part C
+M = [1, 2; 3, 4];
+N = [5, 6; 7, 8];
+S = M + N;
+D = M - N;
+
+% Part D
+M_scaled = 10 * M;</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>size(A)</code> is <code>[2, 3]</code>; <code>size(A_trans)</code> must be <code>[3, 2]</code>.</li>
+  <li><code>S</code> should equal <code>[6, 8; 10, 12]</code>.</li>
+  <li><code>D</code> should equal <code>[-4, -4; -4, -4]</code>.</li>
+  <li><code>M_scaled</code> should equal <code>[10, 20; 30, 40]</code>.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>Why is transposing a matrix a common step in stress analysis when transforming local coordinate systems of a truss bar to global coordinates? (<em>Answer: The coordinate transformation matrix is orthogonal, meaning its inverse equals its transpose: $T^{-1} = T^T$.</em>)</p>
+</div>

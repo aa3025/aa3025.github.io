@@ -1,0 +1,128 @@
+<div class="problem-outcomes">
+<h1>Problem 3: Determinant and Inverse <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Calculate the determinant of 2x2 and 3x3 matrices using the built-in <code>det()</code> function.</li>
+<li>Compute the inverse of a non-singular square matrix using <code>inv()</code>.</li>
+<li>Verify the fundamental identity property of matrix inverses ($B \times B^{-1} = I$).</li>
+<li>Understand the engineering implications of matrix singularity ($\det = 0$).</li>
+</ul>
+<h3>Description</h3>
+<p>The determinant and inverse are crucial for solving engineering systems of equations. In this problem, you will calculate determinants, compute inverses, and verify the identity matrix product.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>A</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Matrix $[1, 2; 3, 4]$</td>
+    </tr>
+    <tr>
+      <td><code>det_A</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Determinant of $A$ via <code>det(A)</code></td>
+    </tr>
+    <tr>
+      <td><code>B</code></td>
+      <td>double</td>
+      <td>$3 \times 3$</td>
+      <td>Matrix $[1, 2, 3; 0, 1, 4; 5, 6, 0]$</td>
+    </tr>
+    <tr>
+      <td><code>det_B</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Determinant of $B$ via <code>det(B)</code></td>
+    </tr>
+    <tr>
+      <td><code>B_inv</code></td>
+      <td>double</td>
+      <td>$3 \times 3$</td>
+      <td>Matrix inverse of $B$ via <code>inv(B)</code></td>
+    </tr>
+    <tr>
+      <td><code>I_check</code></td>
+      <td>double</td>
+      <td>$3 \times 3$</td>
+      <td>Product $B \times B^{-1}$ ($\approx$ identity matrix)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Calculate $\det(A)$ by hand: $ad - bc = (1 \times 4) - (2 \times 3) = 4 - 6 = -2$. Since $\det(A) \neq 0$, does $A^{-1}$ exist?
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_3_3.m</code>.</p>
+
+<p><strong>Part A — Determinant of a 2x2 Matrix</strong><br>
+Given $A = [1, 2; 3, 4]$, store it as <code>A</code> and calculate its determinant <code>det_A</code> using <code>det()</code>.</p>
+
+<p><strong>Part B — Determinant of a 3x3 Matrix</strong><br>
+Given $B = [1, 2, 3; 0, 1, 4; 5, 6, 0]$, store it as <code>B</code> and calculate its determinant <code>det_B</code>.</p>
+
+<p><strong>Part C — Matrix Inverse</strong><br>
+Calculate the inverse of <code>B</code> and store it in <code>B_inv</code> using <code>inv()</code>.</p>
+
+<p><strong>Part D — Identity Verification</strong><br>
+Verify the property $B \times B^{-1} = I$ by computing <code>I_check = B * B_inv</code>. The result should equal the $3\times3$ identity matrix (within machine precision).</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Inverses and Identity)</summary>
+  <div class="hint-content">
+    <p>A square matrix is invertible if and only if its determinant is non-zero ($\det(M) \neq 0$). Multiplying any invertible matrix by its inverse yields the identity matrix $I$ (with 1s on the main diagonal and 0s elsewhere): $M M^{-1} = M^{-1} M = I$.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Use <code>det(A)</code> to compute the determinant. Use <code>inv(B)</code> to compute the inverse matrix. To verify, use standard matrix multiplication: <code>I_check = B * B_inv;</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+A = [1, 2; 3, 4];
+det_A = det(A);
+
+% Part B
+B = [1, 2, 3; 0, 1, 4; 5, 6, 0];
+det_B = det(B);
+
+% Part C
+B_inv = inv(B);
+
+% Part D
+I_check = B * B_inv;</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>det_A</code> must equal exactly <code>-2</code>.</li>
+  <li><code>det_B</code> is $1(0 - 24) - 2(0 - 20) + 3(0 - 5) = -24 + 40 - 15 = 1$.</li>
+  <li><code>I_check</code> should match <code>eye(3)</code> to within $10^{-14}$.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>If the global stiffness matrix $K$ of a structural truss has $\det(K) = 0$, what does this indicate physically about the structure? (<em>Answer: The structure is unstable or contains an unconstrained rigid-body mechanism; it can collapse or move freely under load!</em>)</p>
+</div>

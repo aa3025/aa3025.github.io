@@ -1,0 +1,172 @@
+<div class="problem-outcomes">
+<h1>Problem 5: Engineering Application - Work Done by a Force <span class="badge-tag badge-stretch">Optional Stretch</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Apply vector dot products to solve real-world engineering work and energy problems.</li>
+<li>Resolve non-aligned force vectors into orthogonal components using trigonometry.</li>
+<li>Perform mechanical work calculations for 3D crane rigging and lifting systems.</li>
+<li>Interpret the physical meaning of positive, zero, and negative mechanical work.</li>
+</ul>
+<h3>Description</h3>
+<p>Mechanical work ($W$) is a scalar energy quantity defined by the dot product of a force vector and displacement vector ($W = \mathbf{F} \cdot \mathbf{d}$). In this engineering application, you will evaluate energy transfer across 1D, 2D, and 3D mechanical loading scenarios.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description / Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>F_push</code>, <code>d_crate</code></td>
+      <td>double</td>
+      <td>$1 \times 2$ row</td>
+      <td>Horizontal force $[50, 0]$ N and displacement $[10, 0]$ m</td>
+    </tr>
+    <tr>
+      <td><code>work_A</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Mechanical work done in Part A [Joules]</td>
+    </tr>
+    <tr>
+      <td><code>theta_rad</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Angle $30^\circ$ converted to radians</td>
+    </tr>
+    <tr>
+      <td><code>F_suitcase</code>, <code>d_suitcase</code></td>
+      <td>double</td>
+      <td>$1 \times 2$ row</td>
+      <td>Resolved force vector and displacement $[15, 0]$ m</td>
+    </tr>
+    <tr>
+      <td><code>work_B</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Mechanical work done in Part B [Joules]</td>
+    </tr>
+    <tr>
+      <td><code>F_crane</code>, <code>d_load</code></td>
+      <td>double</td>
+      <td>$1 \times 3$ row</td>
+      <td>3D crane tension force and load displacement</td>
+    </tr>
+    <tr>
+      <td><code>work_C_3D</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>3D crane work done [Joules]</td>
+    </tr>
+    <tr>
+      <td><code>F_friction</code>, <code>d_block</code></td>
+      <td>double</td>
+      <td>$1 \times 2$ row</td>
+      <td>Opposing friction force $[-25, 0]$ N and displacement $[8, 0]$ m</td>
+    </tr>
+    <tr>
+      <td><code>work_D_friction</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Negative work done by friction [Joules]</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> A crane applies $1000\text{ N}$ of upward tension to hold a steel beam stationary for 10 minutes. Predict the work done: since $\mathbf{d} = [0, 0, 0]$, $W = \mathbf{F}\cdot\mathbf{d} = 0\text{ J}$. Work requires motion along the line of action!
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_2_5.m</code>. Recall that mechanical work is defined as $W = \mathbf{F} \cdot \mathbf{d}$.</p>
+
+<p><strong>Part A — Force Parallel to Displacement</strong><br>
+A worker pushes a crate with a constant horizontal force of 50 N, moving it 10 m in the same direction.</p>
+<ol>
+<li>Create force vector <code>F_push = [50, 0]</code>.</li>
+<li>Create displacement vector <code>d_crate = [10, 0]</code>.</li>
+<li>Calculate <code>work_A = dot(F_push, d_crate)</code>.</li>
+</ol>
+
+<p><strong>Part B — Force at an Angle to Displacement</strong><br>
+A person pulls a suitcase with a force of 80 N at $30^\circ$ above horizontal, moving it 15 m horizontally.</p>
+<ol>
+<li>Convert the angle to radians: <code>theta_rad = deg2rad(30)</code>.</li>
+<li>Resolve the force into components: $F_x = |\mathbf{F}|\cos\theta$, $F_y = |\mathbf{F}|\sin\theta$.</li>
+<li>Build <code>F_suitcase = [Fx, Fy]</code> and <code>d_suitcase = [15, 0]</code>.</li>
+<li>Calculate <code>work_B = dot(F_suitcase, d_suitcase)</code>.</li>
+</ol>
+
+<p><strong>Part C — 3D Case: Crane Lifting a Load</strong><br>
+A construction crane exerts cable tension <code>F_crane = [200, 150, 800]</code> N to displace a structural pre-cast load by <code>d_load = [5, -3, 10]</code> m. Calculate <code>work_C_3D = dot(F_crane, d_load)</code>.</p>
+
+<p><strong>Part D — Negative Work: Friction</strong><br>
+A kinetic friction force of 25 N opposes an 8 m horizontal displacement.</p>
+<ol>
+<li>Create <code>F_friction = [-25, 0]</code>.</li>
+<li>Create <code>d_block = [8, 0]</code>.</li>
+<li>Calculate <code>work_D_friction = dot(F_friction, d_block)</code>.</li>
+</ol>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Work and Component Resolution)</summary>
+  <div class="hint-content">
+    <p>Mechanical work is the scalar product of force and displacement: $W = \mathbf{F} \cdot \mathbf{d} = \|\mathbf{F}\|\|\mathbf{d}\|\cos\theta$. When resolving force at angle $\theta$, the component doing work along the horizontal displacement is $F_x = \|\mathbf{F}\|\cos\theta$. The vertical component $F_y = \|\mathbf{F}\|\sin\theta$ does zero work because it is perpendicular to displacement!</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Use <code>deg2rad(30)</code> or <code>30 * pi / 180</code> to convert angles. Use <code>dot(F, d)</code> to compute the scalar work.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+F_push = [50, 0];
+d_crate = [10, 0];
+work_A = dot(F_push, d_crate);
+
+% Part B
+theta_rad = deg2rad(30);
+Fx = 80 * cos(theta_rad);
+Fy = 80 * sin(theta_rad);
+F_suitcase = [Fx, Fy];
+d_suitcase = [15, 0];
+work_B = dot(F_suitcase, d_suitcase);
+
+% Part C
+F_crane = [200, 150, 800];
+d_load = [5, -3, 10];
+work_C_3D = dot(F_crane, d_load);
+
+% Part D
+F_friction = [-25, 0];
+d_block = [8, 0];
+work_D_friction = dot(F_friction, d_block);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>work_A</code> must be $50 \times 10 = 500$ Joules.</li>
+  <li><code>work_B</code> is $80 \times \cos(30^\circ) \times 15 = 80 \times 0.8660 \times 15 \approx 1039.2$ Joules.</li>
+  <li><code>work_C_3D</code> is $200(5) + 150(-3) + 800(10) = 1000 - 450 + 8000 = 8550$ Joules.</li>
+  <li><code>work_D_friction</code> must be $-200$ Joules.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>In thermodynamic and energy conservation terms, why is the work done by friction negative ($-200\text{ J}$)? (<em>Answer: Friction removes mechanical kinetic energy from the system, dissipating it into thermal internal energy (heat).</em>)</p>
+</div>

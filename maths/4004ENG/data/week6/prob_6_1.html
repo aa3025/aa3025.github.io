@@ -1,0 +1,142 @@
+<div class="problem-outcomes">
+<h1>Problem 1: Complex Number Basics <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Define complex numbers in MATLAB using Cartesian notation and the <code>1i</code> imaginary unit.</li>
+<li>Execute fundamental complex arithmetic (addition, multiplication, division).</li>
+<li>Extract component parts (real and imaginary components) using <code>real()</code> and <code>imag()</code>.</li>
+<li>Compute the complex conjugate using <code>conj()</code>.</li>
+</ul>
+<h3>Description</h3>
+<p>Complex numbers are used extensively in AC electrical circuits, control engineering, and vibration mechanics. This exercise introduces MATLAB's lexical syntax for manipulating complex variables in the Cartesian plane.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>z1</code>, <code>z2</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 1$ scalars</td>
+      <td>Complex numbers $3 + 4i$ and $1 - 2i$</td>
+    </tr>
+    <tr>
+      <td><code>z_sum</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Sum $z_1 + z_2$</td>
+    </tr>
+    <tr>
+      <td><code>z_prod</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Product $z_1 \times z_2$</td>
+    </tr>
+    <tr>
+      <td><code>z_quot</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Quotient $z_1 / z_2$</td>
+    </tr>
+    <tr>
+      <td><code>real_z1</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Real part of $z_1$ via <code>real(z1)</code></td>
+    </tr>
+    <tr>
+      <td><code>imag_z1</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Imaginary part of $z_1$ via <code>imag(z1)</code></td>
+    </tr>
+    <tr>
+      <td><code>z1_conj</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Complex conjugate $3 - 4i$ via <code>conj(z1)</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Multiply $z_1 = 3 + 4i$ and $z_2 = 1 - 2i$ by hand: $(3)(1) - (4)(-2) + [3(-2) + 4(1)]i = 3 + 8 + (-6 + 4)i = 11 - 2i$. Note that $i^2 = -1$ flips the sign of the product of imaginary parts!
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_6_1.m</code>.</p>
+
+<p><strong>Part A — Define Complex Numbers</strong><br>
+Define two complex numbers: <code>z1 = 3 + 4*1i</code> and <code>z2 = 1 - 2*1i</code>. (Using <code>1i</code> is recommended to avoid collisions with loop variables).</p>
+
+<p><strong>Part B — Arithmetic Operations</strong><br>
+Calculate:</p>
+<ol>
+<li><code>z_sum = z1 + z2</code></li>
+<li><code>z_prod = z1 * z2</code></li>
+<li><code>z_quot = z1 / z2</code></li>
+</ol>
+
+<p><strong>Part C — Real and Imaginary Parts</strong><br>
+Extract the real part <code>real_z1</code> and imaginary part <code>imag_z1</code> of <code>z1</code> using <code>real()</code> and <code>imag()</code>.</p>
+
+<p><strong>Part D — Complex Conjugate</strong><br>
+Calculate the complex conjugate <code>z1_conj</code> of <code>z1</code> using <code>conj()</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Complex Numbers)</summary>
+  <div class="hint-content">
+    <p>A complex number has the form $z = a + bi$ where $i = \sqrt{-1}$. Addition adds real and imaginary components separately. The conjugate is $\bar{z} = a - bi$. Dividing by $z_2$ multiplies numerator and denominator by $\bar{z}_2$: $\frac{z_1}{z_2} = \frac{z_1 \bar{z}_2}{|z_2|^2}$.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>MATLAB natively supports complex numbers without requiring toolboxes. Use <code>1i</code> for the imaginary unit: <code>3 + 4*1i</code>. Built-in functions <code>real(z)</code>, <code>imag(z)</code>, and <code>conj(z)</code> extract components.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+z1 = 3 + 4*1i;
+z2 = 1 - 2*1i;
+
+% Part B
+z_sum = z1 + z2;
+z_prod = z1 * z2;
+z_quot = z1 / z2;
+
+% Part C
+real_z1 = real(z1);
+imag_z1 = imag(z1);
+
+% Part D
+z1_conj = conj(z1);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>z_sum</code> should be $4 + 2i$.</li>
+  <li><code>z_prod</code> should be $11 - 2i$.</li>
+  <li><code>z_quot</code> is $\frac{(3+4i)(1+2i)}{1^2 + (-2)^2} = \frac{-5 + 10i}{5} = -1 + 2i$.</li>
+  <li><code>real_z1</code> is <code>3</code>, <code>imag_z1</code> is <code>4</code>, and <code>z1_conj</code> is $3 - 4i$.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>In AC circuit analysis, why is electrical impedance defined as a complex number $Z = R + jX$? (<em>Answer: The real part represents resistive energy dissipation, and the imaginary reactance represents magnetic and electrostatic energy storage in inductors and capacitors.</em>)</p>
+</div>

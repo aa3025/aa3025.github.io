@@ -1,0 +1,141 @@
+<div class="problem-outcomes">
+<h1>Problem 2: Differentiation Rules <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Apply the Product Rule for functions multiplied together: $(uv)' = u'v + uv'$.</li>
+<li>Apply the Quotient Rule for rational functions: $(u/v)' = \frac{u'v - uv'}{v^2}$.</li>
+<li>Apply the Chain Rule for composite functions: $\frac{d}{dx}f(g(x)) = f'(g(x))g'(x)$.</li>
+<li>Use the <code>simplify()</code> function to clean up complex algebraic expressions.</li>
+</ul>
+<h3>Description</h3>
+<p>In calculus, complex engineering expressions are differentiated by decomposing them using standard rules. While MATLAB applies these rules automatically with <code>diff()</code>, understanding how to structure and simplify symbolic outputs is an essential analytical skill.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>f_prod</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Product function $(x^2+5)\sin(x)$</td>
+    </tr>
+    <tr>
+      <td><code>df_prod</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Derivative via product rule</td>
+    </tr>
+    <tr>
+      <td><code>g_quot</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Quotient function $\frac{3x+1}{x^2-4}$</td>
+    </tr>
+    <tr>
+      <td><code>dg_quot</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Derivative via quotient rule</td>
+    </tr>
+    <tr>
+      <td><code>h_chain</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Composite function $\sqrt{x^3+2x+1}$</td>
+    </tr>
+    <tr>
+      <td><code>dh_chain</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Derivative via chain rule</td>
+    </tr>
+    <tr>
+      <td><code>dg_simplified</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Simplified derivative via <code>simplify(dg_quot)</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Differentiate $f(x) = (x^2+5)\sin(x)$ by hand using the product rule: $u = x^2+5 \implies u'=2x$; $v = \sin(x) \implies v'=\cos(x)$. Combine: $2x\sin(x) + (x^2+5)\cos(x)$.
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_4_2.m</code>. Ensure symbolic variable <code>x</code> is declared.</p>
+
+<p><strong>Part A — Product Rule</strong><br>
+Given $f(x) = (x^2+5)\sin(x)$, store it as <code>f_prod</code> and calculate its derivative <code>df_prod</code> with respect to $x$.</p>
+
+<p><strong>Part B — Quotient Rule</strong><br>
+Given $g(x) = \dfrac{3x+1}{x^2-4}$, store it as <code>g_quot</code> and calculate its derivative <code>dg_quot</code>.</p>
+
+<p><strong>Part C — Chain Rule</strong><br>
+Given $h(x) = \sqrt{x^3+2x+1}$, store it as <code>h_chain</code> and calculate its derivative <code>dh_chain</code>.</p>
+
+<p><strong>Part D — Simplification</strong><br>
+Use <code>simplify()</code> on <code>dg_quot</code> and store the tidied-up algebraic result in <code>dg_simplified</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Differentiation Rules)</summary>
+  <div class="hint-content">
+    <ul>
+      <li><strong>Product Rule:</strong> $\frac{d}{dx}[u(x)v(x)] = u'(x)v(x) + u(x)v'(x)$.</li>
+      <li><strong>Quotient Rule:</strong> $\frac{d}{dx}\left[\frac{u(x)}{v(x)}\right] = \frac{u'(x)v(x) - u(x)v'(x)}{[v(x)]^2}$.</li>
+      <li><strong>Chain Rule:</strong> $\frac{d}{dx}[g(x)]^n = n[g(x)]^{n-1} g'(x)$. For $\sqrt{u}$, the derivative is $\frac{u'}{2\sqrt{u}}$.</li>
+    </ul>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Ensure <code>syms x</code> is active. Write equations with standard parentheses and asterisks: <code>(x^2 + 5)*sin(x)</code>. Call <code>simplify(expr)</code> to gather terms and cancel common factors.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">syms x
+
+% Part A
+f_prod = (x^2 + 5)*sin(x);
+df_prod = diff(f_prod, x);
+
+% Part B
+g_quot = (3*x + 1)/(x^2 - 4);
+dg_quot = diff(g_quot, x);
+
+% Part C
+h_chain = sqrt(x^3 + 2*x + 1);
+dh_chain = diff(h_chain, x);
+
+% Part D
+dg_simplified = simplify(dg_quot);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>df_prod</code> should expand to <code>2*x*sin(x) + (x^2 + 5)*cos(x)</code>.</li>
+  <li><code>dg_simplified</code> combines the numerator into a single quadratic polynomial over $(x^2 - 4)^2$.</li>
+  <li><code>dh_chain</code> will have denominator $2\sqrt{x^3 + 2x + 1}$ and numerator $3x^2 + 2$.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>When analyzing damped harmonic vibration $x(t) = e^{-\zeta \omega_n t} \cos(\omega_d t)$, why is the product rule essential for calculating the instantaneous velocity? (<em>Answer: The decaying envelope $e^{-\zeta \omega_n t}$ and the oscillating carrier $\cos(\omega_d t)$ both vary continuously with time $t$.</em>)</p>
+</div>

@@ -1,0 +1,274 @@
+<h1>Week 5: Integration &amp; Applications</h1>
+
+<h2>Why This Matters in Engineering</h2>
+<p>Integration is the mathematical engine for calculating accumulated physical quantities over continuous space and time. In mechanical and civil engineering, integrating distributed loads across a beam yields total shear and moment; integrating non-constant pressure distributions across an aerofoil gives total aerodynamic lift; and integrating force over a displacement path determines the mechanical work done ($W = \int F(x)\,dx$). In fluid dynamics and electrical engineering, integration calculates total volumetric flow from varying flow rates and total stored electrical charge from current waveforms ($Q = \int i(t)\,dt$).</p>
+<p>In this module, you will learn when to use <strong>symbolic integration</strong> (<code>int</code>) to obtain exact closed-form algebraic formulas, and when to use <strong>numerical integration</strong> (<code>integral</code>) for experimental datasets or non-integrable functions.</p>
+
+<hr>
+
+<!-- Self-Study & 2-Hour Delivery Wrapper -->
+<div class="route-schedule-card">
+  <h3><i data-lucide="clock"></i> Recommended 2-Hour Lab &amp; Self-Study Route</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Phase</th>
+        <th>Time</th>
+        <th>Focus Activity</th>
+        <th>Key Milestones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Before the Lab</strong></td>
+        <td>15 min</td>
+        <td>Review the "Symbolic vs Numerical" decision guide &amp; readiness check below</td>
+        <td>Understand when to use <code>int()</code> vs <code>integral()</code></td>
+      </tr>
+      <tr>
+        <td><strong>Live Block 1</strong></td>
+        <td>45 min</td>
+        <td><strong>Problem 1</strong> <span class="badge-tag badge-core">Live Core</span> &amp; <strong>Problem 2</strong> <span class="badge-tag badge-core">Live Core</span></td>
+        <td>Symbolic indefinite/definite integrals, substitution, and integration by parts</td>
+      </tr>
+      <tr>
+        <td><strong>Live Block 2</strong></td>
+        <td>40 min</td>
+        <td><strong>Problem 3</strong> <span class="badge-tag badge-core">Live Core</span> + Live Troubleshooting</td>
+        <td>Numerical integration using <code>integral()</code> with element-wise function handles</td>
+      </tr>
+      <tr>
+        <td><strong>After the Lab</strong></td>
+        <td>20 min</td>
+        <td><strong>Problem 4</strong> <span class="badge-tag badge-consolidation">Consolidation</span> &amp; <strong>Problem 5</strong> <span class="badge-tag badge-stretch">Stretch</span></td>
+        <td>Area between curves with <code>solve()</code> bounds, variable force work done, Grader submission</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="readiness-card">
+  <h3><i data-lucide="check-square"></i> Before You Begin: Prerequisites &amp; Readiness Check</h3>
+  <ul>
+    <li><strong>Mathematical Prerequisites:</strong> Antiderivatives (e.g. $\int x^n dx = \frac{x^{n+1}}{n+1}$), the Fundamental Theorem of Calculus ($\int_a^b f(x)dx = F(b) - F(a)$), and integration by parts.</li>
+    <li><strong>Toolbox Prerequisite:</strong> Symbolic Math Toolbox (run <code>ver('symbolic')</code> to verify).</li>
+    <li><strong>Required Files:</strong> Starter files <code>prob_5_1.m</code> through <code>prob_5_5.m</code> in your active working directory.</li>
+  </ul>
+
+  <h4>Quick Formative Checks</h4>
+  <details class="staged-hint hint-concept">
+    <summary class="hint-header">Readiness Check 1: Indefinite Integration &amp; the Constant of Integration</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> Why does MATLAB's <code>int(cos(x), x)</code> return <code>sin(x)</code> rather than <code>sin(x) + C</code>?</p>
+      <p><strong>Answer:</strong> MATLAB's symbolic engine sets the arbitrary constant of integration $C = 0$ by convention. When applying indefinite integrals to engineering boundary conditions, you must add and solve for the constant $C$ manually.</p>
+    </div>
+  </details>
+
+  <details class="staged-hint hint-matlab">
+    <summary class="hint-header">Readiness Check 2: Choosing Symbolic vs Numerical Integration</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> When should you choose <code>integral()</code> over <code>int()</code>?</p>
+      <p><strong>Answer:</strong> Use <code>integral()</code> when the function has no closed-form antiderivative (e.g. Gaussian $e^{-x^2}$), when integrating over semi-infinite numerical domains, or when evaluating experimental/sampled data. Always use element-wise operators (<code>.*</code>, <code>./</code>, <code>.^</code>) inside the anonymous function handle passed to <code>integral()</code>.</p>
+    </div>
+  </details>
+</div>
+
+<hr>
+
+<h2>Learning Objectives</h2>
+<p>By the end of this lab, you should be able to:</p>
+<ul>
+  <li>Perform indefinite and definite symbolic integration using <code>int()</code>.</li>
+  <li>Apply advanced analytical integration techniques (substitution, parts, rational partial fractions).</li>
+  <li>Perform adaptive numerical quadrature using <code>integral()</code> and anonymous function handles.</li>
+  <li>Calculate and visualize geometric area under curves and between intersecting curves.</li>
+  <li>Compare analytical and numerical integration results within an explicit error tolerance.</li>
+  <li>Calculate total physical work done by variable force distributions in engineering systems.</li>
+</ul>
+
+<hr>
+
+<h2>Quick Reference: Integration in MATLAB</h2>
+
+<h3>Symbolic vs Numerical Decision Guide</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Symbolic: <code>int()</code></th>
+      <th>Numerical: <code>integral()</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Input Type</strong></td>
+      <td>Symbolic expression (<code>syms x; f = ...</code>)</td>
+      <td>Anonymous function handle (<code>f = @(x) ...</code>)</td>
+    </tr>
+    <tr>
+      <td><strong>Syntax</strong></td>
+      <td><code>int(f, x, a, b)</code></td>
+      <td><code>integral(f, a, b)</code></td>
+    </tr>
+    <tr>
+      <td><strong>Result</strong></td>
+      <td>Exact mathematical formula or exact fraction</td>
+      <td>IEEE double floating-point scalar</td>
+    </tr>
+    <tr>
+      <td><strong>Best Used For</strong></td>
+      <td>Deriving analytical equations, antiderivatives</td>
+      <td>Complex integrands with no known antiderivative</td>
+    </tr>
+    <tr>
+      <td><strong>Element-Wise Requirement</strong></td>
+      <td>Not strictly required (symbolic algebra)</td>
+      <td><strong>Strictly required</strong> (<code>.*</code>, <code>./</code>, <code>.^</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>Worked Examples</h2>
+
+<h3>Example 1: Indefinite and Definite Symbolic Integration</h3>
+<pre><code class="language-matlab">syms x
+f = 3*x^2 + 2*x + 1;
+
+% Indefinite integral (returns x^3 + x^2 + x)
+F_indef = int(f, x);
+
+% Definite integral from x = 1 to x = 4
+I_def = int(f, x, 1, 4);
+I_num = double(I_def);   % Returns: 78
+</code></pre>
+
+<h3>Example 2: Integration by Parts</h3>
+<pre><code class="language-matlab">syms x
+g = x * exp(-2*x);
+
+% int() handles integration by parts automatically
+G = int(g, x);           % Returns: -exp(-2*x)*(2*x + 1)/4
+</code></pre>
+
+<h3>Example 3: Numerical Integration of a Non-Elementary Function</h3>
+<pre><code class="language-matlab">% Error function integrand: f(x) = exp(-x^2)
+% MUST use element-wise .^ in function handle!
+f_anon = @(x) exp(-x.^2);
+
+% Integrate from 0 to Inf
+I_gaussian = integral(f_anon, 0, Inf);  % Returns: 0.8862 (sqrt(pi)/2)
+</code></pre>
+
+<h3>Example 4: Area Between Two Curves</h3>
+<pre><code class="language-matlab">syms x
+y_top = 2*x;
+y_bottom = x^2;
+
+% Find intersection points analytically
+pts = solve(y_top == y_bottom, x);   % [0; 2]
+x_a = min(double(pts));
+x_b = max(double(pts));
+
+% Area is integral of (top - bottom)
+A_sym = int(y_top - y_bottom, x, x_a, x_b);
+A_val = double(A_sym);               % Returns: 1.3333 (4/3)
+</code></pre>
+
+<div class="prediction-prompt">
+  <strong>Prediction Check:</strong> Why must you subtract $(y_{\text{top}} - y_{\text{bottom}})$? If you reversed them, the integral would yield $-1.3333$. Physical area is always non-negative!
+</div>
+
+<h3>Example 5: Work from Variable Force</h3>
+<pre><code class="language-matlab">syms x
+% Force varies inversely with position: F(x) = 150 / (2 + x)
+F = 150 / (2 + x);
+
+% Work done from x = 0 m to x = 10 m
+W_sym = int(F, x, 0, 10);
+W_joules = double(W_sym);            % Returns: 268.7 Joules
+</code></pre>
+
+<hr>
+
+<h2>Problems in This Module</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Route Category</th>
+      <th>Starter File</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Problem 1</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span></td>
+      <td><code>prob_5_1.m</code></td>
+      <td>Basic symbolic indefinite and definite integrals using <code>int()</code></td>
+    </tr>
+    <tr>
+      <td><strong>Problem 2</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span></td>
+      <td><code>prob_5_2.m</code></td>
+      <td>Advanced forms: substitution, integration by parts, and rational functions</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 3</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span></td>
+      <td><code>prob_5_3.m</code></td>
+      <td>Numerical integration using <code>integral()</code> and anonymous functions</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 4</strong></td>
+      <td><span class="badge-tag badge-consolidation">Independent Consolidation</span></td>
+      <td><code>prob_5_4.m</code></td>
+      <td>Calculating geometric area between curves using <code>solve()</code> for bounds</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 5</strong></td>
+      <td><span class="badge-tag badge-stretch">Optional Stretch</span></td>
+      <td><code>prob_5_5.m</code></td>
+      <td>Engineering work done by non-linear and variable force distributions</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- REMOTE LAB HELP BOX -->
+<div class="remote-help-card">
+  <h3><i data-lucide="help-circle"></i> Remote Lab Help: Integration Pitfalls</h3>
+  <ul>
+    <li><strong>"Error using integral / Operands must be the same size":</strong> You forgot element-wise operators in your function handle. Change <code>@(x) x*sin(x)</code> to <code>@(x) x.*sin(x)</code> and <code>x^2</code> to <code>x.^2</code>.</li>
+    <li><strong>Indefinite vs Definite output:</strong> <code>int(f, x)</code> returns a symbolic expression (formula). <code>int(f, x, a, b)</code> returns a single scalar number.</li>
+    <li><strong>Comparing Symbolic vs Numerical results:</strong> Compare using an explicit tolerance:
+      <pre><code class="language-matlab">is_match = abs(double(val_sym) - val_num) &lt; 1e-6;</code></pre>
+    </li>
+    <li><strong>Negative area result:</strong> Check which function is upper on the interval. If curves cross, you must split the integral at the intersection points!</li>
+  </ul>
+
+  <h4>Standard Teams Help Request Template</h4>
+  <pre><code class="language-text">Problem: Week 5 Problem 3
+Part: Part A (Numerical integral)
+Command that failed: result = integral(@(x) exp(-x^2), 0, 5);
+Exact Error: Operands to the || and && operators must be convertible to logical scalar values...
+What I expected: A scalar numerical integral around 0.88.
+What I already tried: Fixed by changing x^2 to x.^2 (element-wise power).</code></pre>
+</div>
+
+<hr>
+
+<!-- COMPLETION CHECKLIST -->
+<div class="checklist-card" style="border-left: 4px solid #10b981;">
+  <h3><i data-lucide="award"></i> Completion Criteria: You are ready for Week 6 if...</h3>
+  <ul style="list-style: none; padding-left: 0;">
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>1.</strong> You can perform indefinite and definite symbolic integrals with <code>int()</code>.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>2.</strong> You know when to use <code>integral()</code> and can construct valid vectorized function handles.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>3.</strong> You can find curve intersection points and compute bounded enclosed areas.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>4.</strong> You can compute total work done by non-constant forces.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>5.</strong> You have submitted the Week 5 MATLAB Grader questions.</li>
+  </ul>
+</div>

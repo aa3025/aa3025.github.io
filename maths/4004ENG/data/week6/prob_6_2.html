@@ -1,0 +1,129 @@
+<div class="problem-outcomes">
+<h1>Problem 2: Polar and Exponential Forms <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Calculate the modulus (magnitude $r$) and argument (phase $\theta$) of a complex number using <code>abs()</code> and <code>angle()</code>.</li>
+<li>Convert phase angles between radians and degrees using <code>rad2deg()</code>.</li>
+<li>Represent and reconstruct complex numbers in exponential polar form using Euler's formula ($z = r e^{i\theta}$).</li>
+<li>Compute integer powers of complex numbers using De Moivre's theorem ($z^n = r^n e^{in\theta}$).</li>
+</ul>
+<h3>Description</h3>
+<p>In AC circuits and frequency response modeling, engineering quantities are usually expressed in polar/phasor coordinates (magnitude and phase angle). This exercise demonstrates how to convert between Cartesian and exponential polar forms in MATLAB.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>z</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Complex number $-1 + 1i$</td>
+    </tr>
+    <tr>
+      <td><code>r</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Modulus $|z| = \sqrt{a^2 + b^2}$ via <code>abs(z)</code></td>
+    </tr>
+    <tr>
+      <td><code>theta</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Phase angle in radians via <code>angle(z)</code></td>
+    </tr>
+    <tr>
+      <td><code>theta_deg</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Phase angle in degrees via <code>rad2deg(theta)</code></td>
+    </tr>
+    <tr>
+      <td><code>z_exp</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Reconstructed complex number $r e^{i\theta}$</td>
+    </tr>
+    <tr>
+      <td><code>z5</code></td>
+      <td>double (complex)</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Fifth power $z^5$</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> For $z = -1 + 1i$, since $\text{Re}(z) = -1 &lt; 0$ and $\text{Im}(z) = +1 &gt; 0$, in which quadrant of the complex plane does $z$ lie? (Quadrant II: $\theta = 135^\circ$ or $3\pi/4 \approx 2.356$ radians).
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_6_2.m</code>.</p>
+
+<p><strong>Part A — Magnitude and Phase</strong><br>
+Given $z = -1+1i$, store it as <code>z</code> and calculate its magnitude <code>r</code> (using <code>abs()</code>) and phase angle <code>theta</code> in radians (using <code>angle()</code>).</p>
+
+<p><strong>Part B — Convert to Degrees</strong><br>
+Convert <code>theta</code> to degrees, storing the result in <code>theta_deg</code> using <code>rad2deg()</code>.</p>
+
+<p><strong>Part C — Exponential Form</strong><br>
+Reconstruct the complex number using Euler's formula, $z = re^{i\theta}$, storing the result in <code>z_exp = r * exp(1i * theta)</code>.</p>
+
+<p><strong>Part D — Powers via De Moivre's Theorem</strong><br>
+Calculate <code>z5 = z^5</code>, and observe how easily powers are calculated once a complex number is expressed in exponential form.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Euler's Formula &amp; Polar Form)</summary>
+  <div class="hint-content">
+    <p>Every complex number can be written as $z = a + bi = r(\cos\theta + i\sin\theta) = r e^{i\theta}$, where $r = \sqrt{a^2 + b^2}$ and $\theta = \text{atan2}(b, a)$. Raising to a power $n$ yields $(re^{i\theta})^n = r^n e^{in\theta}$.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Use <code>abs(z)</code> for magnitude and <code>angle(z)</code> for phase (returns radians in $[-\pi, \pi]$). Convert using <code>rad2deg(theta)</code>. Reconstruct using <code>r * exp(1i * theta)</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+z = -1 + 1*1i;
+r = abs(z);
+theta = angle(z);
+
+% Part B
+theta_deg = rad2deg(theta);
+
+% Part C
+z_exp = r * exp(1i * theta);
+
+% Part D
+z5 = z^5;</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>r</code> is $\sqrt{(-1)^2 + 1^2} = \sqrt{2} \approx 1.4142$.</li>
+  <li><code>theta</code> should be $3\pi/4 \approx 2.3562$ radians, and <code>theta_deg</code> must equal $135.0^\circ$.</li>
+  <li><code>abs(z - z_exp)</code> must be less than $10^{-14}$.</li>
+  <li>Using De Moivre: $z^5 = (\sqrt{2})^5 e^{i(5 \times 135^\circ)} = 4\sqrt{2} e^{i(675^\circ)} = 4\sqrt{2} e^{-i(45^\circ)} = 4 - 4i$. Check that <code>z5</code> equals $4 - 4i$!</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>Why do electrical engineers convert sinusoidal voltages $v(t) = V_m \cos(\omega t + \phi)$ into complex phasors $\mathbf{V} = V_m e^{i\phi}$ when solving RLC circuits? (<em>Answer: It transforms differential equations into simple complex algebraic multiplications.</em>)</p>
+</div>

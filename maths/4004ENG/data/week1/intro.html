@@ -1,0 +1,312 @@
+<h1>Week 1: Introduction &amp; MATLAB Onboarding</h1>
+
+<h2>Why This Matters in Engineering</h2>
+<p>Modern engineering problems quickly outgrow pencil-and-paper arithmetic. Whether you are calculating aerodynamic drag on an aircraft wing, designing electrical filters, analyzing truss stresses in civil engineering, or processing sensor telemetry in robotics, <strong>MATLAB</strong> (MATrix LABoratory) provides the computational foundation used across industry and research worldwide.</p>
+<p>This onboarding session equips you with the environment navigation, command syntax, variable management, and scripting habits essential for all subsequent PC labs and the <strong>MATLAB Core Assignment</strong>.</p>
+
+<hr>
+
+<!-- Self-Study & Remote Delivery Wrapper -->
+<div class="route-schedule-card">
+  <h3><i data-lucide="clock"></i> Recommended 2-Hour Lab &amp; Self-Study Route</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Phase</th>
+        <th>Time</th>
+        <th>Focus Activities</th>
+        <th>Key Milestones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Before the Lab</strong></td>
+        <td>15 min</td>
+        <td>Verify MATLAB Online login and read the interface overview</td>
+        <td>MATLAB desktop loads cleanly in browser/desktop</td>
+      </tr>
+      <tr>
+        <td><strong>Live Block 1</strong></td>
+        <td>45 min</td>
+        <td>Command Window, Workspace, Calculator arithmetic, Variable naming</td>
+        <td>Assign and manipulate variables; understand case-sensitivity</td>
+      </tr>
+      <tr>
+        <td><strong>Live Block 2</strong></td>
+        <td>40 min</td>
+        <td>Creating scripts (<code>.m</code> files), output suppression, "Break &amp; Repair" exercise</td>
+        <td>Save, run, break, and fix your first engineering script</td>
+      </tr>
+      <tr>
+        <td><strong>After the Lab</strong></td>
+        <td>20 min</td>
+        <td>Review reference formats, start <strong>MATLAB Onramp</strong> course</td>
+        <td>Earn certificate for Aula submission; ready for Week 2 vectors</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="readiness-card">
+  <h3><i data-lucide="check-square"></i> Before You Begin: Prerequisites &amp; Readiness Check</h3>
+  <ul>
+    <li><strong>Mathematical Knowledge:</strong> Standard arithmetic precedence (BODMAS / PEMDAS), basic algebra, and familiarity with powers and roots.</li>
+    <li><strong>MATLAB Prerequisites:</strong> None! No prior coding experience is assumed.</li>
+    <li><strong>Required Software:</strong> MATLAB Online (<a href="https://matlab.mathworks.com" target="_blank" rel="noopener">matlab.mathworks.com</a>) using your Coventry University single sign-on, or local MATLAB desktop (R2022a or newer).</li>
+    <li><strong>Working Directory:</strong> Create a dedicated folder in your MATLAB drive called <code>4004ENG_Labs</code> to store your work.</li>
+  </ul>
+
+  <h4>Quick Formative Checks</h4>
+  <details class="staged-hint hint-concept">
+    <summary class="hint-header">Readiness Check 1: Arithmetic Precedence</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> Predict the output of <code>2 + 3 * 4^2</code> before typing it into MATLAB.</p>
+      <p><strong>Answer:</strong> <code>50</code>. MATLAB evaluates powers first ($4^2 = 16$), then multiplication ($3 \times 16 = 48$), then addition ($2 + 48 = 50$).</p>
+    </div>
+  </details>
+
+  <details class="staged-hint hint-matlab">
+    <summary class="hint-header">Readiness Check 2: Variable Assignment Syntax</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> Which of the following commands assigns the value 10 to a variable named <code>velocity</code>?<br>
+      <code>A) 10 = velocity</code> &nbsp;&nbsp;|&nbsp;&nbsp; <code>B) velocity = 10;</code> &nbsp;&nbsp;|&nbsp;&nbsp; <code>C) velocity == 10</code></p>
+      <p><strong>Answer:</strong> <strong>B</strong>. In MATLAB, assignment always places the variable on the left and the value/expression on the right. <code>A</code> produces a syntax error, and <code>C</code> is a relational equality test.</p>
+    </div>
+  </details>
+</div>
+
+<hr>
+
+<h2>Learning Objectives</h2>
+<p>By the end of this session, you should be able to:</p>
+<ul>
+  <li>Navigate the MATLAB desktop (Current Folder, Command Window, Workspace, Editor).</li>
+  <li>Use the Command Window as an interactive engineering calculator.</li>
+  <li>Create, assign, inspect, and clear variables in memory.</li>
+  <li>Adhere to MATLAB variable naming conventions and respect case sensitivity.</li>
+  <li>Suppress unwanted console output using semicolons.</li>
+  <li>Write, save, and execute MATLAB script files (<code>.m</code>).</li>
+  <li>Diagnose and repair common syntax and naming errors.</li>
+  <li>Access MATLAB documentation using <code>help</code>, <code>doc</code>, and <code>F1</code>.</li>
+</ul>
+
+<hr>
+
+<!-- PART 1: ESSENTIAL FOR TODAY -->
+<div style="border-left: 4px solid #10b981; padding-left: 14px; margin: 24px 0;">
+  <h2 style="color: #10b981; margin-top: 0;">Part 1: Essential for Today (Live PC Lab Core)</h2>
+  <p>Master these core concepts during the 2-hour lab. These are directly required for all weekly problem sheets.</p>
+</div>
+
+<h3>The MATLAB Environment</h3>
+<p>When MATLAB opens, four primary panels organize your work:</p>
+<p><img src="data/week1/img/matlab_desktop.png" alt="MATLAB Desktop Layout"></p>
+
+<ol>
+  <li><strong>Current Folder:</strong> Shows files in your current working directory. Always verify that your active script is saved here.</li>
+  <li><strong>Command Window:</strong> Interactive console prompt (<code>&gt;&gt;</code>) for quick calculations, testing commands, and displaying outputs.</li>
+  <li><strong>Workspace:</strong> Memory monitor showing all active variables, their names, current values, sizes, and classes.</li>
+  <li><strong>Editor:</strong> Text editor where you create and edit reusable MATLAB script files (<code>.m</code>).</li>
+</ol>
+
+<h3>MATLAB as a Calculator</h3>
+<p>MATLAB evaluates standard arithmetic operations following algebraic precedence:</p>
+<pre><code class="language-matlab">2 + 3       % Addition -> 5
+5 - 2       % Subtraction -> 3
+4 * 7       % Multiplication -> 28
+10 / 4      % Division -> 2.5
+2^8         % Exponentiation -> 256
+</code></pre>
+
+<div class="prediction-prompt">
+  <strong>Prediction Check:</strong> Why does <code>2 + 3 * 4</code> equal <code>14</code> rather than <code>20</code>?
+</div>
+
+<h3>Variables and Assignment</h3>
+<p>Store computational results into memory using the assignment operator (<code>=</code>):</p>
+<pre><code class="language-matlab">x = 10;
+y = 5;
+z = x + y   % Displays: z = 15
+</code></pre>
+
+<h4>Case Sensitivity (Critical Grader Gotcha)</h4>
+<p>MATLAB is strictly <strong>case-sensitive</strong>. <code>speed</code>, <code>Speed</code>, and <code>SPEED</code> are three entirely different variables:</p>
+<pre><code class="language-matlab">mass = 12.5;
+Mass = 25.0;
+% Checking Workspace confirms both variables exist independently!
+</code></pre>
+<p><img src="data/week1/img/case_sensitive_variables.png" alt="Case Sensitive Variables"></p>
+
+<h4>Variable Naming Rules</h4>
+<ul>
+  <li>Must begin with a <strong>letter</strong> (e.g. <code>velocity</code>, <code>v1</code>).</li>
+  <li>Can contain letters, numbers, and underscores (e.g. <code>force_net_2</code>).</li>
+  <li><strong>Cannot</strong> start with a number (<code>2velocity</code> is INVALID).</li>
+  <li><strong>Cannot</strong> contain spaces or special punctuation (<code>force value</code> and <code>rate%</code> are INVALID).</li>
+  <li><strong>Cannot</strong> overwrite built-in keywords (avoid naming variables <code>sin</code>, <code>cos</code>, <code>pi</code>, <code>i</code>, <code>j</code>).</li>
+</ul>
+
+<h3>Suppressing Output with Semicolons</h3>
+<p>Ending a statement with a semicolon (<code>;</code>) executes the calculation silently without printing the result to the Command Window:</p>
+<pre><code class="language-matlab">v = 25;       % Output suppressed (Workspace updated silently)
+v = 25        % Output echoed to Command Window: v = 25
+</code></pre>
+<p><em>Best Practice:</em> In script files, always terminate lines with semicolons unless you explicitly intend to print a value.</p>
+
+<h3>Managing Workspace and Screen</h3>
+<pre><code class="language-matlab">clear x        % Removes variable 'x' from Workspace
+clear all      % Removes ALL variables from Workspace (resets memory)
+clc            % Clears the Command Window text (does NOT delete variables)
+</code></pre>
+
+<h3>Working with Scripts (<code>.m</code> Files)</h3>
+<p>Commands entered directly in the Command Window are temporary. To create permanent, repeatable calculations, create a <strong>Script</strong>:</p>
+<ol>
+  <li>Click <strong>New Script</strong> on the Home tab (or press <code>Ctrl+N</code> / <code>Cmd+N</code>).</li>
+  <li>Type your commands, comments, and formulas.</li>
+  <li>Save the file with a valid name (e.g. <code>lab1_intro.m</code>).</li>
+  <li>Click <strong>Run</strong> (or press <code>F5</code>) to execute the entire script.</li>
+</ol>
+
+<pre><code class="language-matlab">% =========================================================
+% 4004ENG Lab 1: First Engineering Script
+% Calculates kinetic energy of an accelerating vehicle
+% =========================================================
+clear all; clc;
+
+mass = 1200;            % Vehicle mass in kg
+velocity = 28.5;        % Velocity in m/s
+
+% Formula: KE = 0.5 * m * v^2
+kinetic_energy = 0.5 * mass * velocity^2;
+
+fprintf('Kinetic Energy: %.2f Joules\n', kinetic_energy);
+</code></pre>
+
+<!-- Break and Repair Exercise -->
+<div class="readiness-card" style="border-left: 4px solid #f59e0b;">
+  <h3><i data-lucide="wrench"></i> Diagnostic Activity: Break and Repair Your Code</h3>
+  <p>To master MATLAB troubleshooting, type each deliberate bug below into a script and observe the exact error message MATLAB produces:</p>
+  <ol>
+    <li>
+      <strong>Bug 1 (Case Sensitivity):</strong>
+      <pre><code class="language-matlab">time = 10;
+distance = 50;
+Speed = Distance / Time;  % Notice capital D and T!</code></pre>
+      <p><em>Error:</em> <code>Unrecognized function or variable 'Distance'.</code><br>
+      <em>Fix:</em> Change <code>Distance / Time</code> to <code>distance / time</code>.</p>
+    </li>
+    <li>
+      <strong>Bug 2 (Implicit Multiplication):</strong>
+      <pre><code class="language-matlab">a = 4;
+b = 2(a + 3);             % In algebra this means 2*(a+3)</code></pre>
+      <p><em>Error:</em> <code>Invalid expression. When calling a function or indexing a variable, use parentheses. Otherwise, use explicit operations.</code><br>
+      <em>Fix:</em> MATLAB requires explicit <code>*</code>: <code>2 * (a + 3)</code>.</p>
+    </li>
+    <li>
+      <strong>Bug 3 (Invalid Variable Name):</strong>
+      <pre><code class="language-matlab">1st_reading = 9.81;</code></pre>
+      <p><em>Error:</em> <code>Invalid expression. Check for missing multiplication operator, missing or unbalanced delimiters...</code><br>
+      <em>Fix:</em> Variable names cannot start with a digit. Rename to <code>reading_1st</code> or <code>reading_1</code>.</p>
+    </li>
+  </ol>
+</div>
+
+<hr>
+
+<!-- PART 2: REFERENCE FOR LATER -->
+<div style="border-left: 4px solid #38bdf8; padding-left: 14px; margin: 24px 0;">
+  <h2 style="color: #38bdf8; margin-top: 0;">Part 2: Reference for Later (Data Types &amp; Formats)</h2>
+  <p>Consult this reference material as needed during subsequent weeks.</p>
+</div>
+
+<h3>Numerical Data Types</h3>
+<p>By default, every number in MATLAB is stored as a <strong>double</strong> (64-bit IEEE double-precision floating point), offering approximately 15–17 significant decimal digits of precision.</p>
+
+<h3>Output Display Formats</h3>
+<p>The <code>format</code> command changes how numbers are displayed in the Command Window; <em>it does not change how they are stored in memory</em>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Example (<code>x = 2/3</code>)</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>format short</code></td>
+      <td><code>0.6667</code></td>
+      <td>Default: 4 decimal digits after the point</td>
+    </tr>
+    <tr>
+      <td><code>format long</code></td>
+      <td><code>0.666666666666667</code></td>
+      <td>Full 15 decimal digits precision display</td>
+    </tr>
+    <tr>
+      <td><code>format bank</code></td>
+      <td><code>0.67</code></td>
+      <td>Currency/2-digit decimal format</td>
+    </tr>
+    <tr>
+      <td><code>format rat</code></td>
+      <td><code>2/3</code></td>
+      <td>Rational fraction approximation</td>
+    </tr>
+    <tr>
+      <td><code>format shortEng</code></td>
+      <td><code>666.6667e-003</code></td>
+      <td>Engineering notation (exponent is multiple of 3)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Text Storage: Character Arrays vs Strings</h3>
+<ul>
+  <li><strong>Character Array (single quotes):</strong> <code>tag = 'Sensor_A';</code> &mdash; Each character is an element in an array (e.g. <code>tag(1)</code> is <code>'S'</code>).</li>
+  <li><strong>String (double quotes):</strong> <code>msg = "Sensor_A";</code> &mdash; Treated as a single unified text scalar.</li>
+</ul>
+
+<h3>Help and Documentation Tools</h3>
+<pre><code class="language-matlab">help norm      % Quick command-line summary and syntax in Command Window
+doc norm       % Opens full documentation window with worked examples
+</code></pre>
+<p><em>Pro Tip:</em> Select any function name in the Editor or Command Window and press <strong>F1</strong> to open context-sensitive documentation immediately.</p>
+
+<hr>
+
+<!-- REMOTE LAB HELP BOX -->
+<div class="remote-help-card">
+  <h3><i data-lucide="help-circle"></i> Remote Lab Help &amp; Troubleshooting (Microsoft Teams)</h3>
+  <p>Working remotely during the PC lab? Here is how to diagnose and resolve immediate setup issues:</p>
+  <ul>
+    <li><strong>MATLAB Online session disconnected:</strong> Refresh your browser and log back in at <a href="https://matlab.mathworks.com" target="_blank" rel="noopener">matlab.mathworks.com</a>. Files saved in MATLAB Drive are automatically preserved.</li>
+    <li><strong>"Undefined function or variable":</strong> Check spelling and exact upper/lowercase capitalization. Ensure the variable was actually assigned earlier in the session.</li>
+    <li><strong>Script does not execute:</strong> Make sure the script is saved in the Current Folder displayed on the left panel.</li>
+    <li><strong>Command Window not accepting input:</strong> Check if a small "Busy" label is visible in the bottom-left status bar. Press <code>Ctrl+C</code> to interrupt any hanging loop.</li>
+  </ul>
+
+  <h4>Standard Teams Help Request Template</h4>
+  <p>When asking your lab tutor for help in Microsoft Teams, copy and fill out this standard template:</p>
+  <pre><code class="language-text">Week / Activity: Week 1 Onboarding / Script Exercise
+Command or Line that failed: kinetic_energy = 0.5 * mass * velocity^2;
+Exact Error Message: Unrecognized function or variable 'velocity'.
+What I expected: A kinetic energy value in Joules.
+What I already tried: Checked spelling in Workspace; noticed I named it 'Velocity' with capital V.</code></pre>
+</div>
+
+<hr>
+
+<!-- COMPLETION CHECKLIST -->
+<div class="checklist-card" style="border-left: 4px solid #10b981;">
+  <h3><i data-lucide="award"></i> Completion Criteria: You are ready for Week 2 if...</h3>
+  <ul style="list-style: none; padding-left: 0;">
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>1.</strong> You can log into MATLAB Online and locate the Current Folder, Command Window, Workspace, and Editor.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>2.</strong> You can create and assign variables, and explain why <code>my_var</code> and <code>My_Var</code> are distinct.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>3.</strong> You use semicolons to suppress output in scripts.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>4.</strong> You can save a <code>.m</code> script and run it cleanly to produce numerical results.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>5.</strong> You have accessed <a href="https://matlabacademy.mathworks.com/details/matlab-onramp/gettingstarted" target="_blank" rel="noopener">MATLAB Onramp</a> to begin earning your course certificate for Aula submission.</li>
+  </ul>
+</div>

@@ -1,0 +1,135 @@
+<div class="problem-outcomes">
+<h1>Problem 3: Numerical Integration <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Construct vectorized anonymous functions using <code>@(x)</code> syntax with element-wise operators.</li>
+<li>Perform numerical quadrature using MATLAB's global adaptive solver <code>integral()</code>.</li>
+<li>Evaluate improper integrals with semi-infinite upper integration limits (<code>Inf</code>).</li>
+<li>Compare analytical symbolic results with numerical results within machine tolerance.</li>
+</ul>
+<h3>Description</h3>
+<p>When physical integrand expressions cannot be solved analytically in closed form, numerical integration provides high-accuracy approximations using adaptive quadrature. In this problem, you will use <code>integral()</code> and compare its efficiency against symbolic methods.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>f_num</code></td>
+      <td>function_handle</td>
+      <td>handle</td>
+      <td>Vectorized anonymous function <code>@(x) exp(-x.^2) .* cos(x)</code></td>
+    </tr>
+    <tr>
+      <td><code>result_0_2</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Definite numerical integral from $x=0$ to $2$</td>
+    </tr>
+    <tr>
+      <td><code>result_inf</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Improper numerical integral from $x=0$ to $\infty$ (<code>Inf</code>)</td>
+    </tr>
+    <tr>
+      <td><code>x</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Symbolic variable declaration</td>
+    </tr>
+    <tr>
+      <td><code>f_sym</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Symbolic expression $\exp(-x^2)\cos(x)$</td>
+    </tr>
+    <tr>
+      <td><code>result_sym</code></td>
+      <td>sym / double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Symbolic integral of <code>f_sym</code> from $0$ to $2$</td>
+    </tr>
+    <tr>
+      <td><code>diff_val</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Absolute difference <code>abs(double(result_sym) - result_0_2)</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> How does MATLAB's <code>integral()</code> handle an infinite limit <code>Inf</code>? Rather than stepping infinitely, it applies mathematical coordinate transformations (e.g. $x = t / (1-t)$) that map $[0, \infty)$ onto a compact interval $[0, 1)$.
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_5_3.m</code>.</p>
+
+<p><strong>Part A — Define an Anonymous Function</strong><br>
+Create a function handle <code>f_num</code> for $f(x) = e^{-x^2}\cos(x)$, using element-wise operators (<code>.^</code>, <code>.*</code>).</p>
+
+<p><strong>Part B — Numerical Integration</strong><br>
+Calculate <code>result_0_2</code>, the definite integral of <code>f_num</code> from $x=0$ to $x=2$, using the <code>integral()</code> function.</p>
+
+<p><strong>Part C — Improper Integral</strong><br>
+Use <code>integral()</code> to find <code>result_inf</code>, the area under <code>f_num</code> from $x=0$ to $x=\infty$ (use <code>Inf</code> for the upper limit).</p>
+
+<p><strong>Part D — Compare with the Symbolic Method</strong><br>
+Define <code>x</code> as symbolic, rebuild the same function as <code>f_sym</code>, and calculate the same integral from $x=0$ to $2$ symbolically as <code>result_sym</code>. Calculate <code>diff_val</code>, the difference between <code>double(result_sym)</code> and <code>result_0_2</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Numerical Quadrature)</summary>
+  <div class="hint-content">
+    <p>Adaptive quadrature estimates $\int_a^b f(x)dx$ by sampling the integrand at dynamically spaced points, concentrating evaluation nodes where the function exhibits sharp curvature or rapid oscillations.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Always include dots: <code>@(x) exp(-x.^2) .* cos(x)</code>. Call <code>integral(f_num, 0, 2)</code> and <code>integral(f_num, 0, Inf)</code>. Compute difference with <code>abs(double(result_sym) - result_0_2)</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+f_num = @(x) exp(-x.^2) .* cos(x);
+
+% Part B
+result_0_2 = integral(f_num, 0, 2);
+
+% Part C
+result_inf = integral(f_num, 0, Inf);
+
+% Part D
+syms x
+f_sym = exp(-x^2) * cos(x);
+result_sym = int(f_sym, x, 0, 2);
+diff_val = abs(double(result_sym) - result_0_2);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>result_0_2</code> should be approximately <code>0.6946</code>.</li>
+  <li><code>result_inf</code> should be approximately <code>0.6865</code>.</li>
+  <li><code>diff_val</code> must be virtually zero ($&lt; 10^{-10}$), confirming that both numerical quadrature and symbolic integration converge to the same truth.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>Why is numerical integration preferred when processing sampled aerodynamic pressure measurements from a wind tunnel sensor grid? (<em>Answer: Experimental data exists only at discrete measurement points; there is no analytical mathematical formula to differentiate or integrate symbolically.</em>)</p>
+</div>

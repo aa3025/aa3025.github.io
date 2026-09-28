@@ -1,0 +1,130 @@
+<div class="problem-outcomes">
+<h1>Problem 1: Basic Symbolic Integration <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Calculate analytical antiderivatives (indefinite integrals) for polynomial, trigonometric, and exponential functions.</li>
+<li>Compute definite integrals over specific limits using <code>int()</code>.</li>
+<li>Convert symbolic definite integrals into IEEE double numeric format for engineering reporting.</li>
+<li>Understand why MATLAB's symbolic integrator omits the constant of integration ($+ C$).</li>
+</ul>
+<h3>Description</h3>
+<p>Integration is a core computational tool for determining accumulated quantities, such as calculating displacement from velocity or stored energy from power. This exercise introduces MATLAB's symbolic solver for analytical indefinite and definite integrals.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>x</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Symbolic independent variable</td>
+    </tr>
+    <tr>
+      <td><code>f1</code>, <code>f2</code>, <code>f3</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ syms</td>
+      <td>Integrand expressions: $5x^3-2x+4$, $\sin(3x)$, $e^{2x}$</td>
+    </tr>
+    <tr>
+      <td><code>F1</code>, <code>F2</code>, <code>F3</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ syms</td>
+      <td>Indefinite integrals via <code>int(f, x)</code></td>
+    </tr>
+    <tr>
+      <td><code>val_definite</code></td>
+      <td>sym</td>
+      <td>$1 \times 1$ sym</td>
+      <td>Definite integral of $x^2+1$ from $x=0$ to $3$</td>
+    </tr>
+    <tr>
+      <td><code>result_numeric</code></td>
+      <td>double</td>
+      <td>$1 \times 1$ scalar</td>
+      <td>Converted double value via <code>double(val_definite)</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Calculate $\int_0^3 (x^2 + 1)\,dx$ by hand: $[\frac{x^3}{3} + x]_0^3 = (\frac{27}{3} + 3) - (0) = 9 + 3 = 12$.
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_5_1.m</code>.</p>
+
+<p><strong>Part A — Indefinite Integrals</strong><br>
+Define symbolic variable <code>x</code>, then find the indefinite integral (antiderivative) of each of the following, storing the functions as <code>f1</code>, <code>f2</code>, <code>f3</code> and their integrals as <code>F1</code>, <code>F2</code>, <code>F3</code>:</p>
+<ol>
+<li>$f_1 = 5x^3 - 2x + 4$</li>
+<li>$f_2 = \sin(3x)$</li>
+<li>$f_3 = e^{2x}$ (use <code>exp(2*x)</code>)</li>
+</ol>
+
+<p><strong>Part B — Definite Integral</strong><br>
+Calculate the definite integral <code>val_definite</code> of $g(x) = x^2+1$ from $x=0$ to $x=3$ using <code>int(g, x, 0, 3)</code>.</p>
+
+<p><strong>Part C — Numerical Conversion</strong><br>
+Convert the symbolic result <code>val_definite</code> into a standard MATLAB numeric value <code>result_numeric</code> using <code>double()</code>.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Fundamental Theorem of Calculus)</summary>
+  <div class="hint-content">
+    <p>The antiderivative of $x^n$ is $\frac{x^{n+1}}{n+1}$ (for $n \neq -1$). For trigonometric terms, $\int \sin(kx)\,dx = -\frac{1}{k}\cos(kx)$. For exponential terms, $\int e^{kx}\,dx = \frac{1}{k}e^{kx}$. Definite integration evaluates the antiderivative across limits: $\int_a^b f(x)dx = F(b) - F(a)$.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Declare <code>syms x</code>. For indefinite integrals, use <code>int(f, x)</code>. For definite integrals over $[a, b]$, supply limits as additional arguments: <code>int(f, x, a, b)</code>. Use <code>double()</code> to convert symbolic numbers to standard floating-point format.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">syms x
+
+% Part A
+f1 = 5*x^3 - 2*x + 4;
+F1 = int(f1, x);
+
+f2 = sin(3*x);
+F2 = int(f2, x);
+
+f3 = exp(2*x);
+F3 = int(f3, x);
+
+% Part B
+g = x^2 + 1;
+val_definite = int(g, x, 0, 3);
+
+% Part C
+result_numeric = double(val_definite);</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>F1</code> must be <code>(5*x^4)/4 - x^2 + 4*x</code>.</li>
+  <li><code>F2</code> must be <code>-cos(3*x)/3</code>.</li>
+  <li><code>F3</code> must be <code>exp(2*x)/2</code>.</li>
+  <li><code>result_numeric</code> must equal exactly <code>12.0</code>.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>If an accelerometer records a vehicle's acceleration $a(t) = 3t^2 - 4$, why does integrating to find velocity $v(t) = \int a(t)\,dt$ require adding an initial velocity condition $v_0$? (<em>Answer: An indefinite integral yields an entire family of curves; the initial velocity $v(0) = v_0$ provides the specific boundary constant $C$.</em>)</p>
+</div>

@@ -1,0 +1,139 @@
+<div class="problem-outcomes">
+<h1>Problem 2: Matrix Multiplication <span class="badge-tag badge-core">Live Core</span></h1>
+<h3>Learning Outcomes</h3>
+<ul>
+<li>Distinguish between linear algebraic matrix multiplication (<code>*</code>) and element-wise multiplication (<code>.*</code>).</li>
+<li>Understand and verify the inner dimension matching condition ($n_A = m_B$).</li>
+<li>Demonstrate and explain the non-commutative property of matrix multiplication ($A \times B \neq B \times A$).</li>
+</ul>
+<h3>Description</h3>
+<p>Matrix multiplication is an essential operation in engineering simulation, but its mathematical rules are completely different from scalar arithmetic. In this problem, you will explore matrix product rules, dimension requirements, and non-commutativity.</p>
+</div>
+
+<div class="problem-statement">
+<h3>Required Grader Variables</h3>
+<table class="grader-var-table">
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Expected Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>A</code>, <code>B</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Matrices $[1, 2; 3, 4]$ and $[5, 6; 7, 8]$</td>
+    </tr>
+    <tr>
+      <td><code>C</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Matrix product $A \times B$ via <code>A * B</code></td>
+    </tr>
+    <tr>
+      <td><code>D</code></td>
+      <td>double</td>
+      <td>$2 \times 3$</td>
+      <td>Matrix $[1, 0, 5; 2, -1, 3]$</td>
+    </tr>
+    <tr>
+      <td><code>E</code></td>
+      <td>double</td>
+      <td>$2 \times 3$</td>
+      <td>Product $A \times D$ (verifying compatibility)</td>
+    </tr>
+    <tr>
+      <td><code>F</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Element-wise product $A \odot B$ via <code>A .* B</code></td>
+    </tr>
+    <tr>
+      <td><code>G</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Matrix product $A \times B$ (matches <code>C</code>)</td>
+    </tr>
+    <tr>
+      <td><code>H</code></td>
+      <td>double</td>
+      <td>$2 \times 2$</td>
+      <td>Reversed product $B \times A$</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Calculate the top-left element of $A \times B$: $(1 \times 5) + (2 \times 7) = 19$. In contrast, what is the top-left element of element-wise $A .* B$? ($1 \times 5 = 5$).
+</div>
+
+<h3>Problem Tasks</h3>
+<p>Complete the following tasks in <code>prob_3_2.m</code>.</p>
+
+<p><strong>Part A — Standard Matrix Multiplication</strong><br>
+Given $A = [1, 2; 3, 4]$ and $B = [5, 6; 7, 8]$, store them as <code>A</code> and <code>B</code> and calculate the matrix product <code>C = A * B</code>.</p>
+
+<p><strong>Part B — Multiplicability Check</strong><br>
+Given <code>A</code> ($2 \times 2$) and a $2 \times 3$ matrix $D = [1, 0, 5; 2, -1, 3]$, store <code>D</code> and calculate the product <code>E = A * D</code>. Note how the result dimensions $(2 \times 3)$ relate to the dimensions of <code>A</code> and <code>D</code>.</p>
+
+<p><strong>Part C — Element-wise vs Matrix Multiplication</strong></p>
+<ol>
+<li>Calculate the element-wise product <code>F = A .* B</code>.</li>
+<li>Calculate the matrix product <code>G = A * B</code> (this should match <code>C</code> from Part A).</li>
+</ol>
+
+<p><strong>Part D — Non-Commutativity</strong><br>
+Calculate <code>H = B * A</code> and compare it with <code>C</code>. Confirm that, in general for matrices, $A \times B \neq B \times A$.</p>
+
+<!-- Three-Tier Staged Hints -->
+<h3>Staged Hints</h3>
+<details class="staged-hint hint-concept">
+  <summary class="hint-header">Hint 1: Concept Hint (Matrix Multiplication Rules)</summary>
+  <div class="hint-content">
+    <p>To multiply $A_{m \times k}$ by $B_{k \times n}$, the number of columns in $A$ must equal the number of rows in $B$. The result has size $m \times n$. Entry $(i, j)$ is the dot product of row $i$ of $A$ and column $j$ of $B$. Because order matters, matrix multiplication is non-commutative ($AB \neq BA$).</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-matlab">
+  <summary class="hint-header">Hint 2: MATLAB Syntax Hint</summary>
+  <div class="hint-content">
+    <p>Use the standard asterisk <code>*</code> for matrix multiplication: <code>C = A * B;</code>. For element-by-element multiplication where corresponding cells are multiplied, prepend a dot: <code>F = A .* B;</code>.</p>
+  </div>
+</details>
+
+<details class="staged-hint hint-skeleton">
+  <summary class="hint-header">Hint 3: Code Skeleton</summary>
+  <div class="hint-content">
+    <pre><code class="language-matlab">% Part A
+A = [1, 2; 3, 4];
+B = [5, 6; 7, 8];
+C = A * B;
+
+% Part B
+D = [1, 0, 5; 2, -1, 3];
+E = A * D;
+
+% Part C
+F = A .* B;
+G = A * B;
+
+% Part D
+H = B * A;</code></pre>
+  </div>
+</details>
+
+<h3>Self-Check &amp; Expected Properties</h3>
+<ul>
+  <li><code>C</code> should be <code>[19, 22; 43, 50]</code>.</li>
+  <li><code>size(E)</code> must be <code>[2, 3]</code>, with values <code>[5, -2, 11; 11, -4, 27]</code>.</li>
+  <li><code>F</code> must be <code>[5, 12; 21, 32]</code> (clearly different from <code>C</code>!).</li>
+  <li><code>H</code> is <code>[23, 34; 31, 46]</code> $\neq$ <code>C</code>, proving non-commutativity.</li>
+</ul>
+
+<h3>Engineering Reflection</h3>
+<p>Why does the non-commutativity of matrix multiplication matter when programming a robotic arm or flight simulator? (<em>Answer: Rotating $90^\circ$ about the pitch axis followed by $90^\circ$ about the yaw axis puts the aircraft into an entirely different orientation than doing yaw first and pitch second!</em>)</p>
+</div>

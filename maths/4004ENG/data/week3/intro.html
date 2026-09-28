@@ -1,0 +1,330 @@
+<h1>Week 3: Matrices &amp; Systems of Equations</h1>
+
+<h2>Why This Matters in Engineering</h2>
+<p>Matrices are the backbone of large-scale engineering computation. In civil and structural engineering, global stiffness matrices ($K\mathbf{u} = \mathbf{f}$) relate forces to structural deflections in skyscrapers and bridges. In electrical engineering, nodal analysis models complex AC/DC circuits through conductance matrices. In robotics and computer graphics, $2\text{D}$ and $3\text{D}$ transformation matrices rotate, translate, and scale CAD geometries and robotic arms in real time.</p>
+<p>This module advances your linear algebra skills from single vectors to multi-dimensional matrices, covering matrix arithmetic, determinants, inverses, and solving simultaneous linear systems $A\mathbf{x} = \mathbf{b}$ using MATLAB's numerically robust backslash operator (<code>\</code>).</p>
+
+<hr>
+
+<!-- Self-Study & 2-Hour Delivery Wrapper -->
+<div class="route-schedule-card">
+  <h3><i data-lucide="clock"></i> Recommended 2-Hour Lab &amp; Self-Study Route</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Phase</th>
+        <th>Time</th>
+        <th>Focus Activity</th>
+        <th>Key Milestones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Before the Lab</strong></td>
+        <td>15 min</td>
+        <td>Review matrix dimension rules &amp; test readiness check below</td>
+        <td>Understand inner-dimension compatibility for multiplication</td>
+      </tr>
+      <tr>
+        <td><strong>Live Block 1</strong></td>
+        <td>45 min</td>
+        <td><strong>Problem 1</strong> <span class="badge-tag badge-core">Live Core</span> &amp; <strong>Problem 2</strong> <span class="badge-tag badge-core">Live Core</span></td>
+        <td>Matrix creation, slicing rows/cols, linear algebraic product <code>A*B</code> vs element-wise <code>A.*B</code></td>
+      </tr>
+      <tr>
+        <td><strong>Live Block 2</strong></td>
+        <td>40 min</td>
+        <td><strong>Problem 3</strong> <span class="badge-tag badge-core">Live Core</span> + Live Troubleshooting</td>
+        <td>Calculate <code>det(A)</code>, test singularity, compute <code>inv(A)</code> with identity verification</td>
+      </tr>
+      <tr>
+        <td><strong>After the Lab</strong></td>
+        <td>20 min</td>
+        <td><strong>Problem 4</strong> <span class="badge-tag badge-consolidation">Consolidation</span> &amp; <strong>Problem 5</strong> <span class="badge-tag badge-stretch">Stretch</span></td>
+        <td>Solve $A\mathbf{x}=\mathbf{b}$ via <code>A\b</code>, apply 2D transformation matrices, submit to MATLAB Grader</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="readiness-card">
+  <h3><i data-lucide="check-square"></i> Before You Begin: Prerequisites &amp; Readiness Check</h3>
+  <ul>
+    <li><strong>Mathematical Prerequisites:</strong> Systems of linear equations (2 and 3 unknowns), matrix dimensions ($m \text{ rows} \times n \text{ columns}$), and the concept of a determinant.</li>
+    <li><strong>MATLAB Prerequisites:</strong> Array creation, colon indexing (Week 2), and scalar operations.</li>
+    <li><strong>Required Files:</strong> Starter templates <code>prob_3_1.m</code> through <code>prob_3_5.m</code> in your active working directory.</li>
+  </ul>
+
+  <h4>Quick Formative Checks</h4>
+  <details class="staged-hint hint-concept">
+    <summary class="hint-header">Readiness Check 1: Matrix Multiplication Dimension Compatibility</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> Can a matrix $A$ of size $3 \times 2$ be multiplied by a matrix $B$ of size $2 \times 4$? If so, what is the size of the product $C = AB$?</p>
+      <p><strong>Answer:</strong> <strong>Yes</strong>. The inner dimensions match ($2 = 2$). The resulting matrix $C$ has outer dimensions: $3 \text{ rows} \times 4 \text{ columns}$.</p>
+    </div>
+  </details>
+
+  <details class="staged-hint hint-matlab">
+    <summary class="hint-header">Readiness Check 2: Element-wise vs Matrix Multiplication</summary>
+    <div class="hint-content">
+      <p><strong>Question:</strong> What is the difference in MATLAB between <code>A * B</code> and <code>A .* B</code>?</p>
+      <p><strong>Answer:</strong> <code>A * B</code> performs standard linear algebraic matrix multiplication (row-by-column dot products). <code>A .* B</code> multiplies corresponding elements individually and requires both matrices to have the exact same dimensions.</p>
+    </div>
+  </details>
+</div>
+
+<hr>
+
+<h2>Learning Objectives</h2>
+<p>By the end of this lab, you should be able to:</p>
+<ul>
+  <li>Define and manipulate matrices in MATLAB using literals, generators (<code>zeros</code>, <code>ones</code>, <code>eye</code>), and concatenation.</li>
+  <li>Index and slice matrices to extract specific rows, columns, and sub-matrices.</li>
+  <li>Perform matrix arithmetic (addition, subtraction, multiplication) and contrast matrix products with element-wise operations.</li>
+  <li>Calculate determinants (<code>det</code>) and matrix inverses (<code>inv</code>), and identify when a matrix is singular.</li>
+  <li>Solve simultaneous systems of linear equations $A\mathbf{x} = \mathbf{b}$ using the backslash operator (<code>\</code>).</li>
+  <li>Apply 2D geometric transformation matrices (scaling, rotation, reflection) to structural coordinate sets.</li>
+</ul>
+
+<hr>
+
+<h2>Quick Reference: Matrix Mathematics</h2>
+<h3>What is a Matrix?</h3>
+<p>A <strong>matrix</strong> is a rectangular array of numbers arranged in rows and columns. A matrix with $m$ rows and $n$ columns is described as $m \times n$. In MATLAB:</p>
+<ul>
+  <li>Commas or spaces separate entries in the same row.</li>
+  <li>Semicolons <code>;</code> end a row and begin the next row.</li>
+</ul>
+<pre><code class="language-matlab">A = [1, 2; 3, 4]  % 2x2 square matrix
+v = [1, 2, 3]     % 1x3 row vector
+w = [1; 2; 3]     % 3x1 column vector
+</code></pre>
+
+<h3>Matrix Generation Tools</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Description</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>zeros(m, n)</code></td>
+      <td>Creates an $m \times n$ matrix of zeros</td>
+      <td><code>Z = zeros(3, 2);</code></td>
+    </tr>
+    <tr>
+      <td><code>ones(m, n)</code></td>
+      <td>Creates an $m \times n$ matrix of ones</td>
+      <td><code>O = ones(2, 4);</code></td>
+    </tr>
+    <tr>
+      <td><code>eye(n)</code></td>
+      <td>Creates an $n \times n$ identity matrix with 1s on main diagonal</td>
+      <td><code>I = eye(3);</code></td>
+    </tr>
+    <tr>
+      <td><code>size(A)</code></td>
+      <td>Returns dimensions vector <code>[rows, cols]</code></td>
+      <td><code>[r, c] = size(A);</code></td>
+    </tr>
+    <tr>
+      <td><code>numel(A)</code></td>
+      <td>Returns total number of elements ($r \times c$)</td>
+      <td><code>N = numel(A);</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Matrix Operations &amp; Solving Systems</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Operation</th>
+      <th>Formula / Method</th>
+      <th>MATLAB Syntax</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Matrix Product</strong></td>
+      <td>$C_{ij} = \sum_k A_{ik}B_{kj}$</td>
+      <td><code>C = A * B;</code></td>
+      <td>Requires inner dimensions to agree ($n_A = m_B$)</td>
+    </tr>
+    <tr>
+      <td><strong>Element-Wise Mult</strong></td>
+      <td>$D_{ij} = A_{ij} B_{ij}$</td>
+      <td><code>D = A .* B;</code></td>
+      <td>Requires identical size for $A$ and $B$</td>
+    </tr>
+    <tr>
+      <td><strong>Transpose</strong></td>
+      <td>$A^T$</td>
+      <td><code>A_trans = A';</code></td>
+      <td>Swaps rows and columns</td>
+    </tr>
+    <tr>
+      <td><strong>Determinant</strong></td>
+      <td>$\det(A)$</td>
+      <td><code>d = det(A);</code></td>
+      <td>Scalar; non-zero indicates invertibility</td>
+    </tr>
+    <tr>
+      <td><strong>Matrix Inverse</strong></td>
+      <td>$A^{-1}$ ($A A^{-1} = I$)</td>
+      <td><code>A_inv = inv(A);</code></td>
+      <td>Requires $A$ to be square and $\det(A) \neq 0$</td>
+    </tr>
+    <tr>
+      <td><strong>Solve $A\mathbf{x}=\mathbf{b}$</strong></td>
+      <td>$\mathbf{x} = A^{-1}\mathbf{b}$</td>
+      <td><code>x = A \ b;</code></td>
+      <td>Preferred backslash operator (Gaussian elimination)</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>Worked Examples</h2>
+
+<h3>Example 1: Matrix Multiplication vs Element-wise Multiplication</h3>
+<pre><code class="language-matlab">A = [1, 2; 3, 4];
+B = [5, 6; 7, 8];
+
+% Linear algebraic matrix multiplication
+C = A * B;   % Returns: [19, 22; 43, 50]
+
+% Element-wise multiplication
+D = A .* B;  % Returns: [5, 12; 21, 32]
+</code></pre>
+
+<div class="prediction-prompt">
+  <strong>Prediction Prompt:</strong> Before running <code>A * B</code>, verify the top-left entry by hand: $(1 \times 5) + (2 \times 7) = 5 + 14 = 19$.
+</div>
+
+<h3>Example 2: Determinant and Inverse Verification</h3>
+<pre><code class="language-matlab">A = [4, 7; 2, 6];
+d = det(A);        % det(A) = 4*6 - 7*2 = 24 - 14 = 10
+
+if abs(d) &gt; 1e-10
+    A_inv = inv(A);
+    % Verify: A * A_inv should equal eye(2)
+    identity_check = A * A_inv;
+else
+    error('Matrix is singular and cannot be inverted.');
+end
+</code></pre>
+
+<h3>Example 3: Solving a 3-Variable Linear System</h3>
+<p>Solve the simultaneous system:
+\[2x + y + z = 8\]
+\[-3x - y + 2z = -11\]
+\[-2x + y + 2z = -3\]</p>
+<pre><code class="language-matlab">A = [ 2,  1, 1;
+     -3, -1, 2;
+     -2,  1, 2];
+b = [8; -11; -3];  % Column vector
+
+% Backslash solve
+x_sol = A \ b;     % Returns: [2; 3; 1] (i.e. x=2, y=3, z=1)
+</code></pre>
+
+<h3>Example 4: 2D Rotation of a Shape</h3>
+<pre><code class="language-matlab">% Unit square corners stored as columns [x; y]
+square = [0, 1, 1, 0; 
+          0, 0, 1, 1];
+
+% 45-degree rotation matrix
+theta = deg2rad(45);
+R = [cos(theta), -sin(theta); 
+     sin(theta),  cos(theta)];
+
+% Apply transformation
+rotated_square = R * square;
+</code></pre>
+
+<hr>
+
+<h2>Problems in This Module</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Route Category</th>
+      <th>Starter File</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Problem 1</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span></td>
+      <td><code>prob_3_1.m</code></td>
+      <td>Matrix creation, indexing rows/columns, submatrix extraction</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 2</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span></td>
+      <td><code>prob_3_2.m</code></td>
+      <td>Matrix multiplication compatibility, element-wise vs matrix operations</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 3</strong></td>
+      <td><span class="badge-tag badge-core">Live Core</span></td>
+      <td><code>prob_3_3.m</code></td>
+      <td>Determinant calculation, singularity check, and matrix inverse</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 4</strong></td>
+      <td><span class="badge-tag badge-consolidation">Independent Consolidation</span></td>
+      <td><code>prob_3_4.m</code></td>
+      <td>Solving simultaneous linear systems $A\mathbf{x} = \mathbf{b}$ via backslash operator</td>
+    </tr>
+    <tr>
+      <td><strong>Problem 5</strong></td>
+      <td><span class="badge-tag badge-stretch">Optional Stretch</span></td>
+      <td><code>prob_3_5.m</code></td>
+      <td>2D geometric transformations: scaling, rotation, reflection</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- REMOTE LAB HELP BOX -->
+<div class="remote-help-card">
+  <h3><i data-lucide="help-circle"></i> Remote Lab Help: Matrix Common Errors</h3>
+  <ul>
+    <li><strong>"Error using * : Incorrect dimensions for matrix multiplication":</strong> Check that the column count of the first matrix equals the row count of the second (<code>size(A,2) == size(B,1)</code>).</li>
+    <li><strong>"Warning: Matrix is singular to working precision":</strong> The determinant is zero (or near $10^{-16}$). The equations are linearly dependent; no unique solution exists.</li>
+    <li><strong>Row vs Column vector mismatch in $A\mathbf{x} = \mathbf{b}$ :</strong> Ensure $\mathbf{b}$ is a <em>column vector</em> (semicolons between values, e.g. <code>[5; 11]</code>) when using <code>A \ b</code>.</li>
+    <li><strong>Unexpected transpose output:</strong> Remember <code>A'</code> transposes the entire matrix. Check <code>size(A')</code> after transposing.</li>
+  </ul>
+
+  <h4>Standard Teams Help Request Template</h4>
+  <pre><code class="language-text">Problem: Week 3 Problem 4
+Part: Part A (Solving linear system)
+Command that failed: x = A \ b;
+Exact Error: Incorrect dimensions for matrix multiplication.
+What I expected: A 3x1 column solution vector.
+What I already tried: Checked size(A) which is 3x3, but size(b) was 1x3 row vector instead of 3x1 column vector!</code></pre>
+</div>
+
+<hr>
+
+<!-- COMPLETION CHECKLIST -->
+<div class="checklist-card" style="border-left: 4px solid #10b981;">
+  <h3><i data-lucide="award"></i> Completion Criteria: You are ready for Week 4 if...</h3>
+  <ul style="list-style: none; padding-left: 0;">
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>1.</strong> You can extract specific rows and columns from matrices using colon slicing <code>A(row, :)</code>.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>2.</strong> You can explain when <code>A * B</code> is valid and how it differs fundamentally from <code>A .* B</code>.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>3.</strong> You can test whether a matrix is singular using <code>det(A)</code> before attempting an inverse.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>4.</strong> You can formulate an engineering linear system into matrix form and solve it with <code>A \ b</code>.</li>
+    <li><input type="checkbox" checked disabled> &nbsp;<strong>5.</strong> You have submitted the Week 3 MATLAB Grader questions.</li>
+  </ul>
+</div>
