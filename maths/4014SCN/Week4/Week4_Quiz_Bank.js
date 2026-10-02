@@ -113,19 +113,19 @@ window.QUIZ_BANK_WEEK4 = {
       "options": [
         {
           "id": "W4-T1-Q04-opt0",
-          "text": "1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\dots = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!}"
+          "text": "$1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\dots = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!}$"
         },
         {
           "id": "W4-T1-Q04-opt1",
-          "text": "x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\dots"
+          "text": "$x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\dots$"
         },
         {
           "id": "W4-T1-Q04-opt2",
-          "text": "1 - \\frac{x^2}{2!} + \\frac{x^4}{4!} - \\dots"
+          "text": "$1 - \\frac{x^2}{2!} + \\frac{x^4}{4!} - \\dots$"
         },
         {
           "id": "W4-T1-Q04-opt3",
-          "text": "1 - x + x^2 - x^3 + \\dots"
+          "text": "$1 - x + x^2 - x^3 + \\dots$"
         }
       ],
       "correct_indices": [
