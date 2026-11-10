@@ -1,1 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Rayleigh-Bénard Convection Screensaver (WebGL)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #05070d;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "DejaVu Sans Mono", monospace;
+      color: #e2e8f0;
+    }
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #020408;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
 
+    /* Telemetry OSD Glassmorphism Box */
+    #telemetry-osd {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      width: 320px;
+      background: rgba(10, 16, 28, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 11.5px;
+      line-height: 1.55;
+      color: #cbd5e1;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(37, 99, 235, 0.15);
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 20;
+    }
+    #telemetry-osd.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .osd-title {
+      font-weight: 700;
+      color: #60a5fa;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .osd-divider {
+      height: 1px;
+      background: rgba(71, 85, 105, 0.5);
+      margin: 6px 0 8px 0;
+    }
+    .osd-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+      font-family: "DejaVu Sans Mono", Consolas, "Courier New", monospace;
+    }
+    .osd-label {
+      color: #94a3b8;
+    }
+    .osd-value {
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .osd-value.highlight {
+      color: #34d399;
+    }
+    .osd-shortcuts {
+      margin-top: 6px;
+      color: #64748b;
+      font-size: 10px;
+      text-align: center;
+    }
+
+    /* Floating Toolbar / Controls Overlay */
+    #controls-bar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 30px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 20;
+    }
+    #controls-bar.autohide {
+      opacity: 0;
+      transform: translateX(-50%) translateY(15px);
+      pointer-events: none;
+    }
+    .ctrl-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(100, 116, 139, 0.35);
+      color: #e2e8f0;
+      border-radius: 18px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .ctrl-btn:hover {
+      background: rgba(59, 130, 246, 0.3);
+      border-color: rgba(96, 165, 250, 0.6);
+      color: #ffffff;
+    }
+    .ctrl-btn:active {
+      transform: scale(0.96);
+    }
+    .ctrl-btn.active {
+      background: rgba(37, 99, 235, 0.4);
+      border-color: #3b82f6;
+      color: #93c5fd;
+    }
+    .ctrl-kbd {
+      font-size: 9.5px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      padding: 1px 4px;
+      color: #94a3b8;
+    }
+
+    /* Screensaver Toast / Status Alert */
+    #status-toast {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      z-index: 30;
+    }
+    #status-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Error Overlay if WebGL2 not supported */
+    #error-modal {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 7, 13, 0.95);
+      color: #f87171;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 100;
+    }
+    #error-modal h2 {
+      margin-bottom: 12px;
+      font-size: 22px;
+    }
+    #error-modal p {
+      max-width: 500px;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="canvas-container">
+    <canvas id="glcanvas"></canvas>
+  </div>
+
+  <!-- Telemetry OSD -->
+  <div id="telemetry-osd">
+    <div class="osd-title">Rayleigh-Bénard Convection</div>
+    <div class="osd-divider"></div>
+    <div class="osd-row">
+      <span class="osd-label">ΔT (Temp Diff)</span>
+      <span class="osd-value" id="val-deltat">4.0 K (Hot: 4.0, Cold: 0.0)</span>
+    </div>
+    <div class="osd-row">
+      <span class="osd-label">Ra (Rayleigh)</span>
+      <span class="osd-value highlight" id="val-rayleigh">175.0 × 10³</span>
+    </div>
+    <div class="osd-row">
+      <span class="osd-label">Buoyancy (gβ)</span>
+      <span class="osd-value" id="val-buoyancy">140.0</span>
+    </div>
+    <div class="osd-row">
+      <span class="osd-label">Diffusivity (α)</span>
+      <span class="osd-value" id="val-diffusivity">4.0</span>
+    </div>
+    <div class="osd-row">
+      <span class="osd-label">Time Step (Δt)</span>
+      <span class="osd-value" id="val-dt">16.0 ms (60 FPS)</span>
+    </div>
+    <div class="osd-row">
+      <span class="osd-label">Sim Grid</span>
+      <span class="osd-value" id="val-grid">840 × 525 (1.6:1)</span>
+    </div>
+    <div class="osd-row">
+      <span class="osd-label">Sim Time (t)</span>
+      <span class="osd-value" id="val-time">0.0 s</span>
+    </div>
+    <div class="osd-row">
+      <span class="osd-label">Palette</span>
+      <span class="osd-value" id="val-palette">Thermal (Fire &amp; Ice)</span>
+    </div>
+    <div class="osd-row">
+      <span class="osd-label">Streamlines</span>
+      <span class="osd-value" id="val-streamlines">OFF</span>
+    </div>
+    <div class="osd-divider"></div>
+    <div class="osd-shortcuts">[T] OSD &nbsp; [↑/↓] ΔT &nbsp; [+/-] Ra &nbsp; [C] Palette &nbsp; [Space] Pause</div>
+  </div>
+
+  <!-- Interactive Controls Toolbar -->
+  <div id="controls-bar">
+    <button class="ctrl-btn" id="btn-pause">
+      <span id="txt-pause">Pause</span> <span class="ctrl-kbd">Space</span>
+    </button>
+    <button class="ctrl-btn" id="btn-reset">
+      Reset <span class="ctrl-kbd">R</span>
+    </button>
+    <button class="ctrl-btn" id="btn-palette">
+      Palette <span class="ctrl-kbd">C</span>
+    </button>
+    <button class="ctrl-btn" id="btn-streamlines">
+      Streamlines <span class="ctrl-kbd">S</span>
+    </button>
+    <button class="ctrl-btn active" id="btn-telemetry">
+      Telemetry <span class="ctrl-kbd">T</span>
+    </button>
+    <button class="ctrl-btn active" id="btn-legend">
+      Colorbar <span class="ctrl-kbd">L</span>
+    </button>
+    <button class="ctrl-btn" id="btn-fullscreen">
+      Fullscreen <span class="ctrl-kbd">F</span>
+    </button>
+  </div>
+
+  <div id="status-toast"></div>
+
+  <div id="error-modal">
+    <h2>WebGL 2.0 Initialization Failed</h2>
+    <p id="error-message">Your browser or hardware does not appear to support WebGL 2.0 with floating-point render targets. Please ensure hardware acceleration is enabled.</p>
+  </div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // -------------------------------------------------------------------------
+    // Shader Sources (GLSL ES 3.00)
+    // -------------------------------------------------------------------------
+
+    const FULLSCREEN_VERT = `#version 300 es
+    in vec2 in_vert;
+    out vec2 v_uv;
+    void main() {
+        v_uv = in_vert * 0.5 + 0.5;
+        gl_Position = vec4(in_vert, 0.0, 1.0);
+    }
+    `;
+
+    // 1. Advection Pass (Semi-Lagrangian inside Solid Cavity)
+    const ADVECTION_FRAG = `#version 300 es
+    precision highp float;
+    in vec2 v_uv;
+    out vec4 fragColor;
+
+    uniform sampler2D u_velocity;
+    uniform vec2 u_texel;
+    uniform float u_dt;
+    uniform vec2 u_mouse;
+    uniform float u_mouse_heat;
+    uniform float u_temp_hot;
+
+    void main() {
+        vec4 current = texture(u_velocity, v_uv);
+        vec2 vel = current.xy;
+        if (isnan(vel.x) || isinf(vel.x)) vel.x = 0.0;
+        if (isnan(vel.y) || isinf(vel.y)) vel.y = 0.0;
+
+        // Backtrack along velocity vector inside the cavity
+        vec2 prev_uv = v_uv - u_dt * vel * u_texel;
+        prev_uv = clamp(prev_uv, vec2(0.5 * u_texel.x, 0.5 * u_texel.y),
+                                 vec2(1.0 - 0.5 * u_texel.x, 1.0 - 0.5 * u_texel.y));
+
+        vec4 advected = texture(u_velocity, prev_uv);
+        float temp = advected.z;
+        if (isnan(temp) || isinf(temp)) temp = 0.0;
+
+        // Bottom plate: strictly UNIFORM hot plate (T = u_temp_hot), solid no-slip
+        if (v_uv.y <= 1.5 * u_texel.y) {
+            temp = u_temp_hot;
+            advected.xy = vec2(0.0);
+        }
+
+        // Top plate: strictly UNIFORM cold plate (T = 0.0), solid no-slip
+        if (v_uv.y >= 1.0 - 1.5 * u_texel.y) {
+            temp = 0.0;
+            advected.xy = vec2(0.0);
+        }
+
+        // Left side wall: SOLID (u = 0) and ADIABATIC (dT/dx = 0 -> mirror temperature from interior)
+        if (v_uv.x <= 1.5 * u_texel.x) {
+            advected.xy = vec2(0.0);
+            temp = texture(u_velocity, vec2(v_uv.x + u_texel.x, v_uv.y)).z;
+        }
+
+        // Right side wall: SOLID (u = 0) and ADIABATIC (dT/dx = 0 -> mirror temperature from interior)
+        if (v_uv.x >= 1.0 - 1.5 * u_texel.x) {
+            advected.xy = vec2(0.0);
+            temp = texture(u_velocity, vec2(v_uv.x - u_texel.x, v_uv.y)).z;
+        }
+
+        // Interactive mouse / touch heating
+        if (u_mouse_heat > 0.0) {
+            float d = distance(v_uv, u_mouse);
+            if (d < 0.05) {
+                temp = mix(temp, u_temp_hot, (1.0 - d / 0.05) * u_mouse_heat);
+            }
+        }
+
+        vec2 damped_vel = advected.xy * 0.9992;
+        if (isnan(damped_vel.x) || isinf(damped_vel.x)) damped_vel.x = 0.0;
+        if (isnan(damped_vel.y) || isinf(damped_vel.y)) damped_vel.y = 0.0;
+        fragColor = vec4(damped_vel, temp, advected.w);
+    }
+    `;
+
+    // 2. Buoyancy & Thermal Diffusion Pass (Adiabatic Side Walls)
+    const BUOYANCY_DIFFUSION_FRAG = `#version 300 es
+    precision highp float;
+    in vec2 v_uv;
+    out vec4 fragColor;
+
+    uniform sampler2D u_velocity;
+    uniform vec2 u_texel;
+    uniform float u_dt;
+    uniform float u_buoyancy;
+    uniform float u_diffusion;
+    uniform float u_temp_hot;
+
+    void main() {
+        vec4 center = texture(u_velocity, v_uv);
+        vec2 vel = center.xy;
+        float temp = center.z;
+        if (isnan(temp) || isinf(temp)) temp = 0.0;
+        if (isnan(vel.x) || isinf(vel.x)) vel.x = 0.0;
+        if (isnan(vel.y) || isinf(vel.y)) vel.y = 0.0;
+
+        // Adiabatic side walls: clamp neighbor lookups to the wall boundary (dT/dx = 0)
+        float t_l = texture(u_velocity, vec2(max(0.5 * u_texel.x, v_uv.x - u_texel.x), v_uv.y)).z;
+        float t_r = texture(u_velocity, vec2(min(1.0 - 0.5 * u_texel.x, v_uv.x + u_texel.x), v_uv.y)).z;
+        float t_b = texture(u_velocity, vec2(v_uv.x, max(0.5 * u_texel.y, v_uv.y - u_texel.y))).z;
+        float t_t = texture(u_velocity, vec2(v_uv.x, min(1.0 - 0.5 * u_texel.y, v_uv.y + u_texel.y))).z;
+
+        // Thermal diffusion: laplacian(T)
+        float laplacian_t = (t_l + t_r + t_b + t_t - 4.0 * temp);
+        temp += u_diffusion * laplacian_t * u_dt;
+        if (isnan(temp) || isinf(temp)) temp = 0.0;
+
+        // Boussinesq Thermal Buoyancy relative to ambient cold fluid (T = 0.0)
+        float buoyancy_force = temp * u_buoyancy;
+        vel.y += buoyancy_force * u_dt;
+        if (isnan(vel.y) || isinf(vel.y)) vel.y = 0.0;
+
+        // Solid wall boundary conditions: strictly zero velocity at all 4 container walls
+        if (v_uv.y <= 1.5 * u_texel.y || v_uv.y >= 1.0 - 1.5 * u_texel.y ||
+            v_uv.x <= 1.5 * u_texel.x || v_uv.x >= 1.0 - 1.5 * u_texel.x) {
+            vel = vec2(0.0);
+        }
+
+        // Plate temperature Dirichlet conditions: bottom hot, top cold
+        if (v_uv.y <= 1.5 * u_texel.y) temp = u_temp_hot;
+        if (v_uv.y >= 1.0 - 1.5 * u_texel.y) temp = 0.0;
+
+        fragColor = vec4(vel, temp, center.w);
+    }
+    `;
+
+    // 3. Divergence Pass (Solid Walls)
+    const DIVERGENCE_FRAG = `#version 300 es
+    precision highp float;
+    in vec2 v_uv;
+    out vec4 fragColor;
+
+    uniform sampler2D u_velocity;
+    uniform vec2 u_texel;
+
+    void main() {
+        float u_l = texture(u_velocity, vec2(max(0.5 * u_texel.x, v_uv.x - u_texel.x), v_uv.y)).x;
+        float u_r = texture(u_velocity, vec2(min(1.0 - 0.5 * u_texel.x, v_uv.x + u_texel.x), v_uv.y)).x;
+        float v_b = texture(u_velocity, vec2(v_uv.x, max(0.5 * u_texel.y, v_uv.y - u_texel.y))).y;
+        float v_t = texture(u_velocity, vec2(v_uv.x, min(1.0 - 0.5 * u_texel.y, v_uv.y + u_texel.y))).y;
+
+        float div = 0.5 * (u_r - u_l + v_t - v_b);
+        fragColor = vec4(div, 0.0, 0.0, 1.0);
+    }
+    `;
+
+    // 4. Pressure Jacobi Solver (Neumann Boundaries dp/dn = 0 on all 4 walls)
+    const JACOBI_PRESSURE_FRAG = `#version 300 es
+    precision highp float;
+    in vec2 v_uv;
+    out vec4 fragColor;
+
+    uniform sampler2D u_pressure;
+    uniform sampler2D u_divergence;
+    uniform vec2 u_texel;
+
+    void main() {
+        float p_l = texture(u_pressure, vec2(max(0.5 * u_texel.x, v_uv.x - u_texel.x), v_uv.y)).r;
+        float p_r = texture(u_pressure, vec2(min(1.0 - 0.5 * u_texel.x, v_uv.x + u_texel.x), v_uv.y)).r;
+        float p_b = texture(u_pressure, vec2(v_uv.x, max(0.5 * u_texel.y, v_uv.y - u_texel.y))).r;
+        float p_t = texture(u_pressure, vec2(v_uv.x, min(1.0 - 0.5 * u_texel.y, v_uv.y + u_texel.y))).r;
+
+        float div = texture(u_divergence, v_uv).r;
+        if (isnan(div) || isinf(div)) div = 0.0;
+        float p_new = (p_l + p_r + p_b + p_t - div) * 0.25;
+        if (isnan(p_new) || isinf(p_new)) p_new = 0.0;
+        fragColor = vec4(p_new, 0.0, 0.0, 1.0);
+    }
+    `;
+
+    // 5. Projection Pass (Enforce Incompressibility & Solid Wall Boundary)
+    const PROJECTION_FRAG = `#version 300 es
+    precision highp float;
+    in vec2 v_uv;
+    out vec4 fragColor;
+
+    uniform sampler2D u_velocity;
+    uniform sampler2D u_pressure;
+    uniform vec2 u_texel;
+
+    void main() {
+        float p_l = texture(u_pressure, vec2(max(0.5 * u_texel.x, v_uv.x - u_texel.x), v_uv.y)).r;
+        float p_r = texture(u_pressure, vec2(min(1.0 - 0.5 * u_texel.x, v_uv.x + u_texel.x), v_uv.y)).r;
+        float p_b = texture(u_pressure, vec2(v_uv.x, max(0.5 * u_texel.y, v_uv.y - u_texel.y))).r;
+        float p_t = texture(u_pressure, vec2(v_uv.x, min(1.0 - 0.5 * u_texel.y, v_uv.y + u_texel.y))).r;
+
+        vec2 grad_p = 0.5 * vec2(p_r - p_l, p_t - p_b);
+        if (isnan(grad_p.x) || isinf(grad_p.x)) grad_p.x = 0.0;
+        if (isnan(grad_p.y) || isinf(grad_p.y)) grad_p.y = 0.0;
+
+        vec4 state = texture(u_velocity, v_uv);
+        vec2 vel = state.xy - grad_p;
+        if (isnan(vel.x) || isinf(vel.x)) vel.x = 0.0;
+        if (isnan(vel.y) || isinf(vel.y)) vel.y = 0.0;
+
+        // Strictly enforce zero velocity at all 4 container walls
+        if (v_uv.y <= 1.5 * u_texel.y || v_uv.y >= 1.0 - 1.5 * u_texel.y ||
+            v_uv.x <= 1.5 * u_texel.x || v_uv.x >= 1.0 - 1.5 * u_texel.x) {
+            vel = vec2(0.0);
+        }
+
+        fragColor = vec4(vel, state.z, state.w);
+    }
+    `;
+
+    // 6. Display & Visualization Pass (Faithful copy of convection.py colormaps)
+    const DISPLAY_FRAG = `#version 300 es
+    precision highp float;
+    in vec2 v_uv;
+    out vec4 fragColor;
+
+    uniform sampler2D u_velocity;
+    uniform vec2 u_resolution;
+    uniform float u_time;
+    uniform float u_temp_hot;
+    uniform int u_palette;
+    uniform bool u_show_streamlines;
+    uniform bool u_show_legend;
+
+    // Colormap 0: High-Contrast Scientific Thermal (Midnight Abyss -> Azure -> Cyan -> Neon Green -> Sun Gold -> Flame Red -> Incandescent White)
+    vec3 colormapThermal(float t) {
+        t = clamp(t, 0.0, 1.0);
+        vec3 c0 = vec3(0.00, 0.01, 0.16); // Midnight Abyss
+        vec3 c1 = vec3(0.00, 0.35, 0.95); // Royal Azure
+        vec3 c2 = vec3(0.00, 0.90, 0.85); // Electric Cyan
+        vec3 c3 = vec3(0.08, 0.95, 0.22); // Neon Lime Green
+        vec3 c4 = vec3(1.00, 0.86, 0.00); // Solar Amber Gold
+        vec3 c5 = vec3(1.00, 0.14, 0.00); // Blazing Flame Red
+        vec3 c6 = vec3(1.00, 1.00, 0.95); // Pure Incandescent White Core
+
+        if (t < 0.15) return mix(c0, c1, t / 0.15);
+        if (t < 0.32) return mix(c1, c2, (t - 0.15) / 0.17);
+        if (t < 0.50) return mix(c2, c3, (t - 0.32) / 0.18);
+        if (t < 0.70) return mix(c3, c4, (t - 0.50) / 0.20);
+        if (t < 0.88) return mix(c4, c5, (t - 0.70) / 0.18);
+        return mix(c5, c6, (t - 0.88) / 0.12);
+    }
+
+    // Colormap 1: High-Contrast Magma Inferno (Pitch Black -> Deep Violet -> Radiant Magenta -> Solar Amber -> White Flare)
+    vec3 colormapMagma(float t) {
+        t = clamp(t, 0.0, 1.0);
+        vec3 c0 = vec3(0.00, 0.00, 0.04);
+        vec3 c1 = vec3(0.35, 0.02, 0.52);
+        vec3 c2 = vec3(0.85, 0.10, 0.45);
+        vec3 c3 = vec3(1.00, 0.48, 0.05);
+        vec3 c4 = vec3(1.00, 0.92, 0.30);
+        vec3 c5 = vec3(1.00, 1.00, 0.95);
+
+        if (t < 0.20) return mix(c0, c1, t / 0.20);
+        if (t < 0.40) return mix(c1, c2, (t - 0.20) / 0.20);
+        if (t < 0.65) return mix(c2, c3, (t - 0.40) / 0.25);
+        if (t < 0.85) return mix(c3, c4, (t - 0.65) / 0.20);
+        return mix(c4, c5, (t - 0.85) / 0.15);
+    }
+
+    // Colormap 2: High-Contrast Oceanic Hydrothermal (Deep Trench Navy -> Electric Azure -> Seafoam Emerald -> Sun Yellow -> Pure White)
+    vec3 colormapOceanic(float t) {
+        t = clamp(t, 0.0, 1.0);
+        vec3 c0 = vec3(0.00, 0.02, 0.10);
+        vec3 c1 = vec3(0.00, 0.35, 0.85);
+        vec3 c2 = vec3(0.02, 0.90, 0.72);
+        vec3 c3 = vec3(0.98, 0.88, 0.12);
+        vec3 c4 = vec3(1.00, 1.00, 0.95);
+
+        if (t < 0.25) return mix(c0, c1, t / 0.25);
+        if (t < 0.50) return mix(c1, c2, (t - 0.25) / 0.25);
+        if (t < 0.75) return mix(c2, c3, (t - 0.50) / 0.25);
+        return mix(c3, c4, (t - 0.75) / 0.25);
+    }
+
+    // Colormap 3: High-Contrast Red-Blue Schlieren
+    vec3 colormapRedBlue(float t) {
+        t = clamp(t, 0.0, 1.0);
+        vec3 c0 = vec3(0.01, 0.02, 0.15); // Midnight navy abyss
+        vec3 c1 = vec3(0.06, 0.30, 0.92); // Vivid cobalt blue
+        vec3 c2 = vec3(0.55, 0.08, 0.50); // Deep magenta
+        vec3 c3 = vec3(0.95, 0.12, 0.08); // Blazing crimson flame
+        vec3 c4 = vec3(1.00, 0.50, 0.05); // Fiery orange
+        vec3 c5 = vec3(1.00, 0.98, 0.90); // Incandescent white
+
+        if (t < 0.22) return mix(c0, c1, t / 0.22);
+        if (t < 0.45) return mix(c1, c2, (t - 0.22) / 0.23);
+        if (t < 0.70) return mix(c2, c3, (t - 0.45) / 0.25);
+        if (t < 0.88) return mix(c3, c4, (t - 0.70) / 0.18);
+        return mix(c4, c5, (t - 0.88) / 0.12);
+    }
+
+    void main() {
+        vec4 state = texture(u_velocity, v_uv);
+        float temp = state.z;
+        if (isnan(temp) || isinf(temp)) temp = 0.0;
+        float norm_temp = clamp(temp / max(0.01, u_temp_hot), 0.0, 1.0);
+        float contrast_temp = pow(norm_temp, 0.65); // Perceptual gamma expansion for rich plumes
+
+        vec3 col;
+        if (u_palette == 0) {
+            col = colormapThermal(contrast_temp);
+        } else if (u_palette == 1) {
+            col = colormapMagma(contrast_temp);
+        } else if (u_palette == 2) {
+            col = colormapOceanic(contrast_temp);
+        } else if (u_palette == 3) {
+            // Red-Blue Schlieren
+            vec2 d = vec2(1.0 / u_resolution.x, 1.0 / u_resolution.y);
+            float t_r = texture(u_velocity, v_uv + vec2(d.x, 0.0)).z;
+            float t_l = texture(u_velocity, v_uv - vec2(d.x, 0.0)).z;
+            float t_t = texture(u_velocity, v_uv + vec2(0.0, d.y)).z;
+            float t_b = texture(u_velocity, v_uv - vec2(0.0, d.y)).z;
+            float grad = length(vec2(t_r - t_l, t_t - t_b)) * 3.5;
+            if (isnan(grad) || isinf(grad)) grad = 0.0;
+            vec3 base = colormapRedBlue(contrast_temp);
+            col = base * (0.60 + 0.40 * grad) + vec3(0.90, 0.95, 1.0) * grad * 0.80;
+        } else {
+            // Green Schlieren optical gradient
+            vec2 d = vec2(1.0 / u_resolution.x, 1.0 / u_resolution.y);
+            float t_r = texture(u_velocity, v_uv + vec2(d.x, 0.0)).z;
+            float t_l = texture(u_velocity, v_uv - vec2(d.x, 0.0)).z;
+            float t_t = texture(u_velocity, v_uv + vec2(0.0, d.y)).z;
+            float t_b = texture(u_velocity, v_uv - vec2(0.0, d.y)).z;
+            float grad = length(vec2(t_r - t_l, t_t - t_b)) * 3.5;
+            if (isnan(grad) || isinf(grad)) grad = 0.0;
+            col = vec3(0.04, 0.07, 0.14) + vec3(0.85, 0.92, 1.0) * grad + colormapThermal(contrast_temp) * 0.4;
+        }
+
+        // Optional velocity streamline streaks ('S' key)
+        if (u_show_streamlines) {
+            vec2 vel = state.xy;
+            float speed = length(vel);
+            if (isnan(speed) || isinf(speed)) speed = 0.0;
+            if (speed > 0.5) {
+                vec2 norm_vel = vel / speed;
+                float wave = sin(dot(v_uv, norm_vel) * 120.0 - u_time * 8.0);
+                float streak = smoothstep(0.70, 0.98, wave) * smoothstep(2.0, 30.0, speed);
+                col += vec3(0.20, 0.35, 0.50) * streak * 0.40;
+            }
+        }
+
+        // Subtle adiabatic side walls border
+        if (v_uv.x < 0.005 || v_uv.x > 0.995) {
+            col = vec3(0.10, 0.12, 0.16);
+        }
+
+        // Vertical temperature legend bar on the right margin ('L' key)
+        if (u_show_legend && v_uv.x > 0.970 && v_uv.x < 0.982 && v_uv.y > 0.10 && v_uv.y < 0.90) {
+            float legT = (v_uv.y - 0.10) / 0.80;
+            float contrastLegT = pow(legT, 0.65);
+            vec3 legCol;
+            if (u_palette == 0) legCol = colormapThermal(contrastLegT);
+            else if (u_palette == 1) legCol = colormapMagma(contrastLegT);
+            else if (u_palette == 2) legCol = colormapOceanic(contrastLegT);
+            else if (u_palette == 3) legCol = colormapRedBlue(contrastLegT);
+            else legCol = colormapThermal(contrastLegT);
+            col = legCol;
+        }
+
+        fragColor = vec4(col, 1.0);
+    }
+    `;
+
+    // -------------------------------------------------------------------------
+    // Simulation App State
+    // -------------------------------------------------------------------------
+    const state = {
+      sim_w: 840,
+      sim_h: 525,
+      buoyancy: 140.0,
+      diffusion: 4.0,
+      delta_t: 4.0,
+      dt: 0.016,
+      palette: 0,
+      show_streamlines: false,
+      show_legend: true,
+      show_telemetry: true,
+      paused: false,
+      sim_time: 0.0,
+      mouse: { x: 0.5, y: 0.5, isDown: false, heat: 0.0 },
+      fps: 60.0
+    };
+
+    const PALETTE_NAMES = [
+      "Thermal (Fire & Ice)",
+      "Magma (Solar)",
+      "Oceanic Hydrothermal",
+      "Red-Blue Schlieren",
+      "Green Schlieren"
+    ];
+
+    // -------------------------------------------------------------------------
+    // WebGL Initialization & Helper Routines
+    // -------------------------------------------------------------------------
+    const canvas = document.getElementById('glcanvas');
+    const gl = canvas.getContext('webgl2', { alpha: false, depth: false, antialias: false, preserveDrawingBuffer: false });
+
+    if (!gl) {
+      showError("WebGL 2.0 is not supported by your browser. Please use Chrome, Firefox, Safari 15+, or Edge.");
+      return;
+    }
+
+    const extFloat = gl.getExtension('EXT_color_buffer_float');
+    if (!extFloat) {
+      showError("WebGL 2 EXT_color_buffer_float extension is not supported by your GPU/driver.");
+      return;
+    }
+    // Optional float linear filtering
+    gl.getExtension('OES_texture_float_linear');
+
+    function showError(msg) {
+      const modal = document.getElementById('error-modal');
+      const text = document.getElementById('error-message');
+      text.innerText = msg;
+      modal.style.display = 'flex';
+    }
+
+    function createShader(gl, type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const info = gl.getShaderInfoLog(shader);
+        gl.deleteShader(shader);
+        throw new Error('Shader compilation error: ' + info);
+      }
+      return shader;
+    }
+
+    function createProgram(gl, vsSource, fsSource) {
+      const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+      const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+      const program = gl.createProgram();
+      gl.attachShader(program, vs);
+      gl.attachShader(program, fs);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        const info = gl.getProgramInfoLog(program);
+        gl.deleteProgram(program);
+        throw new Error('Program link error: ' + info);
+      }
+      return program;
+    }
+
+    // Geometry quad
+    const quadVbo = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadVbo);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1, -1,
+       1, -1,
+      -1,  1,
+      -1,  1,
+       1, -1,
+       1,  1
+    ]), gl.STATIC_DRAW);
+
+    function createVAO(program) {
+      const vao = gl.createVertexArray();
+      gl.bindVertexArray(vao);
+      const loc = gl.getAttribLocation(program, 'in_vert');
+      gl.enableVertexAttribArray(loc);
+      gl.bindBuffer(gl.ARRAY_BUFFER, quadVbo);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      gl.bindVertexArray(null);
+      return vao;
+    }
+
+    // Compile programs
+    const progAdvect = createProgram(gl, FULLSCREEN_VERT, ADVECTION_FRAG);
+    const progBuoyancy = createProgram(gl, FULLSCREEN_VERT, BUOYANCY_DIFFUSION_FRAG);
+    const progDiv = createProgram(gl, FULLSCREEN_VERT, DIVERGENCE_FRAG);
+    const progJacobi = createProgram(gl, FULLSCREEN_VERT, JACOBI_PRESSURE_FRAG);
+    const progProject = createProgram(gl, FULLSCREEN_VERT, PROJECTION_FRAG);
+    const progDisplay = createProgram(gl, FULLSCREEN_VERT, DISPLAY_FRAG);
+
+    const vaoAdvect = createVAO(progAdvect);
+    const vaoBuoyancy = createVAO(progBuoyancy);
+    const vaoDiv = createVAO(progDiv);
+    const vaoJacobi = createVAO(progJacobi);
+    const vaoProject = createVAO(progProject);
+    const vaoDisplay = createVAO(progDisplay);
+
+    // Uniform location cache
+    function getUniforms(program, names) {
+      const u = {};
+      for (const name of names) {
+        u[name] = gl.getUniformLocation(program, name);
+      }
+      return u;
+    }
+
+    const uAdvect = getUniforms(progAdvect, ['u_velocity', 'u_texel', 'u_dt', 'u_mouse', 'u_mouse_heat', 'u_temp_hot']);
+    const uBuoyancy = getUniforms(progBuoyancy, ['u_velocity', 'u_texel', 'u_dt', 'u_buoyancy', 'u_diffusion', 'u_temp_hot']);
+    const uDiv = getUniforms(progDiv, ['u_velocity', 'u_texel']);
+    const uJacobi = getUniforms(progJacobi, ['u_pressure', 'u_divergence', 'u_texel']);
+    const uProject = getUniforms(progProject, ['u_velocity', 'u_pressure', 'u_texel']);
+    const uDisplay = getUniforms(progDisplay, ['u_velocity', 'u_resolution', 'u_time', 'u_temp_hot', 'u_palette', 'u_show_streamlines', 'u_show_legend']);
+
+    // -------------------------------------------------------------------------
+    // Framebuffers & Simulation Textures
+    // -------------------------------------------------------------------------
+    function createTexture(width, height, internalFormat, format, type, filter, initialData = null) {
+      const tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, initialData);
+      return tex;
+    }
+
+    function createFBO(tex) {
+      const fbo = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+      const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+      if (status !== gl.FRAMEBUFFER_COMPLETE) {
+        throw new Error('Framebuffer incomplete: 0x' + status.toString(16));
+      }
+      return fbo;
+    }
+
+    let texVelA, texVelB, fboVelA, fboVelB;
+    let texDiv, fboDiv;
+    let texPA, texPB, fboPA, fboPB;
+
+    function initSimulationBuffers() {
+      const W = state.sim_w;
+      const H = state.sim_h;
+
+      // Initial conductive state:
+      // Interior temperature strictly 0.0 at t=0
+      // Bottom plate: hot (delta_t)
+      // Top plate: cold (0.0)
+      // Velocity: strictly 0.0 everywhere
+      const initVelData = new Float32Array(W * H * 4);
+      for (let x = 0; x < W; x++) {
+        // Bottom row y = 0
+        initVelData[(0 * W + x) * 4 + 2] = state.delta_t;
+        // Top row y = H - 1
+        initVelData[((H - 1) * W + x) * 4 + 2] = 0.0;
+      }
+
+      // Format selection: RGBA32F with FLOAT
+      texVelA = createTexture(W, H, gl.RGBA32F, gl.RGBA, gl.FLOAT, gl.LINEAR, initVelData);
+      texVelB = createTexture(W, H, gl.RGBA32F, gl.RGBA, gl.FLOAT, gl.LINEAR, initVelData);
+      fboVelA = createFBO(texVelA);
+      fboVelB = createFBO(texVelB);
+
+      // Divergence (RGBA32F for universal FBO compatibility)
+      const zeroData = new Float32Array(W * H * 4);
+      texDiv = createTexture(W, H, gl.RGBA32F, gl.RGBA, gl.FLOAT, gl.NEAREST, zeroData);
+      fboDiv = createFBO(texDiv);
+
+      // Pressure ping-pong
+      texPA = createTexture(W, H, gl.RGBA32F, gl.RGBA, gl.FLOAT, gl.NEAREST, zeroData);
+      texPB = createTexture(W, H, gl.RGBA32F, gl.RGBA, gl.FLOAT, gl.NEAREST, zeroData);
+      fboPA = createFBO(texPA);
+      fboPB = createFBO(texPB);
+
+      state.sim_time = 0.0;
+    }
+
+    function resetSimulation() {
+      const W = state.sim_w;
+      const H = state.sim_h;
+      const initVelData = new Float32Array(W * H * 4);
+      for (let x = 0; x < W; x++) {
+        initVelData[(0 * W + x) * 4 + 2] = state.delta_t;
+      }
+      const zeroData = new Float32Array(W * H * 4);
+
+      gl.bindTexture(gl.TEXTURE_2D, texVelA);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, W, H, gl.RGBA, gl.FLOAT, initVelData);
+      gl.bindTexture(gl.TEXTURE_2D, texVelB);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, W, H, gl.RGBA, gl.FLOAT, initVelData);
+
+      gl.bindTexture(gl.TEXTURE_2D, texDiv);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, W, H, gl.RGBA, gl.FLOAT, zeroData);
+      gl.bindTexture(gl.TEXTURE_2D, texPA);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, W, H, gl.RGBA, gl.FLOAT, zeroData);
+      gl.bindTexture(gl.TEXTURE_2D, texPB);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, W, H, gl.RGBA, gl.FLOAT, zeroData);
+
+      state.sim_time = 0.0;
+      showToast("Reset to zero-velocity conductive state");
+      updateTelemetryUI();
+    }
+
+    initSimulationBuffers();
+
+    // -------------------------------------------------------------------------
+    // Fluid Simulation Execution Step
+    // -------------------------------------------------------------------------
+    function stepSimulation() {
+      const texelX = 1.0 / state.sim_w;
+      const texelY = 1.0 / state.sim_h;
+
+      gl.viewport(0, 0, state.sim_w, state.sim_h);
+
+      // 1. Advection Pass (Vel A -> Vel B)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fboVelB);
+      gl.useProgram(progAdvect);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texVelA);
+      gl.uniform1i(uAdvect.u_velocity, 0);
+      gl.uniform2f(uAdvect.u_texel, texelX, texelY);
+      gl.uniform1f(uAdvect.u_dt, state.dt);
+      gl.uniform2f(uAdvect.u_mouse, state.mouse.x, state.mouse.y);
+      gl.uniform1f(uAdvect.u_mouse_heat, state.mouse.heat);
+      gl.uniform1f(uAdvect.u_temp_hot, state.delta_t);
+
+      gl.bindVertexArray(vaoAdvect);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      // 2. Buoyancy & Thermal Diffusion Pass (Vel B -> Vel A)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fboVelA);
+      gl.useProgram(progBuoyancy);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texVelB);
+      gl.uniform1i(uBuoyancy.u_velocity, 0);
+      gl.uniform2f(uBuoyancy.u_texel, texelX, texelY);
+      gl.uniform1f(uBuoyancy.u_dt, state.dt);
+      gl.uniform1f(uBuoyancy.u_buoyancy, state.buoyancy);
+      gl.uniform1f(uBuoyancy.u_diffusion, state.diffusion);
+      gl.uniform1f(uBuoyancy.u_temp_hot, state.delta_t);
+
+      gl.bindVertexArray(vaoBuoyancy);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      // 3. Divergence Pass (Vel A -> Div)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fboDiv);
+      gl.useProgram(progDiv);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texVelA);
+      gl.uniform1i(uDiv.u_velocity, 0);
+      gl.uniform2f(uDiv.u_texel, texelX, texelY);
+
+      gl.bindVertexArray(vaoDiv);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      // 4. Jacobi Pressure Iterations (Ping-Pong P_A <-> P_B)
+      gl.useProgram(progJacobi);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, texDiv);
+      gl.uniform1i(uJacobi.u_divergence, 1);
+      gl.uniform2f(uJacobi.u_texel, texelX, texelY);
+
+      let pInTex = texPA;
+      let fboOut = fboPB;
+      let pOtherTex = texPB;
+      let fboOther = fboPA;
+
+      gl.bindVertexArray(vaoJacobi);
+      for (let i = 0; i < 24; i++) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fboOut);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, pInTex);
+        gl.uniform1i(uJacobi.u_pressure, 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        // Swap ping-pong
+        const tmpTex = pInTex;
+        pInTex = pOtherTex;
+        pOtherTex = tmpTex;
+
+        const tmpFbo = fboOut;
+        fboOut = fboOther;
+        fboOther = tmpFbo;
+      }
+
+      // 5. Projection Pass (Vel A - Grad P -> Vel B)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fboVelB);
+      gl.useProgram(progProject);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texVelA);
+      gl.uniform1i(uProject.u_velocity, 0);
+
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, pInTex);
+      gl.uniform1i(uProject.u_pressure, 1);
+
+      gl.uniform2f(uProject.u_texel, texelX, texelY);
+
+      gl.bindVertexArray(vaoProject);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      // Swap velA and velB so velA holds the final state
+      let tmpTex = texVelA; texVelA = texVelB; texVelB = tmpTex;
+      let tmpFbo = fboVelA; fboVelA = fboVelB; fboVelB = tmpFbo;
+    }
+
+    // -------------------------------------------------------------------------
+    // Render Display Pass to Canvas
+    // -------------------------------------------------------------------------
+    function renderDisplay() {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+
+      gl.useProgram(progDisplay);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texVelA);
+      gl.uniform1i(uDisplay.u_velocity, 0);
+      gl.uniform2f(uDisplay.u_resolution, canvas.width, canvas.height);
+      gl.uniform1f(uDisplay.u_time, state.sim_time);
+      gl.uniform1f(uDisplay.u_temp_hot, state.delta_t);
+      gl.uniform1i(uDisplay.u_palette, state.palette);
+      gl.uniform1i(uDisplay.u_show_streamlines, state.show_streamlines ? 1 : 0);
+      gl.uniform1i(uDisplay.u_show_legend, state.show_legend ? 1 : 0);
+
+      gl.bindVertexArray(vaoDisplay);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    // -------------------------------------------------------------------------
+    // Window Resize Handler
+    // -------------------------------------------------------------------------
+    function resizeCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const displayWidth = Math.floor(window.innerWidth * dpr);
+      const displayHeight = Math.floor(window.innerHeight * dpr);
+
+      if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // -------------------------------------------------------------------------
+    // Telemetry UI Updates
+    // -------------------------------------------------------------------------
+    const elOsd = document.getElementById('telemetry-osd');
+    const elValDeltaT = document.getElementById('val-deltat');
+    const elValRayleigh = document.getElementById('val-rayleigh');
+    const elValBuoyancy = document.getElementById('val-buoyancy');
+    const elValDiffusivity = document.getElementById('val-diffusivity');
+    const elValDt = document.getElementById('val-dt');
+    const elValGrid = document.getElementById('val-grid');
+    const elValTime = document.getElementById('val-time');
+    const elValPalette = document.getElementById('val-palette');
+    const elValStreamlines = document.getElementById('val-streamlines');
+
+    function updateTelemetryUI() {
+      const raVal = state.buoyancy * state.delta_t * 312.5;
+      let raStr;
+      if (raVal >= 1e6) {
+        raStr = (raVal / 1e6).toFixed(2) + " × 10⁶";
+      } else if (raVal >= 1e3) {
+        raStr = (raVal / 1e3).toFixed(1) + " × 10³";
+      } else {
+        raStr = raVal.toFixed(0);
+      }
+
+      elValDeltaT.innerText = `${state.delta_t.toFixed(1)} K (Hot: ${state.delta_t.toFixed(1)}, Cold: 0.0)`;
+      elValRayleigh.innerText = raStr;
+      elValBuoyancy.innerText = state.buoyancy.toFixed(1);
+      elValDiffusivity.innerText = state.diffusion.toFixed(1);
+      elValDt.innerText = `${(state.dt * 1000).toFixed(1)} ms (${Math.round(state.fps)} FPS)`;
+      elValGrid.innerText = `${state.sim_w} × ${state.sim_h} (1.6:1)`;
+      elValTime.innerText = `${state.sim_time.toFixed(1)} s`;
+      elValPalette.innerText = PALETTE_NAMES[state.palette % PALETTE_NAMES.length];
+      elValStreamlines.innerText = state.show_streamlines ? "ON" : "OFF";
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('status-toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1800);
+    }
+
+    // -------------------------------------------------------------------------
+    // Main Animation Loop
+    // -------------------------------------------------------------------------
+    let lastTime = performance.now();
+    let frameCount = 0;
+    let fpsTimeAccum = 0;
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+
+      const delta = (now - lastTime) / 1000;
+      lastTime = now;
+
+      // Track FPS
+      frameCount++;
+      fpsTimeAccum += delta;
+      if (fpsTimeAccum >= 0.5) {
+        state.fps = frameCount / fpsTimeAccum;
+        frameCount = 0;
+        fpsTimeAccum = 0;
+        if (state.show_telemetry) {
+          updateTelemetryUI();
+        }
+      }
+
+      if (!state.paused) {
+        state.sim_time += state.dt;
+        stepSimulation();
+      }
+
+      renderDisplay();
+    }
+    requestAnimationFrame(animate);
+
+    // -------------------------------------------------------------------------
+    // Controls & Keyboard Shortcuts (Identical to convection.py)
+    // -------------------------------------------------------------------------
+    const btnPause = document.getElementById('btn-pause');
+    const txtPause = document.getElementById('txt-pause');
+    const btnReset = document.getElementById('btn-reset');
+    const btnPalette = document.getElementById('btn-palette');
+    const btnStreamlines = document.getElementById('btn-streamlines');
+    const btnTelemetry = document.getElementById('btn-telemetry');
+    const btnLegend = document.getElementById('btn-legend');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    const controlsBar = document.getElementById('controls-bar');
+
+    function togglePause() {
+      state.paused = !state.paused;
+      txtPause.innerText = state.paused ? 'Resume' : 'Pause';
+      btnPause.classList.toggle('active', state.paused);
+      showToast(state.paused ? 'Simulation Paused' : 'Simulation Resumed');
+    }
+
+    function cyclePalette() {
+      state.palette = (state.palette + 1) % PALETTE_NAMES.length;
+      showToast('Palette: ' + PALETTE_NAMES[state.palette]);
+      updateTelemetryUI();
+    }
+
+    function toggleStreamlines() {
+      state.show_streamlines = !state.show_streamlines;
+      btnStreamlines.classList.toggle('active', state.show_streamlines);
+      showToast('Streamlines ' + (state.show_streamlines ? 'ON' : 'OFF'));
+      updateTelemetryUI();
+    }
+
+    function toggleTelemetry() {
+      state.show_telemetry = !state.show_telemetry;
+      btnTelemetry.classList.toggle('active', state.show_telemetry);
+      elOsd.classList.toggle('hidden', !state.show_telemetry);
+      if (state.show_telemetry) updateTelemetryUI();
+    }
+
+    function toggleLegend() {
+      state.show_legend = !state.show_legend;
+      btnLegend.classList.toggle('active', state.show_legend);
+      showToast('Colorbar ' + (state.show_legend ? 'Visible' : 'Hidden'));
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    btnPause.addEventListener('click', togglePause);
+    btnReset.addEventListener('click', resetSimulation);
+    btnPalette.addEventListener('click', cyclePalette);
+    btnStreamlines.addEventListener('click', toggleStreamlines);
+    btnTelemetry.addEventListener('click', toggleTelemetry);
+    btnLegend.addEventListener('click', toggleLegend);
+    btnFullscreen.addEventListener('click', toggleFullscreen);
+
+    // Keyboard controls
+    window.addEventListener('keydown', (e) => {
+      // Awaken controls on key interaction
+      wakeControls();
+
+      switch (e.code) {
+        case 'Space':
+          e.preventDefault();
+          togglePause();
+          break;
+        case 'KeyR':
+          resetSimulation();
+          break;
+        case 'KeyC':
+          cyclePalette();
+          break;
+        case 'KeyS':
+          toggleStreamlines();
+          break;
+        case 'KeyT':
+          toggleTelemetry();
+          break;
+        case 'KeyL':
+        case 'KeyB':
+          toggleLegend();
+          break;
+        case 'KeyF':
+        case 'F11':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          state.delta_t = Math.round(Math.min(20.0, state.delta_t + 0.1) * 10) / 10;
+          showToast(`ΔT: ${state.delta_t.toFixed(1)} K`);
+          updateTelemetryUI();
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          state.delta_t = Math.round(Math.max(0.1, state.delta_t - 0.1) * 10) / 10;
+          showToast(`ΔT: ${state.delta_t.toFixed(1)} K`);
+          updateTelemetryUI();
+          break;
+        case 'Equal':
+        case 'NumpadAdd':
+          state.buoyancy = Math.min(300.0, state.buoyancy + 10.0);
+          showToast(`Buoyancy: ${state.buoyancy.toFixed(0)}`);
+          updateTelemetryUI();
+          break;
+        case 'Minus':
+        case 'NumpadSubtract':
+          state.buoyancy = Math.max(20.0, state.buoyancy - 10.0);
+          showToast(`Buoyancy: ${state.buoyancy.toFixed(0)}`);
+          updateTelemetryUI();
+          break;
+      }
+    });
+
+    // -------------------------------------------------------------------------
+    // Mouse / Touch Interaction (Heat Injection & Stirring)
+    // -------------------------------------------------------------------------
+    function updateMousePos(clientX, clientY, isDown) {
+      const rect = canvas.getBoundingClientRect();
+      state.mouse.x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      state.mouse.y = Math.max(0, Math.min(1, 1.0 - (clientY - rect.top) / rect.height)); // WebGL UV Y is inverted
+      state.mouse.isDown = isDown;
+      state.mouse.heat = isDown ? 1.0 : 0.0;
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      wakeControls();
+      updateMousePos(e.clientX, e.clientY, true);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      wakeControls();
+      if (state.mouse.isDown) {
+        updateMousePos(e.clientX, e.clientY, true);
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      state.mouse.isDown = false;
+      state.mouse.heat = 0.0;
+    });
+
+    // Touch support
+    canvas.addEventListener('touchstart', (e) => {
+      wakeControls();
+      if (e.touches.length > 0) {
+        const t = e.touches[0];
+        updateMousePos(t.clientX, t.clientY, true);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      wakeControls();
+      if (e.touches.length > 0 && state.mouse.isDown) {
+        const t = e.touches[0];
+        updateMousePos(t.clientX, t.clientY, true);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      state.mouse.isDown = false;
+      state.mouse.heat = 0.0;
+    });
+
+    // -------------------------------------------------------------------------
+    // Screensaver Auto-hide Controls
+    // -------------------------------------------------------------------------
+    let hideTimer = null;
+    function wakeControls() {
+      controlsBar.classList.remove('autohide');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        controlsBar.classList.add('autohide');
+      }, 3500);
+    }
+    wakeControls();
+
+    // Initial update
+    updateTelemetryUI();
+
+  })();
+  </script>
+</body>
+</html>
